@@ -1,0 +1,40 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="150" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+ var c=document.getElementById("myCanvas");
+ var ctx=c.getContext("2d");
+ var mx=0;
+ var my=0;
+ var col="No collision";
+ gameloop = setInterval(doGameLoop,16);
+ window.addEventListener("mousemove",mm,true);
+ function doGameLoop(){
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillText("mx:"+mx+" my:"+my,10,10);   
+  ctx.fillRect(mx,my,20,20);
+  ctx.fillRect(100,100,20,20);
+  ctx.fillText(col,10,20);
+  col="No collision";
+  if(rectsoverlap(mx,my,20,20,100,100,20,20)==true){
+    col="Collision";
+  }
+ }
+ function mm(evt){
+  var rect = c.getBoundingClientRect();
+  mx = evt.clientX - rect.left;
+  my = evt.clientY - rect.top;
+ }
+ function rectsoverlap(r1x1,r1y1,r1w,r1h,r2x1,r2y1,r2w,r2h){
+  var r1x2 = r1x1+r1w;
+  var r1y2 = r1y1+r1h;
+  var r2x2 = r2x1+r2w;
+  var r2y2 = r2y1+r2h;
+ 
+  return (r1x1 < r2x2 && r1x2 > r2x1 && r1y1 < r2y2 && r1y2 > r2y1);
+
+ }
+
+</script></body></html>
