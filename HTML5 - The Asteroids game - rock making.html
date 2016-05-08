@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+    var apx = new Array(32*32);
+    var apy = new Array(32*32);
+    var angle = 0;
+    var count1 = 0;
+    for(i=0;i<32;i++){
+        angle=0;
+        for(ii=0;ii<10;ii++){
+            apx[i*32+ii] = Math.round(Math.cos(angle)*16);
+            apy[i*32+ii] = Math.round(Math.sin(angle)*16);
+            apx[i*32+ii] += Math.round(Math.random()*6)+24;
+            apy[i*32+ii] += Math.round(Math.random()*6)+24;
+            angle+=.6;
+        }
+    }
+    
+    for(y=0;y<240;y=y+64){
+        for(x=0;x<320;x=x+64){
+            ctx.moveTo(apx[0]+x,apy[0]+y);
+            for(i=1;i<10;i++){
+                ctx.lineTo(apx[count1*32+i]+x,apy[count1*32+i]+y);
+            }    
+            ctx.lineTo(apx[0]+x,apy[0]+y);
+            ctx.stroke();
+            count1++;
+        }
+    }
+</script></body></html>
