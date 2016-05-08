@@ -1,0 +1,35 @@
+<!DOCTYPE=html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+    var sx = new Array(100);
+    var sy = new Array(100);
+    var ss = new Array(100);
+    
+    for(i=0;i<sx.length;i++){
+        sx[i]=Math.round(Math.random()*c.width);
+        sy[i]=Math.round(Math.random()*c.height);
+        ss[i]=Math.round(Math.random()*3+1);
+    }
+    
+    gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+        ctx.fillStyle="black";
+        ctx.fillRect(0,0,c.width,c.height);
+        // Draw the stars.
+        ctx.fillStyle="white";
+        for(i=0;i<sx.length;i++){
+            ctx.fillRect(sx[i],sy[i],2,2);
+        }
+        // Update the stars position.
+        for(i=0;i<sx.length;i++){
+            sx[i]-=ss[i];
+            if(sx[i]<0) sx[i]=c.width;
+        }
+    }
+    
+</script></body></html>
