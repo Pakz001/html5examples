@@ -1,0 +1,32 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="150" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+ var c=document.getElementById("myCanvas");
+ var ctx=c.getContext("2d");
+ var m="Left Mouse is not pressed";
+ gameloop = setInterval(doGameLoop,16);
+ window.addEventListener("mousedown",md,true);
+ window.addEventListener("mouseup",mu,true);
+
+ function doGameLoop(){
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillText(m,10,10);   
+ }
+ function md(evt){
+  if(evt.which==1){
+   m="left mouse is being pressed.";
+  }
+ }
+ function mu(evt){
+  if(evt.which==1){
+   m="No mouse is pressed.";
+  }
+ }
+</script></body></html>
+
+
+<!DOCTYPE = html>
+<html><body>
