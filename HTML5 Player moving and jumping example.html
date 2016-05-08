@@ -1,0 +1,55 @@
+<!DOCTYPE=html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+ var c=document.getElementById("myCanvas");
+ var ctx=c.getContext("2d");
+ var px=c.width/2;
+ var py=c.height/2;
+ var pw=16;
+ var ph=16;
+ var pm=0.0;
+ var pMoveLeft=false;
+ var pMoveRight=false;
+ gameloop=setInterval(doGameLoop,16);
+ window.addEventListener("keydown",kd,true);
+ window.addEventListener("keyup",ku,true);
+ function doGameLoop(){
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillText("Use arrow keys to move and space to jump.",10,10);
+  ctx.fillRect(px,py,pw,ph);
+  playerGravity();
+  playerMovement();
+ }
+ function playerGravity(){
+  if(!pm==0){
+   py-=pm;
+   pm-=0.1;
+  }
+  if(pm<-4){
+   pm=0;
+   py=c.height/2;
+  }
+ }
+ function playerMovement(){
+  if(pMoveLeft==true){
+   if(px>0) px-=1;
+  }
+  if(pMoveRight==true){
+   if(px<c.width-pw) px+=1;
+  }
+ }
+ function kd(evt){
+  if(evt.keyCode==37) pMoveLeft=true;
+  if(evt.keyCode==39) pMoveRight=true;
+  if(evt.keyCode==32){
+   if(pm==0) pm=4;
+  }
+ }
+ function ku(evt){
+  if(evt.keyCode==37) pMoveLeft=false;
+  if(evt.keyCode==39) pMoveRight=false;
+ }
+</script></body></html>
