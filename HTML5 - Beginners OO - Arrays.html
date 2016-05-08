@@ -1,0 +1,86 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	// Here the drawing takes place
+	function drawrandom(){
+		this.bgmap = [];
+		this.init = true;
+		this.dx = 0.0;
+		this.dy = 0.0;
+		this.incx = 1.0;
+		this.incy = 1.0;
+		this.tw = 16;
+		this.th = 16;
+		this.mw = c.width/this.tw;
+		this.mh = c.height/this.th;
+		this.map = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+		]
+		// This function moves the tilemap
+		this.movetilemap = function(){
+			this.dx += this.incx;
+			this.dy += this.incy;
+			if(this.dx>150){this.incx=-this.incx};
+			if(this.dx<0){this.incx=-this.incx};			
+			if(this.dy>100){this.incy=-this.incy};
+			if(this.dy<0){this.incy=-this.incy};			
+			}
+		// Function that draws the tilemap
+		this.drawtilemap = function(){
+			ctx.fillStyle="white";
+		    for(var y = 0; y < this.map.length; ++y) {
+            for(var x = 0; x < this.map[y].length; ++x) {
+				if(this.map[y][x]==1) ctx.fillRect(x*this.tw+this.dx,y*this.th+this.dy,this.tw,this.th);
+            }
+			}
+		}
+		// Function within a function
+		this.drawbg = function(){
+			var mycol;
+			var cnt=0;
+			// If first time then initiate background colors
+			if (this.init==true){
+				for(var i=0;i<(this.mw*this.mh);i++){
+					this.bgmap[i] = Math.floor(Math.random()*255)+1;
+				}
+				this.init=false;
+			}
+			// Draw the background
+			for(var y=0;y<this.mh;y++){
+			for(var x=0;x<this.mw;x++){
+				mycol = this.bgmap[cnt];
+				ctx.fillStyle="rgb("+mycol+",0,0)";			
+				ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th)
+				cnt+=1;
+			}
+			}
+		};
+	};
+	// Here we create a instance of the function
+	var myrandom = new drawrandom();
+	gameloop=setInterval(dogameloop,16);
+	function dogameloop(){
+		myrandom.movetilemap();
+		myrandom.drawbg();
+		myrandom.drawtilemap();
+	}
+</script></body></html>
