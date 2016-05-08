@@ -1,0 +1,36 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	// Here is the drawrandom function
+	function drawrandom(){
+		this.image = new Image();
+		this.init = true;
+		// Function within a function
+		this.draw = function(x,y){
+			if (this.init==true){
+				this.init=false;
+				this.image = ctx.createImageData(32, 32);
+				for(var i=0;i<(32*32*4);i=i+4){
+					this.image.data[i] = 100;
+					this.image.data[i+1] = 100;
+					this.image.data[i+2] = 100;
+					this.image.data[i+3] = 255;				
+				}				
+			}
+			ctx.putImageData(this.image,x,y);			
+		};
+	};
+	// Here we create a instance of the function
+	var myrandom = new drawrandom();
+	// From the function run the drawrandom function
+	for(var i=0;i<100;i++){
+		var x=Math.floor(Math.random()*c.width)+1
+		var y=Math.floor(Math.random()*c.height)+1
+		myrandom.draw(x,y)
+	}
+</script></body></html>
