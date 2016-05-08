@@ -1,0 +1,63 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+    var message="Use cursor keys to move rectangle.";
+    var rx=c.width/2;
+    var ry=c.height/2;
+    var rw=16;
+    var rh=16;
+    var moveLeft=false;
+    var moveRight=false;
+    var moveUp=false;
+    var moveDown=false;
+    gameloop=setInterval(doGameLoop,16);
+    window.addEventListener("keydown",kd,true);
+    window.addEventListener("keyup",ku,true);
+    function doGameLoop(){
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.fillText(message,10,10);
+        ctx.fillRect(rx,ry,rw,rh);
+        updateplayer();
+    }
+    // Key down function.
+    function kd(evt){
+        if(evt.keyCode==37) moveLeft=true;
+        if(evt.keyCode==39) moveRight=true;
+        if(evt.keyCode==38) moveUp=true;
+        if(evt.keyCode==40) moveDown=true;        
+    }
+    // Key up function
+    function ku(evt){
+        if(evt.keyCode==37) moveLeft=false;
+        if(evt.keyCode==39) moveRight=false;
+        if(evt.keyCode==38) moveUp=false;
+        if(evt.keyCode==40) moveDown=false;
+    }
+    function updateplayer(){
+        if(moveLeft==true){
+            if(rx>0){
+            rx--;
+            }
+        }
+        if(moveRight==true){
+            if(rx<(c.width-rw)){
+            rx++;
+            }
+        }
+        if(moveUp==true){
+            if(ry>0){
+            ry--;
+            }
+        }
+        if(moveDown==true){
+            if(ry<(c.height-rh)){
+            ry++;
+            }
+        }
+    }
+</script></body></html>
