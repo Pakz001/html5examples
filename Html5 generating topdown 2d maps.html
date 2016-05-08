@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+    var mapwidth = 39;
+    var mapheight = 29;
+    var tilewidth = 8;
+    var tileheight = 8;
+    var map = new Array((mapwidth)*(mapheight));
+    gameloop=setInterval(doGameLoop,1000);
+    function doGameLoop(){
+        makemap();
+        for(var y=0;y<mapheight;y++){
+        for(var x=0;x<mapwidth;x++){
+            c = map[y*mapwidth+x];
+            //c=10;
+            if(c<=5){
+                ctx.fillStyle="rgb(0,0,100)";
+            }
+            if(c>5){
+                ctx.fillStyle="rgb(0,100,0)";
+            }
+            ctx.fillRect(x*tilewidth,y*tileheight,tilewidth,tileheight);
+        }
+        }
+    }
+    function makemap(){
+        for(var i=0;i<mapwidth*mapheight;i++){
+            map[i]=0;
+        }
+        var exitloop = 0;
+        while(exitloop==0){
+            x1 = Math.round(Math.random()*mapwidth);
+            y1 = Math.round(Math.random()*mapheight);
+            s = Math.round(Math.random()*8)+2;
+            for(var y2=y1-s/2;y2<y1+s/2;y2++){
+            for(var x2=x1-s/2;x2<x1+s/2;x2++){
+                x3 = x1+x2;
+                y3 = y1+y2;
+                if(x3>=0 && x3<=mapwidth-1 && y3>=0 && y3<=mapheight-1){
+                    a = map[y3*mapwidth + x3];
+                    map[y3*mapwidth+x3] = a+1;
+                    if(a==15){
+                        exitloop = 1;
+                    }
+                }
+            }
+            }
+        }
+
+    }
+
+    
+    
+</script></body></html>
