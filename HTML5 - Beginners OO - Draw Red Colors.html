@@ -1,0 +1,31 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	// Here is the drawrandom function
+	function drawrandom(){
+		this.tw = 16;
+		this.th = 16;
+		this.mw = c.width/this.tw;
+		this.mh = c.height/this.th;
+		// Function within a function
+		this.drawbg = function(){
+			var mycol;
+			for(var y=0;y<this.mh;y++){
+			for(var x=0;x<this.mw;x++){
+				mycol=Math.floor((Math.random() * 255) + 1)
+				ctx.fillStyle="rgb("+mycol+",0,0)";			
+				ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th)
+			}
+			}
+		};
+	};
+	// Here we create a instance of the function
+	var myrandom = new drawrandom();
+	// From the function run the drawrandom function
+	myrandom.drawbg()
+</script></body></html>
