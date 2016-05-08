@@ -1,0 +1,34 @@
+<!DOCTYPE=html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+    var rx = c.width/2;
+    var ry = c.height/2;
+    var rw = 16;
+    var rh = 16;
+    var rm = 5;
+    gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.fillRect(rx,ry,rw,rh);
+        
+        // Update the y position
+        ry -= rm;
+        
+        // Decrease the modifier by a value.
+        rm -=.1
+        
+        // If the rect is back to the original position 
+        // then set the modifier to 5 again and set
+        // the y position back to its start position.
+        if(rm < -5){
+            rm = 5;
+            ry = c.height/2;
+        }
+        
+    }
+</script></body></html>
