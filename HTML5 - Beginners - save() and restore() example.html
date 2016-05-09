@@ -1,0 +1,27 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	
+	
+	gameloop=setInterval(dogameloop,16);
+	
+	function dogameloop(){
+		ctx.clearRect(0,0,c.width,c.height);
+		ctx.fillStyle="black";
+		ctx.font="20px Arial";
+		ctx.fillText("before save state.",20,20);
+		ctx.save();
+		ctx.fillStyle="grey";
+		ctx.font="30px Arial";
+		ctx.fillText("after save state.",20,60);
+		ctx.restore();
+		ctx.fillText("restored state.",20,100);									
+	}	
+		
+	
+	</script></body></html>
