@@ -1,0 +1,15 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+
+ctx.fillStyle="black";
+ctx.fillText("In Chrome press f12",20,20);
+// Here text is printed to the log.
+console.log("A message");
+
+</script></body></html>
