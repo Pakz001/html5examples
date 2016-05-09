@@ -1,0 +1,50 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+
+var enemylist = {};
+
+var enemy1 = {
+	x:10,
+	y:10,
+	w:32,
+	h:32,
+	color:'red',
+	id:'e1',
+};
+enemylist['e1'] = enemy1;
+var enemy2 = {
+	x:50,
+	y:10,
+	w:32,
+	h:32,
+	color:'red',
+	id:'e2',
+};
+enemylist['e2'] = enemy2;
+var player = {
+	x:100,
+	y:100,
+	w:32,
+	h:32,
+	color:'blue',
+};
+
+drawentity(player);
+for(var key in enemylist){
+	drawentity(enemylist[key]);
+}
+
+
+
+function drawentity(entity){
+	ctx.fillStyle=entity.color;
+	ctx.fillRect(entity.x,entity.y,entity.w,entity.h);
+}
+
+</script></body></html>
