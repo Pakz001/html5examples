@@ -1,0 +1,30 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+var enemylist = {};
+
+for(var i=0;i<10;i++){
+	makeenemy(i)
+}
+
+for(var key in enemylist){
+	ctx.fillRect(enemylist[key].x,enemylist[key].y,32,32);;
+}
+
+// Here were clear the enemy list
+enemylist = {};
+
+function makeenemy(id){
+	var enemy = {
+		x:Math.random()*c.width,
+		y:Math.random()*c.height,
+		id:id,
+	};
+	enemylist[id] = enemy;
+}
+</script></body></html>
