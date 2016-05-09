@@ -1,0 +1,24 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	
+	function thegame(){
+		this.clearscreen = function(){
+			ctx.clearRect(0,0,c.width,c.height);
+		}
+	}
+	
+	var mygame = new thegame();
+	gameloop=setInterval(dogameloop,16);
+	function dogameloop(){
+		thegame.clearscreen;
+		ctx.fillStyle="black";
+		ctx.font="30px Arial";
+		ctx.fillText("Screen cleared every draw",10,30);
+	}	
+</script></body></html>
