@@ -1,0 +1,21 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+
+// Here we create a place to store some variables in.
+var enemy = {
+	x:10,
+	y:10,
+	w:32,
+	h:32,
+};
+
+ctx.fillStyle="black";
+ctx.fillRect(enemy.x,enemy.y,enemy.w,enemy.h);  // 100
+
+</script></body></html>
