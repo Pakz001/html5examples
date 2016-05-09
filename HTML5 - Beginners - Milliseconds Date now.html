@@ -1,0 +1,29 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	
+	function thecounter(){
+		this.started = Date.now();
+		this.timestarted = function(){
+			return this.started
+		}
+		this.timeelapsed = function(){
+			return Date.now() - this.started;
+		}
+	}
+	
+	var mycounter = new thecounter();
+	gameloop=setInterval(dogameloop,16);
+	function dogameloop(){
+		ctx.clearRect(0,0,c.width,c.height);
+		ctx.fillStyle="black";
+		ctx.font="30px Arial";
+		ctx.fillText("Start time : "+mycounter.timestarted(),10,30);
+		ctx.fillText("TIme Elapsed : "+mycounter.timeelapsed(),10,60);
+	}	
+</script></body></html>
