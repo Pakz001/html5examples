@@ -1,0 +1,25 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+
+// Object Literal
+var enemylist = {
+	enemyname1:"Bograid",
+	"enemyname2":"Joadui",
+	health:{
+		enemy1:10,
+		"enemy2":20,
+	}
+};
+
+ctx.fillText(enemylist.enemyname1,20,20);
+ctx.fillText(enemylist.health.enemy1,20,40);
+ctx.fillText(enemylist["enemyname2"],220,20);
+ctx.fillText(enemylist.health["enemy2"],220,40);
+
+</script></body></html>
