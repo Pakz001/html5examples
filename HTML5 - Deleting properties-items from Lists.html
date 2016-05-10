@@ -1,0 +1,54 @@
+<!DOCTYPE = html>
+<html><body>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+
+// Here is the list
+var openlist = {};
+
+// create values for the list
+for(var i=0;i<10;i++){
+	var x = Math.floor(Math.random()*20)
+	var y = Math.floor(Math.random()*20)
+	addtoopenlist(i,x,y,10,10,10);
+}
+
+ctx.fillText("Deleting from lists example",10,10);
+
+printopenlist(20,20);
+
+// Here we delete an item <<<<<<<<<<<<<<<<<<<<<<<<<<<
+delete openlist[1];
+
+printopenlist(320,20);
+
+// print the open list to the canvas
+function printopenlist(x,y){
+	var cnt=0;
+	for (var key in openlist){
+		var line = openlist[key].id
+		line += " "+openlist[key].x
+		line += ","+openlist[key].y
+		ctx.fillText(line,20+x,(20+cnt*20)+y);
+		cnt+=1;
+	}
+}
+
+// This function adds to the open list.
+function addtoopenlist(id,x,y,f,g,h){
+	var list = {
+		x:x,
+		y:y,
+		f:f,
+		g:g,
+		h:h,
+		id:id,
+	};
+	openlist[id] = list;
+}
+
+</script></body></html>
