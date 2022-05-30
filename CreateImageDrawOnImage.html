@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <title>Hello, world!</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+
+  <script>
+var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+// create our image and draw onto it.
+let myim = CanvasToImage();
+// our gameloop
+gameloop=setInterval(doGameLoop,333);
+
+function doGameLoop(){
+myCanvas.width = window.innerWidth;
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(100,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example.",10,10); 
+ctx.drawImage(myim,Math.random()*320,Math.random()*240);
+}
+// create a image
+function CanvasToImage() {
+let canvas = document.getElementById("myCanvas");
+let canvasAsImage = new Image(64,64);
+let cv=canvas.getContext("2d");
+
+cv.fillStyle='green';
+cv.fillText("Hello",10,10);
+cv.fillRect(0,0,64,4);
+cv.fillRect(0,64-4,64,4);
+
+canvasAsImage.src = canvas.toDataURL();
+return canvasAsImage;
+}
+</script>
+</body>
+</html>
