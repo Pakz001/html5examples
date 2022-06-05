@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    //
+    // create tile map. all isometric. populous amiga.
+    //
+	white = 0;black=1;grey=2;
+   var c=document.getElementById("myCanvas");
+   var ctx=c.getContext("2d");
+
+	gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+	myCanvas.width = window.innerWidth;
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+	clearscreen();
+	drawtext("Drawing a tilemap example.",10,10);
+
+	//
+	tile(196,32,3);
+	tile(128,32,2);
+	tile(64,32,1);
+
+}
+function tile(x,y,tile){
+	var bottom=32,top=0,right=64,left=0,low1=bottom-bottom/4,center=right/2,high1=bottom/4;
+
+	ctx.save();
+	ctx.translate(x,y);
+	if(tile==3){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(right, high1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+	}
+	if(tile==2){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(right, high1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+	}
+
+	if(tile==1){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(left, low1);
+   	ctx.fill();
+		setcolor('grey')
+ 		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+	}
+	ctx.restore();
+}
+function setcolor(col){
+	ctx.fillStyle=col;
+}
+function drawtext(txt,x,y){
+	ctx.fillStyle='white';
+	ctx.fillText(txt,x,y); 
+}
+function clearscreen(){
+	ctx.fillStyle="rgb(0,0,0)";
+	ctx.fillRect(0,0,c.width,c.height);
+}
+</script>
+</body>
+</html>
