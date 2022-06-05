@@ -12,8 +12,7 @@ Use different browser.
   <script>
     //
     // create tile map. all isometric. populous amiga.
-    //
-	white = 0;black=1;grey=2;
+
    var c=document.getElementById("myCanvas");
    var ctx=c.getContext("2d");
 
@@ -26,17 +25,152 @@ function doGameLoop(){
 	clearscreen();
 	drawtext("Drawing a tilemap example.",10,10);
 
-	//
-	tile(196,32,3);
-	tile(128,32,2);
-	tile(64,32,1);
+   cnt = 0;
+   w = myCanvas.width-64;
+   h = myCanvas.height;
+   for( y=32;y<h;y+=33){
+   for( x=0;x<w;x+=80){
 
+     tile(x,y,cnt);
+     cnt=cnt+1;
+   }}
 }
 function tile(x,y,tile){
-	var bottom=32,top=0,right=64,left=0,low1=bottom-bottom/4,center=right/2,high1=bottom/4;
+	var bottom=32,top=0,right=64,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/4;
 
-	ctx.save();
-	ctx.translate(x,y);
+  ctx.save();
+  ctx.translate(x,y);
+  setcolor('darkslategrey');
+  ctx.fillRect(0,0,64,32);
+  setcolor('white');
+  drawrect(0,0,64,33);
+  drawtext(tile,70,16);
+  if(tile==8){
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center, high1);
+   	ctx.lineTo(right, low1);
+  	   ctx.lineTo(center, bottom);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center, bottom*.6);
+      ctx.lineTo(right, low1);
+   	ctx.fill();
+   }
+	if(tile==7){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, low1);
+      ctx.lineTo(right,high1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,low1);
+      ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(left,low1);
+      ctx.lineTo(center,(low1+high1)/2);
+      ctx.fill();
+	}
+	if(tile==6){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, low1);
+      ctx.lineTo(right,high1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,low1);
+      ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+ 
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+	}
+   if(tile==5){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, low1);
+   	ctx.lineTo(center, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+      setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(center, low1);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+     setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+   }
+   if(tile==4){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, low1);
+   	ctx.lineTo(center, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+      setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(center, low1);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+     setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+   }
 	if(tile==3){
 		setcolor('white');
 		ctx.beginPath();
@@ -49,7 +183,7 @@ function tile(x,y,tile){
    	ctx.lineTo(right, high1);
    	ctx.lineTo(center, bottom);
    	ctx.fill();
-		setcolor('grey');
+		setcolor('dimgrey');
 		ctx.beginPath();
 		ctx.moveTo(right-3, high1);
    	ctx.lineTo(center,bottom);
@@ -69,12 +203,19 @@ function tile(x,y,tile){
    	ctx.lineTo(right, high1);
    	ctx.lineTo(center, bottom);
    	ctx.fill();
-		setcolor('grey');
+		setcolor('dimgrey');
 		ctx.beginPath();
 		ctx.moveTo(right-3, high1);
    	ctx.lineTo(center,bottom);
    	ctx.lineTo(right, low1);
 		ctx.lineTo(right,high1);
+      ctx.fill();
+      setcolor('grey');
+      ctx.beginPath();
+      ctx.moveTo(right-3, high1);
+   	ctx.lineTo(left,low1);
+   	ctx.lineTo(center, (low1+high1)/2);
+		//ctx.lineTo(right,high1);
    	ctx.fill();
 	}
 
@@ -85,7 +226,7 @@ function tile(x,y,tile){
    	ctx.lineTo(center, bottom);
    	ctx.lineTo(left, low1);
    	ctx.fill();
-		setcolor('grey')
+		setcolor('lightgrey')
  		ctx.beginPath();
 		ctx.moveTo(center, top);
    	ctx.lineTo(center, bottom);
@@ -93,6 +234,12 @@ function tile(x,y,tile){
    	ctx.fill();
 	}
 	ctx.restore();
+}
+function drawrect(x,y,w,h){
+ctx.beginPath();
+ctx.strokeStyle='white';
+ctx.rect(x,y,w,h);
+ctx.stroke();
 }
 function setcolor(col){
 	ctx.fillStyle=col;
