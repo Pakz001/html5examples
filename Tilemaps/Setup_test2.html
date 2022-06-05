@@ -10,10 +10,14 @@
 Use different browser.
 </canvas>
 	<script>
+		// Create a 2 dimensional array for use as a tile map(games)
+		// Sparse array. Can use negative values as well. Anything not
+		// set inside the array is 'undefined'
+		//
 		// Set up the drawing canvas
 		//
-   	var c=document.getElementById("myCanvas");
-   	var ctx=c.getContext("2d");
+   		var c=document.getElementById("myCanvas");
+   		var ctx=c.getContext("2d");
 		// Create a array in memory.
 		var map = new Array();
 		// Set up the array.
