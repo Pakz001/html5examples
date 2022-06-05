@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="640" height="480" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+   	var c=document.getElementById("myCanvas");
+   	var ctx=c.getContext("2d");
+		let map = [];
+		for(let x=0;x<10;x++){
+			map[x] = [];
+			for(let y=0;y<10;y++){
+				map[x][y]=Math.floor(Math.random() * 10);
+			}
+		}
+		for(let x=10;x<20;x++){
+			map[x] = [];
+			for(let y=10;y<20;y++){
+				map[x][y]=Math.floor(Math.random() * 10);
+				map[x][y-10]=Math.floor(Math.random() * 10);
+			}
+		}
+		for(let x=1;x<9;x++){
+			map[x] = [];
+			for(let y=1;y<9;y++){
+				map[x][y]=1;
+			}
+		}
+
+		gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.width = window.innerWidth;
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+drawMap();
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText(map[0][0],10,10);
+ctx.filltext(map[1][0],10,25);
+}
+function drawMap(){
+	for(let y=0;y<20;y++){
+		for(let x=0;x<20;x++){
+			var a = map[x][y];
+			if(a>0 && a<10){
+			ctx.fillStyle="rgb("+a*50+",0,0)";
+			ctx.fillRect(x*16,y*16,16,16);
+			}
+		}
+	}
+}
+</script>
+</body>
+</html>
