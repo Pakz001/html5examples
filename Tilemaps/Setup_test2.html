@@ -19,6 +19,8 @@ var map = new Array();
 for (x=0;x<10;x++) {
  	for (var y=0;y<10;y++) {
 		settile(x,y,Math.floor(Math.random() * 10));
+		settile(x+5,y+15,Math.floor(Math.random() * 10));
+
  	}
 }
 
@@ -40,9 +42,11 @@ ctx.fillRect(0,0,c.width,c.height);
 //ctx.fillText(map[0][0],10,10);
 //ctx.filltext(map[1][0],50,50);
 
-	for(y=0;y<10;y++){
-		for(x=0;x<10;x++){
-			var a = map[x][y];
+	for(y=0;y<50;y++){
+		for(x=0;x<50;x++){
+
+if(map[x]!=undefined && map[x][y]!=undefined){
+var a = map[x][y];
 			//if(a>0 && a<10){
 			//ctx.fillStyle="rgb("+a*20+",0,0)";
 			//ctx.fillRect(x*16+64,y*16+64,16,16);
@@ -50,6 +54,7 @@ ctx.fillRect(0,0,c.width,c.height);
 			ctx.fillText(a,x*16+64,y*16);
 			ctx.fillText("hello",50,50);
 			//}
+}
 		}
 	}
 }
