@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width" />
-  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="test"></div>
@@ -11,61 +10,63 @@
 Use different browser.
 </canvas>
 	<script>
+		// Set up the drawing canvas
+		//
    	var c=document.getElementById("myCanvas");
    	var ctx=c.getContext("2d");
-
-var map = new Array();
-
-for (x=0;x<10;x++) {
- 	for (var y=0;y<10;y++) {
-		settile(x,y,Math.floor(Math.random() * 10));
-		settile(x+5,y+15,Math.floor(Math.random() * 10));
-
- 	}
-}
-
-
-
-
-
-		gameloop=setInterval(doGameLoop,16);
-
-function doGameLoop(){
-
-myCanvas.width = window.innerWidth;
-myCanvas.height = window.innerHeight-32;
-myCanvas.width = window.innerWidth-32;
-ctx.fillStyle="rgb(0,0,0)";
-ctx.fillRect(0,0,c.width,c.height);
-
-//ctx.fillStyle="rgb(255,255,255)";
-//ctx.fillText(map[0][0],10,10);
-//ctx.filltext(map[1][0],50,50);
-
-	for(y=0;y<50;y++){
-		for(x=0;x<50;x++){
-
-if(map[x]!=undefined && map[x][y]!=undefined){
-var a = map[x][y];
-			//if(a>0 && a<10){
-			//ctx.fillStyle="rgb("+a*20+",0,0)";
-			//ctx.fillRect(x*16+64,y*16+64,16,16);
-			ctx.fillStyle="rgb(255,255,255)";
-			ctx.fillText(a,x*16+64,y*16);
-			ctx.fillText("hello",50,50);
-			//}
-}
+		// Create a array in memory.
+		var map = new Array();
+		// Set up the array.
+		// 2 dimensional using the settile(x,y,tile) function
+		for (x=0;x<10;x++) {
+ 			for (var y=0;y<10;y++) {
+				settile(x,y,Math.floor(Math.random() * 10));
+				settile(x+5,y+15,Math.floor(Math.random() * 10));
+				settile(x-20,y+20,Math.floor(Math.random()*10));
+ 			}
 		}
-	}
-}
-function settile(x,y,val){
-	if(map[x]==undefined){
- 		map[x]=new Array();
-	}
-	map[x][y]=val;
-}
+		// Initiate and run the gameloop (16 = 60fps 1000/16)
+		gameloop=setInterval(doGameLoop,16);
+		// The main game loop.
+		//
+		function doGameLoop(){
+			myCanvas.width = window.innerWidth;
+			myCanvas.height = window.innerHeight-32;
+			myCanvas.width = window.innerWidth-32;
+			ctx.fillStyle="rgb(0,0,0)";
+			ctx.fillRect(0,0,c.width,c.height);
+			// Draw the tile map.
+			for(y=0;y<50;y++){
+				for(x=-25;x<50;x++){
+					var x2 = (x*16)+(20*16);// scroll to the left to show negatives
+					var y2 = y*16;
+					if(map[x]!=undefined && map[x][y]!=undefined){
+						var a = map[x][y];
+						ctx.fillStyle="rgb(255,255,255)";
+						ctx.fillText(a,x2,y2);
+						ctx.fillText("hello",50,50);
+					}
+				}
+			}
+		}
+		// Set a tile and create slot in memory if there is nothing
+		// there yet.
+		function settile(x,y,val){
+			if(map[x]==undefined){
+ 				map[x]=new Array();
+			}
+			map[x][y]=val;
+		}
 
 
-</script>
+	</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
