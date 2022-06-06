@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+   var c=document.getElementById("myCanvas");
+   var ctx=c.getContext("2d");
+	var Vector = function(x, y) {
+  		this.x = x || 0;
+  		this.y = y || 0;
+	};
+	var pos = new Vector(100,100);
+	var dest = new Vector(200,200);
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.width = window.innerWidth;
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText(pos.y,10,10); 
+		
+		a = getangle(pos.x,pos.y,dest.x,dest.y);
+		pos.x+=Math.cos(a)*3;
+		pos.y+=Math.sin(a)*3;
+
+		ctx.fillStyle='white';
+		ctx.fillRect(pos.x,pos.y,8,8);
+		ctx.fillStyle='yellow';
+		ctx.fillRect(dest.x,dest.y,8,8);
+		//ctx.fillStyle='yellow';
+		drawline(pos.x+4,pos.y+4,dest.x+4,dest.y+4,'yellow');
+
+		d = distance(pos.x,pos.y,dest.x,dest.y);
+
+		if(d<8){
+			dest.x = Math.random()*(myCanvas.width-48)+48;
+			dest.y = Math.random()*(myCanvas.height-48)+48;
+		}
+
+	}
+	//
+	function drawline(x1,y1,x2,y2,col){
+		ctx.strokeStyle=col;
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.lineTo(x2,y2);
+		ctx.stroke();
+	}
+	// Return angle from two points in radians
+	function getangle(x1,y1,x2,y2){
+		return Math.atan2(y2-y1,x2-x1);
+	}
+	function distance(x1,y1,x2,y2){
+		return Math.sqrt( Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2) );
+	}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
