@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    //
+    //	html5 canvas touch device down/up/move coordinates.
+
+   var c=document.getElementById("myCanvas");
+   var ctx=c.getContext("2d");
+
+   var m="no touch..";
+	touchx = 0;
+	touchy = 0;
+ 	c.addEventListener("touchstart", touchHandler);
+	c.addEventListener("touchmove", touchHandler);
+	c.addEventListener("touchend", touchHandler);
+	gameloop=setInterval(doGameLoop,16);
+
+
+function doGameLoop(){
+	myCanvas.width = window.innerWidth;
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+	clearscreen();
+
+  	drawtext(m,50,50);  
+	drawtext(touchx,50,80);
+	drawtext(touchy,50,100);
+
+}
+function touchHandler(e) {
+	if(e.type=="touchstart" && e.touches) {
+      m="touch";
+		const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+      e.preventDefault();
+	}
+	if(e.type=="touchend" && e.touches) {
+    	m="no touch..";
+      e.preventDefault();
+	}
+	if(e.type=="touchmove" && e.touches) {
+    	const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+      e.preventDefault();
+	}
+}
+
+function drawrect(x,y,w,h){
+ctx.beginPath();
+ctx.strokeStyle='white';
+ctx.rect(x,y,w,h);
+ctx.stroke();
+}
+function setcolor(col){
+	ctx.fillStyle=col;
+}
+function drawtext(txt,x,y){
+	ctx.fillStyle='white';
+	ctx.fillText(txt,x,y); 
+}
+function clearscreen(){
+	ctx.fillStyle="rgb(0,0,0)";
+	ctx.fillRect(0,0,c.width,c.height);
+}
+</script>
+</body>
+</html>
