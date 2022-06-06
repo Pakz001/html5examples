@@ -17,6 +17,7 @@ Use different browser.
    var ctx=c.getContext("2d");
 	var touchx = 0;
 	var touchy = 0;
+   var tileselected = 0;
  	c.addEventListener("touchstart", touchHandler);
 	c.addEventListener("touchmove", touchHandler);
 	c.addEventListener("touchend", touchHandler);
@@ -30,9 +31,17 @@ function doGameLoop(){
 	myCanvas.width = window.innerWidth-32;
 	clearscreen();
 	drawtext("Populous(amiga) tiles.",10,10);
-  	ctx.fillText("touch bottom for tile select.",256,10);   
-	
-	if(showtiles){
+  	ctx.fillText("touch bottom for tile select.",myCanvas.width*.65,10);   
+
+   // draw selected tile from set
+   ctx.save();
+   ctx.translate(myCanvas.width/2,0)
+   ctx.scale(.5,.5)
+   tile(0,0,tileselected);
+   ctx.restore();
+
+	// show and select tiles.
+   if(showtiles){
    	cnt = 0;
    	w = myCanvas.width-64;
    	h = myCanvas.height-32;
@@ -67,11 +76,15 @@ function touchHandler(e) {
 function tile(x,y,tile){
 // the edges and isometric points
 // of interest. modify for scale
-	var bottom=32,top=0,right=64,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
+
+	var 
+bottom=32,top=0,right=64,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
 
   	ctx.save();
   	ctx.translate(x,y);
-	if(rectsoverlap(touchx,touchy,1,1,x,y,right,bottom)==true){
+
+if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,right,bottom)==true){
+   tileselected = tile;
   	setcolor('white');
 	}else{
   	setcolor('darkslategrey');
