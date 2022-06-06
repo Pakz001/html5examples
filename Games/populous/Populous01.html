@@ -13,12 +13,13 @@ Use different browser.
     //
     // create tile map. all isometric. populous amiga.
 
-   var scale = 2.0;
+   var debug = "nothing";
+	var scale = 2.0;
 	var c=document.getElementById("myCanvas");
    var ctx=c.getContext("2d");
 	var touchx = 0;
 	var touchy = 0;
-   var tileselected = 0;
+   var tileselected = 1;
    var map = new Array();
 
  	c.addEventListener("touchstart", touchHandler);
@@ -28,7 +29,8 @@ Use different browser.
 	gameloop=setInterval(doGameLoop,16);
    for (x=-3;x<100;x++) {
  	for (var y=-3;y<100;y++) {
-	  settile(x,y,Math.floor(Math.random()*16));
+	  //settile(x,y,Math.floor(Math.random()*16));
+		settile(x,y,0);
  	}
 	}
 
@@ -38,6 +40,7 @@ function doGameLoop(){
 	myCanvas.width = window.innerWidth-32;
 	clearscreen();
 	drawtext("Populous(amiga) tiles.",10,10);
+	drawtext(debug,250,10);
   	ctx.fillText("touch bottom for tile select.",myCanvas.width*.65,10);   
 
    // draw selected tile from set
@@ -48,23 +51,22 @@ function doGameLoop(){
 	ctx.scale(1,1);
    ctx.restore();
 
-	
 
-   /// draw isometric map
+   // draw isometric map
    sw = 0;
-   for(y=2;y<myCanvas.height/(10*scale);y++){
-   for(x=-2;x<myCanvas.width/(64*scale);x++){
+   for(y=0;y<myCanvas.height/(10*scale);y++){
+   for(x=0;x<myCanvas.width/(64*scale);x++){
      dx = x*(61*scale);
      dy = y*(10*scale);
      if(sw==1)dx+=(31*scale)
      if(map[x]!=undefined && map[x][y]!=undefined){
      tile(dx,dy,map[x][y]);
-}
-   }
-   if(sw==0){
-     sw=1;
-   }else{
-     sw=0;
+		}
+   	}
+   	if(sw==0){
+     		sw=1;
+   	}else{
+     		sw=0;
    }}
 
   
@@ -115,9 +117,43 @@ function touchHandler(e) {
 	}
 	if(e.type=="touchend" && e.touches) {
 		showtiles=false;
-      y=Math.floor(touchy/(10*scale));
-      x=Math.floor(touchx/(61*scale));
-      if(!showtiles)map[x][y-2]=tileselected;
+		const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+      //y=Math.floor(touchy/(10*scale));
+      //x=Math.floor(touchx/(61*scale));
+   
+		//if(!showtiles)map[x][y-2]=tileselected;
+
+
+
+
+   // Hack Isometric touch collision
+   sw = 0;
+   for(y=0;y<myCanvas.height/(10*scale);y++){
+   for(x=0;x<myCanvas.width/(64*scale);x++){
+     	dx = x*(61*scale);
+     	dy = y*(10*scale);
+     	if(sw==1)dx+=(31*scale)
+		if(pointpolycollide(touchx,touchy,dx,dy)){
+	     if(map[x]!=undefined && map[x][y]!=undefined){
+  			   //tile(dx,dy,tileselected);
+				if(!showtiles)map[x][y]=tileselected;
+				return;
+			}
+		}
+
+   	}
+   	if(sw==0){
+     		sw=1;
+   	}else{
+     		sw=0;
+   }}
+
+
+
+
+
    	e.preventDefault();
 	}
 	if(e.type=="touchmove" && e.touches) {
@@ -128,10 +164,32 @@ function touchHandler(e) {
       //x=Math.floor(Math.random()*50);
       //y=Math.floor(Math.random()*50);
       
-      y=Math.floor(touchy/(10*scale));
-      x=Math.floor(touchx/(61*scale));
-      if(!showtiles)map[x][y-2]=tileselected;
+      //y=Math.floor(touchy/(10*scale));
+      //x=Math.floor(touchx/(61*scale));
+      //if(!showtiles)map[x][y-2]=tileselected;
+   
 
+	// Hack Isometric touch collision
+   sw = 0;
+   for(y=0;y<myCanvas.height/(10*scale);y++){
+   for(x=0;x<myCanvas.width/(64*scale);x++){
+     	dx = x*(61*scale);
+     	dy = y*(10*scale);
+     	if(sw==1)dx+=(31*scale)
+		if(pointpolycollide(touchx,touchy,dx,dy)){
+	     if(map[x]!=undefined && map[x][y]!=undefined){
+  			   //tile(dx,dy,tileselected);
+				if(!showtiles)map[x][y]=tileselected;
+				return;
+			}
+		}
+
+   	}
+   	if(sw==0){
+     		sw=1;
+   	}else{
+     		sw=0;
+   }}
 
    	e.preventDefault();
 	}
@@ -146,7 +204,7 @@ function tile(x,y,tile){
 bottom=31*scale,top=0*scale,right=63*scale,left=0*scale,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
   	ctx.save();
   	ctx.translate(x,y);
-
+	ctx.scale(1,1);
 
 	
   if(tile==15){
@@ -519,9 +577,9 @@ bottom=31*scale,top=0*scale,right=63*scale,left=0*scale,low1=bottom-bottom/3,cen
 	   setcolor('green');
 		ctx.beginPath(); 
       ctx.moveTo(center, high1);
-      ctx.lineTo(right, low1);
+      ctx.lineTo(right-4, low1);
       ctx.lineTo(center, bottom);
-      ctx.lineTo(left, low1);
+      ctx.lineTo(left+4, low1);
       ctx.fill();
   }
 	ctx.restore();
@@ -583,9 +641,15 @@ function get_line_intersection(p0_x, p0_y, p1_x, p1_y, p2_x,p2_y, p3_x, p3_y){
     return false; // No collision
 }
 
-function pointpolycollide(pointx,pointy){
-      var polygonx = [0,32,64,32];
-      var polygony = [16,0,16,32];
+function pointpolycollide(pointx,pointy,dx,dy){
+      var polygonx = [0*scale,32*scale,64*scale,32*scale];
+      var polygony = [16*scale,0*scale,16*scale,32*scale];
+
+		for(i=0;i<polygonx.length;i++){
+			polygonx[i]+=dx;
+			polygony[i]+=dy;
+		}
+
 		collisioncount=0;
 		sx=Math.random()*640;
 
@@ -602,13 +666,14 @@ function pointpolycollide(pointx,pointy){
       }else{
         sy+=1000;
       }
-
-		for( i=1;i<polygonx.length;i++){
+		
+		for( i=1;i<4;i++){
 			if (get_line_intersection(polygonx[i-1],polygony[i-1],polygonx[i],polygony[i],pointx,pointy,sx,sy))collisioncount+=1;
 }
-		if (get_line_intersection(polygonx[0],polygony[0],polygonx[polygonx.GetSize(0)-1],polygony[polygony.GetSize(0)-1],pointx,pointy,sx,sy))collisioncount+=1;
+
+		if (get_line_intersection(polygonx[0],polygony[0],polygonx[polygonx.length-1],polygony[polygony.length-1],pointx,pointy,sx,sy))collisioncount+=1;
 		
-		if (Math.pow(collisioncount, 2)>0)return true;
+		if (collisioncount % 2 >0)return true;
 		
 		
 		return false;
