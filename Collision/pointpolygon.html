@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+		var debug="noting";
+		var debug2=0;
+		var scale=2.0;
+      var polygonx = [0*scale,32*scale,64*scale,32*scale];
+      var polygony = [16*scale,0*scale,16*scale,32*scale];
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.width = window.innerWidth;
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example."+debug+" } "+debug2,10,10); 
+
+
+
+for(i=1;i<4;i++){
+//drawline(polygonx[i-1]+320,polygony[i-1]+240,polygonx[i]+320,polygony[i]+240,'white');
+}
+//drawline(polygonx[0]+320,polygony[0]+240,polygonx[3]+320,polygony[3]+240,'white');
+
+if(pointpolycollide(360,270,320,240)){
+debug=" collide";
+}else{
+debug="no collide";
+}
+
+}
+
+	// draw a line between 2 points with a specific color
+	// ctx = context
+	function drawline(x1,y1,x2,y2,col){
+		ctx.strokeStyle=col;
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.lineTo(x2,y2);
+		ctx.stroke();
+	}
+
+
+// Returns 1 if the lines intersect, otherwise 0.  Andre la moth.
+function get_line_intersection(p0_x, p0_y, p1_x, p1_y, p2_x,p2_y, p3_x, p3_y){
+	
+    var s1_x,s1_y,s2_x,s2_y;
+    s1_x = p1_x - p0_x;
+    s1_y = p1_y - p0_y;
+    s2_x = p3_x - p2_x;
+    s2_y = p3_y - p2_y;
+
+    var s,t;
+    s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+    t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) return true;
+    
+
+    return false; // No collision
+}
+
+function pointpolycollide(pointx,pointy,dx,dy){
+      var polygonx = [0*scale,32*scale,64*scale,32*scale];
+      var polygony = [16*scale,0*scale,16*scale,32*scale];
+
+		for(i=0;i<4;i++){
+			polygonx[i]+=dx;
+			polygony[i]+=dy;
+		}
+
+		var collisioncount=0;
+		sx=Math.random()*myCanvas.width;
+
+      sy=Math.random()*myCanvas.height;
+
+		if(Math.random()<.5){
+        sx-=1000;
+      }else{
+        sx+=1000;
+      }
+
+		if(Math.random()<.5){
+        sy-=1000;
+      }else{
+        sy+=1000;
+      }
+		drawline(pointx,pointy,sx,sy,'yellow');
+		for( i=1;i<4;i++){
+			drawline(polygonx[i-1],polygony[i-1],polygonx[i],polygony[i],'red');
+			if (get_line_intersection(polygonx[i-1],polygony[i-1],polygonx[i],polygony[i],pointx,pointy,sx,sy))collisioncount+=1;
+}
+
+		if (get_line_intersection(polygonx[0],polygony[0],polygonx[3],polygony[3],pointx,pointy,sx,sy))collisioncount+=1;
+		if (collisioncount % 2 >0)return true;
+		
+		
+		return false;
+
+}
+</script>
+</body>
+</html>
