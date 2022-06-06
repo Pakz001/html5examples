@@ -12,6 +12,7 @@ Use different browser.
 <script>
    var c=document.getElementById("myCanvas");
    var ctx=c.getContext("2d");
+	// a vector data structure
 	var Vector = function(x, y) {
   		this.x = x || 0;
   		this.y = y || 0;
@@ -28,7 +29,7 @@ Use different browser.
 		ctx.fillRect(0,0,c.width,c.height);
 		ctx.fillStyle="rgb(255,255,255)";
 		ctx.fillText(pos.y,10,10); 
-		
+		 // get angle towards destination and move into that direction
 		a = getangle(pos.x,pos.y,dest.x,dest.y);
 		pos.x+=Math.cos(a)*3;
 		pos.y+=Math.sin(a)*3;
@@ -41,14 +42,15 @@ Use different browser.
 		drawline(pos.x+4,pos.y+4,dest.x+4,dest.y+4,'yellow');
 
 		d = distance(pos.x,pos.y,dest.x,dest.y);
-
+		// if close by. create new position for destination point.
 		if(d<8){
 			dest.x = Math.random()*(myCanvas.width-48)+48;
 			dest.y = Math.random()*(myCanvas.height-48)+48;
 		}
 
 	}
-	//
+	// draw a line between 2 points with a specific color
+	// ctx = context
 	function drawline(x1,y1,x2,y2,col){
 		ctx.strokeStyle=col;
 		ctx.beginPath();
@@ -56,10 +58,11 @@ Use different browser.
 		ctx.lineTo(x2,y2);
 		ctx.stroke();
 	}
-	// Return angle from two points in radians
+	// Return angle between two points in radians
 	function getangle(x1,y1,x2,y2){
 		return Math.atan2(y2-y1,x2-x1);
 	}
+	// return the distance from point 1 to point 2(euclidean)
 	function distance(x1,y1,x2,y2){
 		return Math.sqrt( Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2) );
 	}
