@@ -15,10 +15,11 @@ Use different browser.
 
    var c=document.getElementById("myCanvas");
    var ctx=c.getContext("2d");
+	var touchx = 0;
+	var touchy = 0;
  	c.addEventListener("touchstart", touchHandler);
 	c.addEventListener("touchmove", touchHandler);
 	c.addEventListener("touchend", touchHandler);
-   var m="Left Mouse is not pressed";
 	showtiles = false;
 	gameloop=setInterval(doGameLoop,16);
 
@@ -29,7 +30,7 @@ function doGameLoop(){
 	myCanvas.width = window.innerWidth-32;
 	clearscreen();
 	drawtext("Populous(amiga) tiles.",10,10);
-  	ctx.fillText(m,256,10);   
+  	ctx.fillText("touch bottom for tile select.",256,10);   
 	
 	if(showtiles){
    	cnt = 0;
@@ -43,14 +44,23 @@ function doGameLoop(){
 	}
 }
 function touchHandler(e) {
-    if(e.type=="touchstart" && e.touches) {
-        showtiles=true;
-        e.preventDefault();
-    }
-    if(e.type=="touchend" && e.touches) {
-        showtiles=false;
-        e.preventDefault();
-    }
+	if(e.type=="touchstart" && e.touches) {
+		const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+		if(touchy>myCanvas.height-100)showtiles=true;
+		e.preventDefault();
+	}
+	if(e.type=="touchend" && e.touches) {
+		showtiles=false;
+   	e.preventDefault();
+	}
+	if(e.type=="touchmove" && e.touches) {
+		const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+   	e.preventDefault();
+	}
 }
 
 
@@ -59,14 +69,19 @@ function tile(x,y,tile){
 // of interest. modify for scale
 	var bottom=32,top=0,right=64,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
 
-  ctx.save();
-  ctx.translate(x,y);
-  setcolor('darkslategrey');
-  ctx.fillRect(0,0,65,33);
-  setcolor('white');
-  drawrect(0,0,65,33);
-  drawtext(tile,70,16);
-  x+=2;y+=1;
+  	ctx.save();
+  	ctx.translate(x,y);
+	if(rectsoverlap(touchx,touchy,1,1,x,y,right,bottom)==true){
+  	setcolor('white');
+	}else{
+  	setcolor('darkslategrey');
+	}
+  	ctx.fillRect(0,0,65,33);
+	setcolor('white');
+  	drawrect(0,0,65,33);
+	setcolor('white');
+  	drawtext(tile,70,16);
+  	x+=2;y+=1;
 	
   if(tile==15){
 		setcolor('lightgrey');
@@ -435,7 +450,7 @@ function tile(x,y,tile){
 	}
 
   if(tile==0){
-	   setcolor('cornflowerblue');
+	   setcolor('white');
 		ctx.beginPath(); 
       ctx.moveTo(center, high1);
       ctx.lineTo(right, low1);
@@ -462,6 +477,12 @@ function clearscreen(){
 	ctx.fillStyle="rgb(0,0,0)";
 	ctx.fillRect(0,0,c.width,c.height);
 }
+function rectsoverlap(x1,y1,w1,h1,x2,y2,w2,h2){
+		return 	x1 <= x2+w2
+			&& 	x2 <= x1+w1
+			&&	y1 <= y2+h2
+			&&	y2 <= y1+h1;
+	}
 </script>
 </body>
 </html>
