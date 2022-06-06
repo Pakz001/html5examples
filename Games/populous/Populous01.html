@@ -45,17 +45,7 @@ function doGameLoop(){
    tile(0,0,tileselected);
    ctx.restore();
 
-	// show and select tiles.
-   if(showtiles){
-   	cnt = 0;
-   	w = myCanvas.width-64;
-   	h = myCanvas.height-32;
-   	for( y=32;y<h;y+=33){
-   	for( x=0;x<w;x+=80){
-     		tile(x,y,cnt);
-     		cnt=cnt+1;
-   	}}
-	}
+	
 
    /// draw isometric map
    sw = 0;
@@ -73,6 +63,30 @@ function doGameLoop(){
    }else{
      sw=0;
    }}
+
+// show and select tiles.
+   if(showtiles){
+   	cnt = 0;
+   	w = myCanvas.width-64;
+   	h = myCanvas.height-32;
+   	for( y=32;y<h;y+=33){
+   	for( x=0;x<w;x+=80){
+if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,64,32)==true){
+   tileselected = tile
+  	setcolor('white');
+	}else{
+  	setcolor('darkslategrey');
+	}
+   ctx.fillRect(x,y,65,33);
+	//setcolor('white');
+  	drawrect(x,y,65,33);
+	setcolor('white');
+  	//drawtext(tile,70,16);
+  	dx=x+1;dy=y+1
+     		tile(dx,dy,cnt);
+     		cnt=cnt+1;
+   	}}
+	}
 
 }
 function touchHandler(e) {
@@ -105,18 +119,7 @@ bottom=31,top=0,right=63,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom
   	ctx.save();
   	ctx.translate(x,y);
 
-//if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,right,bottom)==true){
-   tileselected = tile;
-  	//setcolor('white');
-//	}else{
-  	//setcolor('darkslategrey');
-	//}
-  	//ctx.fillRect(0,0,65,33);
-	//setcolor('white');
-  	//drawrect(0,0,65,33);
-	//setcolor('white');
-  	//drawtext(tile,70,16);
-  	//x+=2;y+=1;
+
 	
   if(tile==15){
 		setcolor('lightgrey');
