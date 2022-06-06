@@ -19,13 +19,14 @@ Use different browser.
 	var touchy = 0;
    var tileselected = 0;
    var map = new Array();
+
  	c.addEventListener("touchstart", touchHandler);
 	c.addEventListener("touchmove", touchHandler);
 	c.addEventListener("touchend", touchHandler);
 	showtiles = false;
 	gameloop=setInterval(doGameLoop,16);
-   for (x=0;x<10;x++) {
- 	for (var y=0;y<48;y++) {
+   for (x=-3;x<100;x++) {
+ 	for (var y=-3;y<100;y++) {
 	  settile(x,y,Math.floor(Math.random()*16));
  	}
 	}
@@ -49,8 +50,8 @@ function doGameLoop(){
 
    /// draw isometric map
    sw = 0;
-   for(y=2;y<48;y++){
-   for(x=0;x<10;x++){
+   for(y=0;y<myCanvas.height/10;y++){
+   for(x=0;x<myCanvas.width/64;x++){
      dx = x*61;
      dy = y*10;
      if(sw==1)dx+=31;
@@ -63,6 +64,8 @@ function doGameLoop(){
    }else{
      sw=0;
    }}
+
+  
 
 showtilemenu();
 
@@ -116,6 +119,15 @@ function touchHandler(e) {
 		const touches = e.changedTouches;
 		touchx = touches[0].pageX;
 		touchy = touches[0].pageY;
+
+      //x=Math.floor(Math.random()*50);
+      //y=Math.floor(Math.random()*50);
+      
+      y=Math.floor(touchy/10);
+      x=Math.floor(touchx/61);
+      if(!showtiles)map[x][y-2]=tileselected;
+
+
    	e.preventDefault();
 	}
 }
@@ -540,6 +552,65 @@ function rectsoverlap(x1,y1,w1,h1,x2,y2,w2,h2){
 			}
 			map[x][y]=val;
 		}
+
+Function
+
+
+
+
+
+// Returns 1 if the lines intersect, otherwise 0.  Andre la moth.
+function get_line_intersection(p0_x, p0_y, p1_x, p1_y, p2_x,p2_y, p3_x, p3_y){
+	
+    var s1_x,s1_y,s2_x,s2_y;
+    s1_x = p1_x - p0_x;
+    s1_y = p1_y - p0_y;
+    s2_x = p3_x - p2_x;
+    s2_y = p3_y - p2_y;
+
+    var s,t;
+    s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+    t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) return true;
+    
+
+    return false; // No collision
+}
+
+function pointpolycollide(pointx,pointy){
+      var polygonx = [0,32,64,32];
+      var polygony = [16,0,16,32];
+		collisioncount=0;
+		sx=Math.random()*640;
+
+      sy=Math.random()*480;
+
+		if(Math.random()<.5){
+        sx-=1000;
+      }else{
+        sx+=1000;
+      }
+
+		if(Math.random()<.5){
+        sy-=1000;
+      }else{
+        sy+=1000;
+      }
+
+		for( i=1;i<polygonx.length;i++){
+			if (get_line_intersection(polygonx[i-1],polygony[i-1],polygonx[i],polygony[i],pointx,pointy,sx,sy))collisioncount+=1;
+}
+		if (get_line_intersection(polygonx[0],polygony[0],polygonx[polygonx.GetSize(0)-1],polygony[polygony.GetSize(0)-1],pointx,pointy,sx,sy))collisioncount+=1;
+		
+		if (Math.pow(collisioncount, 2)>0)return true;
+		
+		
+		return false;
+
+}
+
+
 </script>
 </body>
 </html>
