@@ -13,7 +13,8 @@ Use different browser.
     //
     // create tile map. all isometric. populous amiga.
 
-   var c=document.getElementById("myCanvas");
+   var scale = 2.0;
+	var c=document.getElementById("myCanvas");
    var ctx=c.getContext("2d");
 	var touchx = 0;
 	var touchy = 0;
@@ -42,19 +43,20 @@ function doGameLoop(){
    // draw selected tile from set
    ctx.save();
    ctx.translate(myCanvas.width/2,0)
-   ctx.scale(.5,.5)
+   ctx.scale(.5,.5);
    tile(0,0,tileselected);
+	ctx.scale(1,1);
    ctx.restore();
 
 	
 
    /// draw isometric map
    sw = 0;
-   for(y=0;y<myCanvas.height/10;y++){
-   for(x=0;x<myCanvas.width/64;x++){
-     dx = x*61;
-     dy = y*10;
-     if(sw==1)dx+=31;
+   for(y=2;y<myCanvas.height/(10*scale);y++){
+   for(x=-2;x<myCanvas.width/(64*scale);x++){
+     dx = x*(61*scale);
+     dy = y*(10*scale);
+     if(sw==1)dx+=(31*scale)
      if(map[x]!=undefined && map[x][y]!=undefined){
      tile(dx,dy,map[x][y]);
 }
@@ -80,21 +82,21 @@ function showtilemenu(){
 
 ctx.fillRect(0,16,myCanvas.width,myCanvas.height);
    	cnt = 0;
-   	w = myCanvas.width-64;
-   	h = myCanvas.height-32;
-   	for( y=32;y<h;y+=33){
-   	for( x=0;x<w;x+=80){
-if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,64,32)==true){
+   	w = myCanvas.width-(64*scale);
+   	h = myCanvas.height-(32*scale);
+   	for( y=32;y<h;y+=(33*scale)){
+   	for( x=0;x<w;x+=(80*scale)){
+if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,(64*scale),(32*scale))==true){
    tileselected = cnt;
   	setcolor('white');
 	}else{
   	setcolor('darkslategrey');
 	}
-   ctx.fillRect(x,y,65,33);
+   ctx.fillRect(x,y,(65*scale),(33*scale));
 	//setcolor('white');
-  	drawrect(x,y,65,33);
+  	drawrect(x,y,(65*scale),(33*scale));
 	setcolor('white');
-  	drawtext(cnt,x+68,y+20);
+  	drawtext(cnt,x+(68*scale),y+(20*scale));
   	dx=x+1;dy=y+1
      		tile(dx,dy,cnt);
      		cnt=cnt+1;
@@ -113,6 +115,9 @@ function touchHandler(e) {
 	}
 	if(e.type=="touchend" && e.touches) {
 		showtiles=false;
+      y=Math.floor(touchy/(10*scale));
+      x=Math.floor(touchx/(61*scale));
+      if(!showtiles)map[x][y-2]=tileselected;
    	e.preventDefault();
 	}
 	if(e.type=="touchmove" && e.touches) {
@@ -123,8 +128,8 @@ function touchHandler(e) {
       //x=Math.floor(Math.random()*50);
       //y=Math.floor(Math.random()*50);
       
-      y=Math.floor(touchy/10);
-      x=Math.floor(touchx/61);
+      y=Math.floor(touchy/(10*scale));
+      x=Math.floor(touchx/(61*scale));
       if(!showtiles)map[x][y-2]=tileselected;
 
 
@@ -138,7 +143,7 @@ function tile(x,y,tile){
 // of interest. modify for scale
 
 	var 
-bottom=31,top=0,right=63,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
+bottom=31*scale,top=0*scale,right=63*scale,left=0*scale,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
   	ctx.save();
   	ctx.translate(x,y);
 
@@ -511,7 +516,7 @@ bottom=31,top=0,right=63,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom
 	}
 
   if(tile==0){
-	   setcolor('white');
+	   setcolor('green');
 		ctx.beginPath(); 
       ctx.moveTo(center, high1);
       ctx.lineTo(right, low1);
