@@ -46,6 +46,114 @@ function tile(x,y,tile){
   drawrect(0,0,65,33);
   drawtext(tile,70,16);
   x+=2;y+=1;
+ if(tile==14){
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,low1);
+   	ctx.lineTo(center, bottom);
+	   ctx.lineTo(left, low1);
+      ctx.fill();
+	   setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right,high1);
+      ctx.lineTo(right,low1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(center, low1);
+      ctx.fill();
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,high1);
+      ctx.lineTo(center,low1);
+   	ctx.fill();
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(right,high1);
+      ctx.lineTo(center,low1);
+   	ctx.fill();
+  }
+  if(tile==13){
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,low1);
+   	ctx.lineTo(center, bottom);
+	   ctx.lineTo(left, low1);
+      ctx.fill();
+	   setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right,low1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(center, low1);
+      ctx.fill();
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,top);
+   	ctx.lineTo(right, low1);
+      ctx.lineTo(center,low1);
+   	ctx.fill();
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(right*.6,bottom*.6);
+   	ctx.lineTo(right, low1);
+
+   	ctx.fill();
+  }
+  if(tile==12){
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,low1);
+   	ctx.lineTo(center, bottom);
+	   ctx.lineTo(left, low1);
+      ctx.fill();
+	   setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right,low1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(center, low1);
+      ctx.fill();
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,high1);
+   	ctx.lineTo(right, low1);
+      ctx.lineTo(center,low1);
+   	ctx.fill();
+  }
+  if(tile==11){
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,top);
+		ctx.lineTo(center,bottom);
+   	ctx.fill();
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left+3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(left, low1);
+		ctx.lineTo(left,high1);
+   	ctx.fill();
+	   setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(center, bottom);
+      ctx.lineTo(right,high1);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,bottom);
+      ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+  }
   if(tile==10){
 	   setcolor('lightgrey');
 		ctx.beginPath();
@@ -67,7 +175,7 @@ function tile(x,y,tile){
    	ctx.lineTo(left, low1);
 		ctx.lineTo(left,high1);
    	ctx.fill();
-	}
+  }
   
   if(tile==9){
 		setcolor('lightgrey');
@@ -85,7 +193,7 @@ function tile(x,y,tile){
    	ctx.lineTo(left, low1);
 		ctx.lineTo(left,high1);
    	ctx.fill();
-	}
+  }
 
   if(tile==8){
 		setcolor('grey');
