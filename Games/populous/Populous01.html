@@ -18,12 +18,17 @@ Use different browser.
 	var touchx = 0;
 	var touchy = 0;
    var tileselected = 0;
+   var map = new Array();
  	c.addEventListener("touchstart", touchHandler);
 	c.addEventListener("touchmove", touchHandler);
 	c.addEventListener("touchend", touchHandler);
 	showtiles = false;
 	gameloop=setInterval(doGameLoop,16);
-
+   for (x=0;x<10;x++) {
+ 	for (var y=0;y<48;y++) {
+	  settile(x,y,Math.floor(Math.random()*16));
+ 	}
+	}
 
 function doGameLoop(){
 	myCanvas.width = window.innerWidth;
@@ -51,6 +56,24 @@ function doGameLoop(){
      		cnt=cnt+1;
    	}}
 	}
+
+   /// draw isometric map
+   sw = 0;
+   for(y=0;y<48;y++){
+   for(x=0;x<10;x++){
+     dx = x*61;
+     dy = y*10;
+     if(sw==1)dx+=31;
+     if(map[x]!=undefined && map[x][y]!=undefined){
+     tile(dx,dy,map[x][y]);
+}
+   }
+   if(sw==0){
+     sw=1;
+   }else{
+     sw=0;
+   }}
+
 }
 function touchHandler(e) {
 	if(e.type=="touchstart" && e.touches) {
@@ -78,23 +101,22 @@ function tile(x,y,tile){
 // of interest. modify for scale
 
 	var 
-bottom=32,top=0,right=64,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
-
+bottom=31,top=0,right=63,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
   	ctx.save();
   	ctx.translate(x,y);
 
-if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,right,bottom)==true){
+//if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,right,bottom)==true){
    tileselected = tile;
-  	setcolor('white');
-	}else{
-  	setcolor('darkslategrey');
-	}
-  	ctx.fillRect(0,0,65,33);
-	setcolor('white');
-  	drawrect(0,0,65,33);
-	setcolor('white');
-  	drawtext(tile,70,16);
-  	x+=2;y+=1;
+  	//setcolor('white');
+//	}else{
+  	//setcolor('darkslategrey');
+	//}
+  	//ctx.fillRect(0,0,65,33);
+	//setcolor('white');
+  	//drawrect(0,0,65,33);
+	//setcolor('white');
+  	//drawtext(tile,70,16);
+  	//x+=2;y+=1;
 	
   if(tile==15){
 		setcolor('lightgrey');
@@ -496,6 +518,14 @@ function rectsoverlap(x1,y1,w1,h1,x2,y2,w2,h2){
 			&&	y1 <= y2+h2
 			&&	y2 <= y1+h1;
 	}
+		// Set a tile and create slot in memory if there is nothing
+		// there yet.
+		function settile(x,y,val){
+			if(map[x]==undefined){
+ 				map[x]=new Array();
+			}
+			map[x][y]=val;
+		}
 </script>
 </body>
 </html>
