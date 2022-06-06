@@ -36,7 +36,9 @@ function doGameLoop(){
    }}
 }
 function tile(x,y,tile){
-	var bottom=32,top=0,right=64,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/4;
+// the edges and isometric points
+// of interest. modify for scale
+	var bottom=32,top=0,right=64,left=0,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
 
   ctx.save();
   ctx.translate(x,y);
@@ -46,6 +48,34 @@ function tile(x,y,tile){
   drawrect(0,0,65,33);
   drawtext(tile,70,16);
   x+=2;y+=1;
+if(tile==15){
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(left, high1);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(right, high1);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,low1);
+      ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,low1);
+   	ctx.lineTo(center, bottom);
+	   ctx.lineTo(left, low1);
+      ctx.fill();
+	}
  if(tile==14){
 	   setcolor('grey');
 		ctx.beginPath();
