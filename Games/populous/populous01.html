@@ -27,7 +27,7 @@ function doGameLoop(){
 
    cnt = 0;
    w = myCanvas.width-64;
-   h = myCanvas.height;
+   h = myCanvas.height-32;
    for( y=32;y<h;y+=33){
    for( x=0;x<w;x+=80){
 
@@ -41,10 +41,52 @@ function tile(x,y,tile){
   ctx.save();
   ctx.translate(x,y);
   setcolor('darkslategrey');
-  ctx.fillRect(0,0,64,32);
+  ctx.fillRect(0,0,65,33);
   setcolor('white');
-  drawrect(0,0,64,33);
+  drawrect(0,0,65,33);
   drawtext(tile,70,16);
+  x+=2;y+=1;
+  if(tile==10){
+	   setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(right,high1);
+   	ctx.lineTo(center, bottom);
+      ctx.fill();
+	   setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+      ctx.fill();
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left+3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(left, low1);
+		ctx.lineTo(left,high1);
+   	ctx.fill();
+	}
+  
+  if(tile==9){
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,top);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(center,bottom);
+   	ctx.fill();
+
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left+3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(left, low1);
+		ctx.lineTo(left,high1);
+   	ctx.fill();
+	}
+
   if(tile==8){
 		setcolor('grey');
 		ctx.beginPath();
@@ -62,7 +104,7 @@ function tile(x,y,tile){
       setcolor('grey');
 		ctx.beginPath();
 		ctx.moveTo(left, high1);
-   	ctx.lineTo(center, bottom*.6);
+   	ctx.lineTo(center, bottom*.4);
       ctx.lineTo(right, low1);
    	ctx.fill();
    }
