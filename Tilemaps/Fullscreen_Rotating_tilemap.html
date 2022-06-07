@@ -1,0 +1,56 @@
+<!DOCTYPE=html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+var c2 = document.createElement("canvas");
+var ctx2=c2.getContext("2d");
+    var map = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ]
+
+var rot=0;
+    gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+        myCanvas.width = c2.width=window.innerWidth-32;
+tw = c.width/16;
+th = c.height/20;
+myCanvas.height=c2.height = window.innerHeight-32;
+ctx2.clearRect(0,0,c.width,c.height);
+        for(var y = 0; y < map.length; ++y) {
+            for(var x = 0; x < map[y].length; ++x) {
+            if(map[y][x]==1) ctx2.fillRect(x*tw,y*th,tw,th);
+            }
+        }
+        ctx.fillText("Drawing a rotating tilemap example.",10,10); 
+
+// here we draw our canvas rotated..
+ctx.save();
+// get the center
+ctx.translate(myCanvas.width/2,myCanvas.height/2);
+ctx.rotate(rot);
+// reverse from center
+ctx.translate(-myCanvas.width/2,-myCanvas.height/2);
+rot+=.02;
+ctx.drawImage(c2,0,0);
+ctx.restore();
+
+    }
+    </script></body></html>
