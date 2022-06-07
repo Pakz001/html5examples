@@ -22,9 +22,9 @@ Use different browser.
 	var touchy = 0;
    var tileselected = 1;
    var map = new Array();
-	var undomap = new Array();
-	var undodepth=0;
-	var editdelay = 0;
+	var undomap = new Array(); // unlimited undo system
+	var undodepth=0; // our undo depth. Each edit changes are stored in undomap. Undoing restores to previous depth
+	var editdelay = 0; // a slight delay between screen switching and touch buttons
 
  	c.addEventListener("touchstart", touchHandler);
 	c.addEventListener("touchmove", touchHandler);
