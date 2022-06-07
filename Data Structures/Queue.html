@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+
+// queue's use the first in first
+// out method. FIFO. shift removes
+// the top item from the 'array'
+// and shifts everything in the 'array'
+// up shrinking the array.
+// unshift adds a value/object to
+// the top of the 'array' moving
+// everything down growing the array.
+
+var queue = [];
+
+queue.unshift(20);
+var b = queue.shift();
+queue.unshift(99);
+
+
+gameloop=setInterval(doGameLoop,16);
+
+
+function doGameLoop(){
+myCanvas.width = window.innerWidth;
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(255,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+
+
+a = queue[0];
+
+ctx.fillText("Item in queue : "+a,10,10); 
+ctx.fillText("shifted value : "+b,10,50);
+
+
+}
+</script>
+</body>
+</html> 
