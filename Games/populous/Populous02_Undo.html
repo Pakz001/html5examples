@@ -69,9 +69,12 @@ function doGameLoop(){
   	setcolor('black');
 	ctx.fillRect(0,0,myCanvas.width,32);
 	setcolor('white');
-	drawtext("Populous(amiga) tiles."+debug+"--"+debug2,10,10);
-	drawtext(debug,250,10);
-  	ctx.fillText("touch bottom for tile select.",myCanvas.width*.65,10);   
+	drawtext("Populous(amiga) tiles.",10,10);
+	ctx.save()
+	ctx.scale(3,3);
+  	ctx.fillText("Tile Menu",(myCanvas.width*.20)/3,(myCanvas.height*.9)/3);
+	ctx.fillText("Undo",(myCanvas.width*.75)/3,(myCanvas.height*.9)/3);
+	ctx.restore();
 
    // draw selected tile from set
    ctx.save();
