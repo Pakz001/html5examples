@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var posx =0;
+	var incx=5;
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.width = window.innerWidth;
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Global Alpha.",10,10); 
+
+
+		// Move the blob on the screen
+		posx+=incx;
+		if(posx>myCanvas.width-150 || posx<-50){
+			incx=-incx;
+		}
+		ctx.save()
+		ctx.translate(posx,0);
+
+
+		// Set global alpha to .5
+		ctx.globalAlpha = .5;
+
+
+		// Draw our blob
+		for(i=0;i<50;i+=1){
+			ctx.fillStyle="rgb("+i*4+",0,0)";				ctx.fillRect(randInt(0,100),randInt(0,100),randInt(50,100),randInt(50,100));
+		}
+
+		// restore our global alpha
+		ctx.globalAlpha = 0;
+
+
+		ctx.restore();
+	}
+	// 
+	// Random integer min, Max
+	function randInt(min,max){
+		return Math.floor(Math.random()*(max-min)+min);
+	}
+</script>
+</body>
+</html>
