@@ -11,5 +11,7 @@ Copy paste (edit) and run.
 Currently using these examples myself through the (free)ios app jsanywhere.
 
 Link to free online and downloadable study book : https://eloquentjavascript.net/ ( option to buy )
+<br>Rex van der Spuy also has some good books.<br><br>
+
 
 Dotate to author of this code repo. (Insert coin) https://www.paypal.me/RudyvanEtten/1
