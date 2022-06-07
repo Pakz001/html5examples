@@ -3,4 +3,8 @@ It was released for a whole series of home computers. The Commodore Amiga being 
 The map in the game was quite special. I never programmed something like this before. I'm trying to get a map engine going right now(jun/2022).<br><br>
 In this folder is a source file that has 16 isometric tiles that I remade based on a map editor screenshot using the build in polygon drawing commands in javascript.<br><br>
 I hope to figure out how this isometric map with different heights works.<br><br>
-I'm programming it right now on a Ipad and Iphone. There are no mouse and keyboard controls at the moment. I can add this later when I am testing and using the laptop. Feel fee to study my repo for bits and pieces that can be inserted into this project for more features(like mouse and keyboard controls)<br>
+I'm programming it right now on a Ipad and Iphone. There are no mouse and keyboard controls at the moment. I can add this later when I am testing and using the laptop. Feel fee to study my repo for bits and pieces that can be inserted into this project for more features(like mouse and keyboard controls)<br><br>
+
+Undo:<br>
+The unlimited undo system is a copy of the map array. This with a extra dimension for the undo depth.<br>
+Every time a change is made. The previous data before being changed is stored in the undo array. When doing a undo. The last changed data is restored to its previous value. I think with the array system(sparse) Only the changed data is stored, conserving memory.<br><br>
