@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+var easing = 0.1;
+var sprite =
+{
+x:50,
+y:50,
+w:32,
+h:32,
+destx:0,
+desty:0,
+draw:function(){
+ctx.fillStyle = "white";
+ctx.fillRect(this.x,this.y,this.w,this.h);
+},
+
+update:function(){
+var vx = this.destx - (this.x + this.w/2);
+  var vy = this.desty - (this.y + this.h/2);
+  var distance = Math.sqrt(vx * vx + vy * vy);
+  
+  if (distance >= 1)
+   {
+    this.x += vx * easing;
+    this.y += vy * easing;
+  }else{
+    this.destx = Math.random()*myCanvas.width;
+this.desty = Math.random()*myCanvas.height;
+}},
+
+};
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.width = window.innerWidth;
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("easing example.",10,10); 
+
+sprite.update();
+sprite.draw();
+
+}
+
+
+</script>
+</body>
+</html> 
