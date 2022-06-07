@@ -90,7 +90,7 @@ showtilemenu();
 
 
 function showtilemenu(){
-
+scale=1.0;
 // show and select tiles.
    if(showtiles){
       ctx.fillStyle = 'rgba(0,0,0,.8';
@@ -117,7 +117,7 @@ if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,(64*scale),(32*scale))==tr
      		cnt=cnt+1;
    	}}
 	}
-
+scale=1.0;
 
 }
 function touchHandler(e) {
