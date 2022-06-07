@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	// Create a new canvas.
+	var canvasBuffer = document.createElement("canvas");
+	//var ctx2 = canvasBuffer.getContext("2d");
+	// Use this to disable transparency. (faster)
+	var ctx2 = canvasBuffer.getContext("2d", { alpha: false });
+	// Draw something on the canvas.
+	ctx2.fillStyle="rgb(220,220,0)";
+	ctx2.fillRect(0,0,c.width,c.height);
+	ctx2.fillStyle="black";
+	ctx2.save();
+	ctx2.scale(5,5);
+	ctx2.fillText("cuckoo",0,canvasBuffer.height/(2*5));
+	ctx2.restore();
+	// Our game loop
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.width = window.innerWidth;
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Draw a canvas.",10,10); 
+		// Draw our canvasBuffer
+		ctx.drawImage(canvasBuffer,100,100);
+	}
+</script>
+</body>
+</html>
