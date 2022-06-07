@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+
+// a stack is a list. items or objects
+// are added to the bottom of the list.
+// this with push. popping a stack list
+// returns the removed value. pop
+// removes the last value from the list
+
+// stacks has its uses and knowing stacks helps!
+
+var stack = [];
+
+stack.push(20);
+var b = stack.pop();
+stack.push(99);
+
+
+gameloop=setInterval(doGameLoop,16);
+
+
+function doGameLoop(){
+myCanvas.width = window.innerWidth;
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(255,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+
+
+a = stack[stack.length-1];
+
+ctx.fillText("Item in stack : "+a,10,10); 
+ctx.fillText("popped value : "+b,10,50);
+
+
+}
+</script>
+</body>
+</html> 
