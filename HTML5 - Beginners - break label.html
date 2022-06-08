@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.width = window.innerWidth;
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing a tilemap example.",10,10); 
+
+		// Here we use a label and break to break out
+		// of a spaghetti loop. 
+		// The labeled if block starts if the variable work=true
+		// when work is set to false and the words break <label>
+		// is given it wil not repeat the loop. This is a way
+		// to break out of a complex loop(no goto!)
+		cnt=0;
+		work = true;
+		succes:if(work){
+		for(i=0;i<10;i++){
+		for(j=0;j<10;j++){
+		for(k=0;k<10;k++){
+			cnt++;
+			work=false;
+			break succes;
+		}}}}
+		ctx.fillText("here : "+cnt,10,50); 
+
+	}
+</script>
+</body>
+</html>
