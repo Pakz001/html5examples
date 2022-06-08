@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	// A class with a constructor and 2 functions
+	class star {
+		constructor(x,y){
+			this.x = x;
+			this.y = y;
+			this.incx = Math.random()*3;
+			this.incy = 0;
+		}
+		update(){
+			this.x+=this.incx;
+			this.y+=this.incy;
+			if(this.x>myCanvas.width+32)this.x=-32;
+		}
+		draw(){
+			ctx.fillRect(this.x,this.y,2,2);
+		}
+
+	}
+	// get set the canvas size
+	setcanvas();
+	var stars = [];
+	for(i=0;i<200;i++){
+		stars.push(
+			new star(
+				Math.random()*myCanvas.width,
+				Math.random()*myCanvas.height
+		));
+	}
+	
+	// the main game loop
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		setcanvas()
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing a tilemap example.",10,10);
+ 
+		// draw and update our stars from the class star
+		for(i of stars){
+			i.update();
+			i.draw();
+		}
+
+	}
+	// get set the canvas size based on the window size
+	function setcanvas(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+	}
+</script>
+</body>
+</html>
+
+
+
+
+
