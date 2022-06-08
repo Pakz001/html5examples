@@ -13,6 +13,7 @@ Use different browser.
     //
     // create tile map. all isometric. populous amiga.
 
+	var toolarrow = 0; // which bottom tool is selected..
    var debug = "nothing";
 	var debug2= "-1";
 	var scale = 1.0;
@@ -75,10 +76,30 @@ function doGameLoop(){
    var sch=myCanvas.width/200;
    var scv=myCanvas.height/200;
 	ctx.scale(sch,scv);
-  	ctx.fillText("Tile Menu",(myCanvas.width*.05)/sch,(myCanvas.height*.9)/scv);
-ctx.fillText("Raise",(myCanvas.width*.33)/sch,(myCanvas.height*.9)/scv);
-ctx.fillText("Lower",(myCanvas.width*.55)/sch,(myCanvas.height*.9)/scv);
-	ctx.fillText("Undo",(myCanvas.width*.75)/sch,(myCanvas.height*.9)/scv);
+	var label = [
+		"Tile Menu",
+		"Raise",
+		"Lower",
+		"Undo"
+	]
+	var pos = [
+		(myCanvas.width*.05)/sch,
+		(myCanvas.height*.9)/scv,
+		(myCanvas.width*.33)/sch,
+		(myCanvas.height*.9)/scv,
+		(myCanvas.width*.55)/sch,
+		(myCanvas.height*.9)/scv,
+		(myCanvas.width*.75)/sch,
+		(myCanvas.height*.9)/scv
+	];
+	var cnt=0;
+	for(i=0;i<label.length;i++){
+  		ctx.fillText(label[i],pos[cnt],pos[cnt+1]);
+		cnt+=2;
+	}
+	ctx.scale(1,1);
+
+	ctx.fillRect(pos[toolarrow*2],pos[(toolarrow*2)+1]*1.02,96/sch,16/scv);
 	ctx.restore();
 
    // draw selected tile from set
@@ -89,7 +110,7 @@ ctx.fillText("Lower",(myCanvas.width*.55)/sch,(myCanvas.height*.9)/scv);
 	ctx.scale(1,1);
    ctx.restore();
 
-showtilemenu();
+	showtilemenu();
 
 }
 
@@ -125,29 +146,61 @@ if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,(64*scale),(32*scale))==tr
 scale=1.0;
 
 }
-function touchHandler(e) {
-	if(e.type=="touchstart" && e.touches) {
-		const touches = e.changedTouches;
-		touchx = touches[0].pageX;
-		touchy = touches[0].pageY;
+
+// Handle the bottom tool bar - this is where
+// the map editing tools are selected. Raise / Lower
+// tiles and undo.
+//
+function updatebottom(e){
+	if(e.type=="touchstart" && e.touches){
 		if(touchx<myCanvas.width/3.4 && touchy>myCanvas.height-100){
 			showtiles=true;
+			toolarrow = 0;
 		}
 		if(touchy>64 && touchy<myCanvas.height-100){
 			undodepth+=1;
 			debug = undodepth;
 		}
+	}
+	if(e.type=="touchend" && e.touches) {
+		if(showtiles){
+			showtiles=false;
+			editdelay=20;
+		}
+		if(touchx>myCanvas.width/3.4 && touchx<myCanvas.width/2 && touchy>myCanvas.height-100){
+			toolarrow=1;
+		}
+		if(touchx>myCanvas.width/2 && touchx<myCanvas.width/1.4 && touchy>myCanvas.height-100){
+			toolarrow=2;
+		}
+	}
+}
+
+function touchHandler(e) {
+	if(e.type=="touchstart" && e.touches) {
+		const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+		updatebottom(e);
+//		if(touchx<myCanvas.width/3.4 && touchy>myCanvas.height-100){
+//			showtiles=true;
+//		}
+//		if(touchy>64 && touchy<myCanvas.height-100){
+//			undodepth+=1;
+//			debug = undodepth;
+//		}
 
 		e.preventDefault();
 	}
 
 
 	if(e.type=="touchend" && e.touches) {
-		if(showtiles){
-			showtiles=false;
-			editdelay=20;
-		}
-
+		updatebottom(e);
+		//if(showtiles){
+		//	showtiles=false;
+		//	editdelay=20;
+		//}
+		
 		const touches = e.changedTouches;
 		touchx = touches[0].pageX;
 		touchy = touches[0].pageY;
