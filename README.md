@@ -12,6 +12,6 @@ Currently using these examples myself through the (free)ios app jsanywhere.
 
 Link to free online and downloadable study book : https://eloquentjavascript.net/ ( option to buy )
 <br>Rex van der Spuy also has some good books.<br><br>
-
-
+(Further references : Javascript the definitive guide(7th), build your own 2d game engine and create web games)
+<br><br>
 Dotate to author of this code repo. (Insert coin) https://www.paypal.me/RudyvanEtten/1
