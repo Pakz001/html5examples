@@ -12,4 +12,4 @@ Every time a change is made. The previous data before being changed is stored in
 <br><br>
 Notes<br>
 I think I need a height map system for this. a additional multidimenional array that holds a height value per cell position.<br>
-tests: do i need to convert each height to a tile map layer?
+tests: do i need to convert each height to a tile map layer? In the web populous that I found here on github. The map can go to any height and breaks through the top of the screen. I can not seem to find any code in there that shows where and how the actual drawing is done.
