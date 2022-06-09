@@ -15,3 +15,5 @@ I think I need a height map system for this. a additional multidimenional array 
 tests: do i need to convert each height to a tile map layer? In the web populous that I found here on github. The map can go to any height and breaks through the top of the screen. I can not seem to find any code in there that shows where and how the actual drawing is done.
 <br>
 Maybe : draw each height layer starting at heighest. If a value is there in a cell position. draw the tiles based on its auto tiling logic. Look up/down.?? If cell position is 10. Then around it can not be lower than 9. The draw coordinates are multiplied to be drawn up x height level.
+<br>
+Is it 4 way bitwise autotiling or 8 way bitwise tiling. (cracking brain looking for tools that create insigths)<br>
