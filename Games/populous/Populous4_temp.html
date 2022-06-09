@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    //
+    // create tile map. all isometric. populous amiga.
+
+	var toolarrow = 0; // which bottom tool is selected..
+   var debug = "nothing";
+	var debug2= "-1";
+	var scale = 1.0;
+	var c=document.getElementById("myCanvas");
+   var ctx=c.getContext("2d");
+	var touchx = 0;
+	var touchy = 0;
+   var tileselected = 1;
+	var heightmap = new Array();
+   var map = new Array();
+	var undomap = new Array(); // unlimited undo system
+	var undodepth=0; // our undo depth. Each edit changes are stored in undomap. Undoing restores to previous depth
+	var editdelay = 0; // a slight delay between screen switching and touch buttons
+
+ 	c.addEventListener("touchstart", touchHandler);
+	c.addEventListener("touchmove", touchHandler);
+	c.addEventListener("touchend", touchHandler);
+	showtiles = false;
+	gameloop=setInterval(doGameLoop,16);
+   for (x=-3;x<100;x++) {
+ 	for (var y=-3;y<100;y++) {
+	  //settile(x,y,Math.floor(Math.random()*16));
+		settile(x,y,0);
+ 	}
+	}
+
+function doGameLoop(){
+	if(editdelay>0)editdelay-=1;
+	
+	myCanvas.width = window.innerWidth;
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+
+	clearscreen();
+	for(x=-1;x<2;x++){
+	for(y=-1;y<2;y++){
+		setheighttile(15+x,10+y,1);
+	}}
+	//debug = heightmap[5][20];
+	//setheighttile(5,19,0);
+	//setheighttile(5,20,1);
+	//setheighttile(5,21,0);
+	// Here we draw the actual isometric map
+	// height mode.
+
+	//
+	// I had to change the isometric draw routine
+	// This to make sure the mapping is correct.
+	var drawhm = true;
+	if(drawhm){
+
+	sw = 0;
+	tw = 59;
+	th = 22;
+   for(x=0;x<50;x++){
+     	dx = -130-x*((tw*scale)/2);
+     	dy = 0+x*((th*scale)/2);
+	   for(y=0;y<50;y++){
+     	//if(sw==1)dx+=(31*scale);
+		tile(dx+500,dy-100,0);	
+
+     	if(heightmap[x]!=undefined && heightmap[x][y]!=undefined){
+			//if(heightmap[x][y]==1){
+			//}
+			if(heightmap[x][y]==1){
+				tile(dx+500,dy-100,1);	
+			}
+		}
+     	//tile(dx,dy,map[x][y]);
+			dx=dx+((tw*scale)/2);
+			dy=dy+((th*scale)/2);
+   	}
+   	//if(sw==0){
+     	//	sw=1;
+   	//}else{
+     	//	sw=0;
+   	//}
+	}
+		
+		
+	}else{
+   // draw isometric map(tile mode//no height)
+   sw = 0;
+   for(y=-2;y<myCanvas.height/(10*scale);y++){
+   for(x=-2;x<myCanvas.width/(64*scale);x++){
+     dx = x*(61*scale);
+     dy = y*(10*scale);
+     if(sw==1)dx+=(31*scale)
+     if(map[x]!=undefined && map[x][y]!=undefined){
+     tile(dx,dy,map[x][y]);
+		}
+   	}
+   	if(sw==0){
+     		sw=1;
+   	}else{
+     		sw=0;
+   }}}
+
+  	setcolor('black');
+	ctx.fillRect(0,0,myCanvas.width,32);
+	setcolor('white');
+	drawtext("Populous(amiga) tiles."+debug,10,10);
+	ctx.save()
+   var sch=myCanvas.width/200;
+   var scv=myCanvas.height/200;
+	ctx.scale(sch,scv);
+	var label = [
+		"Tile Menu",
+		"Raise",
+		"Lower",
+		"Undo"
+	]
+	var pos = [
+		(myCanvas.width*.05)/sch,
+		(myCanvas.height*.9)/scv,
+		(myCanvas.width*.33)/sch,
+		(myCanvas.height*.9)/scv,
+		(myCanvas.width*.55)/sch,
+		(myCanvas.height*.9)/scv,
+		(myCanvas.width*.75)/sch,
+		(myCanvas.height*.9)/scv
+	];
+	var cnt=0;
+	for(i=0;i<label.length;i++){
+  		ctx.fillText(label[i],pos[cnt],pos[cnt+1]);
+		cnt+=2;
+	}
+	ctx.scale(1,1);
+
+	ctx.fillRect(pos[toolarrow*2],pos[(toolarrow*2)+1]*1.02,96/sch,16/scv);
+	ctx.restore();
+
+   // draw selected tile from set
+   ctx.save();
+   ctx.translate(myCanvas.width/2,0)
+   ctx.scale(.5,.5);
+   tile(0,0,tileselected);
+	ctx.scale(1,1);
+   ctx.restore();
+
+	showtilemenu();
+
+}
+
+
+function showtilemenu(){
+scale=1.0;
+// show and select tiles.
+   if(showtiles){
+      ctx.fillStyle = 'rgba(0,0,0,.8';
+
+ctx.fillRect(0,16,myCanvas.width,myCanvas.height);
+   	cnt = 0;
+   	w = myCanvas.width-(64*scale);
+   	h = myCanvas.height-(32*scale);
+   	for( y=32;y<h;y+=(33*scale)){
+   	for( x=0;x<w;x+=(80*scale)){
+if(touchy>64 && rectsoverlap(touchx,touchy-32,1,1,x,y,(64*scale),(32*scale))==true){
+   tileselected = cnt;
+  	setcolor('white');
+	}else{
+  	setcolor('darkslategrey');
+	}
+   ctx.fillRect(x,y,(65*scale),(33*scale));
+	//setcolor('white');
+  	drawrect(x,y,(65*scale),(33*scale));
+	setcolor('white');
+  	drawtext(cnt,x+(68*scale),y+(20*scale));
+  	dx=x+1;dy=y+1
+     		tile(dx,dy,cnt);
+     		cnt=cnt+1;
+   	}}
+	}
+scale=1.0;
+
+}
+
+// Handle the bottom tool bar - this is where
+// the map editing tools are selected. Raise / Lower
+// tiles and undo.
+//
+function updatebottom(e){
+	if(e.type=="touchstart" && e.touches){
+		if(touchx<myCanvas.width/3.4 && touchy>myCanvas.height-100){
+			showtiles=true;
+			toolarrow = 0;
+		}
+		if(touchy>64 && touchy<myCanvas.height-100){
+			undodepth+=1;
+			debug = undodepth;
+		}
+	}
+	if(e.type=="touchend" && e.touches) {
+		if(showtiles){
+			showtiles=false;
+			editdelay=20;
+		}
+		if(touchx>myCanvas.width/3.4 && touchx<myCanvas.width/2 && touchy>myCanvas.height-100){
+			toolarrow=1;
+		}
+		if(touchx>myCanvas.width/2 && touchx<myCanvas.width/1.4 && touchy>myCanvas.height-100){
+			toolarrow=2;
+		}
+	}
+}
+
+function touchHandler(e) {
+	if(e.type=="touchstart" && e.touches) {
+		const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+		updatebottom(e);
+//		if(touchx<myCanvas.width/3.4 && touchy>myCanvas.height-100){
+//			showtiles=true;
+//		}
+//		if(touchy>64 && touchy<myCanvas.height-100){
+//			undodepth+=1;
+//			debug = undodepth;
+//		}
+
+		e.preventDefault();
+	}
+
+
+	if(e.type=="touchend" && e.touches) {
+		updatebottom(e);
+		//if(showtiles){
+		//	showtiles=false;
+		//	editdelay=20;
+		//}
+		
+		const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+      //y=Math.floor(touchy/(10*scale));
+      //x=Math.floor(touchx/(61*scale));
+   
+		//if(!showtiles)map[x][y-2]=tileselected;
+
+		editmap();
+
+
+
+
+
+
+
+	// if pressed up on undo area then undo with current level
+	//
+	if(editdelay==0 && undodepth>-1 && touchy>myCanvas.height-100 && touchx>myCanvas.width*.75){
+		// draw isometric map
+		editdelay=20;
+   	for(y=-2;y<myCanvas.height/(10*scale);y++){
+   	for(x=-2;x<myCanvas.width/(64*scale);x++){
+     		if(map[x]!=undefined && map[x][y]!=undefined){
+				a = undogettile(undodepth,x,y);
+				if(a!=-1){
+					map[x][y]=a;
+				}
+			}
+   	}}
+		if(undodepth>0)undodepth-=1;
+		debug = undodepth;
+	}
+
+
+
+
+   	e.preventDefault();
+	}
+	if(e.type=="touchmove" && e.touches) {
+		const touches = e.changedTouches;
+		touchx = touches[0].pageX;
+		touchy = touches[0].pageY;
+
+      //x=Math.floor(Math.random()*50);
+      //y=Math.floor(Math.random()*50);
+      
+      //y=Math.floor(touchy/(10*scale));
+      //x=Math.floor(touchx/(61*scale));
+      //if(!showtiles)map[x][y-2]=tileselected;
+   
+
+editmap();
+
+   	e.preventDefault();
+	}
+}
+
+// for regular tile editing. put the current selected
+// tile on the current touch position.
+//
+function editmap(){
+   // Hack Isometric touch collision
+	if(toolarrow==0){
+   sw = 0;
+   for(y=-2;y<myCanvas.height/(10*scale);y++){
+   for(x=-2;x<myCanvas.width/(64*scale);x++){
+     	dx = x*(61*scale);
+     	dy = y*(10*scale);
+     	if(sw==1)dx+=(31*scale)
+		if(touchy<myCanvas.height-96 && pointpolycollide(touchx,touchy,dx,dy)){
+	     if(map[x]!=undefined && map[x][y]!=undefined){
+  			   //tile(dx,dy,tileselected);
+				if(!showtiles && editdelay==0 && map[x][y]!=tileselected){
+					undosettile(undodepth,x,y,map[x][y]);
+					map[x][y]=tileselected;
+					
+
+					//undodepth+=1;
+					
+					//debug=undodepth;
+					return;
+				}
+			}
+		}
+
+   	}
+   	if(sw==0){
+     		sw=1;
+   	}else{
+     		sw=0;
+   }}}
+}
+
+function tile(x,y,tile){
+// the edges and isometric points
+// of interest. modify for scale
+
+	var 
+bottom=31*scale,top=0*scale,right=63*scale,left=0*scale,low1=bottom-bottom/3,center=right/2,high1=bottom/3;
+  	ctx.save();
+  	ctx.translate(x,y);
+	ctx.scale(1,1);
+
+	
+  if(tile==15){
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(left, high1);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(right, high1);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,low1);
+      ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,low1);
+   	ctx.lineTo(center, bottom);
+	   ctx.lineTo(left, low1);
+      ctx.fill();
+	}
+ if(tile==14){
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,low1);
+   	ctx.lineTo(center, bottom);
+	   ctx.lineTo(left, low1);
+      ctx.fill();
+	   setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right,high1);
+      ctx.lineTo(right,low1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(center, low1);
+      ctx.fill();
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,high1);
+      ctx.lineTo(center,low1);
+   	ctx.fill();
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(right,high1);
+      ctx.lineTo(center,low1);
+   	ctx.fill();
+  }
+  if(tile==13){
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,low1);
+   	ctx.lineTo(center, bottom);
+	   ctx.lineTo(left, low1);
+      ctx.fill();
+	   setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right,low1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(center, low1);
+      ctx.fill();
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,top);
+   	ctx.lineTo(right, low1);
+      ctx.lineTo(center,low1);
+   	ctx.fill();
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(right*.6,bottom*.6);
+   	ctx.lineTo(right, low1);
+
+   	ctx.fill();
+  }
+  if(tile==12){
+	   setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,low1);
+   	ctx.lineTo(center, bottom);
+	   ctx.lineTo(left, low1);
+      ctx.fill();
+	   setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right,low1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(center, low1);
+      ctx.fill();
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,high1);
+   	ctx.lineTo(right, low1);
+      ctx.lineTo(center,low1);
+   	ctx.fill();
+  }
+  if(tile==11){
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,top);
+		ctx.lineTo(center,bottom);
+   	ctx.fill();
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left+3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(left, low1);
+		ctx.lineTo(left,high1);
+   	ctx.fill();
+	   setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(center, bottom);
+      ctx.lineTo(right,high1);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,bottom);
+      ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+  }
+  if(tile==10){
+	   setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(right,high1);
+   	ctx.lineTo(center, bottom);
+      ctx.fill();
+	   setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+      ctx.fill();
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left+3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(left, low1);
+		ctx.lineTo(left,high1);
+   	ctx.fill();
+  }
+  
+  if(tile==9){
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center,top);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(center,bottom);
+   	ctx.fill();
+
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left+3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(left, low1);
+		ctx.lineTo(left,high1);
+   	ctx.fill();
+  }
+
+  if(tile==8){
+		setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center, high1);
+   	ctx.lineTo(right, low1);
+  	   ctx.lineTo(center, bottom);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, high1);
+   	ctx.lineTo(center, bottom*.4);
+      ctx.lineTo(right, low1);
+   	ctx.fill();
+   }
+	if(tile==7){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, low1);
+      ctx.lineTo(right,high1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,low1);
+      ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(left,low1);
+      ctx.lineTo(center,(low1+high1)/2);
+      ctx.fill();
+	}
+	if(tile==6){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, low1);
+      ctx.lineTo(right,high1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,low1);
+      ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+ 
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+	}
+   if(tile==5){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, low1);
+   	ctx.lineTo(center, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+      setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(center, low1);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+     setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+   }
+   if(tile==4){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, low1);
+   	ctx.fill();
+      setcolor('grey');
+		ctx.beginPath();
+		ctx.moveTo(left, low1);
+   	ctx.lineTo(center, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+      setcolor('lightgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(center, low1);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+     setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(center, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+   }
+	if(tile==3){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(right, high1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+   	ctx.fill();
+	}
+	if(tile==2){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(left, low1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(center, high1);
+   	ctx.lineTo(right, high1);
+   	ctx.lineTo(center, bottom);
+   	ctx.fill();
+		setcolor('dimgrey');
+		ctx.beginPath();
+		ctx.moveTo(right-3, high1);
+   	ctx.lineTo(center,bottom);
+   	ctx.lineTo(right, low1);
+		ctx.lineTo(right,high1);
+      ctx.fill();
+      setcolor('grey');
+      ctx.beginPath();
+      ctx.moveTo(right-3, high1);
+   	ctx.lineTo(left,low1);
+   	ctx.lineTo(center, (low1+high1)/2);
+		//ctx.lineTo(right,high1);
+   	ctx.fill();
+	}
+
+	if(tile==1){
+		setcolor('white');
+		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(left, low1);
+   	ctx.fill();
+		setcolor('lightgrey')
+ 		ctx.beginPath();
+		ctx.moveTo(center, top);
+   	ctx.lineTo(center, bottom);
+   	ctx.lineTo(right, low1);
+   	ctx.fill();
+	}
+
+  if(tile==0){
+	   setcolor('green');
+		ctx.beginPath(); 
+      ctx.moveTo(center, high1);
+      ctx.lineTo(right-2, low1);
+      ctx.lineTo(center, bottom);
+      ctx.lineTo(left+4, low1);
+      ctx.fill();
+  }
+	ctx.restore();
+}
+
+function drawrect(x,y,w,h){
+ctx.beginPath();
+ctx.strokeStyle='white';
+ctx.rect(x,y,w,h);
+ctx.stroke();
+}
+
+function setcolor(col){
+	ctx.fillStyle=col;
+}
+
+function drawtext(txt,x,y){
+	ctx.fillStyle='white';
+	ctx.fillText(txt,x,y); 
+}
+
+function clearscreen(){
+	ctx.fillStyle="rgb(0,0,0)";
+	ctx.fillRect(0,0,c.width,c.height);
+}
+
+function rectsoverlap(x1,y1,w1,h1,x2,y2,w2,h2){
+		return 	x1 <= x2+w2
+			&& 	x2 <= x1+w1
+			&&	y1 <= y2+h2
+			&&	y2 <= y1+h1;
+}
+// Set a undo tile and create slot in memory if there is nothing
+// there yet.
+function undosettile(depth,x,y,val){
+	
+	if(undomap[depth]==undefined){
+		undomap[depth]=new Array();
+	}
+	//debug = undomap[depth];
+	if(undomap[depth][x]==undefined){
+ 		undomap[depth][x]=new Array();
+	}
+	//debug = undomap[depth][x];
+	undomap[depth][x][y]=val;
+	//debug = undomap[depth][x][y];
+
+}
+
+// Set a undo tile and create slot in memory if there is nothing
+// there yet.
+function undogettile(depth,x,y){
+	if(undomap[depth]==undefined){
+		return -1;
+	}
+	if(undomap[depth][x]==undefined){
+ 		return -1;
+	}
+	a = undomap[depth][x][y];
+	if(a==undefined){
+		return -1;
+	}else{
+		return a;
+	}
+}
+
+// Set a tile and create slot in memory if there is nothing
+// there yet.
+function settile(x,y,val){
+	if(map[x]==undefined){
+ 		map[x]=new Array();
+	}
+	map[x][y]=val;
+}
+
+Function
+
+// Set a height and create slot in memory if there is nothing
+// there yet.
+function setheighttile(x,y,val){
+	if(heightmap[x]==undefined){
+ 		heightmap[x]=new Array();
+	}
+	heightmap[x][y]=val;
+}
+
+Function
+
+
+
+// Returns 1 if the lines intersect, otherwise 0.  Andre la moth.
+function get_line_intersection(p0_x, p0_y, p1_x, p1_y, p2_x,p2_y, p3_x, p3_y){
+	
+    var s1_x,s1_y,s2_x,s2_y;
+    s1_x = p1_x - p0_x;
+    s1_y = p1_y - p0_y;
+    s2_x = p3_x - p2_x;
+    s2_y = p3_y - p2_y;
+
+    var s,t;
+    s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+    t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) return true;
+    
+
+    return false; // No collision
+}
+
+function pointpolycollide(pointx,pointy,dx,dy){
+      var polygonx = [0*scale,32*scale,64*scale,32*scale];
+      var polygony = [16*scale,0*scale,16*scale,32*scale];
+
+		for(i=0;i<polygonx.length;i++){
+			polygonx[i]+=dx;
+			polygony[i]+=dy;
+		}
+
+		collisioncount=0;
+		sx=Math.random()*640;
+
+      sy=Math.random()*480;
+
+		if(Math.random()<.5){
+        sx-=1000;
+      }else{
+        sx+=1000;
+      }
+
+		if(Math.random()<.5){
+        sy-=1000;
+      }else{
+        sy+=1000;
+      }
+		
+		for( i=1;i<4;i++){
+			if (get_line_intersection(polygonx[i-1],polygony[i-1],polygonx[i],polygony[i],pointx,pointy,sx,sy))collisioncount+=1;
+}
+
+		if (get_line_intersection(polygonx[0],polygony[0],polygonx[polygonx.length-1],polygony[polygony.length-1],pointx,pointy,sx,sy))collisioncount+=1;
+		
+		if (collisioncount % 2 >0)return true;
+		
+		
+		return false;
+
+}
+
+
+</script>
+</body>
+</html>
