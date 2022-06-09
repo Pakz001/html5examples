@@ -13,3 +13,5 @@ Every time a change is made. The previous data before being changed is stored in
 Notes<br>
 I think I need a height map system for this. a additional multidimenional array that holds a height value per cell position.<br>
 tests: do i need to convert each height to a tile map layer? In the web populous that I found here on github. The map can go to any height and breaks through the top of the screen. I can not seem to find any code in there that shows where and how the actual drawing is done.
+<br>
+Maybe : draw each height layer starting at heighest. If a value is there in a cell position. draw the tiles based on its auto tiling logic. Look up/down.?? If cell position is 10. Then around it can not be lower than 9. The draw coordinates are multiplied to be drawn up x height level.
