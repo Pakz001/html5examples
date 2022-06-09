@@ -8,3 +8,8 @@ I'm programming it right now on a Ipad and Iphone. There are no mouse and keyboa
 Undo:<br>
 The unlimited undo system is a copy of the map array. This with a extra dimension for the undo depth.<br>
 Every time a change is made. The previous data before being changed is stored in the undo array. When doing a undo. The last changed data is restored to its previous value. I think with the array system(sparse) Only the changed data is stored, conserving memory.<br><br>
+
+<br><br>
+Notes<br>
+I think I need a height map system for this. a additional multidimenional array that holds a height value per cell position.<br>
+tests: do i need to convert each height to a tile map layer?
