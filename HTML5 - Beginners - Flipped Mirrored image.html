@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	let myim = CanvasToImage();
+	// when creating a image with canvastoimage then
+	// clear the screen after that.
+	cls();
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		cls();
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing flipped and mirrored image.",10,10); 
+
+
+		ctx.drawImage(myim,100,200);
+		// draw the image mirrored
+		drawmirror(100,100);
+		// draw the image flipped
+		drawflipped(100,300);
+
+	}
+	// draw a image as flipped
+	function drawflipped(x,y){
+		ctx.save();
+		ctx.scale(1, -1);
+		ctx.drawImage(myim,(x),  (-y)-myim.height);
+		ctx.restore();
+	}
+
+	// draw a image as mirrored
+	function drawmirror(x,y){
+		ctx.save();
+		ctx.scale(-1, 1);
+		ctx.drawImage(myim,  (-x)-myim.width,y);
+		ctx.restore();
+	}
+
+	// create a image from a canvas
+	// draw some random things on it like text and lines.
+	function CanvasToImage() {
+		let canvas = document.createElement("canvas");
+		canvas.width =64;
+		canvas.height = 64;
+		let canvasAsImage = new Image(64,64);
+		let cv=canvas.getContext("2d");
+		cv.save();
+		cv.fillStyle='green';
+		cv.scale(1,1);
+		cv.fillRect(0,0,64,4);
+		cv.fillRect(0,64-4,64,4);
+		cv.scale(3,3);
+		cv.fillText("Hello",10,10);
+		cv.restore();
+
+		canvasAsImage.src = canvas.toDataURL();
+		return canvasAsImage;
+	}
+	function cls(){
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+	}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
