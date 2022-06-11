@@ -48,9 +48,21 @@ ctx.fillText("Drawing a tilemap example.",10,10);
 // with the function
 sprites.forEach(drawsprite);
 
+// Here we loop through the
+// sprites array and have the code
+// in a code block here. the i
+// contains the loop number.
+sprites.forEach((sp,i) => {
+  ctx.fillStyle = 'blue';
+  ctx.fillRect(sp.x+5,sp.y+5,32,32);
+  ctx.fillStyle = 'white';
+  ctx.fillText(i,sp.x-5,sp.y-5);
+});
 }
+
 // draw sprite function
 function drawsprite(sp){
+  ctx.fillStyle = 'white';
   ctx.fillRect(sp.x,sp.y,32,32);
 }
 </script>
