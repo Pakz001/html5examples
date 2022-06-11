@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+// create a sprite object
+var sprite = {
+  x:0,
+  y:0
+};
+
+// create a sprites array
+var sprites = [];
+
+// create <10 sprite objects
+// in sprite array.
+for(i=0;i<10;i++){
+obj = Object.create(sprite);
+obj.x = i;
+sprites.push(obj);
+}
+
+
+// copy sprites array object
+// into new sprites2 array object
+var sprites2 = Object.create(sprites);
+
+
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example."+sprites.length,10,10);
+
+// draw the sprites object
+sprites.forEach((sp,i) => {
+  ctx.fillText("x:"+sp.x,100,i*30);
+});
+// draw the sprites copy object
+sprites2.forEach((sp,i) => {
+  ctx.fillText("x:"+sp.x,150,i*30);
+});
+
+}
+</script>
+</body>
+</html> 
