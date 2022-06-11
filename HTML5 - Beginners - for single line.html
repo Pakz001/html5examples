@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+  var sprite = {
+    x:0, // seems random works here Not
+    y:0,
+    draw:function(){
+      ctx.fillRect(this.x,this.y,32,32);
+    }
+  };
+  var sprites = [];
+  for(var i=0;i<10;i++){
+    obj=Object.create(sprite);
+    obj.x=Math.random()*myCanvas.width;
+    obj.y=Math.random()*myCanvas.height;
+    sprites.push(obj);
+}
+  
+
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example.",10,10); 
+
+
+
+// Single line for
+for(i of sprites)i.draw();
+
+
+
+}
+</script>
+</body>
+</html> 
