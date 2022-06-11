@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+var delay=0;
+
+var sprite = {
+  active:false,
+  x:0,
+  y:0,
+  draw:function(){
+    if(this.active){
+      ctx.fillStyle = 'green';
+      ctx.fillRect(this.x,this.y,32,32);
+    }
+  },
+};
+
+var sprites = [];
+
+// pre populate 10 sprites
+for(i=0;i<10;i++){
+  o = Object.create(sprite);
+  o.x = Math.random()*myCanvas.width;
+  o.y = Math.random()*myCanvas.height;
+  sprites.push(o);
+}
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("object/array findindex.",10,10); 
+
+
+// every 100 activate 1 sorite
+delay--;
+if(delay<0){
+  delay=100;
+  // get index of a sprite with
+  // active set to false.
+  var a = sprites.findIndex(element=> element.active===false);
+// if there is a index then activate
+if(a!=undefined)sprites[a].active=true;
+}
+
+
+
+// draw sprites
+for(var i of sprites){
+  i.draw();
+}
+
+
+}
+function addsprite(x,y){
+  //num = 
+}
+</script>
+</body>
+</html> 
