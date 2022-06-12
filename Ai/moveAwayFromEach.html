@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+  var sprite = {
+    x:0,
+    y:0,
+    update:function(){
+
+      for(z of sprites){
+        d = Math.hypot(this.y-z.y,this.x-z.x);
+        if(d>0 && d<32){
+          a=Math.atan2(this.y-z.y,this.x-z.x);
+          this.x+=Math.cos(a)*1;
+          this.y+=Math.sin(a)*1;
+        }
+      }
+    },
+    draw:function(){
+     
+ctx.setColor = 'white';
+      ctx.beginPath();
+ctx.arc(this.x,this.y,8,0,6);
+ ctx.fill();
+    }
+  }
+
+var sprites = [];
+
+
+
+var num=0;
+var delay=20;
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example.",10,10); 
+
+delay-=1;
+if(delay<9 && num<230){
+addsprite();
+num+=1;
+delay=29;
+}
+
+for(i of sprites){
+  i.update();
+  i.draw();
+}
+
+}
+function addsprite(){
+  var obj = Object.create(sprite);
+  obj.x = myCanvas.width/2+(Math.random()*16);
+  obj.y = myCanvas.height/2+(Math.random()*16);
+  sprites.push(obj);
+}
+</script>
+</body>
+</html> 
