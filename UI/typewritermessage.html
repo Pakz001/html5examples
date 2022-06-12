@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var message = {
+		x:0,
+		y:0,
+		w:0,
+		h:0,
+		tpos:0,
+		tspeed:3, // how fast does the text need to appear(lower is faster)
+		message:"",
+		done:false,
+		// new message
+		newmessage:function(m){
+			this.tpos = 0;
+			this.message = m;
+			this.done=false;
+			this.setheight();
+		},
+		// set up our initial text window
+		setup:function(x,y,w,h){
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+		},
+		//
+		// The regular typing routine but now rigged
+		// to set height of the text window
+		setheight:function(){
+			var x1=y1=0;
+			for(i=0;i<this.message.length;i++){
+				ctx.fillText(this.message.substr(i,1),this.x+x1+16,this.y+y1+16);
+				if(this.message.substr(i,1)===' '){
+					var tx = x1;
+					for(var z=i+1;z<this.message.length;z++){
+						tx+=10;
+						if(this.message.substr(z,1)==' '){
+							break;
+						}
+						if(this.message.substr(z,1)!=' '){
+						if(tx>(this.w-32)){							x1=-10;
+							y1+=10;
+							break;
+						}}
+					}
+				}				
+				x1+=10;
+			}
+			this.h = y1+32;		
+		},
+		// This draws the text message window to the ctx canvas
+		//
+		draw:function(){
+			ctx.fillStyle='rgb(30,30,30)';
+			ctx.fillRect(this.x,this.y,this.w,this.h);
+			ctx.strokeStyle='white';
+			ctx.beginPath();
+			ctx.rect(this.x,this.y,this.w,this.h);
+			ctx.stroke();
+			var pos=Math.floor(this.tpos/this.tspeed);
+			var cnt=0;
+			ctx.fillStyle = 'white';
+			var x1=y1=0;
+			if(pos==this.message.length)this.done=true;
+			for(i=0;i<this.message.length;i++){
+				if(i>pos)break;
+				ctx.fillText(this.message.substr(i,1),this.x+x1+16,this.y+y1+16);
+				if(this.message.substr(i,1)===' '){
+					var tx = x1;
+					for(var z=i+1;z<this.message.length;z++){
+						tx+=10;
+						if(this.message.substr(z,1)==' '){
+							break;
+						}
+						if(this.message.substr(z,1)!=' '){
+						if(tx>(this.w-32)){							x1=-10;
+							y1+=10;
+							break;
+						}}
+					}
+				}				
+				x1+=10;
+			}
+		},
+		// call this in the game loop
+		update:function(){
+			this.tpos++;
+		}
+	};
+
+	var m = Object.create(message);
+	m.setup(100,100,200,120);
+	//m.newmessage("Hello from the mister from the radio...");
+	randommessage();
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing:"+m.done,10,10); 
+
+		// if the message has been displayed
+		// immediatly show a new one
+		if(m.done==true)randommessage();
+
+		m.draw();
+		m.update();
+
+	}
+	//
+	// make some random message.
+	function randommessage(){
+		var len=Math.random()*80;
+		len+=40;
+		var a="";
+		for(i=0;i<len;i++){
+			a+=String.fromCharCode(Math.floor(Math.random()*256));
+			if(Math.random()<.4)a+=' ';//every now and then feed a space.
+		}
+		m.newmessage(a);
+	}
+	
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
