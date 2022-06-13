@@ -199,6 +199,9 @@ gameloop=setInterval(doGameLoop,16);
 function doGameLoop(){
 	updateCanvasSize();
 
+	ctx.fillStyle="rgb(0,0,0)";
+	ctx.fillRect(0,0,c.width,c.height);
+
 	for(var y = 0; y < map.length; ++y) {
 	for(var x = 0; x < map[y].length; ++x) {
             //if(map[y][x]==1) {
@@ -272,12 +275,12 @@ for(var y = 0; y < map.length; ++y) {
 		//ctx.fillStyle = 'black';
 		//ctx.fillText(lightmap[y][x],x*tilew,y*tileh+16);
 		//if(lightmap[y][x]>0){
-			var a = (lightmap[y][x]/30);
+			var a = 1.0-(lightmap[y][x]);
 			if(a<0)a=0;
 			if(a>1)a=1;
 			ctx.globalAlpha = a;
-			ctx.fillStyle = 'black';
-			ctx.strokeStyle= 'black';
+			ctx.fillStyle = 'rgb(10,5,0)';
+			//ctx.strokeStyle= 'black';
 			ctx.fillRect(x*tilew,y*tileh,tilew,tileh);
 		//}
 	}}
@@ -287,6 +290,9 @@ for(var y = 0; y < map.length; ++y) {
 	ctx.fillStyle = 'white';
 	ctx.fillText(debug,20,20);
 
+
+	ctx.fillStyle="rgb(255,255,255)";
+	ctx.fillText("Drawing a tilemap example."+debug,10,10); 
 
 
 	// every now and then
@@ -307,12 +313,34 @@ function addsprite(){
   sprites.push(obj);
 }
 function updateCanvasSize(){
+var oldcw = myCanvas.width;
+var oldch = myCanvas.height;
 	myCanvas.height = window.innerHeight-32;
 	myCanvas.width = window.innerWidth-32;
-	ctx.fillStyle="rgb(0,0,0)";
-	ctx.fillRect(0,0,c.width,c.height);
-	ctx.fillStyle="rgb(255,255,255)";
-	ctx.fillText("Drawing a tilemap example."+debug,10,10); 
+var oldtw = tilew;
+var oldth = tileh;
+	tilew = Math.floor(myCanvas.width/mapw);
+	tileh = Math.floor(myCanvas.height/maph);
+
+
+
+if(!sprites || oldcw==myCanvas.width)return;
+// here we want to get the
+// percentage of the position
+// on screen. then set it
+// so it matches the new
+// resolution.
+for(var g of sprites){
+
+var aa= (g.x/oldcw)*100;
+var bb= (g.y/oldch)*100;
+g.x=(myCanvas.width/100)*aa;
+g.y=(myCanvas.height/100)*bb;
+}
+for(var g of sprites){
+g.update();
+}
+
 }
 
 function makelightmap(){
@@ -322,7 +350,7 @@ function makelightmap(){
 	oly = [];
 	olx.push(x);
 	oly.push(y);
-	lightmap[y][x]=2;
+	lightmap[y][x]=1;
 	//var mx=[-1,0,1,1,1,0,-1,-1];
 	//var my=[-1,-1,-1,0,1,1,1,0];
 		var mx=[-1,0,1,0];
@@ -336,11 +364,11 @@ function makelightmap(){
 			if(x+x1>-1 && y+y1>-1 && x+x1<mapw && y+y1<maph){
 			if(lightmap[y+y1][x+x1]==0){
 				if(map[y+y1][x+x1]==0){
-					lightmap[y+y1][x+x1]=lightmap[y][x]+1;
+					lightmap[y+y1][x+x1]=lightmap[y][x]/100*90;
 
 
 				}else{
-					lightmap[y+y1][x+x1]=lightmap[y][x]+1.5;
+					lightmap[y+y1][x+x1]=lightmap[y][x]/100*80;
 				}
 				//if(map[y][x]==1)lightmap[y][x]=lightmap[y][x]/2;
 				olx.push(x+x1);
