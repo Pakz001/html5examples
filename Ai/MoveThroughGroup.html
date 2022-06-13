@@ -25,7 +25,7 @@ var debug=0;
       for(z of sprites){
         d = Math.hypot(this.y-z.y,this.x-z.x);
         if(d>0 && d<32){
-          a=Math.atan2(this.y-z.y,this.x-z.x);
+          a=Math.atan2(this.y-z.y,this.x-z.x)-.5;
           this.x+=Math.cos(a)*32/d;
           this.y+=Math.sin(a)*32/d;
         }
@@ -44,13 +44,20 @@ var debug=0;
 					this.targety=0;
 			}
       }
-    },
-    draw:function(){
-     
-ctx.setColor = 'white';
+		// Every now and then move to center of group for a bit
+		if(Math.random()<.1){
+      //for(t of sprites){
+          a=Math.atan2(myCanvas.width/2-this.y,myCanvas.height/2-this.x);
+          this.x+=Math.cos(a)*.5;
+          this.y+=Math.sin(a)*.5;
+     	}
+   },
+	//Draw a oval or circle using the arc command
+	draw:function(){     
+		ctx.setColor = 'white';
       ctx.beginPath();
-ctx.arc(this.x,this.y,8,0,6);
- ctx.fill();
+		ctx.arc(this.x,this.y,8,0,6);
+		ctx.fill();
     }
   }
 
@@ -70,32 +77,33 @@ var delay=20;
 gameloop=setInterval(doGameLoop,16);
 
 function doGameLoop(){
-myCanvas.height = window.innerHeight-32;
-myCanvas.width = window.innerWidth-32;
-ctx.fillStyle="rgb(0,0,0)";
-ctx.fillRect(0,0,c.width,c.height);
-ctx.fillStyle="rgb(255,255,255)";
-ctx.fillText("Drawing a tilemap example."+debug,10,10); 
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+	ctx.fillStyle="rgb(0,0,0)";
+	ctx.fillRect(0,0,c.width,c.height);
+	ctx.fillStyle="rgb(255,255,255)";
+	ctx.fillText("Drawing a tilemap example."+debug,10,10); 
 
-delay-=1;
-if(delay<9 && num<230){
-addsprite();
-num+=1;
-delay=29;
-}
-
-for(i of sprites){
-  i.update();
-  i.draw();
-}
-
-if(Math.random()<.02){
-
-var s = Math.floor(Math.random()*sprites.length);
-sprites[s].state='movetotarget';
-sprites[s].targetx = Math.random()*myCanvas.width;
-sprites[s].targety = Math.random()*myCanvas.height;
-}
+	// while space add some sprites.
+	delay-=1;
+	if(delay<2 && num<230){
+		addsprite();
+		num+=1;
+		delay=29;
+	}
+	// update our sprites
+	for(i of sprites){
+  		i.update();
+  		i.draw();
+	}
+	// every now and then
+	// pick a sprite and move it to a new location
+	if(Math.random()<.02){
+		var s = Math.floor(Math.random()*sprites.length);
+		sprites[s].state='movetotarget';
+		sprites[s].targetx = Math.random()*myCanvas.width;
+		sprites[s].targety = Math.random()*myCanvas.height;
+	}
 
 
 }
