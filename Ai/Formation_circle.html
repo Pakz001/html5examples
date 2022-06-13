@@ -95,9 +95,11 @@ Use different browser.
 			let d = Math.hypot(this.targety-this.y,this.targetx-this.x);
         	if(d>4){
           	var a=Math.atan2(this.targety-this.y,this.targetx-this.x);
-					// move
-          	this.x+=(Math.cos(a)*this.sp);
-          	this.y+=(Math.sin(a)*this.sp);
+				// sprint if we are far away
+				var sprint=0;
+				if(d>90)sprint=(Math.random()-.5)+.5;
+          	this.x+=(Math.cos(a)*(this.sp+sprint));
+          	this.y+=(Math.sin(a)*(this.sp+sprint));
 			}else{
 					this.state='nothing';
 					this.targetx=0;
