@@ -196,17 +196,53 @@ function doGameLoop(){
             //if(map[y][x]==1) {
 				//	ctx.fillRect(x*tilew,y*tileh,tilew,tileh);
 				//}
+
 				if(map[y][x]==0){
 					ctx.drawImage(tiles,0,16,8,8,x*tilew,y*tileh,tilew,tileh);
 				}
 				if(x%2==0 && y%2==0 && map[y][x]==0){
+					
 					ctx.drawImage(tiles,8,16,8,8,x*tilew,y*tileh,tilew,tileh);
 				}
 
 				if(map[y][x]==1){
 					ctx.drawImage(tiles,16,16,8,8,x*tilew,y*tileh,tilew,tileh);
+					// add shadow
+					if(y+1<maph && map[y+1][x]==0){
+						ctx.fillStyle = 'rgba(0,0,0,.5)';
+						ctx.fillRect(x*tilew,y*tileh+tileh,tilew,tileh/2);
+					}
 				}
 	}}
+
+for(var y = 0; y < map.length; ++y) {
+	for(var x = 0; x < map[y].length; ++x) {
+
+
+				if(map[y][x]==1){
+
+					// add shadow
+					if(y+1<maph && map[y+1][x]==0){
+						ctx.fillStyle = 'rgba(0,0,0,.25)';
+						ctx.fillRect(x*tilew,y*tileh+(tileh*.7),tilew,tileh/2);
+					}
+					if(y+1<mapw && map[y][x+1]==0){
+						ctx.fillStyle = 'rgba(0,0,0,.25)';
+						ctx.fillRect(x*tilew+(tilew*.7),y*tileh,tilew/2,tileh);
+					}
+					// add lights
+					if(y-1>0 && map[y-1][x]==0){
+						ctx.fillStyle = 'rgba(255,255,255,.25)';
+						ctx.fillRect(x*tilew,y*tileh,tilew,tileh/3);
+					}
+					if(x-1>0 && map[y][x-1]==0){
+						ctx.fillStyle = 'rgba(255,255,255,.25)';
+						ctx.fillRect(x*tilew,y*tileh,tilew/3,tileh);
+					}
+				}
+	}}
+
+
 	ctx.fillStyle = 'black';
 	ctx.fillText(debug,20,20);
 
