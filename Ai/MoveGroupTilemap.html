@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+var debug=0;
+	updateCanvasSize();
+	var map = [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ]
+
+	var mapw = map[0].length;
+	var maph = map.length;
+	var tilew = myCanvas.width/mapw+1;
+	var tileh = myCanvas.height/maph+1;
+
+  	var sprite = {
+		traveltime:0,//if we are traveling to long then back to nothing.
+    x:0,
+    y:0,
+    targetx:0,
+    targety:0,
+    state:'nothing',
+    update:function(){
+		// stay away from tiles..
+		for(var y3=-4;y3<8;y3+=4){
+		for(var x3=-4;x3<8;x3+=4){
+		var x1=Math.floor((this.x+x3) / tilew);
+		var y1=Math.floor((this.y+y3) / tileh);
+		for(var y2=-1;y2<2;y2++){
+		for(var x2=-1;x2<2;x2++){
+			if(x1+x2>-1 && y1+y2>-1 && x1+x2<mapw && y1+y2<maph){
+			if(map[y1+y2][x1+x2]!=0){
+				if(y2==-1)this.y++;
+				if(y2==1)this.y--;
+				if(x2==1)this.x--;
+				if(x2==-1)this.x++;
+			}}
+		}}}}
+
+
+
+      // keep distance between other sprites..
+      for(z of sprites){
+        d = Math.hypot(this.y-z.y,this.x-z.x);
+        if(d>0 && d<32){
+          a=Math.atan2(this.y-z.y,this.x-z.x)-.5;
+          this.x+=Math.cos(a)*32/d;
+          this.y+=Math.sin(a)*32/d;
+        }
+      }
+      // move towards destination.
+      if(this.state==='movetotarget'){
+			// if we might be walking and not getting
+			// anywhere then revert back to doing nothing.
+			this.traveltime++;
+			if(this.traveltime>300){
+				this.traveltime=0;
+				this.state='nothing';
+			}
+			let d = Math.hypot(this.targety-this.y,this.targetx-this.x);
+        	if(d>8){
+          	var a=Math.atan2(this.targety-this.y,this.targetx-this.x);
+					// move
+          	this.x+=(Math.cos(a)*1.5);
+          	this.y+=(Math.sin(a)*1.5);
+			}else{
+					this.state='nothing';
+					this.targetx=0;
+					this.targety=0;
+			}
+      }
+		// Every now and then move to center of group for a bit
+		if(Math.random()<.1){
+      //for(t of sprites){
+          a=Math.atan2(myCanvas.width/2-this.y,myCanvas.height/2-this.x);
+          this.x+=Math.cos(a)*.5;
+          this.y+=Math.sin(a)*.5;
+     	}
+
+   },
+	//Draw a oval or circle using the arc command
+	draw:function(){     
+		ctx.setColor = 'white';
+      ctx.beginPath();
+		ctx.arc(this.x,this.y,8,0,6);
+		ctx.fill();
+    }
+  }
+
+var sprites = [];
+
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+for(i =0;i<6;i++){
+addsprite();
+}
+
+
+
+var num=0;
+var delay=20;
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+	updateCanvasSize();
+for(var y = 0; y < map.length; ++y) {
+            for(var x = 0; x < map[y].length; ++x) {
+            if(map[y][x]==1) ctx.fillRect(x*tilew,y*tileh,tilew,tileh);
+            }
+        }
+
+
+	// while space add some sprites.
+	delay-=1;
+	if(delay<1 && num<200){
+		addsprite();
+		num+=1;
+		delay=10;
+	}
+	// update our sprites
+	for(i of sprites){
+  		i.update();
+  		i.draw();
+	}
+	// every now and then
+	// pick a sprite and move it to a new location
+	if(Math.random()<.02){
+		var s = Math.floor(Math.random()*sprites.length);
+		sprites[s].state='movetotarget';
+		sprites[s].targetx = Math.random()*myCanvas.width;
+		sprites[s].targety = Math.random()*myCanvas.height;
+	}
+
+
+}
+function addsprite(){
+  var obj = Object.create(sprite);
+  obj.x = myCanvas.width/2+(Math.random()*16);
+  obj.y = myCanvas.height/2+(Math.random()*16);
+  sprites.push(obj);
+}
+function updateCanvasSize(){
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+	ctx.fillStyle="rgb(0,0,0)";
+	ctx.fillRect(0,0,c.width,c.height);
+	ctx.fillStyle="rgb(255,255,255)";
+	ctx.fillText("Drawing a tilemap example."+debug,10,10); 
+}
+
+</script>
+</body>
+</html> 
