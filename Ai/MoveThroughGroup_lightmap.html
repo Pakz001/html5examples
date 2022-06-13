@@ -58,7 +58,13 @@ var debug=0;
 	var maph = map.length;
 	var tilew = Math.floor(myCanvas.width/mapw);
 	var tileh = Math.floor(myCanvas.height/maph);
-	makelightmap();
+	makelightmap(2,2);
+	makelightmap(mapw-2,2);
+	makelightmap(2,maph-2);
+	makelightmap(mapw-2,maph-2);
+
+	makelightmap(Math.floor(mapw/2),Math.floor(maph/2));
+
 
   	var sprite = {
 		direction:0,
@@ -343,18 +349,26 @@ g.update();
 
 }
 
-function makelightmap(){
-	var x=Math.floor(mapw/2);
-	var y=Math.floor(maph/2);
+function makelightmap(x,y){
+	//var x=Math.floor(mapw/2);
+	//var y=Math.floor(maph/2);
+	var tempmap = [];
+
+	for(var yx = 0; yx < map.length; yx++) {
+		tempmap[yx] = [];
+	for(var xx = 0; xx < map[yx].length; xx++) {
+		tempmap[yx][xx]=0;
+	}}
+	
 	olx = [];
 	oly = [];
 	olx.push(x);
 	oly.push(y);
-	lightmap[y][x]=1;
+	tempmap[y][x]=1;
 	//var mx=[-1,0,1,1,1,0,-1,-1];
 	//var my=[-1,-1,-1,0,1,1,1,0];
-		var mx=[-1,0,1,0];
-		var my=[0,-1,0,1];
+	var mx=[-1,0,1,0];
+	var my=[0,-1,0,1];
 	while(olx.length>0){
 		x = olx.shift()
 		y = oly.shift();
@@ -362,14 +376,15 @@ function makelightmap(){
 			var x1=mx[n];
 			var y1=my[n];
 			if(x+x1>-1 && y+y1>-1 && x+x1<mapw && y+y1<maph){
-			if(lightmap[y+y1][x+x1]==0){
+			if(tempmap[y+y1][x+x1]==0){
 				if(map[y+y1][x+x1]==0){
-					lightmap[y+y1][x+x1]=lightmap[y][x]/100*90;
+					tempmap[y+y1][x+x1]=(tempmap[y][x]/100)*90;
 
 
 				}else{
-					lightmap[y+y1][x+x1]=lightmap[y][x]/100*80;
+					tempmap[y+y1][x+x1]=(tempmap[y][x]/100)*65;
 				}
+				//tempmap[y+y1][x+x1]=1;
 				//if(map[y][x]==1)lightmap[y][x]=lightmap[y][x]/2;
 				olx.push(x+x1);
 				oly.push(y+y1);
@@ -379,8 +394,41 @@ function makelightmap(){
 		}
 
 	}
+	for(var yx = 0; yx < map.length; yx++) {
+	for(var xx = 0; xx < map[yx].length; xx++) {
+		lightmap[yx][xx] = lightmap[yx][xx]+tempmap[yx][xx];
+		lightmap[yx][xx]=lightmap[yx][xx]*.7;
+	}}
+	for(var yx = 0; yx < map.length; yx++) {
+	for(var xx = 0; xx < map[yx].length; xx++) {
+		var d=0;
+		var val=0;
+		for(var x5=-1;x5<2;x5++){
+		for(var y5=-1;y5<2;y5++){
+		var t=yx+x5;
+		var h=xx+y5;
+			if(t>-1 && t<maph && h<mapw && h>-1){
+				val+=lightmap[t][h];
+				d++;
+			}
+		}}
+		if(d>0){
+			lightmap[yx][xx]=val/d;
+		}
+	}}
 }
 
 </script>
 </body>
 </html> 
+
+
+
+
+
+
+
+
+
+
+
