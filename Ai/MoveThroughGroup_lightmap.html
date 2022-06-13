@@ -56,8 +56,8 @@ var debug=0;
 
 	var mapw = map[0].length;
 	var maph = map.length;
-	var tilew = myCanvas.width/mapw;
-	var tileh = myCanvas.height/maph;
+	var tilew = Math.floor(myCanvas.width/mapw);
+	var tileh = Math.floor(myCanvas.height/maph);
 	makelightmap();
 
   	var sprite = {
@@ -272,8 +272,12 @@ for(var y = 0; y < map.length; ++y) {
 		//ctx.fillStyle = 'black';
 		//ctx.fillText(lightmap[y][x],x*tilew,y*tileh+16);
 		//if(lightmap[y][x]>0){
-			ctx.globalAlpha = (lightmap[y][x]/30);
+			var a = (lightmap[y][x]/26);
+			if(a<0)a=0;
+			if(a>1)a=1;
+			ctx.globalAlpha = a;
 			ctx.fillStyle = 'black';
+			ctx.strokeStyle= 'black';
 			ctx.fillRect(x*tilew,y*tileh,tilew,tileh);
 		//}
 	}}
