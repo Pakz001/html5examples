@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	//
+	//
+	//
+	//
+	//
+	//	
+	//
+
+
+	var c=document.getElementById("myCanvas");
+   var ctx=c.getContext("2d");
+	var debug=0;
+
+	//
+	// Formation manager - holds the coordinates
+	// of where the sprites will move towards.
+	// add a new sprite and the circle will grow
+	//
+	// ... needs work with removing sprites
+	var formationManager = {
+		// 0 = leader	
+		step:0,	
+		centerx:0,
+		centery:0,
+		x:[],
+		y:[],
+		character:[],// slot of sprite
+		setcenter:function(x,y){
+			this.centerx = x;
+			this.centery = y;
+		},
+		updatecenter:function(){
+			// make the circle
+			step = (Math.PI*2)/this.x.length;
+			for(var i=0;i<this.x.length;i++){
+				this.x[i] = this.centerx+(Math.cos(i*step)*(this.x.length*5));
+				this.y[i] = this.centery+(Math.sin(i*step)*(this.x.length*5));
+				if(this.character[i]>-1){
+				sprites[this.character[i]].targetx = this.x[i];
+				sprites[this.character[i]].targety = this.y[i];
+				sprites[this.character[i]].state='movetotarget';
+				}
+			}
+		},
+		newsprite:function(spr){
+			this.x.push(0);
+			this.y.push(0);
+			this.character.push(spr);
+			this.setcenter(this.centerx,this.centery);
+			this.updatecenter();
+		},
+		draw:function(){
+			ctx.fillStyle = 'rgb(30,30,30)';
+			ctx.fillText(this.x[0],50,50);
+			for(var i=0;i<this.x.length;i++){
+				ctx.fillRect(this.x[i],this.y[i],16,16);
+			}
+		},
+	};
+
+  	var sprite = {
+		sp:1.5,
+    x:0,
+    y:0,
+    targetx:0,
+    targety:0,
+	 format:false,
+    state:'nothing',
+    update:function(){
+		if(Math.random()<.1)this.sp = Math.random()+.5;
+      // keep distance between other sprites..
+      for(z of sprites){
+        d = Math.hypot(this.y-z.y,this.x-z.x);
+        if(d>0 && d<16){
+          a=Math.atan2(this.y-z.y,this.x-z.x)-.5;
+          this.x+=Math.cos(a)*32/d;
+          this.y+=Math.sin(a)*32/d;
+        }
+      }
+      // move towards destination.
+      if(this.state==='movetotarget'){
+			let d = Math.hypot(this.targety-this.y,this.targetx-this.x);
+        	if(d>4){
+          	var a=Math.atan2(this.targety-this.y,this.targetx-this.x);
+					// move
+          	this.x+=(Math.cos(a)*this.sp);
+          	this.y+=(Math.sin(a)*this.sp);
+			}else{
+					this.state='nothing';
+					this.targetx=0;
+					this.targety=0;
+			}
+      }
+		// Every now and then move to center of group for a bit
+		//if(Math.random()<.1){
+      //for(t of sprites){
+      //    a=Math.atan2(myCanvas.width/2-this.y,myCanvas.height/2-this.x);
+      //    this.x+=Math.cos(a)*.5;
+      //    this.y+=Math.sin(a)*.5;
+     	//}
+   },
+	//Draw a oval or circle using the arc command
+	draw:function(){     
+		ctx.fillStyle = 'white';
+      ctx.beginPath();
+		ctx.arc(this.x,this.y,8,0,6);
+		ctx.fill();
+    }
+  }
+
+var sprites = [];
+
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+for(i =0;i<6;i++){
+//addsprite();
+}
+
+
+
+var formation = Object.create(formationManager);
+
+for(var i=0;i<5;i++){
+//formation.newsprite();
+}
+formation.setcenter(320,200);
+
+var num=0;
+var delay=20;
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+	ctx.fillStyle="rgb(0,0,0)";
+	ctx.fillRect(0,0,c.width,c.height);
+	ctx.fillStyle="rgb(255,255,255)";
+	ctx.fillText("Formation Manager 01."+debug,10,10); 
+
+	// while space add some sprites.
+	delay-=1;
+	formation.centerx+=.4;
+	formation.updatecenter()
+	if(delay<2){
+		delay=29;
+		if(formation.centerx>myCanvas.width-100)formation.centerx=100;
+
+		if(num<16){
+			addsprite();
+			formation.newsprite(sprites.length-1);
+			num+=1;
+		}
+	}
+	
+	formation.draw();
+
+	// update our sprites
+	for(var i of sprites){
+  		i.update();
+  		i.draw();
+	}
+	// every now and then
+	// pick a sprite and move it to a new location
+	if(Math.random()<.02){
+		//var s = Math.floor(Math.random()*sprites.length);
+		//sprites[s].state='movetotarget';
+		//sprites[s].targetx = Math.random()*myCanvas.width;
+		//sprites[s].targety = Math.random()*myCanvas.height;
+
+	}
+
+
+}
+function addsprite(){
+  	var obj = Object.create(sprite);
+  	obj.x = myCanvas.width/2+(Math.random()*16);
+  	obj.y = myCanvas.height/2+(Math.random()*16);
+  	obj.format=true;
+	sprites.push(obj);
+	
+}
+</script>
+</body>
+</html> 
