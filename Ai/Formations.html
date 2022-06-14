@@ -23,6 +23,7 @@ Use different browser.
 	var c=document.getElementById("myCanvas");
 	var ctx=c.getContext("2d");
 	var debug=0;
+
 	class  point {
     	// line,defensivecircle,fingerfour,twoabreast
     	type = 'defensivecircle';
@@ -42,13 +43,16 @@ Use different browser.
 			this.angles = [];
   		}
 		addleader(x,y){
+
 			this.centerx = x;
 			this.centery = y;
-			this.x[0]=(x+32);
-			this.y[0]=(y);
+			this.x.push(x+16);
+			this.y.push(y);
+
 		}
 		// add a slot to the formation if possible
 		addslot(){
+
 			if(this.x.length>3)return; // max = 4
 			
 			var x1=0;
@@ -70,9 +74,13 @@ Use different browser.
 			this.x.push(x1);
 			this.y.push(y1);
       }
+		//if(this.type=='fingerfour'){
+			
+		//}
   	}
 		// update the positions if rotated and such.
 		update(){
+
 			if(this.type=='line'){
 				for(var i=1;i<this.x.length;i++){
 					this.x[i]=this.x[0]+(Math.cos(this.angle)*(i*16));
@@ -80,17 +88,16 @@ Use different browser.
 				}
 			}
 			if(this.type=='defensivecircle'){
-      	var step=(Math.PI*2)/4;
-      		for(var i=0;i<4;i++){
+      		var step=(Math.PI*2)/4;
+      		for(var i=0;i<this.x.length;i++){
         			this.x[i]=this.centerx+(Math.cos(this.angle+i*step)*16);
 					this.y[i]=this.centery+(Math.sin(this.angle+i*step)*16);
       		}
-			//this.x.push(x1-32);
-			//this.y.push(y1);
-			
 			}
+
 		}
 		draw(){
+
 			ctx.globalAlpha = 0.5;
 			for(var z=0;z<this.x.length;z++){
 				if(z==0){
@@ -102,30 +109,32 @@ Use different browser.
 				ctx.arc(this.x[z],this.y[z],6,0,6);
 				ctx.fill();
 			}
+
 		}
 	};
+
+
+
 	myCanvas.height = window.innerHeight-32;
 	myCanvas.width = window.innerWidth-32;
 
+
 	var groups = [];
-	for(var i=0;i<3;i++){
+
+	for(var zi=0;zi<3;zi++){
 		var obj = new point();
 		obj.type = 'line';
-		if(i % 2==0)obj.type='defensivecircle';
-		obj.addleader(i*150+100,200);
+		if(zi % 2 == 0)obj.type='defensivecircle';
+		obj.addleader(zi*150+100,200);
 		obj.addslot();
 		obj.addslot();
 		obj.addslot();
 		groups.push(obj);
 	}
-//debug = groups[0].x.length;
- 
+   //debug = groups[0].x.length;
+
 
 	gameloop=setInterval(doGameLoop,16);
-
-
-
-
 
 	function doGameLoop(){
 		myCanvas.height = window.innerHeight-32;
@@ -133,23 +142,16 @@ Use different browser.
 		ctx.fillStyle="rgb(0,0,0)";
 		ctx.fillRect(0,0,c.width,c.height);
 		ctx.fillStyle="rgb(255,255,255)";
-		ctx.fillText("Formations."+debug,10,10); 
-
-		for(i=0;i<groups.length;i++){
-			groups[i].angle+=.01;
+		ctx.fillText("Drawing a tilemap example.",10,10); 
+		
+		for(var i=0;i<groups.length;i++){
+			groups[i].angle+=0.02;
 			groups[i].update();
 			groups[i].draw();
 		}
-
-		//formation1.angle +=.05;
-		//formation1.update();
-		//formation1.draw();
-
-		//formation2.angle +=.05;
-		//formation2.update();
-		//group1.draw();
-
 	}
+
+
 </script>
 </body>
 </html>
