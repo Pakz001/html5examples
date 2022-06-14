@@ -74,9 +74,25 @@ Use different browser.
 			this.x.push(x1);
 			this.y.push(y1);
       }
-		//if(this.type=='fingerfour'){
+		if(this.type=='fingerfour'){
+			var x1=0;
+			var y1=0;
+			if(this.x.length==1){
+			x1=this.x[0]+Math.cos(this.angle-((220*Math.PI)/180.0))*16;
+			y1=this.y[0]+Math.sin(this.angle-((220*Math.PI)/180.0))*16;
+			}
+			if(this.x.length==2){
+			x1=this.x[0]+Math.cos(this.angle+((40*Math.PI)/180.0))*16;
+			y1=this.y[0]+Math.sin(this.angle+((40*Math.PI)/180.0))*16;
+			}
+			if(this.x.length==3){
+			x1=this.x[0]+Math.cos(this.angle+((40*Math.PI)/180.0))*32;
+			y1=this.y[0]+Math.sin(this.angle+((40*Math.PI)/180.0))*32;
+			}
+			this.x.push(x1);
+			this.y.push(y1);
 			
-		//}
+		}
   	}
 		// update the positions if rotated and such.
 		update(){
@@ -93,6 +109,27 @@ Use different browser.
         			this.x[i]=this.centerx+(Math.cos(this.angle+i*step)*16);
 					this.y[i]=this.centery+(Math.sin(this.angle+i*step)*16);
       		}
+			}
+			if(this.type=='fingerfour'){
+			if(this.x.length==1)return;
+			var x1=0;
+			var y1=0;
+			x1=this.x[0]+Math.cos(this.angle-((220*Math.PI)/180.0))*16;
+			y1=this.y[0]+Math.sin(this.angle-((220*Math.PI)/180.0))*16;
+			this.x[1]=x1;
+			this.y[1]=y1;
+			if(this.x.length==2)return;
+
+			x1=this.x[0]+Math.cos(this.angle+((40*Math.PI)/180.0))*16;
+			y1=this.y[0]+Math.sin(this.angle+((40*Math.PI)/180.0))*16;
+			this.x[2]=x1;
+			this.y[2]=y1;
+			if(this.x.length==3)return;
+			x1=this.x[0]+Math.cos(this.angle+((40*Math.PI)/180.0))*32;
+			y1=this.y[0]+Math.sin(this.angle+((40*Math.PI)/180.0))*32;
+			this.x[3]=x1;
+			this.y[3]=y1;
+
 			}
 
 		}
@@ -124,7 +161,8 @@ Use different browser.
 	for(var zi=0;zi<3;zi++){
 		var obj = new point();
 		obj.type = 'line';
-		if(zi % 2 == 0)obj.type='defensivecircle';
+		if(zi == 1)obj.type='defensivecircle';
+		if(zi == 2)obj.type='fingerfour';
 		obj.addleader(zi*150+100,200);
 		obj.addslot();
 		obj.addslot();
