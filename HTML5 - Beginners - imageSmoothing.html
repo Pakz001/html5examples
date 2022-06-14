@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var img = new Image();
+	// 64x64 sheet of 8x8 sprites. ( base64 conversion by browserling)
+	img.src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAQKADAAQAAAABAAAAQAAAAABGUUKwAAADi0lEQVR4Ae1ZPWhUQRDeyx+aoJwxhShIRIsDJcpBsFC0U2JhIShoo7ZpbLQRCwuxsb86VRALC7GJFhLRSvAPhSMoOSIKIjkEMUY0nPet7LL7bmcnf/vu0Fl4yb75Zvbn29mdeXtKOeXs9Ghj+9UjDUfkVVPjXmc5vXS5/Vy8P6ouV4dckVdPjXud5f2C1R0cHtbPnlOHgl5gdKixwXvQxmpxyi6l3HrA9NRG20/9+UdbdyuujitHfWhipLE4OZcV23dDTNf1zVbWCRVLwMSvfWpsyzZ1oGerulYuB8cGHeChMvn2sBYDf3BlvMUL0HZ/dUmN3OgN4qE2c5fBhSn3x2A4HF4Q2wYcnvuEmx32uJ1ihSj3hx6HF+9tatrT24DD3bHkVbdbAB2ayZv9mh1EDIfNu7tPC1kb887hRq+t/1PHea79dkze84CHsz+1m1MD+efzAByAcFVqC+AQwypSBAGPHaLA8VD27ZBbD4jFeDMwHGIxvb6Zotr5elFRBMIeYbCTSLAEIMYfnF3ScR4xO1QwOeiFCmJ/6c53DYXsgcMexeQM+qWT/nBxHu5NuThWHfbU6nJ4u3iwHoABcHEeOiYUop4tSIXh5lThcMoupdwjwEyO2sMsXqsVoEPaM3jKiS6rbS5Op8aXNch1VvI8IHWc59pf57mtrDmsLlwXD3XQGR2q5diHEGw4nGo3pdx6gBvfzV7PdoxMMVaOHv8RgzXWsfcBn24+Ltw+fULfCVCzQKIDHeMpWb2p8190HkHh5j6AwrPt5fHufQ5f6H2j+nd1q/qLGvlVN/7+lao3T/PQ4LC61ZmBZqYzH9T5evKbWigVSTzUZmqZRwCXB3A4973P4aknG2rfngEAzd6Hi4aUYzhs5D5gjb8rhEhPLfM84H+8D7AEIMb/3aN0Kntu7xP17NIHclGAV9TnVeOkYULAEuDmAVR/ICimZ+4DKHsOp+xSyi0B7n1ANsyZuF3ZvT84FoPjPuDl7/kWHQ5vMchRYAk4dqtSeDTWp+ZGNrR0D0LwIAdAKMwWQ1j1zIAaLO/IwjongJzCWwxyFFgC0CcX56FjQiHqbsEEY/YLpW4V++nMbSvPukeAmRxcNjQIDjd5QMgek9ee1LwvoD62Qn2KTBgQBoQBYUAYEAaEAWFAGBAGhAFhQBgQBoQBYUAYEAaEAWFAGBAGhAFhQBgQBoQBYUAYEAaEgbUy8Af56v/fvj2J9gAAAABJRU5ErkJggg==";
+
+
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing a tilemap example.",10,10); 
+		// no blurry upscaling for images....
+		ctx.imageSmoothingEnabled = false;
+		ctx.drawImage(img,0,0,64,64,0,0,640,480);
+	}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
