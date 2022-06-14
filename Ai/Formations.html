@@ -43,12 +43,10 @@ Use different browser.
 			this.angles = [];
   		}
 		addleader(x,y){
-
 			this.centerx = x;
 			this.centery = y;
 			this.x.push(x+16);
 			this.y.push(y);
-
 		}
 		// add a slot to the formation if possible
 		addslot(){
@@ -78,8 +76,8 @@ Use different browser.
 			var x1=0;
 			var y1=0;
 			if(this.x.length==1){
-			x1=this.x[0]+Math.cos(this.angle-((220*Math.PI)/180.0))*16;
-			y1=this.y[0]+Math.sin(this.angle-((220*Math.PI)/180.0))*16;
+			x1=this.x[0]+Math.cos(this.angle+((220*Math.PI)/180.0))*16;
+			y1=this.y[0]+Math.sin(this.angle+((220*Math.PI)/180.0))*16;
 			}
 			if(this.x.length==2){
 			x1=this.x[0]+Math.cos(this.angle+((40*Math.PI)/180.0))*16;
@@ -90,9 +88,27 @@ Use different browser.
 			y1=this.y[0]+Math.sin(this.angle+((40*Math.PI)/180.0))*32;
 			}
 			this.x.push(x1);
-			this.y.push(y1);
-			
+			this.y.push(y1);			
 		}
+		if(this.type=='twoabreast'){
+			var x1=0;
+			var y1=0;
+			if(this.x.length==1){
+			x1=this.x[0]+Math.cos(this.angle+((0*Math.PI)/180.0))*14;
+			y1=this.y[0]+Math.sin(this.angle+((0*Math.PI)/180.0))*14;
+			}
+			if(this.x.length==2){
+			x1=this.x[0]+Math.cos(this.angle+((40*Math.PI)/180.0))*18;
+			y1=this.y[0]+Math.sin(this.angle+((40*Math.PI)/180.0))*18;
+			}
+			if(this.x.length==3){
+			x1=this.x[0]+Math.cos(this.angle+((90*Math.PI)/180.0))*12;
+			y1=this.y[0]+Math.sin(this.angle+((90*Math.PI)/180.0))*12;
+			}
+			this.x.push(x1);
+			this.y.push(y1);	      
+		}			
+		
   	}
 		// update the positions if rotated and such.
 		update(){
@@ -131,7 +147,27 @@ Use different browser.
 			this.y[3]=y1;
 
 			}
+			if(this.type=='twoabreast'){
+			if(this.x.length==1)return;
+			var x1=0;
+			var y1=0;
+			x1=this.x[0]+Math.cos(this.angle+((0*Math.PI)/180.0))*14;
+			y1=this.y[0]+Math.sin(this.angle+((0*Math.PI)/180.0))*14;
+			this.x[1]=x1;
+			this.y[1]=y1;
+			if(this.x.length==2)return;
 
+			x1=this.x[0]+Math.cos(this.angle+((40*Math.PI)/180.0))*18;
+			y1=this.y[0]+Math.sin(this.angle+((40*Math.PI)/180.0))*18;
+			this.x[2]=x1;
+			this.y[2]=y1;
+			if(this.x.length==3)return;
+			x1=this.x[0]+Math.cos(this.angle+((90*Math.PI)/180.0))*12;
+			y1=this.y[0]+Math.sin(this.angle+((90*Math.PI)/180.0))*12;
+			this.x[3]=x1;
+			this.y[3]=y1;
+
+			}
 		}
 		draw(){
 
@@ -158,11 +194,13 @@ Use different browser.
 
 	var groups = [];
 
-	for(var zi=0;zi<3;zi++){
+	for(var zi=0;zi<4;zi++){
 		var obj = new point();
 		obj.type = 'line';
 		if(zi == 1)obj.type='defensivecircle';
 		if(zi == 2)obj.type='fingerfour';
+		if(zi == 3)obj.type='twoabreast';
+
 		obj.addleader(zi*150+100,200);
 		obj.addslot();
 		obj.addslot();
@@ -180,7 +218,7 @@ Use different browser.
 		ctx.fillStyle="rgb(0,0,0)";
 		ctx.fillRect(0,0,c.width,c.height);
 		ctx.fillStyle="rgb(255,255,255)";
-		ctx.fillText("Drawing a tilemap example.",10,10); 
+		ctx.fillText("Military formations.",10,10); 
 		
 		for(var i=0;i<groups.length;i++){
 			groups[i].angle+=0.02;
