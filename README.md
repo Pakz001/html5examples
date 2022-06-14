@@ -4,7 +4,7 @@ update:checked every file and removed references to a unused css file. gfx now i
 
 html5 javascript game oriented example code.
 
-Copy paste (edit) and run.
+Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
 
 <br><br>
 <img src="Media/A8B4083E-3FC8-47F8-A9FD-8F913AF3A322.jpeg" width="60%"><br>
