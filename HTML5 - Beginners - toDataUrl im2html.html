@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width" />
 </head>
 <body>
+
   <div id="test"></div>
+<textarea id="myTextArea" rows="10" cols="20" name="work">
+</textarea>
 <canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
 Use different browser.
 </canvas>
@@ -14,36 +17,65 @@ Use different browser.
 	var ctx=c.getContext("2d");
 
 	var img = new Image();
-	img.src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAADwCAYAAABxLb1rAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAABQKADAAQAAAABAAAA8AAAAAC5xPxFAAAG+0lEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQIEcgI7l1hgAgQIfAED6BQIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAgYQDdAgEBWwABmqxecAAED6AYIEMgKGMBs9YITIGAA3QABAlkBA5itXnACBAygGyBAICtgALPVC06AgAF0AwQIZAUMYLZ6wQkQMIBugACBrIABzFYvOAECBtANECCQFTCA2eoFJ0DAALoBAgSyAgYwW73gBAhcVV0C3w76DTIAAAAASUVORK5CYII";
+ 
 
-	// Disable the lines below to save the canvas as a base64
-	// string. You can convert a sprite sheet to a base64 string
-	// that can be used inside javascript source code.
-	
-	// set the canvas width and height based on the image and load the image and
-	// draw it on the canvas. then convert it with the built in toDataUrl command.
 
-	// black screen
-	//ctx.fillStyle="rgb(0,0,0)";
-	//ctx.fillRect(0,0,c.width,c.height);
+
+img.src="data:image/png;base64,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";
 	
-	//conversion process
-	//const dataURL = myCanvas.toDataURL();
-	// Put the string into the log and inner html css
-	//console.log(dataURL);
-	// or put the data inside the document (copy it out)
-	//document.querySelector('#test').innerHTML = dataURL;
+//
+//
+// enable this line
+// to load image to convert..
+// it wil be copied into
+// the text field as base64
+// string. 
+
+//img.src='img/Base64me.png';
+
+
+
+
+document.getElementById("myTextArea").value="image base64 wil be placed here. please wait."+img.height;
+
+
+
+
+
+
+   var cnt=0;
 	gameloop=setInterval(doGameLoop,16);
 
-	function doGameLoop(){
+function doGameLoop(){
+   cnt++;
+if(cnt>100){
+
+document.getElementById("myTextArea").cols=myCanvas.width/8;
+  
+	
 		myCanvas.height = window.innerHeight-32;
 		myCanvas.width = window.innerWidth-32;
-		ctx.fillStyle="rgb(220,220,220)";
-		ctx.fillRect(0,0,c.width,c.height);
-		ctx.fillStyle="rgb(255,255,255)";
-		ctx.fillText("Drawing a tilemap example.",10,10); 
 
-		ctx.drawImage(img,0,0);
+}else{
+	myCanvas.height = img.height;
+		myCanvas.width = img.width;
+}
+ctx.fillStyle="rgba(0,0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+
+
+ctx.drawImage(img,0,0);
+
+// copy the canvas with
+// image as base64 into
+// textarea
+if(cnt==95){
+const dataURL = myCanvas.toDataURL();
+
+document.getElementById("myTextArea").value=dataURL;
+
+}
 	}
 </script>
 </body>
