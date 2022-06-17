@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing a line example.",10,10); 
+
+		// settings for drawing a line
+		ctx.strokeStyle = 'red';
+		ctx.lineWidth=1; // width of the lines
+		ctx.beginPath(); // begin out path
+		ctx.moveTo(0,0);
+		ctx.lineTo(200,100);// keep adding these for more lines.
+		ctx.stroke(); // draw all the lines
+
+
+	}
+</script>
+</body>
+</html>
