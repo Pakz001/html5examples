@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var debug = ''; //our debug variable
+
+	//
+	// Add a windows event listener
+	// and when the keydown is detected then
+	// pass the event to the debug variable(object)
+	//
+	window.addEventListener('keydown',(event) =>{
+		debug = event;	
+	});
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		// Draw the text to the screen
+		ctx.save();
+		ctx.scale(3,3);
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Touch/press to activate canvas",10,10); 
+		ctx.fillText("key event = " + debug.key,10,30); 
+		ctx.fillText("code event = " + debug.code,10,50); 
+		ctx.fillText("altKey event = " + debug.altKey,10,70); 
+		ctx.fillText("ctrlKey event = " + debug.ctrlKey,10,90); 
+		ctx.fillText("keyCode event = " + debug.keyCode,10,110); 
+		ctx.restore();
+	}
+	
+</script>
+</body>
+</html>
