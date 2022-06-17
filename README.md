@@ -17,3 +17,8 @@ Link to free online and downloadable study book : https://eloquentjavascript.net
 (Further references : Javascript the definitive guide(7th), build your own 2d game engine and create web games)
 <br><br>
 Dotate to author of this code repo. (Insert coin for book fund and productivity aim) https://www.paypal.me/RudyvanEtten/1
+
+
+interesting yt video's/tutorials : <br><br>
+making a fighting game javascript canvas (3hrs)<br>
+https://youtu.be/vyqbNFMDRGQ<br>
