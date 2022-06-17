@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var a=0;
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing a tilemap example.",10,10); 
+		a=a-1;
+		var x=200+a;
+		var y=100;
+		var w=100;
+		var h=100;
+		ctx.fillStyle = 'red';
+		ctx.fillRect(x,y,w,h);
+		var cx=100;
+		var cy=100;
+		var cr=50;
+		ctx.beginPath();
+		ctx.arc(cx,cy,cr,0,6);
+		ctx.fill();
+		ctx.fillStyle='white';
+		var debug=1;
+		var debug=circleRectCollide(cx,cy,cr,x,y,w,h);
+		ctx.fillText("collision = "+debug,250,100);
+
+	}
+
+// Where ever you go, stack overflow.
+// return true if the rectangle and circle are colliding
+function circleRectCollide(cx,cy,cr,x,y,w,h){
+    var distX = Math.abs(cx - x-w/2);
+    var distY = Math.abs(cy - y-h/2);
+
+    if (distX > (w/2 + cr)) { return false; };
+    if (distY > (h/2 + cr)) { return false; };
+
+    if (distX <= (w/2)) { return true; } ;
+    if (distY <= (h/2)) { return true; };
+
+    var dx=distX-w/2;
+    var dy=distY-h/2;
+    return (dx*dx+dy*dy<=(cr*cr));
+}
+</script>
+</body>
+</html>
