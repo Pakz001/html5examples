@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	// Our class object(Sprite)
+	class Sprite {
+		// This is the constructor used
+		// when initializing a class.
+		// We pass a object through it
+		// by using the {} characters.
+		constructor({posx,posy,width,height}){
+			this.posx = posx;
+			this.posy = posy;
+			this.width = width;
+			this.height = height; 
+		}
+		draw(){
+			ctx.fillStyle = 'red';
+			ctx.fillRect(this.posx,this.posy,this.width,this.height);
+		}
+	};
+
+	// Create our player instance of Sprite
+	// Note that the order of the arguments passed
+	// through the constructor can be in any order
+	// because it is passed as a object.
+	const player = new Sprite({
+		width:50,
+		height:150,
+		posx:100,
+		posy:100
+	});
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing a tilemap example.",10,10); 
+
+		player.draw();
+
+	}
+</script>
+</body>
+</html>
