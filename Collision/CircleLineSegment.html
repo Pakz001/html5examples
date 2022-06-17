@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+
+	var a=0;
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing a tilemap example.",10,10); 
+	 
+		a+=1;
+
+		var x1=0;
+		var y1=0;
+		var x2=300;
+		var y2=300;
+		ctx.strokeStyle = 'red';
+		ctx.lineWidth=1;
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.lineTo(x2,y2);
+		ctx.stroke();
+
+		var cx=300-a;
+		var cy=100
+		var cr=50;
+		
+
+		ctx.beginPath();
+		ctx.arc(cx,cy,cr,0,6);
+		ctx.fill();
+
+		var debug = inteceptCircleLineSeg(cx,cy,cr,x1,y1,x2,y2);
+	
+		if(debug[0].x==undefined){
+		}else{
+		ctx.fillText("collsiion",200,40);
+		};
+	
+	}
+
+
+// where ever you go, slack overflow
+function inteceptCircleLineSeg(cx,cy,cr,x1,y1,x2,y2){
+    var a, b, c, d, u1, u2, ret, retP1, retP2, v1, v2;
+    v1 = {};
+    v2 = {};
+    v1.x = x2 - x1;
+    v1.y = y2 - y1;
+    v2.x = x1 - cx;
+    v2.y = y1 - cy;
+    b = (v1.x * v2.x + v1.y * v2.y);
+    c = 2 * (v1.x * v1.x + v1.y * v1.y);
+    b *= -2;
+    d = Math.sqrt(b * b - 2 * c * (v2.x * v2.x + v2.y * v2.y - cr * cr));
+    if(isNaN(d)){ // no intercept
+        return [];
+    }
+    u1 = (b - d) / c;  // these represent the unit distance of point one and two on the line
+    u2 = (b + d) / c;    
+    retP1 = {};   // return points
+    retP2 = {}  
+    ret = []; // return array
+    if(u1 <= 1 && u1 >= 0){  // add point if on the line segment
+        retP1.x = x1 + v1.x * u1;
+        retP1.y = y1 + v1.y * u1;
+        ret[0] = retP1;
+    }
+    if(u2 <= 1 && u2 >= 0){  // second add point if on the line segment
+        retP2.x = x1 + v1.x * u2;
+        retP2.y = y1 + v1.y * u2;
+        ret[ret.length] = retP2;
+    }       
+    return ret;
+}
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
