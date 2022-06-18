@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+
+  <div id="test"></div>
+<textarea id="myTextArea" rows="10" cols="20" name="work">
+</textarea>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var img = new Image();
+ 
+
+
+
+img.src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAUKADAAQAAAABAAAAUAAAAAAx4ExPAAAFLklEQVR4Ae1avWsVQRC/mBAt/CCJGsEPUFERjQE/IIogErFSa00t2GlhaWNjaWHpP6C9WAWxEj+KFCqWGhAtBG1UEEVQf/ecsDdvd2/27Zt5aPYg2d25mZ3f/m5nd2/uDY2OrvpVlatnBlb0bFkMawYKgZkToRBYCMxkINO8zMBCYCYDmeYjmfZB8xs371Zv375Zun/71rWlukXFyr9aCIM8kOYSh0FdunKj5k+77vOv8eCGh4dHrmt0fHhmthqb3FTt2DNVjY9trH78/FatXbehdmVR37ptd8P/wrOHGsOs1EIYaHdu39cA/Xrx1VJbu+7zv+S8j5Uh7Ve5qUNHq8nN26sP7xfrso/Yg12Rr5MnzlbXrl4I6vXjhtoaCHBY544dP9PAicHh0i7hA+sgrbloa1yqBLq7MMDTzNAuNYgK9Wkawnw2AtTjR/e7ZmkIrE/us4cMywauB/fu+Mz6JlPdROgsRhsGlRx9SM71Qu2QPdZAbGTuUSrUR69yVQJ5CE9PfOnGObH+j8wj79b0Szz28+87qty/v4M8qSqBBK0mrh4oSXTL0wc6D+Wrrpu6d9VNxAD/wF2YbCKdGWE/1vkXH6uXC09UHau9ygE1NhG8vo1+f6c6iFDnR2YvVrv2Hqy0XuPgVzWELRbxEHmQW/gvIRx7AoJ7UQLpHEf9pJynuO3qz0+pG5NyfP9cYwbmYI/ZRo8xCAEypndKIgZyqoMRt426z9aEub9OfP4Jr4s1F3t0E5Hm9ACC5/h4Ps56I/mxcksjH8jxUW5Sgj22CUVnIDqX5vSgy1+puC10LC/u38Xn1oGJt7ltCHd0DSSj1JweZVvIHqX3Nc5V6HP9+ac1jR59mBoKrAF9yRmy9RiDdYNnUdA5rlBJWPh9kluV3H9K+/zcZVEusZVAfpYCCDfD7GuDIC63Io38+Py34Xbv83FTv7wUhzBmYSj3xmeoT8/6GPN17UxjrD5MUIjJJSHcuonQ1k+LLJUuOolsesK10K9LMBEKny5CGBMDR57Y1UqgO5UpTdTo0JOPq3yyhpF+o2vTCmHyyLEBueOOoRWH8KAyKjHwmvfwJiP5otdKIIWw9RqmSY6kb1pD20I4eReWOF9OOq0zEGTgIL3cQliajI2+C4M8hPAgk6LAMIhLmowtIRx4OmUXDhAjFZcQljIV0CshHCBGKpaGcOsaKHW4XPXKMSbw5MsaGCBGKi5roJSpgJ50DSwhHCCwhHCAGKm4hLCUqYBeCeEAMVJxCWEpUwG9EsIBYqTiEsJSpgJ60hCOHmMonU8+UtL6/NdRKbbkL6fM8c9tY2n96LswpjGMqQM8FXSO7wVunbdxj9vmkNGLLffv4nXrudijBAL4qXNz9R/q+NBMa4Nb992DzLVF2/py/bt43TowuW3Ucbm2tSDwLxrC9JtAsqWZSO1YyW2tQ5i+qhHGHOwx2yiB5DynxAcpXNYfpRCmuGhG1Q2Ff60hnOMTmxD/3UxOf6m20l9Ypfbr6qsSSOul69CybuG/hHDmE1WdgSWEM5+ORQjFIFr4V52BscH9L/dMCLQ+wuDhWPk02USsBsNnNc6C2ufA1h8XcVAp7UH/MEma00sZE9dVDWGLRZwPyG1b+C8h7DLeQ12NwJxcYg/j6DJJyel1GScI1EIY4YMsBmUy3BycRZ37T+AkSVWNQKBwc2o850brk5ac+09iJUFZLYR5PpBmYgK2LFUr/2oEZo3+HzJWDeF/iIeeoRYCe6auY1gILARmMpBpXmZgITCTgUzz311/D4JxmeD3AAAAAElFTkSuQmCC";
+	
+//
+//
+// enable this line
+// to load image to convert..
+// it wil be copied into
+// the text field as base64
+// string. 
+
+//img.src='img/20220618123949.png';
+
+
+
+
+document.getElementById("myTextArea").value="image base64 wil be placed here. please wait."+img.height;
+
+
+
+
+
+
+   var cnt=0;
+	gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+   cnt++;
+if(cnt>100){
+
+document.getElementById("myTextArea").cols=myCanvas.width/8;
+  
+	
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+
+}else{
+	myCanvas.height = img.height;
+		myCanvas.width = img.width;
+}
+ctx.fillStyle="rgba(0,0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+
+
+ctx.drawImage(img,0,0);
+
+// copy the canvas with
+// image as base64 into
+// textarea
+if(cnt==95){
+const dataURL = myCanvas.toDataURL();
+
+document.getElementById("myTextArea").value=dataURL;
+
+}
+	}
+</script>
+</body>
+</html>
