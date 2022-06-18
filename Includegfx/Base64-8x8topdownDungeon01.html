@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+
+  <div id="test"></div>
+<textarea id="myTextArea" rows="10" cols="20" name="work">
+</textarea>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var img = new Image();
+ 
+
+
+
+img.src="data:image/png;base64,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";
+	
+//
+//
+// enable this line
+// to load image to convert..
+// it wil be copied into
+// the text field as base64
+// string. 
+
+//img.src='img/20220618121215.png';
+
+
+
+
+document.getElementById("myTextArea").value="image base64 wil be placed here. please wait."+img.height;
+
+
+
+
+
+
+   var cnt=0;
+	gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+   cnt++;
+if(cnt>100){
+
+document.getElementById("myTextArea").cols=myCanvas.width/8;
+  
+	
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+
+}else{
+	myCanvas.height = img.height;
+		myCanvas.width = img.width;
+}
+ctx.fillStyle="rgba(0,0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+
+
+ctx.drawImage(img,0,0);
+
+// copy the canvas with
+// image as base64 into
+// textarea
+if(cnt==95){
+const dataURL = myCanvas.toDataURL();
+
+document.getElementById("myTextArea").value=dataURL;
+
+}
+	}
+</script>
+</body>
+</html>
