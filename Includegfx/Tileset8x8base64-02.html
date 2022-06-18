@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+
+  <div id="test"></div>
+<textarea id="myTextArea" rows="10" cols="20" name="work">
+</textarea>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var img = new Image();
+ 
+
+
+
+img.src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAUKADAAQAAAABAAAAUAAAAAAx4ExPAAADjUlEQVR4Ae2bPXIUQQyFB4oiIwBH1AZEPgUcgITEReKQ8hGYyAfYaCFxTBE6IYOAA8ApNt7QEJA5gZXXco2Z/tHoSZ6G1Va5xtvdUj99rZ4ei+He+6Oj31181ATuqy3D8IpAAAQTIQCCAB+A9iPzzff1qK2lhsXzQ1M55gBJ3XL1w1SklbPT/omVqxs/LgDZ+8Nj29Vmv1Ovl+d+u8IVYL+4mD0bKeuWq6nI5ePjEJGzSo50zUCa0eO+k4xkpkZ3gHTq0clcO/0kY4gRn/I1f8yTx/N366s7QBIsCVYyRurLGlLJX9wDS3QEfc0AlG416ThB7CZDmgFouYXvErLrPfDs5/YB9ovfQ2wxhQbzLruD4lCk0xUgCXv98gWiD7b99PUb7KPkoJktXBLZcl8ABFfHFCDdvFutxBAn0mZ9wCTvgdpJWobHiUYaT3vdwZZ6UkgC5NXiSadedxWQtmqCQ02ahc79TZ8FyNA0Nb3VMVlvHx1OLrpnTx+zq9muFMONpokqarXEKsAWanoTYx4Nr0EYGVw37LI217trNz1EylP9n73VDKSwc/u/hERznyn5Q/s0MUjmFAHk04dOZ/596JxPbe7j78MxLfzO+nJaWDeP4++58dQ+aQuz45TDUl9q/JxtOTCaGCYBzAWtmTjn6y7aS3pLfSltJgBTjvelzQRgbkvsA8TqISKu6Q3qbwTu7KQdfI+2D/Rdt/35S6NEYa2WWAVIk8xd05MEmhuDaJfUEk22cE78PrQHQHCVA2AABAmA5pGBIEDRKdxCTU8bp7f2yEDtylzbBcAACBIAzSMDAyBIADSPDAyAIAHQPDIwAIIEQPPIwAAIEgDNIwMDIEgANI8MDIAgAdA8MhAEKCqovvv4WT3N2zev1LYWhoh2yfxVgL8+6P+Tyu4ftCUyfMcgMdSUuWxhr3fxasGU+r00ZTNQ8240v0q72hx0l+dtvWQ+1KSJrevp9ZDxJwuQ3o2e+lltDrfg1lc/U229x/PiEjxNbDl9SYBT35Fj5/1i3TFEbmvpyvC08aViMb0HkjDL1U0JRtpImyU80mIKEAnuX7UNgODKBcAACBIAzSMDAyBIADSPDAyAIAHQPDIQBJj8Uw70ecvcux53a7IZvrgC9KzDzcAqOWVs4SQWeaNLBqrqbXLN+pGZmp7eYde5AGy5IoPAStmaA7QuF6VEt9QW90BwNQJgAAQJgOZ/AJDhwJWcuXq5AAAAAElFTkSuQmCC";
+	
+//
+//
+// enable this line
+// to load image to convert..
+// it wil be copied into
+// the text field as base64
+// string. 
+
+//img.src='img/20220618123909.png';
+
+
+
+
+document.getElementById("myTextArea").value="image base64 wil be placed here. please wait."+img.height;
+
+
+
+
+
+
+   var cnt=0;
+	gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+   cnt++;
+if(cnt>100){
+
+document.getElementById("myTextArea").cols=myCanvas.width/8;
+  
+	
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+
+}else{
+	myCanvas.height = img.height;
+		myCanvas.width = img.width;
+}
+ctx.fillStyle="rgba(0,0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+
+
+ctx.drawImage(img,0,0);
+
+// copy the canvas with
+// image as base64 into
+// textarea
+if(cnt==95){
+const dataURL = myCanvas.toDataURL();
+
+document.getElementById("myTextArea").value=dataURL;
+
+}
+	}
+</script>
+</body>
+</html>
