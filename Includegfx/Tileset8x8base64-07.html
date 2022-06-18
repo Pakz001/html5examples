@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+
+  <div id="test"></div>
+<textarea id="myTextArea" rows="10" cols="20" name="work">
+</textarea>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var img = new Image();
+ 
+
+
+
+img.src="data:image/png;base64,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";
+	
+//
+//
+// enable this line
+// to load image to convert..
+// it wil be copied into
+// the text field as base64
+// string. 
+
+//img.src='img/20220618180845.png';
+
+
+
+
+document.getElementById("myTextArea").value="image base64 wil be placed here. please wait."+img.height;
+
+
+
+
+
+
+   var cnt=0;
+	gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+   cnt++;
+if(cnt>100){
+
+document.getElementById("myTextArea").cols=myCanvas.width/8;
+  
+	
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+
+}else{
+	myCanvas.height = img.height;
+		myCanvas.width = img.width;
+}
+ctx.fillStyle="rgba(0,0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+
+
+ctx.drawImage(img,0,0);
+
+// copy the canvas with
+// image as base64 into
+// textarea
+if(cnt==95){
+const dataURL = myCanvas.toDataURL();
+
+document.getElementById("myTextArea").value=dataURL;
+
+}
+	}
+</script>
+</body>
+</html>
