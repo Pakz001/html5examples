@@ -2,7 +2,7 @@ update:checked every file and removed references to a unused css file. gfx now i
 
 (Gamedev) - Snippets / templates / functions / prototypes
 
-html5 javascript game oriented example code.
+html5 javascript game oriented example code. ( Do you want to learn how to code games? )
 
 Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
 
