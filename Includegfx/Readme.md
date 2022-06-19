@@ -1,5 +1,3 @@
-this folder holds examples that require external files.<br><br>
-
 
 Use these gfx for your experiments and prototypes. Drawn by me.<br><br>
 
