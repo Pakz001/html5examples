@@ -75,8 +75,86 @@ Use different browser.
 				
 			}
 		}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var debug;
+
+	// Let us use a class for the particles
+	class particleManager {
+		constructor({posx,posy}){
+			this.active = true;
+			this.originx = posx;
+			this.originy = posy;
+			this.radius = [];
+			this.px = [];
+			this.py = [];
+			this.speed = [];
+			this.angle = [];
+			this.color = [];
+			this.countdown = [];
+			this.timeout = 80;
+			this.fadeout = [];
+			this.shrink = [];
+			this.init();	
+		}
+		init(){
+			for(var i=0;i<32;i++){
+				var myangle = (Math.PI*1.5)+((Math.random()-.5)/5)
+				this.angle.push(myangle);
+				this.px.push(this.originx+(Math.cos(myangle)*16));
+				this.py.push(this.originy+(Math.sin(myangle)*16));
+				var spd = Math.random()+.3;
+				if(Math.random()<.5)spd*=5;
+				this.speed.push(spd);
+				this.countdown.push(64); // max distance covered.
+				var rad = (Math.random()*5)+9;
+				this.radius.push(rad);
+				this.shrink.push(rad/(64/spd));
+				this.color.push('dimgrey')
+
+
+			}
+		}
+		update(){	
+			for(var i=0;i<this.px.length;i++){
+				if(this.radius[i]>0)this.radius[i]-=this.shrink[i];
+				this.px[i]+=Math.cos(this.angle[i])*this.speed[i];
+				this.py[i]+=Math.sin(this.angle[i])*this.speed[i];
+				this.countdown[i]-=this.speed[i];
+				if(this.countdown[i]<0){
+
+					this.px[i]=this.originx;
+					this.py[i]=this.originy;
+					var spd = Math.random()+.3;
+					if(Math.random()<.5)spd*=3;
+					//this.speed[i]=(spd);
+					this.countdown[i]=64;
+					let rad = (Math.random()*5)+9;
+					this.radius[i]=rad;
+					var cal=rad/(64/this.speed[i]);
+
+					this.shrink[i]=cal;
+					//debug=this.radius[i];
+
+				}
+				
+			}
+		}
 		draw(){
 			ctx.globalCompositeOperation = 'lighter';
+
 			for(var i=0;i<this.px.length;i++){
 				ctx.beginPath()
 				ctx.fillStyle = this.color[i];
@@ -85,6 +163,7 @@ Use different browser.
 				ctx.arc(this.px[i],this.py[i],this.radius[i],0,6);
 				ctx.fill();
 			}
+			ctx.globalCompositeOperation = 'source-over';
 		}
 	};
 
@@ -120,6 +199,7 @@ Use different browser.
 </script>
 </body>
 </html>
+
 
 
 
