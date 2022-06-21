@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+	var myarray = [1,2,3,4,5,6,7,8,9];
+	myarray = modifyarray(myarray);
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Javascript Html canvas example.",10,10); 
+
+for(var y=0;y<myarray.length;y++){
+	ctx.fillText(myarray[y],100,y*20+20);
+}
+
+
+}
+function modifyarray(thearray){
+for(var i=0;i<thearray.length;i++){
+	myarray[i]+=10;
+}
+return thearray;
+}
+</script>
+</body>
+</html>
