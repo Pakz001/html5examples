@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+gameloop=setInterval(doGameLoop,250);
+
+function doGameLoop(){
+
+
+ctx.fillText("Drawing a tilemap example.",10,10); 
+
+
+var b="nothing";
+switch(Math.floor(Math.random()*3)){
+	case 0:
+		b="state00";
+	break;
+	case 1:
+		b="state01";
+	break;
+	case 2:
+		b="state02";
+	break;
+	default:
+		b="state03";
+	break;
+}
+
+ctx.fillText(b,Math.random()*myCanvas.width,Math.random()*myCanvas.height);
+
+
+}
+</script>
+</body>
+</html>
