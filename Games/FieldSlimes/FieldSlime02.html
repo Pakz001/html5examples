@@ -52,7 +52,7 @@ class enemy {
 		this.growmax = 6;
 		this.growmin = 0;
 		this.growcnt = 1;
-		this.heightmod = 0;
+		this.heightmod = Math.random()*this.growmax;
 	}
 	update(){
 		this.growtime++;
@@ -86,6 +86,8 @@ class enemy {
 		ctx.fillRect(this.x+w/8,this.y+h/4+this.heightmod,w/4,h/4);		ctx.fillRect(this.x+w/2+w/8,this.y+h/4+this.heightmod,w/4,h/4);		ctx.fillStyle='darkgreen'
 		ctx.fillRect(this.x,this.y+h/1.5+this.heightmod,w,h/3);
 		
+		return;
+		// ~Draw debug map (path)
 		ctx.fillStyle = 'white';
 		for(var y = 0; y < this.map2.length; ++y) {
       	for(var x = 0; x < this.map2[y].length; ++x) {
@@ -197,6 +199,8 @@ ctx.fillRect(0,0,c.width,myCanvas.height);
 // add enemy
 if(add){
 enemies.push(new enemy(5,5));
+enemies.push(new enemy(15,2));
+enemies.push(new enemy(18,9));
 add=false;
 }
 
