@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+
+
+
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+var c2 = document.createElement("canvas");
+var ctx2=c2.getContext("2d");
+    var map = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    ]
+
+var debug=0;
+class enemy {
+	constructor(x,y){
+		this.x=x*tw;
+		this.y=y*th;
+
+		this.px = [];
+		this.py = [];
+		// path for the enemy
+		// push works by pushing the last position
+		// back to the current enemy position.
+
+		this.map2 = [];
+		this.makepath();
+		this.delay=0;
+	}
+	update(){
+		this.delay++;
+		if(this.delay==50){
+			this.delay=0;
+			if(this.px.length>0){
+				
+				this.x=(this.px.pop())*tw;
+				this.y=(this.py.pop())*th;
+
+
+			}
+		}
+	}
+	draw(){
+		ctx.fillStyle='green';
+		ctx.fillRect(this.x,
+		this.y,16,16);
+		ctx.fillStyle = 'white';
+		for(var y = 0; y < this.map2.length; ++y) {
+      	for(var x = 0; x < this.map2[y].length; ++x) {
+         	if(this.map2[y][x]!=0) {
+						
+					ctx.fillText(this.map2[y][x],x*tw,y*th);
+
+				}
+			}
+		}
+			
+		
+	}
+	// create path to center of map
+	makepath(){
+	
+		var mx=[-1,0,1,1,1,0,-1,-1];
+		var my=[-1,-1,-1,0,1,1,1,0];
+		var destx = Math.floor(map[0].length/2);
+		var desty = Math.floor(map.length/2);
+		//this.map2 = [...map]; // copy the array
+		// another copy array
+		for (var i = 0; i < map.length; i++)
+    	this.map2[i] = map[i].slice();
+
+		for(var y=0;y<this.map2.length;y++){
+		for(var x=0;x<this.map2[0].length;x++){
+			if(this.map2[y][x]==1)this.map2[y][x]=-1;
+		}}
+
+		var sx = Math.floor(this.x/tw);
+		var sy = Math.floor(this.y/th);
+		var olx = [];
+		var oly = [];
+		olx.push(sx);
+		oly.push(sy);
+		
+		this.map2[sy][sx]=1;
+		
+		while(olx.length>0){
+			var x = olx.shift();
+			var y = oly.shift();
+			var val = this.map2[y][x];
+			
+			if(x==destx && y==desty){
+				debug=val;	
+				var there=100;
+				while(there>0){
+					there--;
+				for(var n=0;n<mx.length;n++){
+					var x2=mx[n];
+					var y2=my[n];
+					var nx = x+x2;
+					var ny = y+y2;
+					debug=val;
+					if(this.map2[ny][nx]==val-1 && this.map2[ny][nx]>-1){
+						x+=x2;
+						y+=y2;
+						val = this.map2[ny][nx];
+						//this.px.unshift(nx);
+						//this.py.unshift(ny);
+						this.px.push(nx);
+						this.py.push(ny);
+
+						if(nx==sx && ny==sy)return;
+						continue;
+					}
+				}}
+			}
+			
+			for(var n=0;n<mx.length;n++){
+				var x1=mx[n];
+				var y1=my[n];
+				if(x+x1>-1 && y+y1>-1 && x+x1<this.map2[0].length && y+y1<this.map2.length){
+					if(this.map2[y+y1][x+x1]==0){
+						if(this.map2[y+y1][x+x1]==0){
+							this.map2[y+y1][x+x1]=val+1;
+							olx.push(x+x1);
+							oly.push(y+y1);
+						}
+					}
+
+				}
+			
+			}
+		}
+	
+	}
+	
+}
+var tw=c.width/map[0].length;
+var th = c.height/map.length;
+var enemies = [];
+
+    
+var add=true;
+
+gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+      myCanvas.width = c2.width=window.innerWidth-32;		myCanvas.height=c2.height = window.innerHeight-32;
+		tw = myCanvas.width/map[0].length;
+		th = myCanvas.height/map.length;
+		
+
+ctx.fillStyle='chocolate';
+ctx.fillRect(0,0,c.width,myCanvas.height);
+
+// add enemy
+if(add){
+enemies.push(new enemy(5,5));
+add=false;
+}
+
+drawmap();
+
+
+
+ctx.fillStyle='white';
+ctx.fillText("Drawing a rotating tilemap example."+debug,110,100); 
+
+for(var i of enemies){
+i.update();
+i.draw();
+}
+
+
+
+    }
+function drawmap(){
+        for(var y = 0; y < map.length; ++y) {
+            for(var x = 0; x < map[y].length; ++x) {
+            	if(map[y][x]==1) {
+						ctx.fillStyle='black';
+						ctx.fillRect(x*tw,y*th,tw,th);
+						if(y+1<map.length && map[y+1][x]==0){
+							ctx.fillStyle='brown';
+							ctx.fillRect(x*tw,y*th+th,tw,th);
+						}
+					}
+				}
+			}
+
+}
+    </script></body></html>
