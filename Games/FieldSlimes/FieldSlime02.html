@@ -24,7 +24,7 @@ var ctx2=c2.getContext("2d");
         [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0],
-        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
     ]
@@ -32,8 +32,10 @@ var ctx2=c2.getContext("2d");
 var debug=0;
 class enemy {
 	constructor(x,y){
-		this.x=x*tw;
-		this.y=y*th;
+		this.spawnx = x;
+		this.spawny = y;
+		this.x=this.spawnx*tw;
+		this.y=this.spawny*th;
 
 		this.px = [];
 		this.py = [];
@@ -55,6 +57,22 @@ class enemy {
 		this.heightmod = Math.random()*this.growmax;
 	}
 	update(){
+	
+	
+			// make some space if near others
+		for(var i=0;i<enemies.length;i++){
+			if(enemies[i].x!=this.x && enemies[i].y!=this.y){
+			//debug=Math.random();
+			if(Math.hypot(enemies[i].y-this.y,enemies[i].x-this.x)<48){
+				var an=Math.atan2(this.y-enemies[i].y,this.x-enemies[i].x);
+				this.x+=Math.cos(an)*1;
+				this.y+=Math.sin(an)*1;
+				//debug=Math.random();
+			}
+			}
+		}
+	
+	
 		this.growtime++;
 		if(this.growtime>this.growclock){
 			this.growtime=0;
@@ -62,9 +80,20 @@ class enemy {
 			if(this.heightmod>this.growmax)this.growcnt=-1;
 			if(this.heightmod<this.growmin)this.growcnt=1;
 		}
+		var there=false;
 		this.delay++;
-		if(this.delay==50){
+		if(this.px.length>0 && this.delay==1){
+			var dx = this.px[this.px.length-1]*tw;
+			var dy = this.py[this.px.length-1]*th;
+			var an=Math.atan2(dy-this.y,dx-this.x);
+			an-=.5;
+			an+=Math.random();
+			this.x+=Math.cos(an)*1;
+			this.y+=Math.sin(an)*1;
+			if(Math.hypot(dy-this.y,dx-this.x)<3)there=true;
 			this.delay=0;
+		}
+		if(there){
 			if(this.px.length>0){
 				
 				this.x=(this.px.pop())*tw;
@@ -73,6 +102,8 @@ class enemy {
 
 			}
 		}
+
+		
 	}
 	draw(){
 		ctx.fillStyle='green';
@@ -93,7 +124,7 @@ class enemy {
       	for(var x = 0; x < this.map2[y].length; ++x) {
          	if(this.map2[y][x]!=0) {
 						
-					ctx.fillText(this.map2[y][x],x*tw,y*th);
+					ctx.fillText(this.map2[y][x],x*tw+tw/2,y*th+th/2);
 
 				}
 			}
@@ -114,9 +145,12 @@ class enemy {
 		for (var i = 0; i < map.length; i++)
     	this.map2[i] = map[i].slice();
 
-		for(var y=0;y<this.map2.length;y++){
+		for(var y=this.map2.length-2;y>0;y--){
 		for(var x=0;x<this.map2[0].length;x++){
-			if(this.map2[y][x]==1)this.map2[y][x]=-1;
+			if(this.map2[y][x]==1){
+				this.map2[y][x]=-1;
+				this.map2[y+1][x]=-1;
+			}
 		}}
 
 		var sx = Math.floor(this.x/tw);
@@ -134,7 +168,7 @@ class enemy {
 			var val = this.map2[y][x];
 			
 			if(x==destx && y==desty){
-				debug=val;	
+				//debug=val;	
 				var there=100;
 				while(there>0){
 					there--;
@@ -143,7 +177,7 @@ class enemy {
 					var y2=my[n];
 					var nx = x+x2;
 					var ny = y+y2;
-					debug=val;
+					//debug=val;
 					if(this.map2[ny][nx]==val-1 && this.map2[ny][nx]>-1){
 						x+=x2;
 						y+=y2;
@@ -163,13 +197,13 @@ class enemy {
 				var x1=mx[n];
 				var y1=my[n];
 				if(x+x1>-1 && y+y1>-1 && x+x1<this.map2[0].length && y+y1<this.map2.length){
-					if(this.map2[y+y1][x+x1]==0){
+					//if(this.map2[y+y1][x+x1]==0){
 						if(this.map2[y+y1][x+x1]==0){
 							this.map2[y+y1][x+x1]=val+1;
 							olx.push(x+x1);
 							oly.push(y+y1);
 						}
-					}
+					//}
 
 				}
 			
@@ -197,21 +231,22 @@ ctx.fillStyle='chocolate';
 ctx.fillRect(0,0,c.width,myCanvas.height);
 
 // add enemy
-var spawnx = [5,15,18];
-var spawny = [5,2,9];
-if(add){
-enemies.push(new enemy(5,5));
-enemies.push(new enemy(15,2));
-enemies.push(new enemy(18,9));
-add=false;
-}
-if(Math.random()<0.005){
-	a = Math.floor(Math.random()*spawnx.length);
-	n = Math.floor(Math.random()*enemies.length);
-	enemies.splice(n,1);
+var spawnx = [2,15,18,1];
+var spawny = [5,2,13,11];
+if(enemies.length<5 && Math.random()<0.01){
+	var a = Math.floor(Math.random()*spawnx.length);
 	enemies.push(new enemy(spawnx[a],spawny[a]));
 }
+if(Math.random()<0.006){
 
+	//var a = Math.floor(Math.random()*spawnx.length);
+	var n = Math.floor(Math.random()*enemies.length);
+	if(enemies[n].px.length<4){
+	enemies.splice(n,1);
+	}
+	//enemies.push(new enemy(spawnx[a],spawny[a]));
+}
+//debug=enemies.length;
 drawmap();
 
 
