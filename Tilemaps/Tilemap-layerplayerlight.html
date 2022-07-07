@@ -62,11 +62,19 @@ ctx.fillStyle='darkgreen';
 ctx.fillRect(0,0,c.width,c.height);
 
 // draw the light around the player
-ctx.globalAlpha =0.2;
+ctx.globalAlpha =0.01;
+var rad=tw*2.5;
+// normally you would use
+// a image of a circle with
+// thick center alpha to
+// lesser alpha going to the
+// edges.(quick hack here)
+for(var z=rad;z>0;z-=3){
 		ctx.fillStyle = 'white';
 		ctx.beginPath();
-		ctx.arc((px*tw),(py*th),tw*2.5,0,6);
+		ctx.arc((px*tw),(py*th),rad-z,0,6);
 		ctx.fill();
+		}
 
 // draw the map
 ctx.globalAlpha=1;
@@ -82,11 +90,14 @@ ctx.fillRect(x*tw,y*th,tw,th);
 // draw the light around the 
 //player. less intense on the
 // tilemap
-ctx.globalAlpha =0.2;
+ctx.globalAlpha =0.01;
+var rad=tw*2.5;
+for(var z=rad;z>0;z-=3){
 		ctx.fillStyle = 'white';
 		ctx.beginPath();
-		ctx.arc((px*tw),(py*th),tw*2.5,0,6);
+		ctx.arc((px*tw),(py*th),rad-z,0,6);
 		ctx.fill();
+		}
 
 
         ctx.fillText("Drawing a rotating tilemap example.",10,10); 
