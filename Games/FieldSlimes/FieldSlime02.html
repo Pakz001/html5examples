@@ -44,8 +44,24 @@ class enemy {
 		this.map2 = [];
 		this.makepath();
 		this.delay=0;
+		
+		// Animate the enemy (slime)
+		// his height is altered.
+		this.growtime = 0;
+		this.growclock = 4;
+		this.growmax = 6;
+		this.growmin = 0;
+		this.growcnt = 1;
+		this.heightmod = 0;
 	}
 	update(){
+		this.growtime++;
+		if(this.growtime>this.growclock){
+			this.growtime=0;
+			this.heightmod+=this.growcnt;
+			if(this.heightmod>this.growmax)this.growcnt=-1;
+			if(this.heightmod<this.growmin)this.growcnt=1;
+		}
 		this.delay++;
 		if(this.delay==50){
 			this.delay=0;
@@ -60,8 +76,16 @@ class enemy {
 	}
 	draw(){
 		ctx.fillStyle='green';
-		ctx.fillRect(this.x,
-		this.y,16,16);
+		var w = tw/3;
+		var h = (tw/3)-this.heightmod;
+		ctx.fillRect(this.x,this.y+this.heightmod,w,h);
+		ctx.fillStyle='white';
+		ctx.fillRect(this.x-2,this.y-2+this.heightmod,w/2,h/2);
+		ctx.fillRect(this.x+w/2+2,this.y-2+this.heightmod,w/2,h/2);
+		ctx.fillStyle='black';
+		ctx.fillRect(this.x+w/8,this.y+h/4+this.heightmod,w/4,h/4);		ctx.fillRect(this.x+w/2+w/8,this.y+h/4+this.heightmod,w/4,h/4);		ctx.fillStyle='darkgreen'
+		ctx.fillRect(this.x,this.y+h/1.5+this.heightmod,w,h/3);
+		
 		ctx.fillStyle = 'white';
 		for(var y = 0; y < this.map2.length; ++y) {
       	for(var x = 0; x < this.map2[y].length; ++x) {
@@ -77,9 +101,10 @@ class enemy {
 	}
 	// create path to center of map
 	makepath(){
-	
-		var mx=[-1,0,1,1,1,0,-1,-1];
-		var my=[-1,-1,-1,0,1,1,1,0];
+		var mx=[-1,0,1,0];
+		var my=[0,-1,0,1];
+		//var mx=[-1,0,1,1,1,0,-1,-1];
+		//var my=[-1,-1,-1,0,1,1,1,0];
 		var destx = Math.floor(map[0].length/2);
 		var desty = Math.floor(map.length/2);
 		//this.map2 = [...map]; // copy the array
