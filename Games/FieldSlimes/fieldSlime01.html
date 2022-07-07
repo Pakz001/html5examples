@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+
+
+
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+var c2 = document.createElement("canvas");
+var ctx2=c2.getContext("2d");
+    var map = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    ]
+
+
+class enemy {
+	constructor(x,y){
+		this.x=x*tw;
+		this.y=y*th;
+	}
+	update(){
+		
+	}
+	draw(){
+		ctx.fillStyle='green';
+		ctx.fillRect(this.x,
+		this.y,16,16);
+	}
+}
+var tw=c.width/map[0].length;
+var th = c.height/map.length;
+var enemies = [];
+enemies.push(new enemy(5,5));
+    
+
+
+gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+        myCanvas.width = c2.width=window.innerWidth-32;
+tw = c.width/map[0].length;
+th = c.height/map.length;
+myCanvas.height=c2.height = window.innerHeight-32;
+ctx.fillStyle='chocolate';
+ctx.fillRect(0,0,c.width,myCanvas.height);
+
+drawmap();
+
+
+
+ctx.fillStyle='white';
+ctx.fillText("Drawing a rotating tilemap example.",110,100); 
+
+for(var i of enemies){
+i.update();
+i.draw();
+}
+
+
+
+    }
+function drawmap(){
+        for(var y = 0; y < map.length; ++y) {
+            for(var x = 0; x < map[y].length; ++x) {
+            	if(map[y][x]==1) {
+						ctx.fillStyle='black';
+						ctx.fillRect(x*tw,y*th,tw,th);
+						if(y+1<map.length && map[y+1][x]==0){
+							ctx.fillStyle='brown';
+							ctx.fillRect(x*tw,y*th+th,tw,th);
+						}
+					}
+				}
+			}
+
+}
+    </script></body></html>
