@@ -53,6 +53,9 @@ var debug;
 var cnt=0;
 var px = 5;
 var py = 5;
+// day and night cycle variables
+var nightalp=0;
+var na=0.002;
 
 gameloop=setInterval(doGameLoop,16);
     function doGameLoop(){
@@ -68,6 +71,35 @@ ctx.globalAlpha = 1;
 ctx.fillStyle='darkgreen';
 ctx.fillRect(0,0,c.width,c.height);
 
+
+// draw the map
+ctx.globalAlpha=1;
+        for(var y = 0; y < map.length; ++y) {
+            for(var x = 0; x < map[y].length; ++x) {
+            if(map[y][x]==1){
+ctx.fillStyle='brown';
+//ctx.setcolor('brown');
+ctx.fillRect(x*tw,y*th,tw,th);
+}
+
+            }
+        }
+
+nightalp+=na;
+if(nightalp>0.8){// dark
+na=-na;
+nightalp=0.8;
+}
+if(nightalp<0){//light
+na=-na;
+nightalp=0.0;
+}
+ctx.globalAlpha=nightalp;
+ctx.fillStyle = 'black'
+ctx.fillRect(0,0,c.width,c.height);
+
+
+
 ctx.fillStyle='white';
 var x=px*tw;
 var y=py*th;
@@ -81,7 +113,7 @@ for(var d=0;d<96;d+=5){
 ctx.beginPath();
 ctx.moveTo(x,y);
 var star=true;
-for(var an=0;an<Math.PI*2;an+=0.2){
+for(var an=0;an<Math.PI*2;an+=0.1){
 if(anblock[an])continue;
 var go=false;
 //for(var d=0;d<96;d+=5){
@@ -121,18 +153,9 @@ ctx.closePath;
 
 
 
-// draw the map
-ctx.globalAlpha=1;
-        for(var y = 0; y < map.length; ++y) {
-            for(var x = 0; x < map[y].length; ++x) {
-            if(map[y][x]==1){
-ctx.fillStyle='brown';
-//ctx.setcolor('brown');
-ctx.fillRect(x*tw,y*th,tw,th);
-}
 
-            }
-        }
+
+
 
 
         ctx.fillText("Drawing a rotating tilemap example."+debug,10,10); 
