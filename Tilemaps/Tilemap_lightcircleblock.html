@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+//
+// Here we draw a filled circle using the
+// line(poly) drawing commands.
+// We start at the center and make a circle.
+// We grow every pass. If we touch a block
+// we stop there. Every pass we draw again
+// ontop of the last. This using a set
+// globalAlpha.
+//
+//
+//
+//
+//
+//
+//
+
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+var c2 = document.createElement("canvas");
+var ctx2=c2.getContext("2d");
+    var map = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ]
+
+var debug;
+var cnt=0;
+var px = 5;
+var py = 5;
+
+gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+        myCanvas.width = c2.width=window.innerWidth-32;
+tw = c.width/16;
+th = c.height/20;
+myCanvas.height=c2.height = window.innerHeight-32;
+
+
+
+
+ctx.globalAlpha = 1;
+ctx.fillStyle='darkgreen';
+ctx.fillRect(0,0,c.width,c.height);
+
+ctx.fillStyle='white';
+var x=px*tw;
+var y=py*th;
+var anblock = [];
+for(var an=0;an<Math.PI*2;an+=0.2){
+	anblock[an]=false;
+}
+
+ctx.globalAlpha=0.05;
+for(var d=0;d<96;d+=5){
+ctx.beginPath();
+ctx.moveTo(x,y);
+var star=true;
+for(var an=0;an<Math.PI*2;an+=0.2){
+if(anblock[an])continue;
+var go=false;
+//for(var d=0;d<96;d+=5){
+var x2=Math.floor((x+(Math.cos(an)*(d)))/tw);
+var y2=Math.floor((y+(Math.sin(an)*(d)))/th);
+var x3=x+Math.cos(an)*(d+15);
+var y3=y+Math.sin(an)*(d+15);
+if(x2>=0 && x2<map[0].length && y2>=0 && y2<map.length){
+	if(map[y2][x2]!=0){
+		if(star){
+			ctx.moveTo(x3,y3);
+			star=false;
+			go=true;
+		}else{
+		ctx.lineTo(x3,y3);
+		go=true;
+		anblock[an]=true;
+		}
+	continue;
+	}
+}else{
+	anblock[an]=true;
+}
+
+//}
+if(go==false && star==false){
+	ctx.lineTo(x3,y3);
+}
+if(star){
+	ctx.moveTo(x3,y3);
+	star=false;
+}
+}
+ctx.fill();
+ctx.closePath;
+}
+
+
+
+// draw the map
+ctx.globalAlpha=1;
+        for(var y = 0; y < map.length; ++y) {
+            for(var x = 0; x < map[y].length; ++x) {
+            if(map[y][x]==1){
+ctx.fillStyle='brown';
+//ctx.setcolor('brown');
+ctx.fillRect(x*tw,y*th,tw,th);
+}
+
+            }
+        }
+
+
+        ctx.fillText("Drawing a rotating tilemap example."+debug,10,10); 
+
+
+
+// move position to different position
+cnt++;
+if(cnt>50){
+	var zx=Math.floor(Math.random()*map.length);
+	var zy=Math.floor(Math.random()*map[0].length);
+	if(map[zy][zx]!=1){
+		px = zx;
+		py = zy;
+	}
+	cnt=0;
+}
+
+
+
+
+    }
+    </script></body></html>
