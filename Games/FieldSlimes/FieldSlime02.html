@@ -197,11 +197,19 @@ ctx.fillStyle='chocolate';
 ctx.fillRect(0,0,c.width,myCanvas.height);
 
 // add enemy
+var spawnx = [5,15,18];
+var spawny = [5,2,9];
 if(add){
 enemies.push(new enemy(5,5));
 enemies.push(new enemy(15,2));
 enemies.push(new enemy(18,9));
 add=false;
+}
+if(Math.random()<0.005){
+	a = Math.floor(Math.random()*spawnx.length);
+	n = Math.floor(Math.random()*enemies.length);
+	enemies.splice(n,1);
+	enemies.push(new enemy(spawnx[a],spawny[a]));
 }
 
 drawmap();
