@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body>
+<div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	// Our variables.
+	var pos_x = [];
+	var pos_y = [];
+	// The maximum time before we 
+	// get to the destination.
+	var timeMax = 60;
+	// Our current time.
+	var time = 0;
+	
+	// first frame setup
+	var init = true;
+	
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		
+		// In the first pass we set up
+		// the objects.
+		if(init){
+			init=false; //remember to disable
+			//
+			// Create 5 lines on different
+			// positions on the canvas. Each
+			// line lower is more to the right.
+			for(var i=0;i<5;i++){
+				pos_x.push(i*myCanvas.width/8);
+				pos_y.push(i*50+100);
+			}
+		}
+		// Some debug and info
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		// We do our drawing and timing here.
+		ctx.fillStyle='white';
+		for(var i=0;i<pos_x.length;i++){
+			
+			// Our current position is the destination divided
+			// by the maximum time. First get the step value.
+			var step = (myCanvas.width-pos_x[i])/timeMax;
+			
+			//  We multiply the step by the time to get our current
+			// position
+			var endx = step*time;
+			
+			// draw our line
+			ctx.fillRect(pos_x[i],pos_y[i],endx,2);
+		}
+		// Keep adding to the time until we
+		// get to the maximum time. Then reset
+		// to 0.
+		time++;
+		if(time>timeMax)time=0;
+		
+		
+	}
+</script>
+</body>
+</html>
+
+
