@@ -59,7 +59,7 @@ class enemy {
 	update(){
 	
 	
-			// make some space if near others
+		// make some space if near others
 		for(var i=0;i<enemies.length;i++){
 			if(enemies[i].x!=this.x && enemies[i].y!=this.y){
 			//debug=Math.random();
@@ -72,7 +72,8 @@ class enemy {
 			}
 		}
 	
-	
+		//
+		// Animate the enemies(shrink/expand)
 		this.growtime++;
 		if(this.growtime>this.growclock){
 			this.growtime=0;
@@ -80,6 +81,17 @@ class enemy {
 			if(this.heightmod>this.growmax)this.growcnt=-1;
 			if(this.heightmod<this.growmin)this.growcnt=1;
 		}
+		
+		//
+		// Path optimalisation - When
+		// at <5 cells from the target.
+		// Check if we have a straight
+		// line towards the target.
+		// Modify path arrays..
+		
+		//
+		// Move the enemy to the destination in the
+		// path arrays.
 		var there=false;
 		this.delay++;
 		if(this.px.length>0 && this.delay==1){
