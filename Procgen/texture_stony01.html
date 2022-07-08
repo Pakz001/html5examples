@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+class frag{
+	// create/setup the variables
+	// in this class. x and y is
+	// the position to draw on the canvas.
+	// size is the size of the shape(frag)
+	constructor(x,y,size,color){
+		this.color = color;
+		this.size=size;
+		this.x=x;
+		this.y=y;
+		this.sx = [];
+		this.sy = [];
+		// Create our frag.
+		// note that you need to call using this.
+		this.makefrag();
+	}
+	// make the shapes. go in a circle
+	// with a random step. store each
+	// step as a coordinate
+	makefrag(){
+		var st=Math.random()/2+.3;
+		for(var i=0;i<Math.PI*2;i+=st){
+			var d=Math.random()*this.size;
+			d+=this.size;
+			var x1=this.x+Math.cos(i)*d;
+			var y1=this.y+Math.sin(i)*d;
+			this.sx.push(x1);
+			this.sy.push(y1);
+		}
+	}
+	
+	update(){
+	}
+	// Draw the frag from the coordinates we
+	// create in the makefrag function. We
+	// draw a filled poly using the move and lineto
+	// commands.
+	draw(){
+		
+		if(this.sx.length==0)return;
+		//ctx.fillStyle='white';
+		ctx.fillStyle = this.color;
+		ctx.beginPath();
+		ctx.moveTo(this.sx[i],this.sy[i]);
+		
+		for(var i=1;i<this.sx.length;i++){
+			ctx.lineTo(this.sx[i],this.sy[i]);
+		}
+		ctx.fill();
+	}
+}
+fragments = [];
+//fragments.push(new frag(100,100));
+var init=true;
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Creating fragments example.",10,10); 
+
+// If on the first frame then initialise
+// the frags.
+if(init){
+	for(var y=16;y<myCanvas.height;y+=5){
+	for(var x=16;x<myCanvas.width-16;x+=5){
+		// create a variable between 2 to upto 7.
+		var s = Math.random()*5;
+		s+=2;
+		var grey = Math.floor(Math.random()*255);
+		if(Math.random()<.5)grey/=2;
+		// create our frag at screen position
+		fragments.push(new frag(x,y,s,"rgb("+grey+","+grey+","+grey+")"));
+	}}
+	init=false;
+}
+// draw our fragments
+for(var i of fragments){
+	i.draw();
+}
+
+
+
+
+}
+</script>
+</body>
+</html>
