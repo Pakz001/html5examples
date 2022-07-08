@@ -328,11 +328,51 @@ function drawmap(){
         for(var y = 0; y < map.length; ++y) {
             for(var x = 0; x < map[y].length; ++x) {
             	if(map[y][x]==1) {
+
+						
+						// black roof
 						ctx.fillStyle='black';
 						ctx.fillRect(x*tw,y*th,tw,th);
+						//
+						//highlight at the top of black area
+						if(y-1>=0){
+							if(map[y-1][x]==0){
+								ctx.fillStyle='white';
+								ctx.globalAlpha=0.5;
+								ctx.fillRect(x*tw,y*th,tw,2);
+								ctx.globalAlpha=1.0;
+							}
+						}
+						//
+						//highlight at the left of black area
+						if(x-1>=0){
+							if(map[y][x-1]==0){
+								ctx.fillStyle='white';
+								ctx.globalAlpha=0.5;
+								ctx.fillRect(x*tw,y*th,2,th);
+								ctx.globalAlpha=1.0;
+							}
+						}
+						//
+						//highlight at the right of black area
+						if(x+1<map[0].length){
+							if(map[y][x+1]==0){
+								ctx.fillStyle='white';
+								ctx.globalAlpha=0.5;
+								ctx.fillRect(x*tw+tw,y*th,2,th);
+								ctx.globalAlpha=1.0;
+							}
+						}
+						// brown front
 						if(y+1<map.length && map[y+1][x]==0){
 							ctx.fillStyle='brown';
 							ctx.fillRect(x*tw,y*th+th,tw,th);
+							ctx.fillStyle='white';
+							// hightlights of brown front.
+							ctx.globalAlpha=0.3;
+							ctx.fillRect(x*tw,y*th+th,tw,2);
+							ctx.fillRect(x*tw,y*th+th*2-2,tw,2);
+							ctx.globalAlpha=1.0;
 						}
 					}
 				}
