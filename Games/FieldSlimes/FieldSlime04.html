@@ -224,10 +224,20 @@ class enemy {
 			ctx.fillRect((this.x-this.spawnwidth/4)+tw/8,this.y-myCanvas.height,this.spawnwidth/2,myCanvas.height+th/2);
 			if(this.spawntime<this.spawntimemax/2)return;
 		}
-				
-		ctx.fillStyle='green';
+		
+		// set up dimensions of enemy
 		var w = tw/3;
 		var h = (tw/3)-this.heightmod;
+		
+		// shadow below en
+		ctx.globalAlpha = 0.3;
+		ctx.fillStyle='black';
+		ctx.beginPath();
+		ctx.arc(this.x+tw/16+w/4,this.y+((th/16)+h/1.7)+(this.heightmod/1.7),w/1.6,0,6);
+		ctx.fill();
+		ctx.globalAlpha=1;
+
+		ctx.fillStyle='green';
 		ctx.fillRect(this.x,this.y+this.heightmod,w,h);
 		ctx.fillStyle='white';
 		ctx.fillRect(this.x-2,this.y-2+this.heightmod,w/2,h/2);
@@ -262,6 +272,22 @@ class enemy {
 		}
 			
 		
+	}
+	// Create a lighsource around the enemy
+	// draw this ontop of the ground before
+	// drawing any objects.
+	//
+	drawlight(){
+		// draw the light around the player
+		ctx.globalAlpha =0.03;
+		var rad=tw*1.5;
+		for(var z=rad;z>0;z-=8){
+			ctx.fillStyle = 'white';
+			ctx.beginPath();
+			ctx.arc(this.x+tw/16,this.y+th/16,rad-z,0,6);
+			ctx.fill();
+		}
+		ctx.globalAlpha = 0;
 	}
 	// create path to center of map
 	makepath(){
@@ -357,9 +383,14 @@ gameloop=setInterval(doGameLoop,16);
 		tw = myCanvas.width/map[0].length;
 		th = myCanvas.height/map.length;
 		
-ctx,globalAlpha=0;
-ctx.fillStyle='chocolate';
-ctx.fillRect(0,0,c.width,myCanvas.height);
+		ctx,globalAlpha=0;
+		ctx.fillStyle='chocolate';
+		ctx.fillRect(0,0,c.width,myCanvas.height);
+		for(var i of enemies){
+			i.drawlight();
+		}
+
+
 
 // add enemy
 var spawnx = [2,15,18,1];
@@ -394,6 +425,7 @@ i.draw();
 
 }
 function drawmap(){
+		ctx.globalAlpha=1;
         for(var y = 0; y < map.length; ++y) {
             for(var x = 0; x < map[y].length; ++x) {
             	if(map[y][x]==1) {
