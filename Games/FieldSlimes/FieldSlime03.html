@@ -39,6 +39,7 @@ class enemy {
 		// and to much pushing
 		// then stop moving to target.
 		this.state = 'followpath';
+		this.directlinestate='unchecked';
 		this.busy++;
 		this.spawnx = x;
 		this.spawny = y;
@@ -76,7 +77,7 @@ class enemy {
 			if(this.heightmod<this.growmin)this.growcnt=1;
 		}
 	
-		if(this.state=='nothing')return;
+
 	
 		// make some space if near others
 		for(var i=0;i<enemies.length;i++){
@@ -98,7 +99,7 @@ class enemy {
 			}
 			}
 		}
-	
+		if(this.state=='nothing')return;	
 
 		
 		//
@@ -107,7 +108,7 @@ class enemy {
 		// Check if we have a straight
 		// line towards the target.
 		// Modify path arrays..
-		if(this.state=='followpath' && this.px.length==4){
+		if(this.state=='followpath' && this.directlinestate=='unchecked' && this.px.length==4){
 			var dx = this.px[0]*tw;
 			var dy = this.py[0]*th;
 			var an=Math.atan2(dy-this.y,dx-this.x);			var tx=this.x;
@@ -121,6 +122,9 @@ class enemy {
 				// then we have failed..
 				if(map[Math.floor(ty/th)][Math.floor(tx/tw)]!=0){
 					loopy=false;
+					
+					this.directlinestate='checked';
+					break;
 				}
 				// did we make it there without
 				// touching a map object.
@@ -131,10 +135,8 @@ class enemy {
 					this.state='movetotarget';
 					//this.px.slice(0,this.px.length);
 					//this.py.slice(0,this.py.length);
-					this.px.length=0;
-					this.py.length=0;
-					this.px.push(Math.floor(dx/tw));
-					this.py.push(Math.floor(dy/th));
+					this.px.length=1;
+					this.py.length=1;
 				}
 			}
 		}
