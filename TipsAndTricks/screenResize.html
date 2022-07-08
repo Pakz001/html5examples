@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	// This is the evenhandler that detects
+	// when the window is resized. The screenResize
+	// function is executed when that happens.
+	// Here the conversion of the screen/game objects
+	// is done.
+	window.addEventListener('resize', screenResize);
+	
+	// Our objects.
+	var sprite_x = [];
+	var sprite_y = [];
+	var sprite_width = [];
+	var sprite_height = [];
+	var init=true;
+	var oldwidth = 0;
+	var oldheight = 0;
+	var debug=0;
+	
+	// Before we start we get the canvas dimension
+	// and set the variables that detects the 
+	// resize changes.
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+	oldwidth = myCanvas.width;
+	oldheight = myCanvas.height;
+
+	gameloop=setInterval(doGameLoop,16);
+
+
+function doGameLoop(){
+
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Javascript Html canvas example."+debug,10,10);
+
+// In the first frame set up the screen objects
+//
+if(init){
+	init=false;
+	for(var i=0;i<20;i++){
+		var x = Math.floor(Math.random()*myCanvas.width);
+		var y = Math.floor(Math.random()*myCanvas.height);
+		var w = Math.floor(Math.random()*32)+8;
+		var h = Math.floor(Math.random()*32)+8;
+		sprite_x.push(x);
+		sprite_y.push(y);
+		sprite_width.push(w);
+		sprite_height.push(h);
+	}
+}
+
+// draw the sprites
+for(var i=0;i<sprite_x.length;i++){
+	ctx.fillStyle = 'white';
+	ctx.fillRect(sprite_x[i],sprite_y[i],sprite_width[i],sprite_height[i]);
+}
+
+}
+//
+// This is the function that is called when
+// the screen dimension(resize) is changed.
+function screenResize(){
+	// get the new dimensions
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+
+	// For every object on the screen.
+	// change their position and size to
+	// fit the new resolution
+	for(var i=0;i<sprite_x.length;i++){
+		var aa= (sprite_x[i]/oldwidth)*100;
+		var bb= (sprite_y[i]/oldheight)*100;
+		sprite_x[i]=(myCanvas.width/100)*aa;
+		sprite_y[i]=(myCanvas.height/100)*bb;
+		var aa= (sprite_width[i]/oldwidth)*100;
+		var bb= (sprite_height[i]/oldheight)*100;
+		sprite_width[i]=(myCanvas.width/100)*aa;
+		sprite_height[i]=(myCanvas.height/100)*bb;
+	}
+	// Store the new dimension in the 
+	// variables that are used
+	// to convert the new space positions.
+	oldwidth=myCanvas.width;
+	oldheight=myCanvas.height;
+
+}
+</script>
+</body>
+</html>
