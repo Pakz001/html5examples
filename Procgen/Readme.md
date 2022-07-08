@@ -1,3 +1,3 @@
 
 <br><br>
-<img src="Media/E9609758-82D4-41E1-B97E-5DD15D91FB59.jpeg" width="60%"><br>
+<img src="Media/A3C0409B-E58F-48D1-B07C-EA1D0502ADF7.jpeg" width="60%"><br>
