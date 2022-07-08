@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+class frag{
+	constructor(x,y){
+		this.x =x;
+		this.y=y;
+		this.sx = [];
+		this.sy = [];
+		this.makefrag();
+	}
+	makefrag(){
+	var st=Math.random()/2+.3;
+		for(var i=0;i<Math.PI*2;i+=st){
+			var d=Math.random()*5;
+			d+=5;
+			var x1=this.x+Math.cos(i)*d;
+			var y1=this.y+Math.sin(i)*d;
+			this.sx.push(x1);
+			this.sy.push(y1);
+		}
+	}
+	
+	update(){
+	}
+	draw(){
+		
+		if(this.sx.length==0)return;
+		ctx.fillStyle='white';
+		ctx.beginPath();
+		ctx.moveTo(this.sx[i],this.sy[i]);
+		
+		for(var i=1;i<this.sx.length;i++){
+			ctx.lineTo(this.sx[i],this.sy[i]);
+		}
+		ctx.fill();
+	}
+}
+fragments = [];
+fragments.push(new frag(100,100));
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example.",10,10); 
+
+
+for(var i of fragments){
+i.draw();
+}
+
+
+
+
+}
+</script>
+</body>
+</html>
