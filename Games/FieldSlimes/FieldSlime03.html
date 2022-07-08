@@ -8,6 +8,7 @@ Use different browser.
 // Small problem with flickering
 // this got introduced with the
 // path opt - adding straight line walk
+// fixed - loop not being exited correctly!
 
 
     var c=document.getElementById("myCanvas");
@@ -137,6 +138,7 @@ class enemy {
 					//this.py.slice(0,this.py.length);
 					this.px.length=1;
 					this.py.length=1;
+					break;
 				}
 			}
 		}
