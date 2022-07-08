@@ -1,5 +1,5 @@
 
-<h1>html5 javascript game oriented example code. ( Learn to code games by studying examples ) </h1>
+<h3>html5 javascript game oriented example code. ( Learn to code games by studying examples ) </h3>
 
 update:checked every file and removed references to a unused css file. gfx now included by base64(toDataUrl())
 
