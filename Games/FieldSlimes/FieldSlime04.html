@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+//
+// Small problem with flickering
+// this got introduced with the
+// path opt - adding straight line walk
+// fixed - loop not being exited correctly!
+
+
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+var c2 = document.createElement("canvas");
+var ctx2=c2.getContext("2d");
+    var map = [
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    ]
+
+var debug=0;
+class enemy {
+	constructor(x,y){
+		// if we are at the end 
+		// and to much pushing
+		// then stop moving to target.
+		this.state = 'followpath';//followpath
+		// start in the spawn mode
+		// draw animation.
+		this.state = 'beamdrop';
+		this.beamtime = 0;
+		this.beamtimemax = 50;
+		//this.state = 'spawn';
+		this.spawntime = 0;
+		this.spawntimemax = 70;
+		this.spawnwidth = 0;
+		this.spawnwidthinc = 1.5;
+		
+		
+		
+		this.directlinestate='unchecked';
+		this.busy++;
+		this.spawnx = x;
+		this.spawny = y;
+		this.x=this.spawnx*tw;
+		this.y=this.spawny*th;
+
+		this.px = [];
+		this.py = [];
+		// path for the enemy
+		// push works by pushing the last position
+		// back to the current enemy position.
+
+		this.map2 = [];
+		this.makepath();
+		this.delay=0;
+		
+		// Animate the enemy (slime)
+		// his height is altered.
+		this.growtime = 0;
+		this.growclock = 4;
+		this.growmax = 6;
+		this.growmin = 0;
+		this.growcnt = 1;
+		this.heightmod = Math.random()*this.growmax;
+	}
+	update(){
+		
+		if(this.state=='beamdrop'){
+			this.beamtime++;
+			if(this.beamtime>this.beamtimemax){
+				this.state='spawn';
+			}
+			return;
+		}
+		if(this.state=='spawn'){
+			this.spawntime++;
+			if(this.spawntime>this.spawntimemax/2 && this.spawnwidthinc>0){
+				this.spawnwidthinc=-this.spawnwidthinc;
+			}
+			if(this.spawntime>this.spawntimemax){
+				this.state='followpath';
+			}
+			return;
+		}
+	
+			//
+		// Animate the enemies(shrink/expand)
+		this.growtime++;
+		if(this.growtime>this.growclock){
+			this.growtime=0;
+			this.heightmod+=this.growcnt;
+			if(this.heightmod>this.growmax)this.growcnt=-1;
+			if(this.heightmod<this.growmin)this.growcnt=1;
+		}
+	
+
+	
+		// make some space if near others
+		for(var i=0;i<enemies.length;i++){
+			if(enemies[i].x!=this.x && enemies[i].y!=this.y){
+			//debug=Math.random();
+			if(Math.hypot(enemies[i].y-this.y,enemies[i].x-this.x)<32){
+				var an=Math.atan2(this.y-enemies[i].y,this.x-enemies[i].x);
+				an+=Math.random();
+				an-=.5;
+				this.x+=Math.cos(an)*1.5;
+				this.y+=Math.sin(an)*1.5;
+				enemies[i].x-=Math.cos(an)*1.5;
+				enemies[i].y-=Math.sin(an)*1.5;
+				this.busy++;
+				if(this.busy>100){
+					this.state='nothing';
+				}
+				//debug=Math.random();
+			}
+			}
+		}
+		if(this.state=='nothing')return;	
+
+		
+		//
+		// Path optimalisation - When
+		// at <5 cells from the target.
+		// Check if we have a straight
+		// line towards the target.
+		// Modify path arrays..
+		if(this.state=='followpath' && this.directlinestate=='unchecked' && this.px.length==4){
+			var dx = this.px[0]*tw;
+			var dy = this.py[0]*th;
+			var an=Math.atan2(dy-this.y,dx-this.x);			var tx=this.x;
+			var ty=this.y;
+			var loopy=true;
+			while(loopy){
+				
+				tx+=Math.cos(an)*1;
+				ty+=Math.sin(an)*1;
+				// If we touch a map object
+				// then we have failed..
+				if(map[Math.floor(ty/th)][Math.floor(tx/tw)]!=0){
+					loopy=false;
+					
+					this.directlinestate='checked';
+					break;
+				}
+				// did we make it there without
+				// touching a map object.
+				if(Math.hypot(dy-ty,dx-tx)<3){
+					
+					//modify path by removing
+					//cells until destination.
+					this.state='movetotarget';
+					//this.px.slice(0,this.px.length);
+					//this.py.slice(0,this.py.length);
+					this.px.length=1;
+					this.py.length=1;
+					break;
+				}
+			}
+		}
+		
+		
+		//
+		// Move the enemy to the destination in the
+		// path arrays.
+		var there=false;
+		this.delay++;
+		if(this.px.length>0 && this.delay==1){
+			
+			var dx = this.px[this.px.length-1]*tw;
+			var dy = this.py[this.px.length-1]*th;
+			var an=Math.atan2(dy-this.y,dx-this.x);
+			this.x+=Math.cos(an)*1;
+			this.y+=Math.sin(an)*1;
+			if(Math.hypot(dy-this.y,dx-this.x)<3)there=true;
+			this.delay=0;
+		}
+		if(there){
+			if(this.px.length>0){
+				
+				this.x=(this.px.pop())*tw;
+				this.y=(this.py.pop())*th;
+
+
+			}
+			if(this.px.length==0){
+				this.state='nothing';
+			}
+		}
+		
+	}
+	draw(){
+	
+		if(this.state=='beamdrop'){
+			var h=(myCanvas.height+th/2)/this.beamtimemax;
+			h=h*this.beamtime;
+			ctx.fillStyle='white';
+			ctx.fillRect(this.x+tw/8,this.y-myCanvas.height,2,h);
+			return;
+		}
+	
+		if(this.state=='spawn'){
+			this.spawnwidth+=this.spawnwidthinc;
+			ctx.fillStyle='white';
+			ctx.fillRect((this.x-this.spawnwidth/4)+tw/8,this.y-myCanvas.height,this.spawnwidth/2,myCanvas.height+th/2);
+			if(this.spawntime<this.spawntimemax/2)return;
+		}
+				
+		ctx.fillStyle='green';
+		var w = tw/3;
+		var h = (tw/3)-this.heightmod;
+		ctx.fillRect(this.x,this.y+this.heightmod,w,h);
+		ctx.fillStyle='white';
+		ctx.fillRect(this.x-2,this.y-2+this.heightmod,w/2,h/2);
+		ctx.fillRect(this.x+w/2+2,this.y-2+this.heightmod,w/2,h/2);
+		ctx.fillStyle='black';
+		ctx.fillRect(this.x+w/8,this.y+h/4+this.heightmod,w/4,h/4);		ctx.fillRect(this.x+w/2+w/8,this.y+h/4+this.heightmod,w/4,h/4);		ctx.fillStyle='darkgreen'
+		ctx.fillRect(this.x,this.y+h/1.5+this.heightmod,w,h/3);
+		
+		return;
+		// ~Draw debug map (path)
+		ctx.fillStyle = 'white';
+		for(var y = 0; y < this.map2.length; ++y) {
+      	for(var x = 0; x < this.map2[y].length; ++x) {
+         	if(this.map2[y][x]!=0) {
+						
+					ctx.fillText(this.map2[y][x],x*tw+tw/2,y*th+th/2);
+
+				}
+			}
+		}
+			
+		
+	}
+	// create path to center of map
+	makepath(){
+		var mx=[-1,0,1,0];
+		var my=[0,-1,0,1];
+		//var mx=[-1,0,1,1,1,0,-1,-1];
+		//var my=[-1,-1,-1,0,1,1,1,0];
+		var destx = Math.floor(map[0].length/2);
+		var desty = Math.floor(map.length/2);
+		//this.map2 = [...map]; // copy the array
+		// another copy array
+		for (var i = 0; i < map.length; i++)
+    	this.map2[i] = map[i].slice();
+
+		for(var y=this.map2.length-2;y>0;y--){
+		for(var x=0;x<this.map2[0].length;x++){
+			if(this.map2[y][x]==1){
+				this.map2[y][x]=-1;
+				this.map2[y+1][x]=-1;
+			}
+		}}
+
+		var sx = Math.floor(this.x/tw);
+		var sy = Math.floor(this.y/th);
+		var olx = [];
+		var oly = [];
+		olx.push(sx);
+		oly.push(sy);
+		
+		this.map2[sy][sx]=1;
+		
+		while(olx.length>0){
+			var x = olx.shift();
+			var y = oly.shift();
+			var val = this.map2[y][x];
+			
+			if(x==destx && y==desty){
+				//debug=val;	
+				var there=100;
+				while(there>0){
+					there--;
+				for(var n=0;n<mx.length;n++){
+					var x2=mx[n];
+					var y2=my[n];
+					var nx = x+x2;
+					var ny = y+y2;
+					//debug=val;
+					if(this.map2[ny][nx]==val-1 && this.map2[ny][nx]>-1){
+						x+=x2;
+						y+=y2;
+						val = this.map2[ny][nx];
+						//this.px.unshift(nx);
+						//this.py.unshift(ny);
+						this.px.push(nx);
+						this.py.push(ny);
+
+						if(nx==sx && ny==sy)return;
+						continue;
+					}
+				}}
+			}
+			
+			for(var n=0;n<mx.length;n++){
+				var x1=mx[n];
+				var y1=my[n];
+				if(x+x1>-1 && y+y1>-1 && x+x1<this.map2[0].length && y+y1<this.map2.length){
+					//if(this.map2[y+y1][x+x1]==0){
+						if(this.map2[y+y1][x+x1]==0){
+							this.map2[y+y1][x+x1]=val+1;
+							olx.push(x+x1);
+							oly.push(y+y1);
+						}
+					//}
+
+				}
+			
+			}
+		}
+	
+	}
+	
+}
+var tw=c.width/map[0].length;
+var th = c.height/map.length;
+var enemies = [];
+
+    
+var add=true;
+
+gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+      myCanvas.width = c2.width=window.innerWidth-32;		myCanvas.height=c2.height = window.innerHeight-32;
+		tw = myCanvas.width/map[0].length;
+		th = myCanvas.height/map.length;
+		
+ctx,globalAlpha=0;
+ctx.fillStyle='chocolate';
+ctx.fillRect(0,0,c.width,myCanvas.height);
+
+// add enemy
+var spawnx = [2,15,18,1];
+var spawny = [5,2,13,11];
+if(enemies.length<5 && Math.random()<0.01){
+	var a = Math.floor(Math.random()*spawnx.length);
+	enemies.push(new enemy(spawnx[a],spawny[a]));
+}
+if(Math.random()<0.006 && enemies.length>0){
+
+	//var a = Math.floor(Math.random()*spawnx.length);
+	var n = Math.floor(Math.random()*enemies.length);
+	if(enemies[n].px.length<4){
+		enemies.splice(n,1);
+	}
+	//enemies.push(new enemy(spawnx[a],spawny[a]));
+}
+//debug=enemies.length;
+drawmap();
+
+
+
+ctx.fillStyle='white';
+ctx.fillText("Debug : "+debug,10,10); 
+
+for(var i of enemies){
+i.update();
+i.draw();
+}
+
+
+
+}
+function drawmap(){
+        for(var y = 0; y < map.length; ++y) {
+            for(var x = 0; x < map[y].length; ++x) {
+            	if(map[y][x]==1) {
+
+						
+						// black roof
+						ctx.fillStyle='black';
+						ctx.fillRect(x*tw,y*th,tw,th);
+						//
+						//highlight at the top of black area
+						if(y-1>=0){
+							if(map[y-1][x]==0){
+								ctx.fillStyle='white';
+								ctx.globalAlpha=0.5;
+								ctx.fillRect(x*tw,y*th,tw,2);
+								ctx.globalAlpha=1.0;
+							}
+						}
+						//
+						//highlight at the left of black area
+						if(x-1>=0){
+							if(map[y][x-1]==0){
+								ctx.fillStyle='white';
+								ctx.globalAlpha=0.5;
+								ctx.fillRect(x*tw,y*th,2,th);
+								ctx.globalAlpha=1.0;
+							}
+						}
+						//
+						//highlight at the right of black area
+						if(x+1<map[0].length){
+							if(map[y][x+1]==0){
+								ctx.fillStyle='white';
+								ctx.globalAlpha=0.5;
+								ctx.fillRect(x*tw+tw,y*th,2,th);
+								ctx.globalAlpha=1.0;
+							}
+						}
+						// brown front
+						if(y+1<map.length && map[y+1][x]==0){
+							ctx.fillStyle='brown';
+							ctx.fillRect(x*tw,y*th+th,tw,th);
+							ctx.fillStyle='white';
+							// hightlights of brown front.
+							ctx.globalAlpha=0.3;
+							ctx.fillRect(x*tw,y*th+th,tw,2);
+							ctx.fillRect(x*tw,y*th+th*2-2,tw,2);
+							ctx.globalAlpha=1.0;
+						}
+					}
+				}
+			}
+
+}
+    </script></body></html>
