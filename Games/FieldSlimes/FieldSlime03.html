@@ -167,10 +167,7 @@ class enemy {
 		
 	}
 	draw(){
-		ctx.fillStyle='white';
-		ctx.fillRect(this.x-2,this.y-2,24,24);
-		
-		return;
+				
 		ctx.fillStyle='green';
 		var w = tw/3;
 		var h = (tw/3)-this.heightmod;
@@ -302,15 +299,15 @@ if(enemies.length<5 && Math.random()<0.01){
 	var a = Math.floor(Math.random()*spawnx.length);
 	enemies.push(new enemy(spawnx[a],spawny[a]));
 }
-//if(Math.random()<0.006){
+if(Math.random()<0.006){
 
 	//var a = Math.floor(Math.random()*spawnx.length);
 	var n = Math.floor(Math.random()*enemies.length);
-	//if(enemies[n].px.length<4){
-	//enemies.splice(n,1);
-	//}
+	if(enemies[n].px.length<4){
+		enemies.splice(n,1);
+	}
 	//enemies.push(new enemy(spawnx[a],spawny[a]));
-//}
+}
 //debug=enemies.length;
 drawmap();
 
