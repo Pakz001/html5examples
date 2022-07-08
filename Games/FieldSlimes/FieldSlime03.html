@@ -65,6 +65,17 @@ class enemy {
 		this.heightmod = Math.random()*this.growmax;
 	}
 	update(){
+	
+			//
+		// Animate the enemies(shrink/expand)
+		this.growtime++;
+		if(this.growtime>this.growclock){
+			this.growtime=0;
+			this.heightmod+=this.growcnt;
+			if(this.heightmod>this.growmax)this.growcnt=-1;
+			if(this.heightmod<this.growmin)this.growcnt=1;
+		}
+	
 		if(this.state=='nothing')return;
 	
 		// make some space if near others
@@ -88,15 +99,7 @@ class enemy {
 			}
 		}
 	
-		//
-		// Animate the enemies(shrink/expand)
-		this.growtime++;
-		if(this.growtime>this.growclock){
-			this.growtime=0;
-			this.heightmod+=this.growcnt;
-			if(this.heightmod>this.growmax)this.growcnt=-1;
-			if(this.heightmod<this.growmin)this.growcnt=1;
-		}
+
 		
 		//
 		// Path optimalisation - When
