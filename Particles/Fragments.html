@@ -14,18 +14,28 @@ Use different browser.
     var ctx=c.getContext("2d");
 
 class frag{
-	constructor(x,y){
-		this.x =x;
+	// create/setup the variables
+	// in this class. x and y is
+	// the position to draw on the canvas.
+	// size is the size of the shape(frag)
+	constructor(x,y,size){
+		this.size=size;
+		this.x=x;
 		this.y=y;
 		this.sx = [];
 		this.sy = [];
+		// Create our frag.
+		// note that you need to call using this.
 		this.makefrag();
 	}
+	// make the shapes. go in a circle
+	// with a random step. store each
+	// step as a coordinate
 	makefrag(){
-	var st=Math.random()/2+.3;
+		var st=Math.random()/2+.3;
 		for(var i=0;i<Math.PI*2;i+=st){
-			var d=Math.random()*5;
-			d+=5;
+			var d=Math.random()*this.size;
+			d+=this.size;
 			var x1=this.x+Math.cos(i)*d;
 			var y1=this.y+Math.sin(i)*d;
 			this.sx.push(x1);
@@ -35,6 +45,10 @@ class frag{
 	
 	update(){
 	}
+	// Draw the frag from the coordinates we
+	// create in the makefrag function. We
+	// draw a filled poly using the move and lineto
+	// commands.
 	draw(){
 		
 		if(this.sx.length==0)return;
@@ -49,7 +63,9 @@ class frag{
 	}
 }
 fragments = [];
-fragments.push(new frag(100,100));
+//fragments.push(new frag(100,100));
+var init=true;
+
 gameloop=setInterval(doGameLoop,16);
 
 function doGameLoop(){
@@ -58,11 +74,24 @@ myCanvas.width = window.innerWidth-32;
 ctx.fillStyle="rgb(0,0,0)";
 ctx.fillRect(0,0,c.width,c.height);
 ctx.fillStyle="rgb(255,255,255)";
-ctx.fillText("Drawing a tilemap example.",10,10); 
+ctx.fillText("Creating fragments example.",10,10); 
 
-
+// If on the first frame then initialise
+// the frags.
+if(init){
+	for(var y=16;y<myCanvas.height;y+=32){
+	for(var x=16;x<myCanvas.width-16;x+=32){
+		// create a variable between 2 to upto 7.
+		var s = Math.random()*5;
+		s+=2;
+		// create our frag at screen position
+		fragments.push(new frag(x,y,s));
+	}}
+	init=false;
+}
+// draw our fragments
 for(var i of fragments){
-i.draw();
+	i.draw();
 }
 
 
