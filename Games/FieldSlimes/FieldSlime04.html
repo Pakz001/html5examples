@@ -51,7 +51,8 @@ class enemy {
 		this.spawnwidth = 0;
 		this.spawnwidthinc = 1.5;
 		
-		
+		// direction we are moving
+		this.direction = 'center'; //left//right//center
 		
 		this.directlinestate='unchecked';
 		this.busy++;
@@ -185,17 +186,20 @@ class enemy {
 			var dx = this.px[this.px.length-1]*tw;
 			var dy = this.py[this.px.length-1]*th;
 			var an=Math.atan2(dy-this.y,dx-this.x);
+			var oldx=this.x;
 			this.x+=Math.cos(an)*1;
-			this.y+=Math.sin(an)*1;
+			this.y+=Math.sin(an)*1;		
+			this.direction='center';
+			if(this.x>oldx)this.direction='right';
+			if(this.x<oldx)this.direction='left';
+
 			if(Math.hypot(dy-this.y,dx-this.x)<3)there=true;
 			this.delay=0;
 		}
 		if(there){
 			if(this.px.length>0){
-				
 				this.x=(this.px.pop())*tw;
 				this.y=(this.py.pop())*th;
-
 
 			}
 			if(this.px.length==0){
@@ -228,8 +232,20 @@ class enemy {
 		ctx.fillStyle='white';
 		ctx.fillRect(this.x-2,this.y-2+this.heightmod,w/2,h/2);
 		ctx.fillRect(this.x+w/2+2,this.y-2+this.heightmod,w/2,h/2);
+		// eyes
 		ctx.fillStyle='black';
-		ctx.fillRect(this.x+w/8,this.y+h/4+this.heightmod,w/4,h/4);		ctx.fillRect(this.x+w/2+w/8,this.y+h/4+this.heightmod,w/4,h/4);		ctx.fillStyle='darkgreen'
+		if(this.direction=='center'){
+			ctx.fillRect(this.x+w/8,this.y+h/4+this.heightmod,w/4,h/4);			ctx.fillRect(this.x+w/2+w/8,this.y+h/4+this.heightmod,w/4,h/4);
+		}
+		if(this.direction=='left'){
+			ctx.fillRect(this.x,this.y+h/8+this.heightmod,w/4,h/4);			ctx.fillRect(this.x+w/2,this.y+h/8+this.heightmod,w/4,h/4);
+		}
+		if(this.direction=='right'){
+			ctx.fillRect(this.x+w/8+w/16,this.y+h/8+this.heightmod,w/4,h/4);			ctx.fillRect(this.x+w/2+w/8+w/16,this.y+h/8+this.heightmod,w/4,h/4);
+		}
+		
+		// bottom shadow
+		ctx.fillStyle='darkgreen'
 		ctx.fillRect(this.x,this.y+h/1.5+this.heightmod,w,h/3);
 		
 		return;
