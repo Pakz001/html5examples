@@ -295,7 +295,7 @@ gameloop=setInterval(doGameLoop,16);
 		tw = myCanvas.width/map[0].length;
 		th = myCanvas.height/map.length;
 		
-
+ctx,globalAlpha=0;
 ctx.fillStyle='chocolate';
 ctx.fillRect(0,0,c.width,myCanvas.height);
 
@@ -306,7 +306,7 @@ if(enemies.length<5 && Math.random()<0.01){
 	var a = Math.floor(Math.random()*spawnx.length);
 	enemies.push(new enemy(spawnx[a],spawny[a]));
 }
-if(Math.random()<0.006){
+if(Math.random()<0.006 && enemies.length>0){
 
 	//var a = Math.floor(Math.random()*spawnx.length);
 	var n = Math.floor(Math.random()*enemies.length);
