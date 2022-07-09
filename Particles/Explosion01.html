@@ -14,8 +14,10 @@ Use different browser.
     var ctx=c.getContext("2d");
 
 class frag{
-	constructor(x,y){
-		this.inc = .1;
+	constructor(x,y,size){
+		this.active=true;
+		this.size = size;
+		this.inc = .3;
 		this.maxscale = 3.0;
 		this.minscale = 0.1;
 		this.x =x;
@@ -25,6 +27,8 @@ class frag{
 		this.an = [];
 		this.sx = [];
 		this.sy = [];
+		this.sx2 = [];
+		this.sy2 = [];
 		
 		this.makefrag();
 	}
@@ -32,7 +36,7 @@ class frag{
 	var st=Math.random()/2+.3;
 		for(var i=0;i<Math.PI*2;i+=st){
 			var d=Math.random()*5;
-			d+=16;
+			d+=this.size;
 			this.rad.push(d);
 			this.an.push(i);
 			var x1=this.x+Math.cos(i)*d;
@@ -49,16 +53,24 @@ class frag{
 		}
 if(this.scale<this.minscale){
 	this.inc=0.1;
+	this.active=false;
 }
 		this.sx.length=0;
 		this.sy.length=0;
+		this.sx2.length=0;
+		this.sy2.length=0;
 		for(var i=0;i<this.an.length;i++){
 			var d= this.rad[i]*this.scale;
+			var d2=this.rad[i]*this.scale/2;
 			var an= this.an[i];
 			var x1=this.x+Math.cos(an)*d;
 			var y1=this.y+Math.sin(an)*d;
 						this.sx.push(x1);
 			this.sy.push(y1);
+						var x1=this.x+Math.cos(an)*d2;
+			var y1=this.y+Math.sin(an)*d2;
+						this.sx2.push(x1);
+			this.sy2.push(y1);
 		}
 	}
 	draw(){
@@ -76,10 +88,26 @@ ctx.lineTo(this.sx[1],this.sy[1]);
 		ctx.lineWidth=4;
 		ctx.strokeStyle='red';
 		ctx.stroke();
+	
+	
+	
+		ctx.fillStyle='white';
+		ctx.beginPath();
+		ctx.moveTo(this.sx2[i],this.sy2[i]);
+		
+		for(var i=1;i<this.sx2.length;i++){
+			ctx.lineTo(this.sx2[i],this.sy2[i]);
+		}
+ctx.lineTo(this.sx2[1],this.sy2[1]);
+		ctx.fill();
+		//ctx.lineWidth=4;
+		//ctx.strokeStyle='red';
+		//ctx.stroke();
 	}
+	
 }
 fragments = [];
-fragments.push(new frag(100,100));
+fragments.push(new frag(100,100,16));
 gameloop=setInterval(doGameLoop,16);
 
 function doGameLoop(){
@@ -90,13 +118,20 @@ ctx.fillRect(0,0,c.width,c.height);
 ctx.fillStyle="rgb(255,255,255)";
 ctx.fillText("Drawing a tilemap example.",10,10); 
 
-
-for(var i of fragments){
-
-i.draw();
-i.update();
+if(Math.random()<.2){
+var s=Math.random()*16;
+s+=4;
+fragments.push(new frag(Math.random()*c.width,Math.random()*c.height,s));
 }
 
+for(var i of fragments){
+i.update();
+i.draw();
+
+}
+for(i=0;i<fragments.length;i++){
+	if(fragments[i].active==false)fragments.splice(i,1);
+}
 
 
 
