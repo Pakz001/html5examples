@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+class frag{
+	constructor(x,y,size){
+		this.active=true;
+		this.size = size;
+		this.inc = .3;
+		this.maxscale = 3.0;
+		this.minscale = 0.1;
+		this.x =x;
+		this.y=y;
+		this.scale = 1.0;
+		this.rad = [];
+		this.an = [];
+		this.sx = [];
+		this.sy = [];
+
+		
+		this.makefrag();
+	}
+	makefrag(){
+	var st=(Math.PI*2)/20;
+	var cnt=0;
+		for(var i=0;i<Math.PI*2;i+=st){
+		
+		cnt++;
+		
+			var d=Math.random()*5;
+			d+=this.size;
+		if(cnt>2 && cnt<8)d=d/2;
+		if(cnt>12 && cnt<18)d=d/2;
+			this.rad.push(d);
+			this.an.push(i);
+			var x1=this.x+Math.cos(i)*d;
+			var y1=this.y+Math.sin(i)*d;
+			this.sx.push(x1);
+			this.sy.push(y1);
+		}
+		this.rotate(Math.random()*Math.PI*2);
+	}
+	
+	update(){
+		
+	}
+	draw(){
+		
+		if(this.sx.length==0)return;
+		ctx.fillStyle='yellow';
+		ctx.beginPath();
+		ctx.moveTo(this.sx[i],this.sy[i]);
+		
+		for(var i=1;i<this.sx.length;i++){
+			ctx.lineTo(this.sx[i],this.sy[i]);
+		}
+ctx.lineTo(this.sx[1],this.sy[1]);
+		ctx.fill();
+		ctx.lineWidth=2;
+		ctx.strokeStyle='red';
+		ctx.stroke();
+	
+	}
+	
+	
+	rotate(r){
+		for(var i=0;i<this.sx.length;i++){
+		this.sx[i]=this.x+(Math.cos(this.an[i]+r))*this.rad[i];
+		this.sy[i]=this.y+(Math.sin(this.an[i]+r))*this.rad[i];
+		
+		}
+	}
+	
+}
+fragments = [];
+fragments.push(new frag(100,100,16));
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example.",10,10); 
+
+if(Math.random()<.05){
+var s=Math.random()*16;
+s+=4;
+fragments.push(new frag(Math.random()*c.width,Math.random()*c.height,s));
+}
+
+for(var i of fragments){
+i.update();
+i.draw();
+
+}
+for(i=0;i<fragments.length;i++){
+	if(fragments[i].active==false)fragments.splice(i,1);
+}
+
+
+
+}
+</script>
+</body>
+</html>
