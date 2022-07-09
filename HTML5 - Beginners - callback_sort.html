@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+// here we create a
+// array with numbers.
+	var test = [7,2,12,87,3,56,32];
+	
+
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("sorting array using callback..",10,10); 
+
+// create a temp array
+// and copy test array into
+// this.
+var a = [];
+for(var i=0;i<test.length;i++){
+a.push(test[i]);
+}
+// draw the contents of
+// the temp array.
+ctx.fillText("Original contents. : "+a,10,30); 
+// sort the temp array
+// using a callback
+// function
+a.sort(lowest);
+// draw the contents of
+// the temp array
+ctx.fillText("sorted contents. : "+a,10,60); 
+
+
+}
+// this function is used as
+// a callback function for
+// sort. 
+function lowest(a,b){
+	return a-b;
+}
+</script>
+</body>
+</html>
