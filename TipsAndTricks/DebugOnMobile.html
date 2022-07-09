@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+ <textarea id='origin' name='origin' rows='20'
+ cols='60'></textarea>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+// use the set up textarea
+// as a debug window.
+const debug = document.getElementById("origin")
+// here we set the
+// debug textarea text.
+debug.value='abc';
+// here we add to the debug
+// textarea text.
+debug.value+=' 1053';
+
+
+
+gameloop=setInterval(doGameLoop,400);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example.",10,10); 
+
+
+
+//document.write(50);
+
+
+
+
+}
+</script>
+</body>
+</html>
