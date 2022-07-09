@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+class frag{
+	constructor(x,y){
+		this.inc = .1;
+		this.maxscale = 3.0;
+		this.minscale = 0.1;
+		this.x =x;
+		this.y=y;
+		this.scale = 1.0;
+		this.rad = [];
+		this.an = [];
+		this.sx = [];
+		this.sy = [];
+		
+		this.makefrag();
+	}
+	makefrag(){
+	var st=Math.random()/2+.3;
+		for(var i=0;i<Math.PI*2;i+=st){
+			var d=Math.random()*5;
+			d+=16;
+			this.rad.push(d);
+			this.an.push(i);
+			var x1=this.x+Math.cos(i)*d;
+			var y1=this.y+Math.sin(i)*d;
+			this.sx.push(x1);
+			this.sy.push(y1);
+		}
+	}
+	
+	update(){
+		this.scale+=this.inc;
+		if(this.scale>this.maxscale){
+		this.inc=-0.1;
+		}
+if(this.scale<this.minscale){
+	this.inc=0.1;
+}
+		this.sx.length=0;
+		this.sy.length=0;
+		for(var i=0;i<this.an.length;i++){
+			var d= this.rad[i]*this.scale;
+			var an= this.an[i];
+			var x1=this.x+Math.cos(an)*d;
+			var y1=this.y+Math.sin(an)*d;
+						this.sx.push(x1);
+			this.sy.push(y1);
+		}
+	}
+	draw(){
+		
+		if(this.sx.length==0)return;
+		ctx.fillStyle='yellow';
+		ctx.beginPath();
+		ctx.moveTo(this.sx[i],this.sy[i]);
+		
+		for(var i=1;i<this.sx.length;i++){
+			ctx.lineTo(this.sx[i],this.sy[i]);
+		}
+ctx.lineTo(this.sx[1],this.sy[1]);
+		ctx.fill();
+		ctx.lineWidth=4;
+		ctx.strokeStyle='red';
+		ctx.stroke();
+	}
+}
+fragments = [];
+fragments.push(new frag(100,100));
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example.",10,10); 
+
+
+for(var i of fragments){
+
+i.draw();
+i.update();
+}
+
+
+
+
+}
+</script>
+</body>
+</html>
