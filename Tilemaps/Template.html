@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var map = [
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1],
+		[1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1],
+      [1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ]
+
+		var rot=0;
+    gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+        	myCanvas.width = window.innerWidth-32;
+			myCanvas.height = window.innerHeight-32;
+			// tile width and height
+			tw = Math.floor(c.width/map[0].length); 
+			th = Math.floor(c.height/map.length);
+			ctx.clearRect(0,0,c.width,c.height);
+			// Draw the tile map..
+        	for(var y = 0; y < map.length; ++y) {
+         for(var x = 0; x < map[y].length; ++x) {
+         	if(map[y][x]==1){
+					ctx.fillStyle = 'rgb(100,20,5)';
+					ctx.fillRect(x*tw,y*th,tw,th);
+				}
+         	if(map[y][x]==0){
+					ctx.fillStyle = 'rgb(70,40,10)';
+					ctx.fillRect(x*tw,y*th,tw,th);
+				}
+
+         }}
+
+        	ctx.fillText("Drawing a rotating tilemap example.",10,10); 
+
+
+
+    }
+    </script></body></html>
