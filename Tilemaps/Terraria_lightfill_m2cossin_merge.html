@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html><body>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	//
+	// Slow! make a temp lightmap and update that every change to
+	// lighting. Draw that ontop of the map. To slow for realtime..
+	//
+	//
+
+	//
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var c2 = document.createElement("canvas");
+	var ctx2=c2.getContext("2d");
+	var map = [
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1],
+		[1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1],
+      [1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ]
+	var lightmap = [];
+	for (var i = 0; i < map.length; i++)
+   lightmap[i] = map[i].slice();	
+	for(var y2=0;y2<lightmap.length;y2++){
+	for(var x2=0;x2<lightmap[0].length;x2++){
+		lightmap[y2][x2]=1;
+	}}
+	lightfill(8,6,100);
+
+	gameloop=setInterval(doGameLoop,16);
+	function doGameLoop(){
+   	myCanvas.width = c2.width = window.innerWidth-32;
+		myCanvas.height = c2.height = window.innerHeight-32;
+		// tile width and height
+		tw = Math.floor(c.width/map[0].length); 
+		th = Math.floor(c.height/map.length);
+		ctx.clearRect(0,0,c.width,c.height);
+			
+		// Draw the tile map..
+      for(var y = 0; y < map.length; ++y) {
+		for(var x = 0; x < map[y].length; ++x) {
+      	if(map[y][x]==1){
+				ctx.fillStyle = 'rgb(100,20,5)';
+				ctx.fillRect(x*tw,y*th,tw,th);
+			}
+         if(map[y][x]==0){
+				ctx.fillStyle = 'rgb(70,40,10)';
+				ctx.fillRect(x*tw,y*th,tw,th);
+			}
+			//ctx.fillStyle='white';
+			//ctx.fillText(lightmap[y][x],x*tw+tw/2,y*th+th/2);
+      }}
+
+		// Draw the lightmap on top
+		ctx2.globalAlpha = 1;
+		ctx2.fillStyle = 'rgb(0,0,0)';
+      for(var y = 0; y < map.length; ++y) {
+		for(var x = 0; x < map[y].length; ++x) {
+			if(lightmap[y][x]==1)ctx2.fillRect(x*tw,y*th,tw,th);
+		}}
+		ctx.globalAlpha = 1.0;
+		ctx.drawImage(c2,0,0);	
+
+		// Draw the lightmap on top(merge)
+		var lay = [.75,.5,.25];
+		for(var l=0;l<lay.length;l++){
+      for(var y = 0; y < map.length; ++y) {
+		for(var x = 0; x < map[y].length; ++x) {
+			if(lightmap[y][x]==lay[l]){
+				ctx2.beginPath();
+				var x2 = ((x*tw)+tw/2)+Math.cos(0)*(tw);
+				var y2 = ((y*th)+th/2)+Math.sin(0)*(th);
+				ctx2.moveTo(x2,y2);
+				for(var an=0;an<Math.PI*2;an+=Math.PI/4){
+					x2 = ((x*tw)+tw/2)+Math.cos(an)*tw;
+					y2 = ((y*th)+th/2)+Math.sin(an)*th;
+					ctx2.lineTo(x2,y2);
+				}
+				ctx2.fill();
+				//ctx2.beginPath();
+				//ctx2.arc(x*tw+tw/2,y*th+th/2,tw/1.2,0,6);
+				//ctx2.fill();
+			}
+	
+		}}
+      ctx.globalAlpha = lay[l];
+		ctx.drawImage(c2,0,0);	
+		}
+		
+		ctx.fillText("Drawing a rotating tilemap example.",10,10); 
+
+
+
+	}
+	// Fill on top of value 0. When encounter tile 1
+	// fill to 3 steps deep into this.
+	function lightfill(x,y,length){
+		var mx=[-1,0,1,1,1,0,-1,-1];
+		var my=[-1,-1,-1,0,1,1,1,0];
+		// cross fill
+		//var mx=[-1,0,1,0];
+		//var my=[0,-1,0,1];
+		// temp closed map.
+		var tempmap = [];	
+		for (var i = 0; i < map.length; i++)
+   	tempmap[i] = map[i].slice();	
+		for(var zy=0;zy<map.length;zy++){
+		for(var zx=0;zx<map[0].length;zx++){
+			tempmap[zy][zx]=0;			
+		}}
+		
+		// open list.
+		var olx = [];
+		var oly = [];
+		olx.push(x);
+		oly.push(y);
+		tempmap[y][x] = 1;
+		lightmap[y][x] = 0;
+		var stopat=0;
+		while(olx.length>0 && stopat<length){
+			stopat++;
+			var x1 = olx.shift();
+			var y1 = oly.shift();
+			//var x1 = olx.pop();
+			//var y1 = oly.pop();
+			//var val = lightmap[y1][x1];
+			
+			for(var i=0;i<mx.length;i++){
+				var x2=x1+mx[i];
+				var y2=y1+my[i];
+				if(x2>=0 && x2<map[0].length && y2>=0 && y2<map.length){
+				
+				if(tempmap[y2][x2]==0 && map[y2][x2]==0){
+					lightmap[y2][x2]=0;
+					tempmap[y2][x2]=1;
+					olx.push(x2);
+					oly.push(y2);
+				}}
+			}
+			
+		}
+		
+		// edge grow..
+		var tempmap2 = [];	
+		for (var i = 0; i < map.length; i++)
+   	tempmap2[i] = map[i].slice();	
+		for(var zy=0;zy<map.length;zy++){
+		for(var zx=0;zx<map[0].length;zx++){
+			tempmap2[zy][zx]=0;			
+		}}
+		for(var i=0;i<.76;i+=.25){			for(var y2=0;y2<tempmap.length;y2++){
+		for(var x2=0;x2<tempmap[0].length;x2++){
+			if(tempmap[y2][x2]==1){
+				for(var y3=-1;y3<2;y3++){
+				for(var x3=-1;x3<2;x3++){
+					var x4 = x2+x3;
+					var y4 = y2+y3;
+					if(x4>=0 && x4<map[0].length && y4>=0 && y4<map.length){
+						if(lightmap[y4][x4]==1){
+							lightmap[y4][x4]=i;
+							tempmap2[y4][x4]=1;
+						}
+					}
+				}}
+			}
+		}}
+		for (var zi = 0; zi < tempmap2.length; zi++)
+   	tempmap[zi] = tempmap2[zi].slice();
+		}
+		
+	}
+</script></body></html>
