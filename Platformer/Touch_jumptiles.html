@@ -28,42 +28,64 @@ Use different browser.
 			this.jumpforcemax=6;
 			this.tilew=48;
 			this.tileh=16;
-			
+			this.tilelock = -1;
 			this.tilex = [];
 			this.tiley = [];
 			this.tileinc = [];
-			this.tiletop = 0;
-			this.tilebottom = this.ground;
-			this.newtile(
-			0,
-			this.ground+this.h/2)
-			
-			this.newtile(
-			myCanvas.width-64,
-			this.ground+this.h/2)
+			this.tiletop = this.ground/2;
+			this.tilebottom = this.ground+this.h;
+
+			for(var i=0;i<myCanvas.width;i+=220){
+				this.newtile(
+				i,
+				this.tilebottom)
+			}
+
 		}
 		newtile(x,y){
 			this.tilex.push(x);
 			this.tiley.push(y);
+			this.tileinc.push(Math.floor(Math.random()*2)+1);
 		}
 		jump(){
 			if(this.jumpactive)
 			return;
 			this.jumpactive=true;
+			this.tilelock = -1;
 			this.jumpforce=-this.jumpforcemax;
 		}
 		update(){
+			if(this.tilelock>-1){
+				this.y = this.tiley[this.tilelock]-this.h;
+			}
+		
+			//move tiles
+			for(var i=0;i<this.tilex.length;i++){
+				this.tiley[i]+=this.tileinc[i];
+				if(this.tiley[i]>this.tilebottom){
+					this.tiley[i]=this.tilebottom;
+					this.tileinc[i]=-this.tileinc[i];
+				}
+				if(this.tiley[i]<this.tiletop){
+					this.tiley[i]=this.tiletop;
+					this.tileinc[i]=-this.tileinc[i];
+				}
+				
+			}
+			
 			// move to destination x
 			// this with x3(check
 			// collision in here..)
 			for(var i=0;i<3;i++){
 				if(this.x<this.destx){
-					if(this.playertilecollide(1,0)==false){
+					var ct = this.playertilecollide(1,0);
+					if(ct==-1){
 						this.x+=1;
 					}
 				}
 				if(this.x>this.destx){
-					if(this.playertilecollide(-1,0)==false){
+					var ct = this.playertilecollide(-1,0);
+					if(ct==-1){
 						this.x-=1;
 					}
 				}
@@ -86,8 +108,11 @@ Use different browser.
 					}else{
 						this.y+=1;
 					}
-					if(this.playertilecollide(0,0)){
+					var ct = this.playertilecollide(0,0);
+					if(ct>-1){
+						this.tilelock = ct;
 						this.jumpactive=false;
+						this.destx = this.x;
 						this.y = oldy;
 						break;
 					}
@@ -101,9 +126,19 @@ Use different browser.
 				this.jumpforce+=.1;
 
 			}
+			if(this.jumpactive==false && this.tilelock==-1){
+				//if(playertilecollide(0,0)==false){
+				if(this.y<this.ground){
+					this.jumpactive=true;
+					this.jumpforce=0;
+				}
+				//}
+			}
 		}
 		draw(){
+
 			ctx.fillStyle='white';
+			ctx.fillRect(0,this.ground+this.h,myCanvas.width,1);
 			ctx.fillRect(	this.x,
 								this.y,
 								this.w,
@@ -128,19 +163,24 @@ Use different browser.
 					this.tiley[j],
 					this.tilew,
 					this.tileh)==true){
-					return true;
+					return j;
 					}
 			}
-			return false;
+			return -1;
 		}
 	}
-	const mrnario = new nario(200,200);
+	var mrnario;
+	var init=true;
 
 gameloop=setInterval(doGameLoop,16);
 
 function doGameLoop(){
 myCanvas.height = window.innerHeight-32;
 myCanvas.width = window.innerWidth-32;
+if(init){
+	init=false;
+	mrnario = new nario(200,myCanvas.height/2);
+}
 ctx.fillStyle="rgb(0,0,0)";
 ctx.fillRect(0,0,c.width,c.height);
 ctx.fillStyle="rgb(255,255,255)";
@@ -173,4 +213,4 @@ function rectsoverlap(r1x1,r1y1,r1w,r1h,r2x1,r2y1,r2w,r2h){
  }
 </script>
 </body>
-</html>
+</html>		
