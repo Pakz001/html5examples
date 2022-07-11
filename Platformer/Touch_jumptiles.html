@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+	c.addEventListener("touchend", touchHandler);
+	
+    var ctx=c.getContext("2d");
+	class nario{
+		constructor(x,y){
+			this.x = x;
+			this.y = y;
+			this.destx = x;
+			this.ground=y;
+			this.w = 48;
+			this.h = 48;
+			this.jumpactive=false;
+			this.jumpgravity=1;
+			this.jumpforce=0;
+			this.jumpforcemax=6;
+			this.tilew=48;
+			this.tileh=16;
+			
+			this.tilex = [];
+			this.tiley = [];
+			this.tileinc = [];
+			this.tiletop = 0;
+			this.tilebottom = this.ground;
+			this.newtile(
+			0,
+			this.ground+this.h/2)
+			
+			this.newtile(
+			myCanvas.width-64,
+			this.ground+this.h/2)
+		}
+		newtile(x,y){
+			this.tilex.push(x);
+			this.tiley.push(y);
+		}
+		jump(){
+			if(this.jumpactive)
+			return;
+			this.jumpactive=true;
+			this.jumpforce=-this.jumpforcemax;
+		}
+		update(){
+			// move to destination x
+			// this with x3(check
+			// collision in here..)
+			for(var i=0;i<3;i++){
+				if(this.x<this.destx){
+					if(this.playertilecollide(1,0)==false){
+						this.x+=1;
+					}
+				}
+				if(this.x>this.destx){
+					if(this.playertilecollide(-1,0)==false){
+						this.x-=1;
+					}
+				}
+			}
+			if(this.jumpactive){
+				// we want to only move the sprite
+				// with 1 pixel per change. this
+				// so any collision checks will
+				// not fail.
+				
+				for(var i=0;i<=Math.abs(this.jumpforce);i++){
+					if(this.y>this.ground){
+						this.jumpactive=false;
+						this.y=this.ground;
+						break;
+					}
+					var oldy = this.y;
+					if(this.jumpforce<0){
+						this.y-=1;
+					}else{
+						this.y+=1;
+					}
+					if(this.playertilecollide(0,0)){
+						this.jumpactive=false;
+						this.y = oldy;
+						break;
+					}
+				}
+				// decrease the jumpforce
+				// eventually we wil go 
+				// downwards.
+				this.jumpforce+=.1;
+				// fall faster.
+				if(this.jumpforce>0)
+				this.jumpforce+=.1;
+
+			}
+		}
+		draw(){
+			ctx.fillStyle='white';
+			ctx.fillRect(	this.x,
+								this.y,
+								this.w,
+								this.h);
+			// draw tiles
+						for(var i=0;i<this.tilex.length;i++){
+		ctx.fillRect(	this.tilex[i],
+		this.tiley[i],
+		this.tilew,
+		this.tileh);
+						}
+
+		}
+		playertilecollide(x,y){
+
+			for(var j=0;j<this.tilex.length;j++){
+			if(rectsoverlap(									this.x+x,
+					this.y+y,
+					this.w,
+					this.h,
+					this.tilex[j],
+					this.tiley[j],
+					this.tilew,
+					this.tileh)==true){
+					return true;
+					}
+			}
+			return false;
+		}
+	}
+	const mrnario = new nario(200,200);
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Touch the screen to jump/move.",10,10); 
+
+mrnario.update();
+mrnario.draw();
+
+
+
+
+
+}
+function touchHandler(e){
+if(e.type=="touchend" && e.touches) {
+    	//m="no touch..";
+		mrnario.jump();
+		mrnario.destx = e.changedTouches[0].clientX;
+      e.preventDefault();
+	}
+}
+function rectsoverlap(r1x1,r1y1,r1w,r1h,r2x1,r2y1,r2w,r2h){
+  var r1x2 = r1x1+r1w;
+  var r1y2 = r1y1+r1h;
+  var r2x2 = r2x1+r2w;
+  var r2y2 = r2y1+r2h;
+ 
+  return (r1x1 < r2x2 && r1x2 > r2x1 && r1y1 < r2y2 && r1y2 > r2y1);
+
+ }
+</script>
+</body>
+</html>
