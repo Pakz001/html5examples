@@ -10,10 +10,16 @@
 Use different browser.
 </canvas>
   <script>
-    var c=document.getElementById("myCanvas");
+	//
+	// Jump from platform to platform and try not to fall down.
+	//
+	// developed for Landscape mode and larger resolutions.(edit me)
+	// todo : gfx.
+	//
+   var c=document.getElementById("myCanvas");
 	c.addEventListener("touchend", touchHandler);
 	
-    var ctx=c.getContext("2d");
+	var ctx=c.getContext("2d");
 	class nario{
 		constructor(x,y){
 			this.x = x;
@@ -34,7 +40,10 @@ Use different browser.
 			this.tileinc = [];
 			this.tiletop = this.ground/2;
 			this.tilebottom = this.ground+this.h;
-
+			
+			this.x = 0;
+			this.destx = 0;
+			this.tilelock = 0;
 			for(var i=0;i<myCanvas.width;i+=220){
 				this.newtile(
 				i,
@@ -55,13 +64,11 @@ Use different browser.
 			this.jumpforce=-this.jumpforcemax;
 		}
 		update(){
-			if(this.tilelock>-1){
-				this.y = this.tiley[this.tilelock]-this.h;
-			}
 		
 			//move tiles
 			for(var i=0;i<this.tilex.length;i++){
 				this.tiley[i]+=this.tileinc[i];
+				this.tiley[i]=Math.floor(this.tiley[i]);
 				if(this.tiley[i]>this.tilebottom){
 					this.tiley[i]=this.tilebottom;
 					this.tileinc[i]=-this.tileinc[i];
@@ -71,6 +78,9 @@ Use different browser.
 					this.tileinc[i]=-this.tileinc[i];
 				}
 				
+			}
+			if(this.tilelock>-1){
+				this.y = Math.floor(this.tiley[this.tilelock]-this.h);
 			}
 			
 			// move to destination x
@@ -97,9 +107,15 @@ Use different browser.
 				// not fail.
 				
 				for(var i=0;i<=Math.abs(this.jumpforce);i++){
-					if(this.y>this.ground){
+					//if(this.y>this.ground){
+					if(this.y>myCanvas.height){
+						//this.jumpactive=false;
+						//this.y=this.ground;
 						this.jumpactive=false;
-						this.y=this.ground;
+						this.x = 0;
+						this.destx = 0;
+						this.tilelock = 0;
+						
 						break;
 					}
 					var oldy = this.y;
@@ -138,7 +154,8 @@ Use different browser.
 		draw(){
 
 			ctx.fillStyle='white';
-			ctx.fillRect(0,this.ground+this.h,myCanvas.width,1);
+			// draw ground line
+			//ctx.fillRect(0,this.ground+this.h,myCanvas.width,1);
 			ctx.fillRect(	this.x,
 								this.y,
 								this.w,
