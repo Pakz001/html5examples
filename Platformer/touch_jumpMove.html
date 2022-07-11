@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+  <div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:1px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+	c.addEventListener("touchend", touchHandler);
+	
+    var ctx=c.getContext("2d");
+	class nario{
+		constructor(x,y){
+			this.x = x;
+			this.y = y;
+			this.destx = x;
+			this.ground=y;
+			this.w = 48;
+			this.h = 48;
+			this.jumpactive=false;
+			this.jumpgravity=1;
+			this.jumpforce=0;
+			this.jumpforcemax=6;
+			
+		}
+		jump(){
+			if(this.jumpactive)
+			return;
+			this.jumpactive=true;
+			this.jumpforce=-this.jumpforcemax;
+		}
+		update(){
+			// move to destination x
+			// this with x3(check
+			// collision in here..)
+			for(var i=0;i<3;i++){
+				if(this.x<this.destx)
+				this.x+=1;
+				if(this.x>this.destx)
+				this.x-=1;
+			}
+			if(this.jumpactive){
+				// we want to only move the sprite
+				// with 1 pixel per change. this
+				// so any collision checks will
+				// not fail.
+				
+				for(var i=0;i<=Math.abs(this.jumpforce);i++){
+					if(this.y>this.ground){
+						this.jumpactive=false;
+						this.y=this.ground;
+						break;
+					}
+					if(this.jumpforce<0){
+						this.y-=1;
+					}else{
+						this.y+=1;
+					}
+
+				}
+				// decrease the jumpforce
+				// eventually we wil go 
+				// downwards.
+				this.jumpforce+=.1;
+				// fall faster.
+				if(this.jumpforce>0)
+				this.jumpforce+=.1;
+
+			}
+		}
+		draw(){
+			ctx.fillStyle='white';
+			ctx.fillRect(	this.x,
+								this.y,
+								this.w,
+								this.h);
+		}
+	}
+	const mrnario = new nario(200,200);
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Touch the screen to jump/move.",10,10); 
+
+mrnario.update();
+mrnario.draw();
+
+
+
+
+
+}
+function touchHandler(e){
+if(e.type=="touchend" && e.touches) {
+    	//m="no touch..";
+		mrnario.jump();
+		mrnario.destx = e.changedTouches[0].clientX;
+      e.preventDefault();
+	}
+}
+</script>
+</body>
+</html>
