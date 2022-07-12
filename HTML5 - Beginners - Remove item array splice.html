@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	
+	var arr = [1,2,3,4,5,6,7,8,9];
+
+	// Remove item at position 4.
+	// cpu intensive if done a lot per frame!
+	arr.splice(4,1);
+
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+
+		// Draw our array on the canvas.
+		ctx.fillStyle='white';
+		ctx.fillText(arr,100,50);
+	}
+</script>
+</body>
+</html>
