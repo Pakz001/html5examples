@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html><body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	//
+	// Small message boards(cartoon)
+	//
+	// Place these behind a character or
+	// on a place where you wish to display
+	// a message.
+
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	class boards{
+		constructor(x,y,text){
+			
+			this.active = true;
+			this.x = x;
+			this.y = y;
+			this.tekst = text;
+			this.tw = ctx.measureText(text).width;
+			this.th = ctx.measureText('M').width;
+
+			// board dimension
+			// and rotation
+			this.w1 = 45;
+			this.h1 = 20;
+			this.x1 = -this.w1/2;
+			this.y1 = -this.h1*2;
+			this.rot=Math.PI;
+
+			this.timeout = 100;
+			
+		}
+		update(){
+			
+			if(this.rot<Math.PI*2){
+				this.rot+=0.1;
+			}else{
+			this.timeout--;
+			if(this.timeout<0){
+				this.active=false;
+			}}		
+		}
+		draw(){
+
+
+
+			var x1 = this.x1;
+			var y1 = this.y1;
+			var w1 = this.w1;
+			var h1 = this.h1;
+			var tw = this.tw;
+			var th = this.th;
+			ctx.save();
+			ctx.translate(this.x,this.y);
+			ctx.rotate(this.rot);
+			ctx.fillStyle='white';
+			ctx.fillRect(x1,y1,w1,h1);
+			ctx.fillStyle='black';
+			ctx.fillText(this.tekst,((x1+w1/2)-(tw/2)),(y1+h1/3)+th/2);
+			ctx.fillStyle='brown';
+			ctx.fillRect(x1+w1/2-w1/15,y1+h1,w1/7,h1);
+
+			ctx.restore()
+			
+		}
+	}
+		var messages = ['No Way!','Oops!','Oh oh!','Time Out','Level 1'];
+		var board = [];
+		board.push(new boards(100,100,"yellow"));
+    gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+        	myCanvas.width = window.innerWidth-32;
+			myCanvas.height = window.innerHeight-32;
+			ctx.fillStyle='rgb(50,20,10)';
+			ctx.fillRect(0,0,c.width,c.height);
+			ctx.fillStyle='white';
+        	ctx.fillText("Message board system example.",10,10); 
+
+			if(Math.random()<.04){
+				board.push(new boards(Math.random()*c.width,Math.random()*c.height,messages[Math.floor(Math.random()*messages.length)]));
+			}
+			for(var i=0;i<board.length;i++){
+				board[i].update();
+				board[i].draw();
+			}
+			for(var i=0;i<board.length;i++){
+				if(board[i].active==false)board.splice(i,1);
+			}
+    }
+    </script></body></html>
