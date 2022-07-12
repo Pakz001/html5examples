@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		// call our function with a variable amount
+		// of arguments.
+	
+		writeDown(1,2,3,'laser',5,6,'sharks',8,9);
+		
+	}
+	
+	//
+	// A function that can take a variable
+	// amount of arguments. Print every argument
+	// to the screen.(until fits*)
+	
+	function writeDown(...args){
+		if(args.length==0)return;
+		ctx.fillStyle='white';
+		var y=60;
+		for(ar of args){
+			ctx.fillText(ar,100,y);
+			y+=30;
+		}
+	}
+</script>
+</body>
+</html>
