@@ -67,10 +67,10 @@ Use different browser.
 				var ty = Math.floor(this.y/th);
 				//if(map[ty][tx]!=0 && this.
 				var zz=Math.floor(this.x-(tx*tw));
-				if(map[ty][tx]==2 && zz==11 && this.y!=this.desty){
+				if(map[ty][tx]==2 && ty-1>0 && map[ty-1][tx]==2 && zz==11 && this.y>this.desty){
 					this.onladder=true;
 				}
-				if(ty+1<map.length && map[ty+1][tx]==2 && zz==11 && this.y!=this.desty){
+				if(ty+1<map.length && ty-1>0 && map[ty+1][tx]==2 && zz==11 && this.y<this.desty){
 					this.onladder=true;
 				}
 
