@@ -6,6 +6,7 @@ Use different browser.
 <script>
 	var c=document.getElementById("myCanvas");
 	var ctx=c.getContext("2d");
+	c.addEventListener("touchend", touchHandler);
 	var map = [
 		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -14,29 +15,94 @@ Use different browser.
 		[1,1,1,1,1,1,1,1,3,3,2,3,3,1,1,1,1,1,1,1],
       [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
 		[1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
-		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,2,3,3,1],
+		[1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,2,3,3,1],
 		[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1],
       [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1],
 		[1,3,3,2,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 		[1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
 		[1,0,0,2,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,1],
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ]
 
 	class player{
 		constructor(){
 			this.x,this.y=0;
+			this.w = tw/2;
+			this.h = th/2;
 			this.setstart();
+			this.destx = this.x;
+			this.desty = this.y;
+			this.movespeed = 4;
+			this.onladder = false;
 		}
 		setstart(){
+			for(var y=0;y<map.length;y++){
+			for(var x=0;x<map[0].length;x++){
+				if(map[y][x]==9){
+					this.x = x*tw;
+					this.y = y*th+this.h;
+				}
+			}}
+		}
+		setdestination(x,y){
+			//debug = y;
+			var tx = Math.floor(x/tw);
+			var ty = Math.floor(y/th);
+			if(map[ty][tx]!=0)return;
+			this.destx = x;
+			// drop the touched y position
+			// down to the floor.
+			for(var y1=y;y1<myCanvas.height;y1++){
+				var ty = Math.floor(y1/th);
+				if(ty<map.length && map[ty][tx]!=0 ){
+					this.desty = (ty*th)-this.h;
+					//map[ty][tx]=0;
+					return;
+				}
+			}
 		}
 		update(){
+			for(var ms=0;ms<this.movespeed;ms++){
+				var tx = Math.floor(this.x/tw);
+				var ty = Math.floor(this.y/th);
+				//if(map[ty][tx]!=0 && this.
+				var zz=Math.floor(this.x-(tx*tw));
+				if(map[ty][tx]==2 && zz==11 && this.y!=this.desty){
+					this.onladder=true;
+				}
+				if(ty+1<map.length && map[ty+1][tx]==2 && zz==11 && this.y!=this.desty){
+					this.onladder=true;
+				}
+
+				if(this.onladder && this.desty!=this.y){
+					if(this.y>this.desty){
+						this.y-=1;
+					}
+					if(this.y<this.desty){
+						this.y+=1;
+					}				
+				}
+				if(this.desty==this.y)this.onladder=false;
+				if(this.onladder==false){
+					if(this.x>this.destx){
+						this.x-=1;
+					}
+					if(this.x<this.destx){
+						this.x+=1;
+					}
+				}
+				
+			}
 		}
 		draw(){
+			ctx.fillStyle='red';
+			ctx.fillRect(this.x,this.y,this.w,this.h);
 		}
 	}
-		var init=true;
-		var tw,th;
+	var debug = 0;
+	var myplayer=-1;
+	var init=true;
+	var tw,th;
 
     gameloop=setInterval(doGameLoop,16);
     function doGameLoop(){
@@ -46,6 +112,12 @@ Use different browser.
 			tw = Math.floor(c.width/map[0].length); 
 			th = Math.floor(c.height/map.length);
 			ctx.clearRect(0,0,c.width,c.height);
+			
+			if(init){
+				init=false;
+				myplayer=new player();
+			}
+			
 			// Draw the tile map..
         	for(var y = 0; y < map.length; ++y) {
          for(var x = 0; x < map[y].length; ++x) {
@@ -86,10 +158,20 @@ Use different browser.
 				}
 
          }}
+
+			myplayer.update();
+			myplayer.draw();
+
 			ctx.fillStyle='white';
-        	ctx.fillText("Drawing a rotating tilemap example.",10,10); 
+        	ctx.fillText("Drawing a rotating tilemap example."+debug,10,10); 
 			
 
 
     }
+	function touchHandler(e){
+		if(e.type=="touchend" && e.touches) {
+			myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+	}
     </script></body></html>
