@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	gameloop=setInterval(doGameLoop,16);
+
+	// Say we have a tile map or a level
+	// or sprite editor. We want to put
+	// the data into our html file.
+	// We could use the join() method
+	// in our parser to get the numbers
+	// into a useable state...
+	// becomes : 0,0,0,0,0,0
+	var arr = [0,0,0,0,0,0];
+	arr.join()
+	//arr.join(' & '); // this works too
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		// Draw our string(after the join!)
+		ctx.fillStyle="white";
+		ctx.fillText(arr,100,50);
+	}
+</script>
+</body>
+</html>
