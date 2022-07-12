@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html><body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var map = [
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+		[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+		[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+		[1,1,1,1,1,1,1,1,3,3,2,3,3,1,1,1,1,1,1,1],
+      [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+		[1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,2,3,3,1],
+		[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1],
+      [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1],
+		[1,3,3,2,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+		[1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+		[1,0,0,2,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ]
+
+	class player{
+		constructor(){
+			this.x,this.y=0;
+			this.setstart();
+		}
+		setstart(){
+		}
+		update(){
+		}
+		draw(){
+		}
+	}
+		var init=true;
+		var tw,th;
+		var rot=Math.PI;
+    gameloop=setInterval(doGameLoop,16);
+    function doGameLoop(){
+        	myCanvas.width = window.innerWidth-32;
+			myCanvas.height = window.innerHeight-32;
+			// tile width and height
+			tw = Math.floor(c.width/map[0].length); 
+			th = Math.floor(c.height/map.length);
+			ctx.clearRect(0,0,c.width,c.height);
+			// Draw the tile map..
+        	for(var y = 0; y < map.length; ++y) {
+         for(var x = 0; x < map[y].length; ++x) {
+				if(map[y][x]==3){//metal
+					ctx.fillStyle = 'rgb(100,100,100)';
+					ctx.fillRect(x*tw,y*th,tw,th);
+				}
+				if(map[y][x]==2){//ladder
+					ctx.fillStyle = 'rgb(200,200,200)';
+					ctx.fillRect(x*tw,y*th,tw,th);
+				}
+         	if(map[y][x]==1){//solid
+					ctx.fillStyle = 'rgb(200,100,5)';
+					ctx.fillRect(x*tw,y*th,tw,th);
+				}
+         	if(map[y][x]==0 || map[y][x]==9){//none or spawn
+					ctx.fillStyle = 'rgb(10,4,1)';
+					ctx.fillRect(x*tw,y*th,tw,th);
+				}
+
+         }}
+			ctx.fillStyle='white';
+        	ctx.fillText("Drawing a rotating tilemap example.",10,10); 
+			
+			if(rot<Math.PI*2)rot+=0.1;
+
+			var tekst = "poop!";
+			var tw = ctx.measureText(tekst).width;
+			var th = ctx.measureText('M').width;
+
+			var w1 = 40;
+			var h1 = 20;
+			var x1 = -w1/2;
+			var y1 = -h1;
+			ctx.save();
+			ctx.translate(100,100);
+			ctx.rotate(rot);
+			ctx.fillStyle='white';
+			ctx.fillRect(x1,y1,w1,h1);
+			ctx.fillStyle='black';
+			ctx.fillText(tekst,((x1+w1/2)-(tw/2)),(y1+h1/3)+th/2);
+			ctx.fillStyle='brown';
+			ctx.fillRect(x1+w1/2-w1/15,y1+h1,w1/7,h1);
+
+			ctx.restore()
+
+    }
+    </script></body></html>
