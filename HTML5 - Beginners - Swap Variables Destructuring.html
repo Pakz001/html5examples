@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	// Destructing array
+	// Swap variables
+	// Set up variables.
+	var [px,py,pw,ph] = [100,100,25,100];
+	
+	// Swap width and height.
+	[pw,ph] = [ph,pw];
+
+	//
+	// Sometimes you want to swap two variables.
+	// By using a destructuring array
+	// you need no additional variables to do this.
+
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		// Draw the player.
+		ctx.fillStyle="white";
+		ctx.fillRect(px,py,pw,ph);
+	}
+</script>
+</body>
+</html>
