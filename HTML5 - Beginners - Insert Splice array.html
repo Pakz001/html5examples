@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var items = ['bird','badger','dog','cat'];
+	// insert weasel at position 0. Shift
+	// all others up. array grows size with 1.
+	items.splice(0,0,'weasel');
+	
+	// Below: insert at 0. Remove the first.
+	//items.splice(0,1,'weasel');
+	//
+	// Bewow: inser at 0. Remove the entire
+	// rest of the array.
+	//items.splice(0,items.length,'weasel');
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		// Draw our array contents.
+		ctx.fillStyle='white';
+		ctx.fillText(items,100,50);
+	}
+</script>
+</body>
+</html>
