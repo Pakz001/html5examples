@@ -43,6 +43,10 @@ Use different browser.
 			// Do we have the next item on the list
 			// this is done with the indexOf() command
 			var a = inventory.indexOf(i);
+			// you can also use includes() which
+			// returns true or false if a item is in the
+			// array. indexOf return the slot in the array
+			// where the item is found.
 			if(a>=0){
 				ctx.fillText("Owned item : "+i,100,50+y);
 			}else{
