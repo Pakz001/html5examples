@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	// create a array with items.
+	var items = ['Blight Sword','Razor Shield','Potion of Healing','Leather Boots'];
+	// copy the contents from items into our inventory.
+	var inventory = [...items];
+	// Add a item we do not have yet to the items.
+	items.push('Invisible Hat');
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10);
+		
+		//
+		// Here we check our inventory with all
+		// the items in the game. Telling us
+		// what we have and what we do not have.
+		//
+		ctx.fillStyle='white';
+		// loop thought every item in the game.
+		var y=0;
+		for(var i of items){
+			// Do we have the next item on the list
+			// this is done with the indexOf() command
+			var a = inventory.indexOf(i);
+			if(a>=0){
+				ctx.fillText("Owned item : "+i,100,50+y);
+			}else{
+				ctx.fillText("Unowned item : "+i,100,50+y);
+			}
+			// text line 1 down.
+			y+=30;
+		}
+	}
+</script>
+</body>
+</html>
