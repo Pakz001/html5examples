@@ -37,7 +37,7 @@ Use different browser.
 	}
 		var init=true;
 		var tw,th;
-		var rot=Math.PI;
+
     gameloop=setInterval(doGameLoop,16);
     function doGameLoop(){
         	myCanvas.width = window.innerWidth-32;
@@ -49,13 +49,32 @@ Use different browser.
 			// Draw the tile map..
         	for(var y = 0; y < map.length; ++y) {
          for(var x = 0; x < map[y].length; ++x) {
-				if(map[y][x]==3){//metal
+
+				if(map[y][x]==3){//metal beam
+					ctx.beginPath();
+					ctx.lineWidth=tw/8;
+					ctx.strokeStyle='rgb(100,100,100)';
+					ctx.moveTo(x*tw,y*th+th/4);
+					ctx.lineTo(x*tw+tw/2,y*th+th-th/4);
+					ctx.lineTo(x*tw+tw,y*th+th/4);
+					ctx.stroke();
 					ctx.fillStyle = 'rgb(100,100,100)';
-					ctx.fillRect(x*tw,y*th,tw,th);
+					ctx.fillRect(x*tw,y*th,tw,th/4);
+					ctx.fillRect(x*tw,y*th+th-th/4,tw,th/4);
+
 				}
 				if(map[y][x]==2){//ladder
-					ctx.fillStyle = 'rgb(200,200,200)';
+					ctx.fillStyle = 'rgb(0,0,0)';
 					ctx.fillRect(x*tw,y*th,tw,th);
+					ctx.fillStyle = 'white';
+					ctx.fillRect(x*tw,y*th,tw/10,th);
+					ctx.fillStyle = 'white';
+					ctx.fillRect(x*tw+tw-tw/10,y*th,tw/10,th);
+					for(var zy=y*th;zy<y*th+th;zy+=th/3){
+						ctx.fillRect(x*tw,zy,tw,th/10);
+						
+					}
+
 				}
          	if(map[y][x]==1){//solid
 					ctx.fillStyle = 'rgb(200,100,5)';
@@ -70,27 +89,7 @@ Use different browser.
 			ctx.fillStyle='white';
         	ctx.fillText("Drawing a rotating tilemap example.",10,10); 
 			
-			if(rot<Math.PI*2)rot+=0.1;
 
-			var tekst = "poop!";
-			var tw = ctx.measureText(tekst).width;
-			var th = ctx.measureText('M').width;
-
-			var w1 = 40;
-			var h1 = 20;
-			var x1 = -w1/2;
-			var y1 = -h1;
-			ctx.save();
-			ctx.translate(100,100);
-			ctx.rotate(rot);
-			ctx.fillStyle='white';
-			ctx.fillRect(x1,y1,w1,h1);
-			ctx.fillStyle='black';
-			ctx.fillText(tekst,((x1+w1/2)-(tw/2)),(y1+h1/3)+th/2);
-			ctx.fillStyle='brown';
-			ctx.fillRect(x1+w1/2-w1/15,y1+h1,w1/7,h1);
-
-			ctx.restore()
 
     }
     </script></body></html>
