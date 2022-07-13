@@ -13,6 +13,7 @@ Use different browser.
     var c=document.getElementById("myCanvas");
     var ctx=c.getContext("2d");
 	c.addEventListener("touchend", touchHandler);
+	c.addEventListener("touchstart", touchHandler);
 	
 var map = [
 		[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -31,30 +32,37 @@ var map = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ]
 
+var lasttouchx,lasttouchy;
+var autoscroll=false;
 var tw,th;
 var [camx,camy] = [0,0];
 
 gameloop=setInterval(doGameLoop,16);
 
 function doGameLoop(){
-myCanvas.height = window.innerHeight-32;
-myCanvas.width = window.innerWidth-32;
-tw = Math.floor(myCanvas.width/map[0].length); 
-			th = Math.floor(myCanvas.height/map.length);
-
-			ctx.clearRect(0,0,c.width,c.height);
-ctx.fillStyle="rgb(0,0,0)";
-ctx.fillRect(0,0,c.width,c.height);
-ctx.fillStyle="rgb(255,255,255)";
-ctx.fillText("Drawing a tilemap example.",10,10); 
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+	tw = Math.floor(myCanvas.width/map[0].length); 	th = Math.floor(myCanvas.height/map.length);
+	ctx.clearRect(0,0,c.width,c.height);
+	ctx.fillStyle="rgb(0,0,0)";
+	ctx.fillRect(0,0,c.width,c.height);
 
 
-// Draw the tile map..
-        	for(var y = 0; y < map.length; ++y) {
-         for(var x = 0; x < map[y].length; ++x) {
-
-var dx = (x*tw)+camx;
-var dy = (y*th)+camy;
+			// Draw the tile map..
+			tw = 96;
+			th = 96;
+			// using the camx and camy variables.
+			// get the tile left and top and bottom and right
+			// of the screen. Draw between these tiles from the map.
+			var lt = Math.floor(-camx / tw);
+			var tt = Math.floor(-camy / th);
+			var rt = Math.floor((-camx / tw)+((myCanvas.width/tw)))+1;
+			var bt = Math.floor((-camy / th)+((myCanvas.height/th)))+1;
+        	for(var y = tt; y < bt; ++y) {
+         for(var x = lt; x < rt; ++x) {
+				if(x>=0 && y>=0 && x<map[0].length && y<map.length){
+				var dx = (x*tw)+camx;
+				var dy = (y*th)+camy;
 
          	if(map[y][x]==1){
 					ctx.fillStyle = 'rgb(100,100,100)';
@@ -65,8 +73,10 @@ var dy = (y*th)+camy;
 					ctx.fillRect(dx,dy,tw,th);
 				}
 
-         }}
-
+         }}}
+		autoscr();
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Drawing a tilemap example."+lt,10,10); 
 
 
 
@@ -77,22 +87,56 @@ var dy = (y*th)+camy;
 
 
 	function touchHandler(e){
-		if(e.type=="touchend" && e.touches) {
-		var x = e.changedTouches[0].clientX;
+		if(e.type=="touchstart" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lasttouchx = x;
+			lasttouchy = y;
+			autoscroll = true;
 		
-		var y = e.changedTouches[0].clientY;
-		
-		if(x<myCanvas.width/2){
-			camx-=16;
-		}
-		if(x>myCanvas.width/2){
-			camx+=16;
-		}
 			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
       	e.preventDefault();
 		}
+		if(e.type=="touchend" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			autoscroll = false;
+		
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+
 	}
 
+function autoscr(){
+	if(autoscroll==false)return;
+	var x = lasttouchx;
+	var y = lasttouchy;
+	
+	if(	x<myCanvas.width/2 && 
+			y>myCanvas.height/4 && 
+			y<myCanvas.height-myCanvas.height/4){
+			camx+=16;
+	}
+	
+	if(	x>myCanvas.width/2 &&
+			y>myCanvas.height/4 && 
+			y<myCanvas.height-myCanvas.height/4){
+		
+		camx-=16;
+	}
+	
+	if(	y<myCanvas.height/4 ){
+		
+		camy+=16;
+	}
+	
+	if(	y>myCanvas.height/4+myCanvas.height/2 ){
+	
+		camy-=16;
+	}
+
+}
 </script>
 </body>
 </html>
