@@ -32,6 +32,8 @@ var map = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ]
 
+var [colx,coly,colw,colh] = [80,80,50,50];
+var debug;
 var lasttouchx,lasttouchy;
 var autoscroll=false;
 var tw,th;
@@ -75,10 +77,20 @@ function doGameLoop(){
 
          }}}
 		autoscr();
+
+		var z = rectmapcollide(colx,coly,colw,colh,0,0);
+		ctx.globalAlpha = .5;
+		if(z===false){
+			ctx.fillStyle='yellow';
+		}
+		if(z===true){
+			ctx.fillStyle='red';
+		}
+
+		ctx.fillRect(colx,coly,colw,colh);
+		ctx.globalAlpha = 1;
 		ctx.fillStyle="rgb(255,255,255)";
-		ctx.fillText("Drawing a tilemap example."+camx,10,10); 
-
-
+		ctx.fillText("Drawing a tilemap example."+debug,10,10); 
 
 }
 
@@ -93,7 +105,8 @@ function doGameLoop(){
 			lasttouchx = x;
 			lasttouchy = y;
 			autoscroll = true;
-		
+			colx = x-colw/2;
+			coly = y-colh/2;
 			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
       	e.preventDefault();
 		}
@@ -142,6 +155,37 @@ function autoscr(){
 	}
 
 }
+
+function rectmapcollide(x,y,w,h,offsetx,offsety){
+
+	var cx=Math.floor((x-camx)/tw);
+	var cy=Math.floor((y-camy)/th);
+
+	for(var y2=cy-1;y2<cy+3;y2++){
+	for(var x2=cx-1;x2<cx+3;x2++){	
+		if(x2>=0 && x2<map[0].length && y2>=0 && y2<map.length){
+			if(map[y2][x2] == 1){
+				var x3 = ((x2)*tw)+camx;
+				var y3 = ((y2)*th)+camy;
+				if(rectsoverlap(x+offsetx,y+offsety,w,h,x3,y3,tw,th)==true){
+					return true;
+				}
+			}
+		}
+	}
+	}
+	return false;
+}
+
+function rectsoverlap(r1x1,r1y1,r1w,r1h,r2x1,r2y1,r2w,r2h){
+  var r1x2 = r1x1+r1w;
+  var r1y2 = r1y1+r1h;
+  var r2x2 = r2x1+r2w;
+  var r2y2 = r2y1+r2h;
+ 
+  return (r1x1 < r2x2 && r1x2 > r2x1 && r1y1 < r2y2 && r1y2 > r2y1);
+
+ }
 </script>
 </body>
 </html>
