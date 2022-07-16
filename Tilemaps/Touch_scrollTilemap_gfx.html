@@ -54,7 +54,7 @@ var map = [
 for(y=0;y<map.length;y++){
 for(x=0;x<map[0].length;x++){
 if(map[y][x]==1){
-	if(Math.random()<.3 && x+1<map[0].length){
+	if(Math.random()<.3 && x+1<map[0].length && map[y][x+1]==1){
 		tilemap[y][x]=4;
 		tilemap[y][x+1]=5;
 	}else{
