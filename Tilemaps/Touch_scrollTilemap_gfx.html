@@ -198,14 +198,16 @@ function autoscr(){
 	if(	x<myCanvas.width/2 && 
 			y>myCanvas.height/4 && 
 			y<myCanvas.height-myCanvas.height/4){
-		if(camx<=(tw*(map.length-2)-myCanvas.width))camx+=16;
+		if(camx<=0)camx+=16;
 	}
 	
 	if(	x>myCanvas.width/2 &&
 			y>myCanvas.height/4 && 
-			y<myCanvas.height-myCanvas.height/4){
+			y<myCanvas.height-myCanvas.width/4){
 		
-		if(camx>-((map[0].length*tw)-myCanvas.width))camx-=16;
+		if(camx>-((map[0].length*tw)-myCanvas.width)){
+		camx-=16;
+		}
 	}
 	
 	if(	y<myCanvas.height/4 ){
