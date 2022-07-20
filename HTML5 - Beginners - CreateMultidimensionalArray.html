@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var mapwidth = 100;
+	var mapheight = 100;
+	//var tilewidth = Math.floor(myCanvas.width/mapwidth)+1;
+	//var tileheight = Math.floor(myCanvas.height/mapheight)+1;
+	map = [];
+	for(var i=0;i<mapwidth;i++){
+		map[i] = new Array();
+		for(var j=0;j<mapheight;j++){
+			map[i][j]=0;
+		}
+	}	
+	map[10][10]=50;
+
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		tilewidth = Math.floor(myCanvas.width/mapwidth)+1;
+		tileheight = Math.floor(myCanvas.height/mapheight)+1;
+		
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+
+		for(var y=0;y<mapheight;y++){
+		for(var x=0;x<mapwidth;x++){
+			var col=map[x][y];
+			ctx.fillStyle="rgb("+col+","+col+","+col+")";
+			ctx.fillRect(x*tilewidth,y*tileheight,tilewidth,tileheight);
+		}}
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+
+	}
+</script>
+</body>
+</html>
