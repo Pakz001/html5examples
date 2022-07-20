@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+
+	var debug = [];
+	debug.x = 0;
+	debug.y = 0;
+	
+	var mapwidth = 100;
+	var mapheight = 100;
+	//var tilewidth = Math.floor(myCanvas.width/mapwidth)+1;
+	//var tileheight = Math.floor(myCanvas.height/mapheight)+1;
+	map = [];
+	for(var i=0;i<mapwidth;i++){
+		map[i] = new Array();
+		for(var j=0;j<mapheight;j++){
+			map[i][j]=0;
+		}
+	}
+
+	class Astar {
+		constructor(){
+			this.node = {x:0,y:0,f:0,g:0,h:0,px:0,py:0};
+			this.ol = [];
+			this.cl = [];
+			this.path = [];
+			this.start = {};
+			this.end = {};
+			// open list map
+			// and closed list map
+			// copied from the main map[][]
+			this.olmap = [];
+			this.clmap = [];
+			for (var i = 0; i < map.length; i++){
+  				this.olmap[i] = map[i].slice();
+				this.clmap[i] = map[i].slice();
+			}
+		}
+		findpath(sx,sy,ex,ey){
+			// get the start and end position.
+			this.start = {x:sx,y:sy};
+			this.end = {x:ex,y:ey};
+			// clear the maps at every new findpath
+			this.clearmaps();
+
+			
+			this.ol = [];
+			this.cl = [];
+			this.path = [];
+			this.ol.push({x:this.start.x,y:this.start.y,f:0,g:0,h:0,px:0,py:0});
+			this.olmap[this.start.x][this.start.y]=1;
+			var tx,ty,tf,tg,th,tpx,tpy;
+
+
+	    	while(this.ol.length>0){
+	       	var lowestf = 100000;
+				for(var i=0;i<this.ol.length;i++){
+	            if(this.ol[i].f < lowestf){
+
+	                lowestf = this.ol[i].f
+	                tx = this.ol[i].x
+	                ty = this.ol[i].y
+	                tf = this.ol[i].f
+	                tg = this.ol[i].g
+	                th = this.ol[i].h
+	                tpx = this.ol[i].px
+	                tpy = this.ol[i].py
+	            }
+	        }
+	        if(tx == this.end.x && ty == this.end.y){
+	            this.cl.push({x:tx,y:ty,f:0,g:0,h:0,px:tpx,py:tpy})
+		
+	            this.findpathback();
+	            return true;
+	        	}else{
+					//debug.x = tx;
+					//debug.y = ty;
+					this.removefromopenlist(tx,ty);
+					
+					this.olmap[tx][ty] = 0
+	            this.clmap[tx][ty] = 1
+	            this.cl.push({x:tx,y:ty,f:0,g:0,h:0,px:tpx,py:tpy});
+					
+					for(var y=-1;y<2;y++){
+	           	for(var x=-1;x<2;x++){
+	            	var newx = tx+x;
+	            	var newy = ty+y;	
+						if(newx>=0 && newy>=0 && newx<mapwidth && newy<mapheight){
+	              	if(this.olmap[newx][newy] == 0){
+	             	if(this.clmap[newx][newy] == 0){
+	              		this.olmap[newx][newy] = 1;
+		              	var gg = map[newx][newy];
+	                 	var hh = this.distance(newx,newy,this.end.x,this.end.y)
+	                 	var ff = gg+hh;
+							this.ol.push({x:newx,y:newy,f:ff,g:gg,h:hh,px:tx,py:ty});
+						}}}
+					}}
+					
+				}
+			}
+			return false;	
+		}
+		
+		drawpath(){
+			ctx.fillStyle='yellow';
+			for(var i=0;i<this.path.length;i++){
+				ctx.fillRect(this.path[i].x*tilewidth,this.path[i].y*tileheight,tilewidth,tileheight);
+			}
+		}
+		
+		findpathback(){
+			var x=this.end.x;
+			var y=this.end.y;
+			
+			this.path.unshift({x:x,y:y});
+			while(1){
+	        for(var i=0;i<this.cl.length;i++){
+	            if(this.cl[i].x == x && this.cl[i].y == y){
+	              	x = this.cl[i].px;
+	             	y = this.cl[i].py;
+						this.path.unshift({x:x,y:y});
+	                //path.AddFirst(New pathnode(x,y))
+					}
+				}
+	        if(x == this.start.x && y == this.start.y)return true;
+			}  
+		}		
+		
+		removefromopenlist(x,y){
+
+			for(var i=0;i<this.ol.length;i++){
+				if(this.ol[i].x == x && this.ol[i].y == y){
+					this.ol.splice(i,1);
+					return;
+				}
+			}
+		}
+		clearmaps(){
+			for(var y=0;y<mapheight;y++){
+			for(var x=0;x<mapwidth;x++){
+				this.olmap[x][y]=0;
+				this.clmap[x][y]=0;
+			}}
+		}
+		distance(x1,y1,x2,y2){
+			return Math.abs(x2-x1)+Math.abs(y2-y1);
+		}
+
+	}
+
+		
+	// generate map;;
+	genmap();
+	var pathfinder = new Astar();
+	pathfinder.findpath(	5,70,50,10);
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		tilewidth = Math.floor(myCanvas.width/mapwidth)+1;
+		tileheight = Math.floor(myCanvas.height/mapheight)+1;
+		
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+	
+		if(Math.random()<.01){
+			var sx = Math.floor(Math.random()*mapwidth);
+			var sy = Math.floor(Math.random()*mapheight);
+			var ex = Math.floor(Math.random()*mapwidth);
+			var ey = Math.floor(Math.random()*mapheight);
+			pathfinder.findpath(sx,sy,ex,ey);
+		}
+
+		// draw the map
+		for(var y=0;y<mapheight;y++){
+		for(var x=0;x<mapwidth;x++){
+			var col=map[x][y]*15;
+			ctx.fillStyle="rgb("+col+","+col+","+col+")";
+			ctx.fillRect(x*tilewidth,y*tileheight,tilewidth,tileheight);
+		}}
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example."+debug.x+","+debug.y,10,10); 
+
+		pathfinder.drawpath();
+		// draw the start loc and end loc.
+		ctx.fillStyle = 'yellow'
+		ctx.fillRect(pathfinder.start.x*tilewidth,pathfinder.start.y*tileheight,tilewidth,tileheight);
+		ctx.fillStyle = 'red'
+		ctx.fillRect(pathfinder.end.x*tilewidth,pathfinder.end.y*tileheight,tilewidth,tileheight);
+
+
+	}
+		function genmap(){
+	var lowest = 0;
+	var zx1=0;
+	var zx2=0;
+	while(lowest < 20){
+		var x1 = Math.floor(Math.random()*mapwidth/2)+zx1;
+		var y1 = Math.floor(Math.random()*mapheight/2)+zx1;
+		if(Math.random()<.1){
+			zx1=Math.floor(Math.random()*mapwidth/4);
+			zx1=Math.floor(Math.random()*mapheight/4);
+		}
+		var radius = Math.floor((Math.random()*6)+3);
+		//lowest++;
+		for(var y2=-radius;y2<radius;y2++){
+		for(var x2=-radius;x2<radius;x2++){
+			
+			if( ((x2*x2)+(y2*y2))  <= radius*radius+radius*0.8){
+				var x3 = x1+x2;
+				var y3 = y1+y2;
+				if(x3>=0 && y3>=0 && x3<mapwidth && y3<mapheight){
+					map[x3][y3]=map[x3][y3]+1;
+					if(map[x3][y3] > lowest)lowest = map[x3][y3];
+				}
+			}
+		}
+		}
+	}
+	}
+
+</script>
+</body>
+</html>
