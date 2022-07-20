@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+
+// create a variable object.
+const specialForms = Object.create(null);
+
+// create a function inside our
+// object. this using a arrow 
+// function.
+//
+// the function here returns
+// true if variable 1 is equal
+// or higher than variable 2.
+
+specialForms.evalPower = (power,maxPower) => {
+if(power<maxPower)return false;
+if(power>=maxPower)return true;
+return false;
+};
+
+
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("creating function 2.",10,10); 
+
+// call our function and draw
+// the result to the screen.
+ctx.fillText(specialForms["evalPower"](50,100),50,70);
+
+
+
+
+
+
+
+}
+</script>
+</body>
+</html>
