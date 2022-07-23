@@ -1,5 +1,5 @@
 
-<img src="Media/A3C0409B-E58F-48D1-B07C-EA1D0502ADF7.jpeg" width="60%"><br><br>
+<img src="DFD11E92-9FB9-48D6-918E-C4F81E863CC7.jpeg" width="60%"><br><br>
 
 
 From tutorial by 3dSage :<br>
