@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	//
+	// Tried to recreate trees from a screenshot from
+	// the amiga game pirates.
+	// I used a cellular automa routine
+	// and some modifications.
+	// The results were not that great. It
+	// might stil be usable though.
+	//
+	//
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var mapwidth = 180;
+	var mapheight = 120;
+	map = [];
+	for(var i=0;i<mapwidth;i++){
+		map[i] = new Array();
+		for(var j=0;j<mapheight;j++){
+			map[i][j]=0;
+		}
+	}	
+
+	cellular();
+	linestoleftup();
+	greydots();
+	widenfloor();
+	treelinegrid();
+	lightentrees();
+	gameloop=setInterval(doGameLoop,200);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		drawmap(6);
+	}
+	function drawmap(scale=5){
+		for(var y=0;y<mapheight;y++){
+		for(var x=0;x<mapwidth;x++){
+			if(map[x][y]==0){
+				ctx.fillStyle='rgb(50,100,20)';
+			}
+			if(map[x][y]==1){
+				ctx.fillStyle='rgb(30,80,10)';
+			}
+			if(map[x][y]==2){
+				ctx.fillStyle='rgb(26,74,6)';
+			}
+			if(map[x][y]==3){
+				ctx.fillStyle='rgb(22,68,6)';
+			}
+			if(map[x][y]==4){
+				ctx.fillStyle='rgb(16,62,6)';
+			}
+			if(map[x][y]==5){
+				ctx.fillStyle='rgb(122,122,122)';
+			}
+			if(map[x][y]==6){
+				ctx.fillStyle='rgb(55,120,25)';
+			}
+	
+			ctx.fillRect(x*scale,y*scale,scale,scale);
+
+		}}
+	}
+	function lightentrees(){
+		for(var i=0;i<(mapwidth*mapheight)/4;i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>=5 && y>=5 && x<mapwidth-1 && y<mapheight-1 && map[x][y]==0 && map[x][y+1]!=0){
+				map[x][y]=6;
+			}
+		}
+	}
+	function treelinegrid(){
+		for(var i=0;i<(mapwidth*mapheight)/4;i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>=5 && y>=5 && x<mapwidth-1 && y<mapheight-1 && map[x][y]!=0 && map[x][y+1]==0){
+				var mz=(Math.random()*2)+2
+				for(z=0;z<mz;z++){
+					map[x-z][y]=4;
+				}
+				for(z=0;z<3;z++){
+					map[x][y-z]=4;
+				}
+			}
+		}		
+	}
+	function widenfloor(){
+		for(var i=0;i<(mapwidth*mapheight);i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>=1 && y>=1 && x<mapwidth-1 && y<mapheight-1){
+				var z1=Math.floor(Math.random()*2)-1;
+				var z2=Math.floor(Math.random()*2)-1;
+				if(map[x][y]==0 && map[x+z1][y+z2]!=0){
+					map[x+z1][y+z2]=0;
+				}
+			}	
+		}
+	}
+	function greydots(){
+		for(var i=0;i<(mapwidth*mapheight)/15;i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>=0 && y>=0 && x<mapwidth && y<mapheight){
+				if(map[x][y]==0){
+					map[x][y]=5;
+				}
+			}
+		}
+	}
+	// in color 1 make small lines left up
+	// using color 2;
+	function linestoleftup(){
+		for(var y=0;y<mapheight-1;y++){
+		for(var x=0;x<mapwidth;x++){
+			if(map[x][y]==1 && map[x][y+1]==0){
+				map[x][y+1]=2;
+				if(Math.random()<.2){
+				for(var j=0;j<4;j++){
+					if(x-j>0){
+						map[x-j][y]=2;
+					}
+				}
+				}
+				// line up.
+				if(y>5 && x<mapwidth-2 && map[x][y-1]==1 && map[x+1][y]==0){
+					var l=Math.random()*3;
+					for(var j=0;j<l;j++){
+						map[x][y-j]=2;
+					}
+				}
+				// lines left up
+				if(Math.random()<.7){
+					var l=Math.random()*3;
+					var x2=x;
+					var y2=y;
+					while(l>0){
+						l--;
+						x2--;
+						y2--;
+						if(x2>=0 && y2>=0){
+						map[x2][y2]=3;
+						}
+					}
+				}
+			}
+		}}
+		
+	}
+	function cellular(){
+		
+		//fill the map with noise
+    	for(var y=0;y<mapheight;y++){
+    	for(var x=0;x<mapwidth;x++){
+        map[x][y] = Math.floor(Math.random()*2);
+    	}}
+
+    	for(var i=0;i<2;i++){
+	    	// loop through the map
+  	  		for(var y=0;y<mapheight;y++){
+    		for(var x=0;x<mapwidth;x++){
+
+        		//count the neigbouring 1's 
+        		var cnt = 0;
+        		for(var y1=-1;y1<2;y1++){
+        		for(var x1=-1;x1<2;x1++){
+            	var x2=x+x1;
+            	var y2=y+y1;
+            	if( x2>=0 && y2>=0 && x2<mapwidth && y2<mapheight){
+              		if(map[x2][y2] == 1)cnt+=1;
+            	}
+        		}}
+				if(Math.random()<.2){
+        		// if 3 walls and map is a wall then map x,y is not a wall anymore
+        		if(cnt < 4 && map[x][y] == 1){
+                	map[x][y] = 0;
+				}
+        		// if more then 4 walls then map x,y is wall
+        		if(cnt >= 5)map[x][y] = 1;
+				}
+    		}}
+		}
+		
+	}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
