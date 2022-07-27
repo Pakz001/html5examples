@@ -1,4 +1,5 @@
-
+<br>
+pirates Amiga trees try 4 turned into a 'complete' remake of the world map. The screen where you sail your ship across the world. The generator has been tested of fairly large map sizes. There is no boat currently.
 <br>
 Texture_stony01 :<br>
 Here I created a class that can create hard round shapes in a greyscale color of any size. By filling the screen
