@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	// coder bug
+	// if line with -- than this gets replaced with a different
+	// and only one -.
+	//
+	// Tried to recreate trees from a screenshot from
+	// the amiga game pirates.
+	// I used a cellular automa routine
+	// and some modifications.
+	// The results were not that great. It
+	// might stil be usable though.
+	//
+	//
+	var debug=0;
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var mapwidth = c.width;
+	var mapheight = c.height;
+	var map = [];
+	var map2 = [];
+	for(var i=0;i<mapwidth;i++){
+		map[i] = new Array();
+		map2[i] = new Array();
+		for(var j=0;j<mapheight;j++){
+			map[i][j]=0;
+			map2[i][j]=0;
+		}
+	}	
+	
+	// for the clouds
+	var windangle = Math.random()*(Math.PI*2);
+	var tmp = [];
+	for(var i=0;i<64;i++){
+		tmp[i] = new Array();
+		for(var j=0;j<32;j++){
+			tmp[i][j]=0;
+		}
+	}	
+	var cloudim = [];
+	var imx = [];
+	var imy = [];
+	for(var i=0;i<10;i++){
+		cloudim[i]=CanvasToImage();
+	}
+	
+	
+	//makethemap();
+	var refr=0;
+	var init=true;
+	gameloop=setInterval(doGameLoop,30);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight*.96;
+		myCanvas.width = window.innerWidth*.96;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		
+		refr++;
+		if(refr>30 || init){
+			windangle = Math.random()*(Math.PI*2);
+			for(var i=0;i<cloudim.length;i++){
+				imx[i]=Math.random()*myCanvas.width;
+				imy[i]=Math.random()*myCanvas.height;
+			}
+			mapwidth=Math.floor(myCanvas.width/3);
+			mapheight=Math.floor(myCanvas.height/3);
+			init=false;
+			makethemap();
+			refr=0;
+		}
+			drawmap(3);
+			drawmap2(3);
+
+		for(var i=0;i<cloudim.length;i++){
+			ctx.drawImage(cloudim[i],imx[i],imy[i]);
+
+			imx[i]+=Math.cos(windangle);
+			imy[i]+=Math.sin(windangle);
+		}
+		
+		
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Pirates(Amiga) map generator - test."+debug,10,10); 
+
+	}
+	
+	function makethemap(){
+		cellular();
+		linestoleftup();
+		greydots();
+		widenfloor();
+		treelinegrid();
+		lightentrees();
+		landmasses();
+		mountains();
+		addcities();
+	}
+	
+	function drawmap2(scale=5){
+		for(var y=0;y<mapheight;y++){
+		for(var x=0;x<mapwidth;x++){
+			if(map2[x][y]==1){
+				ctx.fillStyle='rgb(34,51,221)'; // water
+				ctx.fillRect(x*scale,y*scale,scale,scale);
+			}
+			if(map2[x][y]==2){
+				ctx.fillStyle='rgb(51,170,255)'; // coast water
+				ctx.fillRect(x*scale,y*scale,scale,scale);
+			}
+			if(map2[x][y]==3){
+				ctx.fillStyle='rgb(221,153,102)'; // beach
+				ctx.fillRect(x*scale,y*scale,scale,scale);
+			}
+			if(map2[x][y]==4){
+				ctx.fillStyle='rgb(34,102,221)'; // water waves center
+				ctx.fillRect(x*scale,y*scale,scale,scale);
+			}
+			if(map2[x][y]==5){
+				ctx.fillStyle='rgb(34,85,221)'; // water waves center edges
+				ctx.fillRect(x*scale,y*scale,scale,scale);
+			}
+			
+
+		}}
+	}
+	
+	function drawmap(scale=5){
+		for(var y=0;y<mapheight;y++){
+		for(var x=0;x<mapwidth;x++){
+			if(map[x][y]==0){
+				//ctx.fillStyle='rgb(50,100,20)';//ground
+				ctx.fillStyle='rgb(51,119,0)';
+			}
+			if(map[x][y]==1){
+				//ctx.fillStyle='rgb(30,80,10)'; //tree
+				ctx.fillStyle='rgb(34,85,0)'; //tree
+
+			}
+			if(map[x][y]==2){
+				ctx.fillStyle='rgb(22,85,0)';
+			}
+			if(map[x][y]==3){
+				ctx.fillStyle='rgb(22,76,0)';
+			}
+			if(map[x][y]==4){
+				//ctx.fillStyle='rgb(16,62,6)';
+				ctx.fillStyle='rgb(34,68,0)'; //darkest
+			}
+			if(map[x][y]==5){ // roch light
+				ctx.fillStyle='rgb(122,122,122)';
+			}
+			if(map[x][y]==6){ //ground light
+				//ctx.fillStyle='rgb(55,120,25)';
+				ctx.fillStyle='rgb(51,136,0)';
+
+			}
+			if(map[x][y]==10){ // roch lightest
+				ctx.fillStyle='rgb(170,170,170)';
+			}
+			if(map[x][y]==11){ // roch darkest
+				ctx.fillStyle='rgb(68,68,68)';
+			}
+		
+			if(map[x][y]==12){ // house roof
+				ctx.fillStyle='rgb(68,34,0)';
+			}
+			if(map[x][y]==13){ // house stone
+				ctx.fillStyle='rgb(204,204,204)';
+			}
+			if(map[x][y]==14){ // house door
+				ctx.fillStyle='rgb(68,68,68)';
+			}
+			
+	
+			ctx.fillRect(x*scale,y*scale,scale,scale);
+
+		}}
+	}
+	
+	function growcoastline(){
+	}
+	
+	function lightentrees(){
+		for(var i=0;i<(mapwidth*mapheight)/4;i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>=5 && y>=5 && x<mapwidth-1 && y<mapheight-1 && map[x][y]==0 && map[x][y+1]!=0){
+				map[x][y]=6;
+			}
+		}
+	}
+	function treelinegrid(){
+		for(var i=0;i<(mapwidth*mapheight);i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>=5 && y>=5 && x<mapwidth-1 && y<mapheight-1 && map[x][y]!=0 && map[x][y+1]==0){
+				var mz=(Math.random()*2)+2
+				for(z=0;z<mz;z++){
+					map[x-z][y]=4;
+				}
+				for(z=0;z<3;z++){
+					map[x][y-z]=4;
+				}
+			}
+		}		
+	}
+	function widenfloor(){
+		for(var i=0;i<(mapwidth*mapheight);i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>=2 && y>=2 && x<mapwidth-2 && y<mapheight-2){
+				var z1=Math.floor(Math.random()*2)-1;
+				var z2=Math.floor(Math.random()*2)-1;
+				if(map[x][y]==0 && map[x+z1][y+z2]!=0){
+					map[x+z1][y+z2]=0;
+				}
+			}	
+		}
+	}
+	function greydots(){
+		for(var i=0;i<(mapwidth*mapheight)/15;i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>=0 && y>=0 && x<mapwidth && y<mapheight){
+				if(map[x][y]==0){
+					map[x][y]=5;
+				}
+			}
+		}
+	}
+	// in color 1 make small lines left up
+	// using color 2;
+	function linestoleftup(){
+		for(var y=1;y<mapheight-1;y++){
+		for(var x=0;x<mapwidth;x++){
+			if(map[x][y]==1 && map[x][y+1]==0){
+				map[x][y+1]=2;
+				if(Math.random()<.2){
+				for(var j=0;j<4;j++){
+					if(x-j>0){
+						map[x-j][y]=2;
+					}
+				}
+				}
+				// line up.
+				if(y>5 && x<mapwidth-2 && map[x][y-1]==1 && map[x+1][y]==0){
+					var l=Math.random()*3;
+					for(var j=0;j<l;j++){
+						map[x][y-j]=2;
+					}
+				}
+				// lines left up
+				if(Math.random()<.7){
+					var l=Math.random()*3;
+					var x2=x;
+					var y2=y;
+					while(l>0){
+						l--;
+						x2-=1;
+						y2-=1;
+						if(x2>=0 && y2>=0){
+						map[x2][y2]=3;
+						}
+					}
+				}
+			}
+		}}
+		
+	}
+	function cellular(){
+	
+		map = [];
+		map2 = [];
+		for(var i=0;i<mapwidth;i++){
+			map[i] = [];
+			map2[i] = [];
+			for(var j=0;j<mapheight;j++){
+				map[i][j]=0;
+				map2[i][j]=0;
+			}
+		}	
+		
+		//fill the map with noise
+    	for(var y=0;y<mapheight;y++){
+    	for(var x=0;x<mapwidth;x++){
+        map[x][y] = Math.floor(Math.random()*2);
+    	}}
+
+    	for(var i=0;i<2;i++){
+	    	// loop through the map
+  	  		for(var y=0;y<mapheight;y++){
+    		for(var x=0;x<mapwidth;x++){
+
+        		//count the neigbouring 1's 
+        		var cnt = 0;
+        		for(var y1=-1;y1<2;y1++){
+        		for(var x1=-1;x1<2;x1++){
+            	var x2=x+x1;
+            	var y2=y+y1;
+            	if( x2>=0 && y2>=0 && x2<mapwidth && y2<mapheight){
+              		if(map[x2][y2] == 1)cnt+=1;
+            	}
+        		}}
+				if(Math.random()<.2){
+        		// if 3 walls and map is a wall then map x,y is not a wall anymore
+        		if(cnt < 4 && map[x][y] == 1){
+                	map[x][y] = 0;
+				}
+        		// if more then 4 walls then map x,y is wall
+        		if(cnt >= 5)map[x][y] = 1;
+				}
+    		}}
+		}
+		
+	}
+	
+	
+	//
+	// Create a sea. First make some brushstrokes
+	// then grow these..
+	function landmasses(){
+
+		for(var i=0;i<(mapwidth+mapheight)/50;i++){
+			var a = Math.random()*Math.PI;
+			var x = Math.floor(Math.random()*mapwidth);
+			var y = Math.floor(Math.random()*mapheight);
+			var l = Math.floor(Math.random()*mapwidth+mapwidth);
+			var brushsize = Math.floor(Math.random()*(mapwidth/20));
+			var turn = Math.random(); // <.5 = left
+			var turnspeed=0.05;
+			for(var j=0;j<l;j++){
+			x+=Math.cos(a);
+			y+=Math.sin(a);
+			if(Math.random()<.1 && brushsize>1)brushsize--;
+			if(Math.random()<.03)turn=Math.random();
+			if(Math.random()<.01)turnspeed=(Math.random()/10)-1/20;
+			if(turn<.5)a+=turnspeed;
+			if(turn>.5)a-=turnspeed;
+			for(var y1=y-brushsize;y1<y+brushsize;y1++){
+			for(var x1=x-brushsize;x1<x+brushsize;x1++){
+				x1 = Math.floor(x1);
+				y1 = Math.floor(y1);
+				if(x1>=0 && y1>=0 && x1<mapwidth && y1<mapheight){
+					map2[x1][y1]=1;
+				}
+			}}
+			}
+			
+		}
+	
+		// grow brushstrokes;
+		for(var i=0;i<(mapwidth*mapheight)*3;i++){
+			var x = Math.floor(Math.random()*mapwidth);
+			var y = Math.floor(Math.random()*mapheight);
+			if(map2[x][y]==1){
+				for(var y1=y-1;y1<y+2;y1++){
+				for(var x1=x-1;x1<x+2;x1++){
+					if(x1>=0 && x1<mapwidth && y1>=0 && y1<mapheight){
+						map2[x1][y1]=1;
+					}
+				}}
+			}
+		}
+		
+		// make smoother
+		for(var i=0;i<(mapwidth*mapheight);i++){
+			var x = Math.floor(Math.random()*mapwidth);
+			var y = Math.floor(Math.random()*mapheight);
+			if(map2[x][y]==0){
+				var cnt=0;
+				for(var y1=y-1;y1<y+2;y1++){
+				for(var x1=x-1;x1<x+2;x1++){
+					if(x1>=0 && x1<mapwidth && y1>=0 && y1<mapheight){
+						if(map2[x1][y1]==1)cnt++;
+					}
+				}}
+				if(cnt>4)map2[x][y]=1;				
+			}
+		}		
+		
+		// erase small blobs
+		for(var y=1;y<mapheight-1;y++){
+		for(var x=1;x<mapwidth-1;x++){
+			if(map2[x][y]==0){
+				if(map2[x-1][y]==1 && map2[x+1][y]==1){
+					map2[x][y]=1;
+				}				
+			}
+		}}
+		
+		var map3 = [];
+		for (var i = 0; i < map.length; i++)
+   	map3[i] = map2[i].slice();
+		//
+		// makebeaches
+		for(var i=0;i<4;i++){
+			var flow=0;
+			if(i>1)flow=1;
+		for(var y=1;y<mapheight-1;y++){
+		for(var x=1;x<mapwidth-1;x++){
+			if(map3[x][y]==0 && map3[x+1][y]==1){
+				map2[x][y]=2+flow;
+			}
+			if(map3[x][y]==0 && map3[x-1][y]==1){
+				map2[x][y]=2+flow;
+			}
+			if(map3[x][y]==0 && map3[x][y+1]==1){
+				map2[x][y]=2+flow;
+			}
+			if(map3[x][y]==0 && map3[x][y-1]==1){
+				map2[x][y]=2+flow;
+			}
+
+		}}
+			for(var y1=0;y1<mapheight;y1++){
+			for(var x1=0;x1<mapwidth;x1++){
+				if(map2[x1][y1]==(2+flow))map3[x1][y1]=1;
+			}}
+		}
+		
+		// grow beaches line
+		for(var i=0;i<mapwidth;i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(map3[x][y]==1){
+				var rbsize=4;
+				if(Math.random()<.1)rbsize*=2;
+				for(var brushsize=0;brushsize<rbsize;brushsize++){
+				for(var y2=y-brushsize;y2<y+brushsize;y2++){
+				for(var x2=x-brushsize;x2<x+brushsize;x2++){
+					if(x2>=0 && y2>=0 && x2<mapwidth && y2<mapheight){
+						if(map3[x2][y2]==1){
+							map3[x2][y2]=0;
+								for(var y1=y2-1;y1<y2+2;y1++){
+								for(var x1=x2-1;x1<x2+2;x1++){
+									if(x1>=0 && y1>=0 && x1<mapwidth && y1<mapheight){
+										if(map2[x1][y1]==0 || map2[x1][y1]==2){
+											map2[x1][y1]=3;
+										}	
+									}		
+								}}				
+						}						
+					}
+				}}}
+			}
+		}
+		// fix shore waves(light blue
+		for(var y=1;y<mapheight-1;y++){
+		for(var x=1;x<mapwidth-1;x++){
+			if(map2[x][y]==3 && map2[x+1][y]==1)map2[x][y]=2;
+			if(map2[x][y]==3 && map2[x-1][y]==1)map2[x][y]=2;			if(map2[x][y]==3 && map2[x][y+1]==1)map2[x][y]=2;
+			if(map2[x][y]==3 && map2[x][y-1]==1)map2[x][y]=2;			
+		}}
+		
+		// waves (1) ADD waves
+		for(var i=0;i<(mapwidth+mapheight)*8;i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(x>0 && y>0 && x<mapwidth-1 && y<mapheight-1 && map2[x][y]==1){
+				if(map2[x][y-1]==1 && map2[x][y+1]==1){
+				var len = Math.floor(Math.random()*3)+1;
+				if(len==1){
+					map2[x][y]=4;
+				}
+				if(x+1<mapwidth && len==2){
+					map2[x][y]=5;
+					map2[x+1][y]=4;
+				}
+				if(x+2<mapwidth && len==3){
+					map2[x][y]=4;
+					map2[x+1][y]=5;
+					map2[x+2][y]=4;
+					if(x+4<mapwidth && y+2<mapheight && Math.random()<.1){
+						map2[x+3][y+1]=4;
+						map2[x+4][y+2]=4;
+					}
+				}
+				}
+			}
+
+		}
+		
+	}
+	function mountains(){
+
+		for(var i=0;i<mapwidth/2;i++){
+			var x=Math.floor(Math.random()*(mapwidth));
+			var y=Math.floor(Math.random()*(mapheight));
+			var fail=false;
+			for(var y2=y-5;y2<y+16;y2++){
+			for(var x2=x-16;x2<x+16;x2++){
+				if(x2>=0 && x2<mapwidth && y2<mapheight && y2>-0){
+					if(map2[x2][y2]>0)fail=true;
+					if(map[x2][y2]==11 || map[x2][y2]==10)fail=true;
+				}else{
+					fail=true;
+				}
+			}}
+			if(fail==false){
+				for(var y2=y-5;y2<y+16;y2++){
+				for(var x2=x-16;x2<x+16;x2++){
+					//map[x2][y2]=0;
+				}}		
+
+				for(var j=0;j<3;j++){
+				var x1=x+j*3;
+				var y1=y+j*3;
+				var angle=Math.PI/1.2;
+				var anmod=Math.random()/10-Math.random()/20;
+				var ml = Math.floor(Math.random()*25)+5;
+				for(var l=0;l<ml-(j*3);l++){
+					if(Math.random()<.3)l+=2;
+					angle+=anmod;
+					x1+=Math.cos(angle);
+					y1+=Math.sin(angle);
+					if(x1-8>=0 && y1-8>=0 && x1<mapwidth-8 && y1<mapheight-8){
+					
+					dx = Math.floor(x1);
+					dy =  Math.floor(y1);
+					
+					//make moutains
+					setmap(dx-3,dy,0);
+					setmap(dx+3,dy,0);
+					setmap(dx-3,dy+3,0);
+					setmap(dx+3,dy+3,0);
+					//map[dx-3][dy]=0;
+					//map[dx+3][dy]=0;
+					//map[dx-3][dy+3]=0;
+					//map[dx+3][dy+3]=0;
+					
+					setmap(dx-3,dy+4,11);
+					setmap(dx+3,dy+4,11);
+					//map[dx-3][dy+4]=11;
+					//map[dx+3][dy+4]=11;
+					
+					setmap(dx,dy,11);
+					setmap(dx+1,dy,11);
+					setmap(dx-1,dy-1,11);
+					setmap(dx,dy+1,11);
+					//map[dx][dy]=11;
+					//map[dx+1][dy]=11;
+					//map[dx-1][dy-1]=11;
+					//map[dx][dy+1]=11;
+					if(j==1){
+						setmap(dx+2,dy,11);
+						setmap(dx+2,dy,11);
+						//map[dx+2][dy]=11;
+						//map[dx-1][dy-3]=11;
+					}
+					setmap(dx,dy,10);
+					//map[dx][dy]=10;
+					if(l>3 && l<10){
+						for(var z1=-2;z1<3;z1++){
+						for(var z2=-2;z2<3;z2++){
+							if(Math.random()<.8){
+								setmap(dx+z1,dy+z1,5);
+								//map[dx+z1][dy+z2]=5;												
+							}
+							if(z1>-1 && z1<2 && Math.random()<.7){
+								setmap(dx+z1,dy+z2,10);
+								//map[dx+z1][dy+z2]=10;
+							}
+						}}
+					}
+					if(Math.random()<.2){
+						setmap(dx-1,dy,11);
+						setmap(dx-2,dy,11);
+						setmap(dx+3,dy+4,11);
+						setmap(dx+2,dy+4,11);
+						//map[dx-1][dy]=11;
+						//map[dx-2][dy]=11;
+						//map[dx+3][dy+4]=11;
+						//map[dx+2][dy+4]=11;
+					}
+					if(Math.random()<.3){
+						setmap(dx,dy+2,10);
+						setmap(dx+1,dy+3,10);
+						//map[dx][dy+2]=10;
+						//map[dx+1][dy+3]=10;
+					}
+				}}}
+			}
+			
+		}
+	}
+	function addcities(){
+		
+		for(var i=0;i<mapwidth;i++){
+			var x=Math.floor(Math.random()*mapwidth);
+			var y=Math.floor(Math.random()*mapheight);
+			if(getmap(x,y)>-1 && getmap2(x-1,y)==3){
+				var cont=true;
+				for(var y1=y;y1<y+16;y1++){
+				for(var x1=x+2;x1<x+20;x1++){
+					if(x1<0 || y1<0 || x1>=mapwidth || y1>= mapheight)cont=false;
+					if(	getmap(x1,y1)==13 || 
+							getmap(x1,y1)==12 || 
+							getmap(x1,y1)==14 || 
+							getmap(x1,y1)==10 || 
+							getmap(x1,y1)==11){
+						cont=false;
+						//debug=456;
+					}
+					if(getmap2(x1,y1)>0)cont=false;
+				}}				
+				if(cont==true){
+				var tweak=25;
+				var tweak2=0
+				for(var y1=y;y1<y+16;y1++){
+				for(var x1=x+tweak2;x1<x+tweak;x1++){
+
+					setmap(x1,y1,0);
+					if(Math.random()<.4)setmap(x1,y1,6);					if(Math.random()<.2)setmap(x1,y1,5);
+				}
+				if(Math.random()<.3)	tweak-=1;
+				if(Math.random()<.5)	tweak2+=1;
+				}
+				drawlittlehouse(x+3,y+2);				drawlittlehouse(x+6,y+6);
+				drawlittlehouse(x+13,y+3);				drawlittlehouse(x+14,y+12);
+				}
+			}
+		}
+	}
+	function drawlittlehouse(x,y){
+
+		for(var i=0;i<6;i++){
+			setmap(x+i,y,12);
+		}
+
+		for(var i=0;i<8;i++){
+			setmap((x-1)+i,y+1,12);
+		}
+
+		for(var i=0;i<5;i++){
+			setmap((x+1)+i,y+2,13);
+			setmap((x+1)+i,y+3,13);
+		}
+		for(var i=0;i<8;i++){
+			setmap(x+i,y+4,4);
+			setmap(x+i,y+5,4);
+		}
+		var z = Math.floor(Math.random()*3);
+		setmap(x+2+z,y+2,14);
+		setmap(x+2+z,y+3,14);
+		
+		
+	}
+	function getmap2(x,y){
+		if(x>=0 && y>=0 && x<mapwidth && y<mapheight)return map2[x][y];
+		return -1;
+	}
+	
+	function getmap(x,y){
+		if(x>=0 && y>=0 && x<mapwidth && y<mapheight)return map[x][y];
+		return -1;
+	}
+	function setmap(x,y,val){
+		if(x>=0 && y>=0 && x<mapwidth && y<mapheight){
+			map[x][y]=val;
+		}
+	}
+	
+	// for the clouds
+	
+// create a image
+function CanvasToImage() {
+	let canvas = document.getElementById("myCanvas");
+	let canvasAsImage = new Image(64,64);
+	let cv=canvas.getContext("2d");
+
+
+	for(var i=0;i<4;i++){
+
+		//clear array
+	 	for(var x=0;x<64;x++){
+		for(var y=0;y<32;y++){
+			settmp(x,y,0);
+		}}
+
+
+		// make cloud
+		var x = 0;
+		var y = 16;
+		var done=99;
+		var angle=0;
+		var cnt1 = 0;
+		var anglestep=Math.random()/8+.1;
+		while(x<32){
+			if(x>20){
+				angle=1;
+				anglestep=.2;
+			}
+			x+=1;
+			y+=Math.sin(angle);
+			if(y<0)y=0;
+			angle-=anglestep;
+			if(x<28 && Math.random()<.2)anglestep=Math.random();
+			for(var y2=y;y2<16;y2++){
+				settmp(x+15,y2+15,17);
+				settmp(x,y2,y2-5);
+			}
+			done-=1;
+		}
+
+		// draw cloud in image
+		var x2=Math.random()*48;
+		var y2=Math.random()*16;
+
+		for(var y=0;y<32;y++){
+		for(var x=0;x<64;x++){
+			if(tmp[x][y]>0){
+				var c = 255-(tmp[x][y]*12);
+				cv.fillStyle = "rgb("+c+","+c+","+c+")";
+				//cv.fillStyle='grey';
+				cv.fillRect(x+x2,y+y2,1,1);
+			}
+		}}
+	
+	}
+
+	canvasAsImage.src = canvas.toDataURL();
+	return canvasAsImage;
+}
+function settmp(x,y,val){
+	if(x>=0 && y>=0 && x<64 && y<32){
+		tmp[Math.floor(x)][Math.floor(y)]=val;
+	}
+}	
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
