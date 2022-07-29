@@ -25,7 +25,7 @@ Use different browser.
 	// Doom Javascript HTML5 - Part 1.
 	// From a tutorial from 3DSage (youtube)
 	//
-	//
+	// Current bug - keyboard does not work anymore...
 	
 	
 	var c=document.getElementById("myCanvas");
@@ -117,11 +117,9 @@ Use different browser.
 	
 	}
 
-	walls = [];
+	var walls = [];
 	for(var i=0;i<130;i++){
 		walls.push(new wall());
-		//var tmp = Object.create(wall);
-		//walls.push(tmp);
 	}
 
 
@@ -141,51 +139,37 @@ Use different browser.
 			this.surface = 0; // is there a surface to draw
 		}
 	}
-	sectors = [];
-	for(var i=0;i<130;i++){
-		//var tmp = Object.create(sector)
+	var sectors = [];
+	for(var i=0;i<30;i++){
 		sectors.push(new sector());
-		//var tmp = Object.create(sector);
-		//sectors.push(tmp);
 	}
 
+	loadMap();
 
 
-	// load sectors
-	var v1=0;
-	var v2=0;
-	for(var s=0;s<numSect;s++){
-		sectors[s].ws=loadSectors[v1+0];// wall start number
-		sectors[s].we=loadSectors[v1+1];// wall end number
-		sectors[s].z1=loadSectors[v1+2];// sector bottom height
-		sectors[s].z2=loadSectors[v1+3]-loadSectors[v1+2];// sector top height
-		sectors[s].c1=loadSectors[v1+4]; // sector top color
-		sectors[s].c2=loadSectors[v1+5]; // sector bottom color
-		
-		v1+=6;
-		for(var w=sectors[s].ws;w<sectors[s].we;w++){
-			walls[w].x1 = loadWalls[v2+0];
-			walls[w].y1 = loadWalls[v2+1];			
-			walls[w].x2 = loadWalls[v2+2];			
-			walls[w].y2 = loadWalls[v2+3];			
-			walls[w].c = loadWalls[v2+4];			
-			v2+=5;
-		}
-		
-	}
 	
-var selected = false;	
-var selectionx =	-1;
-var selectiony = -1;
-var selectionsector = -1;
-
-scw =0;
-sch=0;
+	var selected = false;	
+	var selectionx =	-1;
+	var selectiony = -1;
+	var selectionsector = -1;
+	
+	scw =0;
+	sch=0;
+	
+	var main=false;
+	var realStart = 1000;
+	
 	gameloop=setInterval(doGameLoop,16);
 
 	function doGameLoop(){
 		myCanvas.height = window.innerHeight*.96;
-		myCanvas.width = window.innerWidth*.96;		
+		myCanvas.width = window.innerWidth*.96;
+		if(realStart>0)realStart-=1;
+		if(realStart==0){
+			realStart=-1;
+			loadMap();
+			main=true;
+		}
 		
 		scw=myCanvas.width/sw;
 		sch=myCanvas.height/sh;
@@ -195,11 +179,14 @@ sch=0;
 		ctx.fillRect(0,0,sw,sw);
 		ctx.fillStyle="rgb(255,255,255)";
 		ctx.fillText("Touch screen edit: "+debug,10,10); 
-		drawtopdown();
-		
-		//moveplayer();
-		//draw3d();
-		//touchUI();
+		if(realStart!=0 && realStart!=-1){
+			drawtopdown();
+		}
+		if(main){
+			moveplayer();
+			draw3d();
+			touchUI();
+		}
 		
 	}
 
@@ -346,16 +333,17 @@ sch=0;
 		var cs = cos[pa];
 		var sn = sin[pa];
 		
+		for(q=0;q<5;q++){
 		// order sectors by distance
 		for(s=0;s<numSect-1;s++){
 		for(w=0;w<numSect-s-1;w++){
 			if(sectors[w].d<sectors[w+1].d){
-				//var st=sectors[w];
-				//sectors[w]=sectors[w+1];
-				//sectors[w+1]=st;
-				[sectors[w+1],sectors[w]] = [sectors[w],sectors[w+1]];
+				var st=sectors[w];
+				sectors[w]=sectors[w+1];
+				sectors[w+1]=st;
+				//[sectors[w+1],sectors[w]] = [sectors[w],sectors[w+1]];
 			}
-		}}
+		}}}
 		
 		
 		// draw sectors
@@ -506,7 +494,7 @@ sch=0;
 		if(p==8) c = 'rgb(0,60,130)';
 		if(p==9) c = 'rgb(255,0,0)';
 		ctx.fillStyle=c;
-		ctx.fillRect(x,y,1,1);	
+		ctx.fillRect(x,y,2,2);	
 	}
 	function degrees_to_radians(degrees) {
   		return degrees * (Math.PI / 180);
@@ -701,6 +689,42 @@ function md(evt){
 		ctx.fillRect(x1-1,y1-1,2,2);
 		
 	}
+	
+	function loadMap(){
+//		walls.length=0;
+//		for(var i=0;i<130;i++){
+//			walls.push(new wall());
+//		}
+//		sectors.length=0;
+//		for(var i=0;i<30;i++){
+//			sectors.push(new sector());
+//		}
+		
+		// load sectors
+		var v1=0;
+		var v2=0;
+		for(var s=0;s<numSect;s++)
+		{
+			sectors[s].ws=loadSectors[v1+0];// wall start number
+			sectors[s].we=loadSectors[v1+1];// wall end number
+			sectors[s].z1=loadSectors[v1+2];// sector bottom height
+			sectors[s].z2=loadSectors[v1+3]-loadSectors[v1+2];// sector top height
+			sectors[s].c1=loadSectors[v1+4]; // sector top color
+			sectors[s].c2=loadSectors[v1+5]; // sector bottom color
+			v1+=6;
+			for(var w=sectors[s].ws;w<sectors[s].we;w++)
+			{
+				walls[w].x1 = loadWalls[v2+0];
+				walls[w].y1 = loadWalls[v2+1];
+				walls[w].x2 = loadWalls[v2+2];
+				walls[w].y2 = loadWalls[v2+3];
+				walls[w].c = loadWalls[v2+4];
+				v2+=5;
+			}	
+		}	
+		
+	}
+
 </script>
 </body>
 </html>
