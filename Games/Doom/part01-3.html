@@ -56,8 +56,8 @@ Use different browser.
 		0,96,0,64,7
 	];
 	
-	var numSect = 2; // number of sectors
-	var numWall = 8; // number of walls;
+	var numSect = 4; // number of sectors
+	var numWall = 16; // number of walls;
 	
 	var cos = [];
 	var sin = [];
@@ -79,7 +79,14 @@ Use different browser.
 	var kw=ks=ka=kd=ksl=ksr=km=0;
 	
 	
-	class wall {
+	var wall = {
+		x1:0,
+		y1:0,
+		x2:0,
+		y2:0,
+		c:0
+		
+	/*
 		constructor(){
 			this.x1=0; // bottom line point 1
 			this.y1=0; 
@@ -87,14 +94,25 @@ Use different browser.
 			this.y2=0;
 			this.c=0; // wall color
 		}
+	*/
 	}
 
 	walls = [];
 	for(var i=0;i<130;i++){
-		walls.push(new wall());
+		//walls.push(new wall());
+		var tmp = Object.create(wall);
+		walls.push(tmp);
 	}
 
-	class sector{
+	var sector = {
+		ws:0,
+		we:0,
+		z1:0,
+		z2:0,
+		x:0,
+		y:0,
+		d:0
+/*
 		constructor(){
 			this.ws=0; // wall number start and end
 			this.we=0;
@@ -104,10 +122,13 @@ Use different browser.
 			this.y=0;
 			this.d=0; // add y distance to sort drawing order
 		}
+*/
 	}
 	sectors = [];
 	for(var i=0;i<130;i++){
-		sectors.push(new sector());
+		//sectors.push(new sector());
+		var tmp = Object.create(sector);
+		sectors.push(tmp);
 	}
 
 
@@ -137,21 +158,19 @@ Use different browser.
 
 	function doGameLoop(){
 		myCanvas.height = window.innerHeight*.96;
-		myCanvas.width = window.innerWidth*.96;		
-		ctx.scale(2,2);
-		ctx.fillStyle="rgb(0,0,0)";
-		ctx.fillRect(0,0,c.width,c.height);
+		myCanvas.width = window.innerWidth*.96;		ctx.scale(6,6);
+		ctx.fillStyle="rgb(120,120,120)";
+		ctx.fillRect(0,0,sw,sw);
 		ctx.fillStyle="rgb(255,255,255)";
-		ctx.fillText("W/A/S/D m+ , . "+debug,10,10); 
+		ctx.fillText("W/A/S/D m+ , . "+pa,10,10); 
 		moveplayer();
-		ctx.scale(6,6);
 		draw3d();
 	}
 
 	
 	// clip line
 	function clipBehindPlayer(x1,y1,z1,x2,y2,z2){
-
+	
 		var da = y1; // distance plane --> point a
 		var db = y2; // distance plane -> point b
 		var d = da-db;
@@ -200,15 +219,20 @@ Use different browser.
 	}
 	
 	function draw3d(){
+		var s=0;
+		var w=0;
 		var wx = [];
 		var wy = [];
 		var wz = [];
+		//var cs = Math.cos(degrees_to_radians(pa));
+		//var sn = Math.sin(degrees_to_radians(pa));
+
 		var cs = cos[pa];
 		var sn = sin[pa];
 		
 		// order sectors by distance
-		for(var s=0;s<numSect-1;s++){
-		for(var w=0;w<numSect-s-1;w++){
+		for(s=0;s<numSect-1;s++){
+		for(w=0;w<numSect-s-1;w++){
 			if(sectors[w].d<sectors[w+1].d){
 				//var st=sectors[w];
 				//sectors[w]=sectors[w+1];
@@ -219,10 +243,10 @@ Use different browser.
 		
 		
 		// draw sectors
-		for(var s=0;s<numSect;s++){
+		for(s=0;s<numSect;s++){
 			sectors[s].d=0;			// clear distance
-			//for(var loop=0;loop<2;loop++){
-				for(var w=sectors[s].ws;w<sectors[s].we;w++){
+			for(var loop=0;loop<2;loop++){
+				for(w=sectors[s].ws;w<sectors[s].we;w++){
 			
 					// offset bottom 2 points by player
 					var x1 = walls[w].x1-px;
@@ -230,14 +254,14 @@ Use different browser.
 					var x2 = walls[w].x2-px;
 					var y2 = walls[w].y2-py;
 					//swap for surface
-					//if(loop==0){
-					//	var swp=x1;
-					//	x1=x2;
-					//	x2=swp;
-					//	swp=y1;
-					//	y1=y2;
-					//	y2=swp;
-					//}	
+					if(loop==0){
+						var swp=x1;
+						x1=x2;
+						x2=swp;
+						swp=y1;
+						y1=y2;
+						y2=swp;
+					}	
 					// world x position
 					wx[0] = x1*cs-y1*sn;
 					wx[1] = x2*cs-y2*sn;
@@ -264,12 +288,13 @@ Use different browser.
 						[wx[2],wy[2],wz[2]] = clipBehindPlayer(wx[2],wy[2],wz[2],wx[3],wy[3],wz[3]);//top line
 						
 					}
+					
 					if(wy[1]<1){
 						[wx[1],wy[1],wz[1]]	= clipBehindPlayer(wx[1],wy[1],wz[1],wx[0],wy[0],wz[0]);//bottom line
 						[wx[3],wy[3],wz[3]]	= clipBehindPlayer(wx[3],wy[3],wz[3],wx[2],wy[2],wz[2]);//top line
 						
 					}
-
+					
 					// screen x, screen y position
 					wx[0] = wx[0]*200/wy[0]+sw2;wy[0] = wz[0]*200/wy[0]+sh2;			wx[1] = wx[1]*200/wy[1]+sw2;wy[1] = wz[1]*200/wy[1]+sh2;
 					wx[2] = wx[2]*200/wy[2]+sw2;wy[2] = wz[2]*200/wy[2]+sh2;			wx[3] = wx[3]*200/wy[3]+sw2;wy[3] = wz[3]*200/wy[3]+sh2;
@@ -277,7 +302,7 @@ Use different browser.
 					drawWall(wx[0],wx[1],wy[0],wy[1],wy[2],wy[3],walls[w].c);						
 				}
 				sectors[s].d/=(sectors[s].we-sectors[s].ws);
-			//}
+			}
 		}
 	}
 
@@ -293,6 +318,9 @@ Use different browser.
 		}
 		var dx=sin[pa]*10.0;
 		var dy=cos[pa]*10.0;
+		var dx = Math.sin(degrees_to_radians(pa));
+		var dy = Math.cos(degrees_to_radians(pa));
+		
 		if(kw==1 && km==0){
 			px+=dx;
 			py+=dy;
