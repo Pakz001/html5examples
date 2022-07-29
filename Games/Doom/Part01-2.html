@@ -21,7 +21,8 @@ Use different browser.
 	var c=document.getElementById("myCanvas");
 	var ctx=c.getContext("2d");
 	window.addEventListener("keydown",kd,true);
- 	window.addEventListener("keyup",ku,true);	var debug = 0;
+ 	window.addEventListener("keyup",ku,true);	
+        var debug = 0;
 	var sw = 160;
 	var sh = 120;
 	var sw2 = sw/2;
@@ -212,9 +213,9 @@ Use different browser.
 		
 		
 		// draw sectors
-		for(var s=0;sectors.length;s++){
+		for(var s=0;numSect;s++){
 			sectors[s].d=0;			// clear distance
-			for(var loop=0;loop<2;loop++){
+			//for(var loop=0;loop<2;loop++){
 			for(var w=sectors[s].ws;w<sectors[s].we;w++){
 		
 			// offset bottom 2 points by player
@@ -223,14 +224,14 @@ Use different browser.
 			var x2 = walls[w].x2-px;
 			var y2 = walls[w].y2-py;
 			//swap for surface
-			if(loop==0){
-				var swp=x1;
-				x1=x2;
-				x2=swp;
-				swp=y1;
-				y1=y2;
-				y2=swp;
-			}	
+			//if(loop==0){
+			//	var swp=x1;
+			//	x1=x2;
+			//	x2=swp;
+			//	swp=y1;
+			//	y1=y2;
+			//	y2=swp;
+			//}	
 			// world x position
 			wx[0] = x1*cs-y1*sn;
 			wx[1] = x2*cs-y2*sn;
@@ -268,8 +269,8 @@ Use different browser.
 			wx[2] = wx[2]*200/wy[2]+sw2;wy[2] = wz[2]*200/wy[2]+sh2;			wx[3] = wx[3]*200/wy[3]+sw2;wy[3] = wz[3]*200/wy[3]+sh2;
 
 			drawWall(wx[0],wx[1],wy[0],wy[1],wy[2],wy[3],walls[w].c);			}
-			sectors[s].d/=(sectors[s].we-sectors[s].ws);
-		}
+			//sectors[s].d/=(sectors[s].we-sectors[s].ws);
+			}
 		}
 	}
 
