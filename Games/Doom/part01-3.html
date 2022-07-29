@@ -32,7 +32,7 @@ Use different browser.
 		0,4,0,40, 	// sector 1
 		4,8,0,40, 	// sector 2
 		8,12,0,40, 	// sector 3
-		12,16,0,40, 	// sector 5
+		12,16,0,40 	// sector 5
 	];
 	var loadWalls = [
 		0,0,32,0,0,
@@ -53,11 +53,11 @@ Use different browser.
 		0,64,32,64,6,
 		32,64,32,96,7,
 		32,96,0,96,6,
-		0,96,0,64,7,
+		0,96,0,64,7
 	];
 	
-	var numSect = 1; // number of sectors
-	var numWall = 4; // number of walls;
+	var numSect = 2; // number of sectors
+	var numWall = 8; // number of walls;
 	
 	var cos = [];
 	var sin = [];
@@ -90,7 +90,7 @@ Use different browser.
 	}
 
 	walls = [];
-	for(var i=0;i<numWall;i++){
+	for(var i=0;i<130;i++){
 		walls.push(new wall());
 	}
 
@@ -106,14 +106,15 @@ Use different browser.
 		}
 	}
 	sectors = [];
-	for(var i=0;i<numSect;i++){
+	for(var i=0;i<130;i++){
 		sectors.push(new sector());
 	}
 
 
 
 	// load sectors
-	var v1=v2=0;
+	var v1=0;
+	var v2=0;
 	for(var s=0;s<numSect;s++){
 		sectors[s].ws=loadSectors[v1+0];// wall start number
 		sectors[s].we=loadSectors[v1+1];// wall end number
@@ -122,7 +123,11 @@ Use different browser.
 		v1+=4;
 		for(var w=sectors[s].ws;w<sectors[s].we;w++){
 			walls[w].x1 = loadWalls[v2+0];
-			walls[w].y1 = loadWalls[v2+1];			walls[w].x2 = loadWalls[v2+2];			walls[w].y2 = loadWalls[v2+3];			walls[w].c = loadWalls[v2+4];			v2+=5;
+			walls[w].y1 = loadWalls[v2+1];			
+			walls[w].x2 = loadWalls[v2+2];			
+			walls[w].y2 = loadWalls[v2+3];			
+			walls[w].c = loadWalls[v2+4];			
+			v2+=5;
 		}
 		
 	}
@@ -272,7 +277,7 @@ Use different browser.
 					drawWall(wx[0],wx[1],wy[0],wy[1],wy[2],wy[3],walls[w].c);						
 				}
 				sectors[s].d/=(sectors[s].we-sectors[s].ws);
-			}
+			//}
 		}
 	}
 
