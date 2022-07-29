@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	
+	// Doom Javascript HTML5 - Part 1.
+	// From a tutorial from 3DSage (youtube)
+	//
+	//
+	
+	
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	window.addEventListener("keydown",kd,true);
+ 	window.addEventListener("keyup",ku,true);	
+        var debug = 0;
+	var sw = 160;
+	var sh = 120;
+	var sw2 = sw/2;
+	var sh2 = sh/2;
+	
+	var loadSectors = [
+		0,4,0,40, 	// sector 1
+		4,8,0,40, 	// sector 2
+		8,12,0,40, 	// sector 3
+		12,16,0,40, 	// sector 5
+	];
+	var loadWalls = [
+		0,0,32,0,0,
+		32,0,32,32,1,
+		32,32,0,32,0,
+		0,32,0,0,1,
+		
+		64,0,96,0,2,
+		96,0,96,32,3,
+		96,32,64,32,2,
+		64,32,64,0,3,
+		
+		64,64,96,64,4,
+		96,64,96,96,5,
+		96,96,64,96,4,
+		64,96,64,64,5,
+		
+		0,64,32,64,6,
+		32,64,32,96,7,
+		32,96,0,96,6,
+		0,96,0,64,7,
+	];
+	
+	var numSect = 1; // number of sectors
+	var numWall = 4; // number of walls;
+	
+	var cos = [];
+	var sin = [];
+	//populate cos and sin arrays.
+	for(var x=0;x<360;x++){
+		cos[x] = Math.cos(x/180.0*Math.PI);
+		sin[x] = Math.sin(x/180.0*Math.PI);
+	}
+	
+	var px=py=pz=0;
+	var pa,pl;
+	// initiate player
+	px = 70;
+	py = -110;
+	pz = 20;
+	pa = 0;
+	pl = 0;
+	// w/s/a/d strafe left/right and m=forward.
+	var kw=ks=ka=kd=ksl=ksr=km=0;
+	
+	
+	class wall {
+		constructor(){
+			this.x1=0; // bottom line point 1
+			this.y1=0; 
+			this.x2=0;// bottom line point 2
+			this.y2=0;
+			this.c=0; // wall color
+		}
+	}
+
+	walls = [];
+	for(var i=0;i<numWall;i++){
+		walls.push(new wall());
+	}
+
+	class sector{
+		constructor(){
+			this.ws=0; // wall number start and end
+			this.we=0;
+			this.z1=0; // height of bottom and top
+			this.z2=0;
+			this.x=0; // center position for sector
+			this.y=0;
+			this.d=0; // add y distance to sort drawing order
+		}
+	}
+	sectors = [];
+	for(var i=0;i<numSect;i++){
+		sectors.push(new sector());
+	}
+
+
+
+	// load sectors
+	var v1=v2=0;
+	for(var s=0;s<numSect;s++){
+		sectors[s].ws=loadSectors[v1+0];// wall start number
+		sectors[s].we=loadSectors[v1+1];// wall end number
+		sectors[s].z1=loadSectors[v1+2];// sector bottom height
+		sectors[s].z2=loadSectors[v1+3];// sector top height
+		v1+=4;
+		for(var w=sectors[s].ws;w<sectors[s].we;w++){
+			walls[w].x1 = loadWalls[v2+0];
+			walls[w].y1 = loadWalls[v2+1];			walls[w].x2 = loadWalls[v2+2];			walls[w].y2 = loadWalls[v2+3];			walls[w].c = loadWalls[v2+4];			v2+=5;
+		}
+		
+	}
+	
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight*.96;
+		myCanvas.width = window.innerWidth*.96;		
+		ctx.scale(2,2);
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("W/A/S/D m+ , . "+debug,10,10); 
+		moveplayer();
+		ctx.scale(6,6);
+		draw3d();
+	}
+
+	
+	// clip line
+	function clipBehindPlayer(x1,y1,z1,x2,y2,z2){
+
+		var da = y1; // distance plane --> point a
+		var db = y2; // distance plane -> point b
+		var d = da-db;
+		if(d==0)d=1;
+		var s = da/(da-db); // intersectiokn factor(between 0 and 1)
+		x1 = x1+s*(x2-(x1));
+		y1 = y1+s*(y2-(y1));
+		if(y1==0)y1=1; // prevent divide by zero
+		z1 = z1+s*(z2-(z1));
+		return [
+		x1,
+		y1,
+		z1
+		];
+	}
+	
+	function drawWall(x1,x2,b1,b2,t1,t2,c){
+		var x,y;
+		// hold difference in distance.
+		var dyb = b2-b1;	// y distance of bottom line
+		var dyt = t2-t1;	// y distance of top line
+		var dx = x2-x1;	// x distance
+		if(dx==0)dx=1; 
+		var xs=x1; 	// hold initial x1 start position
+		//clip x (change =1 to 0 for non visible
+		if(x1<1)x1=1; //clip left
+		if(x2<1)x2=1; //clip left
+		if(x1>sw-1)x1=sw-1; // clip right
+		if(x2>sw-1)x2=sw-1; //clip right
+		// draw x verticle lines
+		for(x=x1;x<x2;x++){
+			var y1 = dyb*(x-xs+0.5)/dx+b1; // y bottom point;
+			var y2 = dyt*(x-xs+0.5)/dx+t1; // y bottom point;
+			//pixel(x,y1,0);//bottom
+			//pixel(x,y2,0);//top
+			//clip y (change =1 to 0 for non visible
+			if(y1<1)y1=1; //clip left
+			if(y2<1)y2=1; //clip left
+			if(y1>sh-1)y1=sh-1; // clip right
+			if(y2>sh-1)y2=sh-1; //clip right
+
+			for(y=y1;y<y2;y++){
+				pixel(x,y,c);
+			}
+		}
+	}
+	
+	function draw3d(){
+		var wx = [];
+		var wy = [];
+		var wz = [];
+		var cs = cos[pa];
+		var sn = sin[pa];
+		
+		// order sectors by distance
+		for(var s=0;s<numSect-1;s++){
+		for(var w=0;w<numSect-s-1;w++){
+			if(sectors[w].d<sectors[w+1].d){
+				//var st=sectors[w];
+				//sectors[w]=sectors[w+1];
+				//sectors[w+1]=st;
+				[sectors[w+1],sectors[w]] = [sectors[w],sectors[w+1]];
+			}
+		}}
+		
+		
+		// draw sectors
+		for(var s=0;s<numSect;s++){
+			sectors[s].d=0;			// clear distance
+			//for(var loop=0;loop<2;loop++){
+				for(var w=sectors[s].ws;w<sectors[s].we;w++){
+			
+					// offset bottom 2 points by player
+					var x1 = walls[w].x1-px;
+					var y1 = walls[w].y1-py;
+					var x2 = walls[w].x2-px;
+					var y2 = walls[w].y2-py;
+					//swap for surface
+					//if(loop==0){
+					//	var swp=x1;
+					//	x1=x2;
+					//	x2=swp;
+					//	swp=y1;
+					//	y1=y2;
+					//	y2=swp;
+					//}	
+					// world x position
+					wx[0] = x1*cs-y1*sn;
+					wx[1] = x2*cs-y2*sn;
+					wx[2] = wx[0];
+					wx[3] = wx[1];
+				
+					// world y position (depth)
+					wy[0] = y1*cs+x1*sn;
+					wy[1] = y2*cs+x2*sn;
+					wy[2] = wy[0];
+					wy[3] = wy[1];
+					// world z height;
+					wz[0] = sectors[s].z1-pz+((pl*wy[0])/32.0);
+					wz[1] = sectors[s].z1-pz+((pl*wy[1])/32.0);
+					wz[2] = wz[0]+sectors[s].z2;
+					wz[3] = wz[1]+sectors[s].z2;
+					// store this walls distance
+					sectors[s].d+=dist(0,0,(wx[0]+wx[1])/2,(wy[0]+wy[1])/2);
+					// dont draw if behind player
+					if(wy[0]<0 && wy[1]<1)continue; // wall behind player, dont draw
+					// point behind player clip
+					if(wy[0]<1){
+						[wx[0],wy[0],wz[0]] = clipBehindPlayer(wx[0],wy[0],wz[0],wx[1],wy[1],wz[1]);//bottom line
+						[wx[2],wy[2],wz[2]] = clipBehindPlayer(wx[2],wy[2],wz[2],wx[3],wy[3],wz[3]);//top line
+						
+					}
+					if(wy[1]<1){
+						[wx[1],wy[1],wz[1]]	= clipBehindPlayer(wx[1],wy[1],wz[1],wx[0],wy[0],wz[0]);//bottom line
+						[wx[3],wy[3],wz[3]]	= clipBehindPlayer(wx[3],wy[3],wz[3],wx[2],wy[2],wz[2]);//top line
+						
+					}
+
+					// screen x, screen y position
+					wx[0] = wx[0]*200/wy[0]+sw2;wy[0] = wz[0]*200/wy[0]+sh2;			wx[1] = wx[1]*200/wy[1]+sw2;wy[1] = wz[1]*200/wy[1]+sh2;
+					wx[2] = wx[2]*200/wy[2]+sw2;wy[2] = wz[2]*200/wy[2]+sh2;			wx[3] = wx[3]*200/wy[3]+sw2;wy[3] = wz[3]*200/wy[3]+sh2;
+
+					drawWall(wx[0],wx[1],wy[0],wy[1],wy[2],wy[3],walls[w].c);						
+				}
+				sectors[s].d/=(sectors[s].we-sectors[s].ws);
+			}
+		}
+	}
+
+	function moveplayer(){
+		// move up down left right
+		if(ka==1 && km==0){
+			pa-=2;
+			if(pa<0)pa+=360;
+		}
+		if(kd==1 && km==0){
+			pa+=2;  
+			if(pa>359)pa-=360;
+		}
+		var dx=sin[pa]*10.0;
+		var dy=cos[pa]*10.0;
+		if(kw==1 && km==0){
+			px+=dx;
+			py+=dy;
+		}
+		if(ks==1 && km==0){
+			px-=dx;
+			py-=dy;
+		}
+		// strafe left, right
+		if(ksr==1){
+			px+=dy;
+			py-=dx;
+		}
+		if(ksl==1){
+			px-=dy;
+			py+=dx;
+		}
+		//move up, down , look up down
+		if(ka==1 && km==1){
+			pl-=1;
+		} 
+		if(kd==1 && km==1){
+			pl+=1;
+		} 
+		if(kw==1 && km==1){
+			pz-=4;
+		} 
+		if(ks==1 && km==1){
+			pz+=4;
+		} 
+
+
+
+
+	}
+
+	function pixel(x,y,p){
+		if(p==0) c = 'rgb(255,255,0)';
+		if(p==1) c = 'rgb(160,160,0)';
+		if(p==2) c = 'rgb(0,255,0)';
+		if(p==3) c = 'rgb(0,160,0)';
+		if(p==4) c = 'rgb(0,255,0)';
+		if(p==5) c = 'rgb(0,160,255)';
+		if(p==6) c = 'rgb(160,100,0)';
+		if(p==7) c = 'rgb(110,50,0)';
+		if(p==8) c = 'rgb(0,60,130)';
+		ctx.fillStyle=c;
+		ctx.fillRect(x,y,1,1);	
+	}
+	function degrees_to_radians(degrees) {
+  		return degrees * (Math.PI / 180);
+	}
+	function radians_to_degrees(radians) {
+ 		return radians * (180 / Math.PI);
+	}
+	function kd(evt){
+		debug=evt.keyCode;
+  		if(evt.keyCode==87)kw = 1;
+  		if(evt.keyCode==65)ka = 1;
+  		if(evt.keyCode==83)ks = 1;
+  		if(evt.keyCode==68)kd = 1;
+  		if(evt.keyCode==77)km = 1;
+  		if(evt.keyCode==188)ksl = 1;
+  		if(evt.keyCode==190)ksr = 1;
+
+ 	}
+ 	function ku(evt){
+  		if(evt.keyCode==87)kw = 0;
+  		if(evt.keyCode==65)ka = 0;
+  		if(evt.keyCode==83)ks = 0;
+  		if(evt.keyCode==68)kd = 0;
+  		if(evt.keyCode==77)km = 0;
+  		if(evt.keyCode==188)ksl = 0;
+  		if(evt.keyCode==190)ksr = 0;
+
+	}	
+	function dist(x1,y1,x2,y2){
+		return Math.hypot(y2-y1,x2-x1);
+	}
+</script>
+</body>
+</html>
