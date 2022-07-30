@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	//
+	// Thanks to 3dSage of youtube.
+	//
+	// todo : see tutorial of 3dsage.
+	//
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var debug=0;
+	var tex_brick = [
+	
+	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+	
+	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+	1,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,1, 0,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,0,
+	1,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,1, 0,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,0,
+	1,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,1, 0,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,0,
+	1,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,1, 0,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,0,
+	1,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,1, 0,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,0,
+	1,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,1, 0,1,1,1,1,1,1,0, 1,1,1,1,1,1,1,0,
+	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+
+	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+
+	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,
+	0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0,
+	0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0,
+	0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0,
+	0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0,
+	0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0,
+	0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0, 0,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,0,
+	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0
+
+	]
+
+	var tex_check = [
+	
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1,
+
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1
+	
+	]
+
+	var map = [
+	[1,1,1,1,1,1,1,1],
+	[1,0,0,0,2,0,0,1],
+	[1,0,0,0,2,0,0,1],
+	[1,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,1],
+	[1,0,0,0,0,2,0,1],
+	[1,0,0,0,0,0,0,1],
+	[1,1,1,1,1,1,1,1],
+	];
+
+	var px,py;
+	px = 200;
+	py = 200;
+	pa = 0;
+	var tw,th;
+
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		tw = (myCanvas.width/2)/map[0].length;
+		th = (myCanvas.height)/map.length;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		
+		pa+=0.01;
+		drawmap();
+		drawplayer();
+		castline();
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillText("Javascript Html canvas example."+debug,10,10); 
+
+	}
+	//
+	// This is the last line. It casts a line from the player(camera)
+	// position. If the ray(or bullet?) hits a wall. You have a distance
+	// and you draw a line at that point. The distance is a base for the
+	// height of a wall there.
+	// A camera view is done by casting lines from left(30 degrees) to right
+	// (30 degrees). Multiple rays cast thus. L...eye...R
+	//
+	// Fish eye fix and tile number for different color.
+	
+	// Modify(parameter modify) and see what happens.
+	//
+	function castline(){
+		var anglestep = degrees_to_radians(1);
+		var offs=0;
+		for(var a=pa-degrees_to_radians(30);a<pa+degrees_to_radians(30);a+=anglestep){
+			var lx = px+4;
+			var ly = py+4;
+			//var a = pa;
+			var ex,ey;
+			for(var d=0;d<500;d++){
+				lx+=Math.cos(a);
+				ly+=Math.sin(a);
+				mx = Math.floor(lx/tw);
+				my = Math.floor(ly/th);
+				if(mx>=0 && mx<map[0].length && my>=0 && my<map.length){
+				if(map[my][mx]!=0){
+					ex = lx;
+					ey = ly;
+					var dist=Math.hypot(px+4-ex,py+4-ey);
+			
+					// fix fish eye effect!
+					var ca = pa-a;
+					dist=dist*Math.cos(ca);
+					
+					// size of your player view     
+					dist = (tw*myCanvas.height)/(dist);
+				
+					// Draw raycast line here.
+					if(map[my][mx]==1){
+						ctx.strokeStyle='yellow';
+					}else{
+						ctx.strokeStyle='red';
+					}
+					ctx.lineWidth = 10;
+					//ctx.beginPath();
+					//ctx.moveTo((myCanvas.width/2)+(offs*10),myCanvas.height/2);
+					//ctx.lineTo((myCanvas.width/2)+(offs*10),(myCanvas.height/2)-dist/2);
+					//ctx.stroke();
+					
+					//
+					// Draw each line from out of the texture array. (part1)
+					//
+					var lineH = (myCanvas.height/2) - (myCanvas.height/2-dist/2);
+					var y;
+					var ty=0;
+					var ty_step=32.0/lineH;
+					for(y=0;y<lineH;y++){
+						var c = tex_brick[Math.floor(ty)*32];
+						if(c==0)ctx.strokeStyle = 'yellow';
+						if(c==1)ctx.strokeStyle = 'red';
+						drawline(	(myCanvas.width/2)+(offs*10),
+										myCanvas.height/2-y,
+										(myCanvas.width/2)+(offs*10),
+										(myCanvas.height/2)-y+1);
+						ty+=ty_step;
+					}
+					
+					
+					ctx.strokeStyle='grey';
+					ctx.beginPath();
+					ctx.moveTo((myCanvas.width/2)+(offs*10),myCanvas.height/2);
+					ctx.lineTo((myCanvas.width/2)+(offs*10),myCanvas.height);
+					ctx.stroke();
+					break;
+				}}
+			}
+			offs++;
+			ctx.strokeStyle='yellow';
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(px+4,py+4);
+			ctx.lineTo(ex,ey);
+			ctx.stroke();
+		}
+	}
+	function drawline(x1,y1,x2,y2){
+		ctx.lineWidth = 10;
+		//ctx.strokeStyle = 'yellow';
+		ctx.beginPath();
+		ctx.moveTo(x1,y1);
+		ctx.lineTo(x2,y2);
+		ctx.stroke();
+
+	}
+	
+	function drawplayer(){
+		ctx.fillStyle='red';
+		ctx.fillRect(px,py,8,8);
+	
+	}
+	function drawmap(){
+		
+		for(var y=0;y<map.length;y++){
+		for(var x=0;x<map[0].length;x++){
+			if(map[y][x] == 1){
+				ctx.fillStyle='yellow';
+				ctx.fillRect(x*tw,y*th,tw,th);
+			}
+			if(map[y][x] == 2){
+				ctx.fillStyle='red';
+				ctx.fillRect(x*tw,y*th,tw,th);
+			}
+			
+			
+		}}
+	}
+	function degrees_to_radians(degrees) {
+  		return degrees * (Math.PI / 180);
+	}
+	function radians_to_degrees(radians) {
+ 		return radians * (180 / Math.PI);
+	}
+
+			
+	
+</script>
+</body>
+</html>
