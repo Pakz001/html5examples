@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {
+touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}</style>
+
+
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	
+	// Doom Javascript HTML5 - Part 1.
+	// From a tutorial from 3DSage (youtube)
+	//
+	// Current bug - keyboard does not work anymore...
+	
+	
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	window.addEventListener("keydown",kd,true);
+ 	window.addEventListener("keyup",ku,true);	
+	window.addEventListener("touchstart", touchHandler);
+	window.addEventListener("touchmove", touchHandler);
+	window.addEventListener("touchend", touchHandler);
+	window.addEventListener("mousedown",md,true);
+ 	window.addEventListener("mouseup",mu,true);
+	window.addEventListener('mousemove', mm);
+	
+	var touch=false;
+	var touchx=touchy=0;
+        var debug = 0;
+	var sw = 160;
+	var sh = 120;
+	var sw2 = sw/2;
+	var sh2 = sh/2;
+	
+	var loadSectors = [
+		// wall start, wall end, z2 height, z2 height
+		// bottom color, top color
+		0,4,0,40,9,9, 	// sector 1
+		4,8,0,40,9,9, 	// sector 2
+		8,12,0,40,9,9, 	// sector 3
+		12,16,0,40,9,9, 	// sector 4
+		
+		//16,20,40,41,3,3 // floor (painters algo problem)
+								// use 2 layers (1 floor layer- draw this
+								// first then after that the ground level.
+								// braintstorm ceiling!
+		
+		16,20,-50,40,9,9 // wall in the back of the map
+	];
+	var loadWalls = [
+		// x1,y1,x2,y2,color
+		0,0,32,0,0,
+		32,0,32,32,1,
+		32,32,0,32,0,
+		0,32,0,0,1,
+		
+		64,0,96,0,2,
+		96,0,96,32,3,
+		96,32,64,32,2,
+		64,32,64,0,3,
+		
+		64,64,96,64,4,
+		96,64,96,96,5,
+		96,96,64,96,4,
+		64,96,64,64,5,
+		
+		0,64,32,64,6,
+		32,64,32,96,7,
+		32,96,0,96,6,
+		0,96,0,64,7,
+
+		0,96,96,96,0,			// This is the wall in the back of the map.
+		96,96,96,96+2,1,
+		96,96+2,96,96+2,0,
+		0,96+2,0,96,1,
+
+
+// floor (painters algo problem (see sectors above)
+//		0,0,96,0,0,
+//		96,0,96,96,1,
+//		96,96,0,96,0,
+//		0,96,0,0,1
+
+	];
+	
+	var numSect = 5; // number of sectors
+	var numWall = 20; // number of walls;
+	
+	var cos = [];
+	var sin = [];
+	//populate cos and sin arrays.
+	for(var x=0;x<360;x++){
+		cos[x] = Math.cos(x/180.0*Math.PI);
+		sin[x] = Math.sin(x/180.0*Math.PI);
+	}
+	
+	var px=py=pz=0;
+	var pa,pl;
+	// initiate player
+	px = 70;
+	py = -110;
+	pz = 20;
+	pa = 0;
+	pl = 0;
+	// w/s/a/d strafe left/right and m=forward.
+	var kw=ks=ka=kd=ksl=ksr=km=0;
+	
+	
+	class wall {			
+		constructor(){
+			this.x1=0; // bottom line point 1
+			this.y1=0; 
+			this.x2=0;// bottom line point 2
+			this.y2=0;
+			this.c=0; // wall color
+		}
+	
+	}
+
+	var walls = [];
+	for(var i=0;i<130;i++){
+		walls.push(new wall());
+	}
+
+
+	class sector {
+		constructor(){
+			this.ws=0; // wall number start and end
+			this.we=0;
+			this.z1=0; // height of bottom and top
+			this.z2=0;
+			this.d=0; // add y distance to sort drawing order
+			this.c1=0; //bottom and top color;
+			this.c2=0;
+			this.surf = []; // to hold points for surface
+			for(var i=0;i<sw;i++){
+				this.surf.push(0);
+			}
+			this.surface = 0; // is there a surface to draw
+		}
+	}
+	var sectors = [];
+	for(var i=0;i<60;i++){
+		sectors.push(new sector());
+	}
+
+	loadMap();
+
+
+	
+	var selected = false;	
+	var selectionx =	-1;
+	var selectiony = -1;
+	var selectionsector = -1;
+	
+	scw =0;
+	sch=0;
+	
+	var main=false;
+	var realStart = 17;
+	
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight*.96;
+		myCanvas.width = window.innerWidth*.96;
+		if(realStart>0)realStart-=1;
+		if(realStart==0){
+			realStart=-1;
+			loadMap();
+			main=true;
+		}
+		
+		scw=myCanvas.width/sw;
+		sch=myCanvas.height/sh;
+		
+		ctx.scale(scw,sch);
+		ctx.fillStyle="rgb(120,120,120)";
+		ctx.fillRect(0,0,sw,sw);
+		ctx.fillStyle="rgb(255,255,255)";
+		var tt=realStart;
+		ctx.fillText("Touch screen edit: "+tt,10,10); 
+		if(realStart!=0 && realStart!=-1){
+			drawtopdown();
+		}
+		if(main){
+			moveplayer();
+			draw3d();
+			touchUI();
+		}
+		
+	}
+
+	function drawtopdown(){
+		var v1=0;
+		var v2=0;
+		for(var s=0;s<numSect;s++){
+			//sectors[s].ws=loadSectors[v1+0];// wall start number
+			//sectors[s].we=loadSectors[v1+1];// wall end number
+			//sectors[s].z1=loadSectors[v1+2];// sector bottom height
+			//sectors[s].z2=loadSectors[v1+3]-loadSectors[v1+2];// sector top height
+			//sectors[s].c1=loadSectors[v1+4]; // sector top color
+			//sectors[s].c2=loadSectors[v1+5]; // sector bottom color
+			v1+=6;
+		for(var w=sectors[s].ws;w<sectors[s].we;w++){
+			var x1 	= loadWalls[v2+0];
+			var y1 	= loadWalls[v2+1];
+			var x2 	= loadWalls[v2+2];
+			var y2 	= loadWalls[v2+3];
+			var c 	= loadWalls[v2+4];			drawLine(x1,y1,x2,y2,c)
+			drawAnker(x1,y1);
+			drawAnker(x2,y2);
+			if(touch==true){
+				if(rectsoverlap(touchx,touchy,1,1,x1-2,y1-2,4,4)==true){
+					selection = true;
+					selectionx = x1;
+					selectiony = y1;
+					selectionsector = s;
+					debug = s;
+
+					//loadWalls[v2+0] = x1;
+					//loadWalls[v2+1] = y1+10;
+					//loadWalls[v2+2] = x2;
+					//loadWalls[v2+3] = y2+10;
+					
+				}
+			}
+			v2+=5;
+		}
+		
+		}
+	}
+	
+	function modifyWalls(){
+		//var v2=selectionsector*5;
+		var v2=0;
+		for(var s=0;s<numSect;s++){
+			for(var w=sectors[s].ws;w<sectors[s].we;w++){
+				//if(s==selectionsector){
+					if(loadWalls[v2+0] == selectionx && loadWalls[v2+1] == selectiony){
+						loadWalls[v2+0] = touchx;loadWalls[v2+1] = touchy;
+					}
+					if(loadWalls[v2+2] == selectionx && loadWalls[v2+3] == selectiony){
+						loadWalls[v2+2] = touchx;loadWalls[v2+3] = touchy;
+					}
+				//}
+				v2+=5;
+			}	
+		}
+	}
+	
+	// clip line
+	function clipBehindPlayer(x1,y1,z1,x2,y2,z2){
+	
+		var da = y1; // distance plane --> point a
+		var db = y2; // distance plane -> point b
+		var d = da-db;
+		if(d==0)d=1;
+		var s = da/(da-db); // intersectiokn factor(between 0 and 1)
+		x1 = x1+s*(x2-(x1));
+		y1 = y1+s*(y2-(y1));
+		if(y1==0)y1=1; // prevent divide by zero
+		z1 = z1+s*(z2-(z1));
+		return [
+		x1,
+		y1,
+		z1
+		];
+	}
+	
+	function drawWall(x1,x2,b1,b2,t1,t2,c,s){
+		var x,y;
+		// hold difference in distance.
+		var dyb = b2-b1;	// y distance of bottom line
+		var dyt = t2-t1;	// y distance of top line
+		var dx = x2-x1;	// x distance
+		if(dx==0)dx=1; 
+		var xs=x1; 	// hold initial x1 start position
+		//clip x (change =1 to 0 for non visible
+		if(x1<1)x1=1; //clip left
+		if(x2<1)x2=1; //clip left
+		if(x1>sw-1)x1=sw-1; // clip right
+		if(x2>sw-1)x2=sw-1; //clip right
+		// draw x verticle lines
+		for(x=x1;x<x2;x++){
+			var y1 = dyb*(x-xs+0.5)/dx+b1; // y bottom point;
+			var y2 = dyt*(x-xs+0.5)/dx+t1; // y bottom point;
+			//pixel(x,y1,0);//bottom
+			//pixel(x,y2,0);//top
+			//clip y (change =1 to 0 for non visible
+			if(y1<1)y1=1; //clip left
+			if(y2<1)y2=1; //clip left
+			if(y1>sh-1)y1=sh-1; // clip right
+			if(y2>sh-1)y2=sh-1; //clip right
+			
+			
+	
+			//surface
+			if(sectors[s].surface==1){// save bottom points
+				sectors[s].surf[Math.floor(x)]=Math.floor(y1);
+				continue;
+			} 
+			if(sectors[s].surface==2){ // save top points
+				sectors[s].surf[Math.floor(x)]=Math.floor(y2);
+				continue;
+			}
+			if(sectors[s].surface==-1){// bottom
+				for(y=sectors[s].surf[Math.floor(x)];y<y1;y++){
+					pixel(x,y,sectors[s].c1);
+				}
+			} 
+			if(sectors[s].surface==-2){// top
+				for(y=y2;y<sectors[s].surf[Math.floor(x)];y++){
+					pixel(x,y,sectors[s].c2);
+				}
+			} 
+			
+			for(y=y1;y<y2;y++){
+				pixel(x,y,c);
+			}
+		}
+	}
+	
+	function draw3d()
+	{
+		var s=0;
+		var w=0;
+		var wx = [];
+		var wy = [];
+		var wz = [];
+		//var cs = Math.cos(degrees_to_radians(pa));
+		//var sn = Math.sin(degrees_to_radians(pa));
+
+		var cs = cos[pa];
+		var sn = sin[pa];
+		
+		for(q=0;q<5;q++){
+		// order sectors by distance
+		for(s=0;s<numSect-1;s++){
+		for(w=0;w<numSect-s-1;w++){
+			if(sectors[w].d<sectors[w+1].d){
+				var st=sectors[w];
+				sectors[w]=sectors[w+1];
+				sectors[w+1]=st;
+				//[sectors[w+1],sectors[w]] = [sectors[w],sectors[w+1]];
+			}
+		}}}
+		
+		
+		// draw sectors
+		for(s=0;s<numSect;s++)
+		{
+			sectors[s].d=0;			// clear distance
+			
+			
+			if(pz<sectors[s].z1){
+				sectors[s].surface=1;// bottom surface
+			} else 	if(pz>sectors[s].z2){
+				sectors[s].surface=2;// top surface
+			}else{
+				sectors[s].surface=0;// no surfaces
+			} 
+			
+			for(var loop=0;loop<2;loop++)
+			{
+				for(w=sectors[s].ws;w<sectors[s].we;w++)
+				{
+			
+					// offset bottom 2 points by player
+					var x1 = walls[w].x1-px;
+					var y1 = walls[w].y1-py;
+					var x2 = walls[w].x2-px;
+					var y2 = walls[w].y2-py;
+					//swap for surface
+					if(loop==0){
+						var swp=x1;
+						x1=x2;
+						x2=swp;
+						swp=y1;
+						y1=y2;
+						y2=swp;
+					}	
+					// world x position
+					wx[0] = x1*cs-y1*sn;
+					wx[1] = x2*cs-y2*sn;
+					wx[2] = wx[0];
+					wx[3] = wx[1];
+				
+					// world y position (depth)
+					wy[0] = y1*cs+x1*sn;
+					wy[1] = y2*cs+x2*sn;
+					wy[2] = wy[0];
+					wy[3] = wy[1];
+					// world z height;
+					wz[0] = sectors[s].z1-pz+((pl*wy[0])/32.0);
+					wz[1] = sectors[s].z1-pz+((pl*wy[1])/32.0);
+					wz[2] = wz[0]+sectors[s].z2;
+					wz[3] = wz[1]+sectors[s].z2;
+					// store this walls distance
+					sectors[s].d+=dist(0,0,(wx[0]+wx[1])/2,(wy[0]+wy[1])/2);
+					// dont draw if behind player
+					if(wy[0]<0 && wy[1]<1)continue; // wall behind player, dont draw
+					// point behind player clip
+					
+					if(wy[0]<1){
+						[wx[0],wy[0],wz[0]] = clipBehindPlayer(wx[0],wy[0],wz[0],wx[1],wy[1],wz[1]);//bottom line
+						[wx[2],wy[2],wz[2]] = clipBehindPlayer(wx[2],wy[2],wz[2],wx[3],wy[3],wz[3]);//top line
+					}
+					
+					if(wy[1]<1){
+						[wx[1],wy[1],wz[1]] = clipBehindPlayer(wx[1],wy[1],wz[1],wx[0],wy[0],wz[0]);//bottom line
+						[wx[3],wy[3],wz[3]] = clipBehindPlayer(wx[3],wy[3],wz[3],wx[2],wy[2],wz[2]);//top line
+					}
+					
+					// screen x, screen y position
+					wx[0] = wx[0]*200/wy[0]+sw2;wy[0] = wz[0]*200/wy[0]+sh2;					wx[1] = wx[1]*200/wy[1]+sw2;wy[1] = wz[1]*200/wy[1]+sh2;
+					wx[2] = wx[2]*200/wy[2]+sw2;wy[2] = wz[2]*200/wy[2]+sh2;					wx[3] = wx[3]*200/wy[3]+sw2;wy[3] = wz[3]*200/wy[3]+sh2;
+
+					drawWall(
+									Math.floor(wx[0]),
+									Math.floor(wx[1]),
+									Math.floor(wy[0]),
+									Math.floor(wy[1]),
+									Math.floor(wy[2]),
+									Math.floor(wy[3]),
+									walls[w].c,s);						
+				}
+				sectors[s].d/=(sectors[s].we-sectors[s].ws);// find avarage sector distance
+				sectors[s].surface*=-1; // flip to negative draw surface
+			}
+		}
+	}
+
+	function moveplayer(){
+		// move up down left right
+		if(ka==1 && km==0){
+			pa-=2;
+			if(pa<0)pa+=360;
+		}
+		if(kd==1 && km==0){
+			pa+=2;  
+			if(pa>359)pa-=360;
+		}
+		var dx=sin[pa]*10.0;
+		var dy=cos[pa]*10.0;
+		var dx = Math.sin(degrees_to_radians(pa));
+		var dy = Math.cos(degrees_to_radians(pa));
+		
+		if(kw==1 && km==0){
+			px+=dx;
+			py+=dy;
+		}
+		if(ks==1 && km==0){
+			px-=dx;
+			py-=dy;
+		}
+		// strafe left, right
+		if(ksr==1){
+			px+=dy;
+			py-=dx;
+		}
+		if(ksl==1){
+			px-=dy;
+			py+=dx;
+		}
+		//move up, down , look up down
+		if(ka==1 && km==1){
+			pl-=1;
+		} 
+		if(kd==1 && km==1){
+			pl+=1;
+		} 
+		if(kw==1 && km==1){
+			pz-=4;
+		} 
+		if(ks==1 && km==1){
+			pz+=4;
+		} 
+
+
+
+
+	}
+
+	function pixel(x,y,p){
+		c='blue';
+		if(p==0) c = 'rgb(255,255,0)';
+		if(p==1) c = 'rgb(160,160,0)';
+		if(p==2) c = 'rgb(0,255,0)';
+		if(p==3) c = 'rgb(0,160,0)';
+		if(p==4) c = 'rgb(0,255,0)';
+		if(p==5) c = 'rgb(0,160,255)';
+		if(p==6) c = 'rgb(160,100,0)';
+		if(p==7) c = 'rgb(110,50,0)';
+		if(p==8) c = 'rgb(0,60,130)';
+		if(p==9) c = 'rgb(255,0,0)';
+		ctx.fillStyle=c;
+		ctx.fillRect(x,y,2,2);	
+	}
+	function degrees_to_radians(degrees) {
+  		return degrees * (Math.PI / 180);
+	}
+	function radians_to_degrees(radians) {
+ 		return radians * (180 / Math.PI);
+	}
+	function kd(evt){
+		//debug=evt.keyCode;
+  		if(evt.keyCode==87)kw = 1;
+  		if(evt.keyCode==65)ka = 1;
+  		if(evt.keyCode==83)ks = 1;
+  		if(evt.keyCode==68)kd = 1;
+  		if(evt.keyCode==77)km = 1;
+  		if(evt.keyCode==188)ksl = 1;
+  		if(evt.keyCode==190)ksr = 1;
+
+ 	}
+ 	function ku(evt){
+  		if(evt.keyCode==87)kw = 0;
+  		if(evt.keyCode==65)ka = 0;
+  		if(evt.keyCode==83)ks = 0;
+  		if(evt.keyCode==68)kd = 0;
+  		if(evt.keyCode==77)km = 0;
+  		if(evt.keyCode==188)ksl = 0;
+  		if(evt.keyCode==190)ksr = 0;
+	}	
+	function dist(x1,y1,x2,y2){
+		return Math.hypot(y2-y1,x2-x1);
+	}
+	
+	function touchUI(){
+		var t=["w","a","s","d","m",".",","];
+		var bw=sw/7;
+		var bh=sh/7;
+		var top=sh-(bh*1);
+
+		ctx.fillStyle='black';
+		//ctx.fillRect(0,0,40,40);
+		ctx.strokeStyle='white';
+					var c=0;
+
+		for(var y1=top;y1<top+(1*bh);y1+=bh){
+		for(var x1=0;x1<(7*bw);x1+=bw){
+		
+		//ctx.fillRect(x1,y1,bw,bh);
+		
+		if(touch){
+
+			if(rectsoverlap(touchx,
+								touchy,
+								1,
+								1,
+								x1,
+								y1,
+								bw,
+								bh)==true){
+								execKeys(c);
+								}
+		}
+		
+		
+		ctx.rect(x1,y1,bw,bh);
+		ctx.fillStyle='black';
+		ctx.fill();
+		ctx.stroke();
+		c++;
+	}}
+c=0;
+		for(var y1=top;y1<top+(1*bh);y1+=bh){
+		for(var x1=0;x1<(7*bw);x1+=bw){
+	
+		if(t[c].length>0){
+			ctx.fillStyle='white';
+			ctx.fillText(t[c],x1+bw/4,y1+(bh/1.5));
+		}
+		c++;
+	}
+	
+	}
+}
+		
+function execKeys(c){
+
+		if(c==0)kw=1;
+  		if(c==1)ka = 1;
+  		if(c==2)ks = 1;
+  		if(c==3)kd = 1;
+  		if(c==4)km = 1;
+  		if(c==5)ksl = 1;
+  		if(c==6)ksr = 1;
+}
+
+function deexecKeys(c){
+	 kw = 0;
+  		ka = 0;
+  		ks = 0;
+  		kd = 0;
+  		km = 0;
+  		ksl = 0;
+  		ksr = 0;
+}
+		
+		function rectsoverlap(r1x1,r1y1,r1w,r1h,r2x1,r2y1,r2w,r2h){
+		
+  var r1x2 = r1x1+r1w;
+  var r1y2 = r1y1+r1h;
+  var r2x2 = r2x1+r2w;
+  var r2y2 = r2y1+r2h;
+ 
+  return (r1x1 < r2x2 && r1x2 > r2x1 && r1y1 < r2y2 && r1y2 > r2y1);
+
+ }
+
+
+	function touchHandler(e) {
+
+	if(e.type=="touchstart" && e.touches) {
+      //m="touch";
+		const touches = e.changedTouches;
+		touch = true;
+		touchx = Math.floor(touches[0].pageX/scw);
+		touchy = Math.floor(touches[0].pageY/sch);
+      e.preventDefault();
+	}
+	if(e.type=="touchend" && e.touches) {
+		touch=false;
+		deexecKeys();
+		
+		
+		// for the selection
+		if(selection){
+			modifyWalls();
+			selection=false;
+		}
+		
+		
+    	//m="no touch..";
+      e.preventDefault();
+	}
+	if(e.type=="touchmove" && e.touches) {
+    	const touches = e.changedTouches;
+		touchx = Math.floor(touches[0].pageX/scw);
+		touchy = Math.floor(touches[0].pageY/sch);
+      e.preventDefault();
+	}
+}
+
+function mm(evt){
+	touchx = evt.pageX;//clientX
+	touchy = evt.pageY;//clientY
+  
+ }
+
+function md(evt){
+  if(evt.which==1){
+   //m="left mouse is being pressed.";
+	touch = true;
+  }
+ }
+ function mu(evt){
+  if(evt.which==1){
+   //m="No mouse is pressed.";
+		touch=false;
+		deexecKeys();
+  }
+ }
+	function drawLine(x1,y1,x2,y2,c){
+		// settings for drawing a line
+		if(c==0) c = 'rgb(255,255,0)';
+		if(c==1) c = 'rgb(160,160,0)';
+		if(c==2) c = 'rgb(0,255,0)';
+		if(c==3) c = 'rgb(0,160,0)';
+		if(c==4) c = 'rgb(0,255,0)';
+		if(c==5) c = 'rgb(0,160,255)';
+		if(c==6) c = 'rgb(160,100,0)';
+		if(c==7) c = 'rgb(110,50,0)';
+		if(c==8) c = 'rgb(0,60,130)';
+		if(c==9) c = 'rgb(255,0,0)';
+		
+		ctx.strokeStyle = c;
+		ctx.lineWidth=1; // width of the lines
+		ctx.beginPath(); // begin out path
+		ctx.moveTo(x1,y1);
+		ctx.lineTo(x2,y2);// keep adding these for more lines.
+		ctx.stroke(); // draw all the lines
+	}
+	function drawAnker(x1,y1){
+		ctx.fillStyle='black';
+		ctx.fillRect(x1-2,y1-2,4,4);
+		ctx.fillStyle='white';
+		ctx.fillRect(x1-1,y1-1,2,2);
+		
+	}
+	
+	function loadMap(){
+//		walls.length=0;
+//		for(var i=0;i<130;i++){
+//			walls.push(new wall());
+//		}
+//		sectors.length=0;
+//		for(var i=0;i<30;i++){
+//			sectors.push(new sector());
+//		}
+		
+		// load sectors
+		var v1=0;
+		var v2=0;
+		for(var s=0;s<numSect;s++)
+		{
+			sectors[s].ws=loadSectors[v1+0];// wall start number
+			sectors[s].we=loadSectors[v1+1];// wall end number
+			sectors[s].z1=loadSectors[v1+2];// sector bottom height
+			sectors[s].z2=loadSectors[v1+3]-loadSectors[v1+2];// sector top height
+			sectors[s].c1=loadSectors[v1+4]; // sector top color
+			sectors[s].c2=loadSectors[v1+5]; // sector bottom color
+			v1+=6;
+			for(var w=sectors[s].ws;w<sectors[s].we;w++)
+			{
+				walls[w].x1 = loadWalls[v2+0];
+				walls[w].y1 = loadWalls[v2+1];
+				walls[w].x2 = loadWalls[v2+2];
+				walls[w].y2 = loadWalls[v2+3];
+				walls[w].c = loadWalls[v2+4];
+				v2+=5;
+			}	
+		}	
+		
+	}
+
+</script>
+</body>
+</html>
