@@ -22,8 +22,9 @@ Use different browser.
 	var c=document.getElementById("myCanvas");
 	var ctx=c.getContext("2d");
 	var debug = "";
-	var mapWidth = 160*2;
-	var mapHeight = 120*2;
+	// map resolution * = size of the map to be generated(tested up to *3)
+	var mapWidth = 160*3;
+	var mapHeight = 120*3;
 	var hs; // horizontal and vertical scale
 	var vs;
 	var delay = 200;
@@ -114,21 +115,18 @@ Use different browser.
 
 		}
 	}
-	
+	//
+	// Create a mapp grass background
+	// last in generation. does not overwrite
+	// anything already there.
+	//
 	function createMapGrass(){
 //			"rgb(65,148,42)",		//lightest green  - 8
 //			"rgb(61,139,37)",		// map green 12
 //			"rgb(48,113,29)"   // dark green 13\
-	// dark spots
-	for(var i=0;i<(mapWidth+mapHeight)*3;i++){
-		x=Math.random()*mapWidth|0;
-		y=Math.random()*mapHeight|0;
-		if(map[x][y]==0){
-			map[x][y]=13
-		}
-	}
+
 	// light spots
-	for(var i=0;i<(mapWidth+mapHeight)*3;i++){
+	for(var i=0;i<(mapWidth+mapHeight)*5;i++){
 		x=Math.random()*mapWidth|0;
 		y=Math.random()*mapHeight|0;
 		if(map[x][y]==0){
@@ -148,15 +146,15 @@ Use different browser.
 			if(Math.random()<.16)angle+=Math.random()/2;
 			var x1=x|0;
 			var y1=y|0;
-			if(Math.random()<.8 && x1>=0 && x1<mapWidth && y1>=0 && y1<mapHeight){
+			if(Math.random()<.6 && x1>=0 && x1<mapWidth && y1>=0 && y1<mapHeight){
 			if(map[x1][y1]==0){
 				map[x1][y1]=8;
 			}}
 		}
 	}
 	
-	// green spots
-	for(var i=0;i<mapWidth/5;i++){
+	// green spots (blobs lenghty)
+	for(var i=0;i<mapWidth/2;i++){
 		x=Math.random()*mapWidth|0;
 		y=Math.random()*mapHeight|0;
 		var len=Math.random()*(mapWidth/20)+mapWidth/20;
@@ -182,9 +180,21 @@ Use different browser.
 		}
 		
 	}
+	
+		// dark spots
+	for(var i=0;i<(mapWidth+mapHeight)*8;i++){
+		x=Math.random()*mapWidth|0;
+		y=Math.random()*mapHeight|0;
+		if(map[x][y]==0){
+			map[x][y]=13
+		}
+	}
 		
 	}
 	
+	//
+	// Create a forrest (sw=sprite width)
+	//
 	function createForrest(x,y,sw,sh){
 		x=Math.floor(x);y=Math.floor(y);
 		sw=Math.floor(sw);sh=Math.floor(sh);
@@ -444,14 +454,14 @@ Use different browser.
 			"rgb(12,27,3)",		//green ground 6
 //			"rgb(9,20,2)",			// green shadow 7
 			"rgb(25,67,17)",			// green shadow 7
-			"rgb(68,160,45)",		//lightest green  - 			
+			"rgb(68,152,45)",		//lightest green  - 			
 //			"rgb(65,148,42)",		//lightest green  - 8
 			"rgb(44,101,28)",		//darker green - 9
 			"rgb(39,83,27)",		//darkest green 10
 			"rgb(22,49,5)",		// green shadow 11
 			"rgb(61,139,37)",		// map green 12
 			"rgb(48,113,29)",   // dark green 13
-			"rgb(67,150,41)"   // green spot 14
+			"rgb(67,145,41)"   // green spot 14
 			
 
 		];
