@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	var debug = "";
+	var mapWidth = 160*2;
+	var mapHeight = 120*2;
+	var hs; // horizontal and vertical scale
+	var vs;
+	var delay = 200;
+	var maxDelay = 200;
+	sprite = [];
+	for(var i=0;i<mapWidth;i++){
+		sprite[i] = new Array();
+		for(var j=0;j<mapHeight;j++){
+			sprite[i][j]=0;
+		}
+	}	
+
+	map = [];
+	for(var i=0;i<mapWidth;i++){
+		map[i] = new Array();
+		for(var j=0;j<mapHeight;j++){
+			map[i][j]=0;
+		}
+	}	
+	
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		delay++;
+		if(delay>maxDelay){
+			delay=0;
+			myCanvas.height = window.innerHeight*.98;
+			myCanvas.width = window.innerWidth*.98;
+			hs = myCanvas.width/mapWidth;
+			vs = myCanvas.height/mapHeight;
+			ctx.scale(hs,vs);///*  */scale canvas to mapWidth and height
+			ctx.fillStyle="rgb(62,136,40)";
+			//setDrawColor(2);
+			ctx.fillRect(0,0,mapWidth,mapHeight);
+			clearMap();
+			//for(var y=0;y<mapHeight-32;y+=64){
+			//for(var x=0;x<mapWidth-32;x+=64){
+			//	var mountainSize = (Math.random()*32)+32|0;
+			//	var an=0;
+			//	an+=Math.random()*20;
+			//	if(Math.random()<.8)createMountain(x,y,mountainSize,mountainSize,an);
+			//}}
+			for(var j=0;j<1;j++){
+			var pd=Math.random()*Math.PI*2;
+			var len = Math.random()*mapWidth/10;
+			var x1=Math.random()*mapWidth;
+			var y1=Math.random()*mapHeight;
+			for(var aa=0;aa<len;aa++){
+				x1+=Math.cos(pd)*16;
+				y1+=Math.sin(pd)*16;
+				pd+=Math.random()/5;
+				createMountain(x1,y1,64,64,20);
+			}}
+			for(var i=0;i<mapWidth/17;i++){
+				var mountainSize = (Math.random()*32)+32;
+				var an=0;
+				an+=Math.random()*20;
+				var x = Math.random()*mapWidth*1.5;
+				var y = Math.random()*mapHeight*1.5;
+				x-=64;
+				y-=64;
+				
+				
+				createMountain(x,y,mountainSize,mountainSize,an);
+			}
+			for(var i=0;i<30;i++){
+				var x=(Math.random()*mapWidth)|0;
+				var y=(Math.random()*mapHeight)|0;
+				if(map[x][y]==0){
+					map[x][y]=2;
+				}
+			}
+			
+			
+			for(var i=0;i<mapWidth/10;i++){
+				var x=(Math.random()*mapWidth)|0;
+				var y=(Math.random()*mapHeight)|0;
+				var fs=(Math.random()*70)+40;
+				fs=fs|0;
+				createForrest(x,y,fs,fs);
+			}
+			
+			//createMountain(50,100,32,32);
+			//createMountain(100,100,32,32);
+			drawMap();
+			ctx.fillStyle="rgb(255,255,255)";
+			ctx.fillText("Map Generator / pakz001."+debug,10,10); 
+
+		}
+	}
+	
+	function createForrest(x,y,sw,sh){
+		x=Math.floor(x);y=Math.floor(y);
+		sw=Math.floor(sw);sh=Math.floor(sh);
+
+		for(var y1=0;y1<sh;y1++){
+		for(var x1=0;x1<sw;x1++){
+			sprite[x1][y1]=0;
+		}}
+		
+		for(var i=0;i<(sw+sh)/5;i++){
+			var x1=Math.random()*sw;
+			var y1=Math.random()*sh;
+			x1/=2;
+			y1/=2;
+			x1+=sw/4;
+			y1+=sh/4;
+			
+			var tr=Math.random()*3+1|0;
+			if(tr==1 && Math.random()<.2)tr=2;
+			if(Math.random()<.2)tr=3;
+			insertTreeBrush(x1,y1,sw,sh,tr);
+		}
+		// put the sprite on the map array
+		for(var y1=0;y1<sh;y1++){
+		for(var x1=0;x1<sw;x1++){
+			if(x1+x>=0 && y1+y>=0 && x1+x<mapWidth && y1+y<mapHeight){
+				if(map[x1+x][y1+y]==0){
+				if(sprite[x1][y1]!=0)map[x1+x][y1+y] = sprite[x1][y1];
+				}
+			}
+		}}
+		
+		
+	}
+	
+	// insert a tree brush into the sprite
+	// array. overwrite anything below it.
+	function insertTreeBrush(x,y,sw,sh,tree){
+		// 1 = midgreen - 
+		// 2 = darkgreen
+		// 3 = lightgreen
+		// 0 = transparent(do not draw)
+		// 4 = green shadow
+	
+		var tree1 = [	
+							[0,1,1,1,0,0],
+							[1,1,1,1,1,0],
+							[1,1,1,1,1,0],
+							[0,1,1,1,0,0],
+							[0,0,0,0,0,0],
+						]
+		var tree2 = [	
+							[0,1,1,1,0,0],
+							[1,1,1,1,1,0],
+							[1,1,1,1,2,0],
+							[0,2,1,2,0,0],
+							[0,0,2,0,0,0],
+						]
+		var tree3 = [	
+							[0,1,3,3,1,0],
+							[2,1,3,2,2,2],
+							[2,1,1,3,2,2],
+							[2,2,1,1,2,4],
+							[2,2,1,1,4,4],
+						]
+		// insert the tree into the sprite array.
+		var val=0;
+		for(var y1=0;y1<tree1.length;y1++){
+		for(var x1=0;x1<tree1[0].length;x1++){
+			if(tree==1)val=tree1[y1][x1];
+			if(tree==2)val=tree2[y1][x1];
+			if(tree==3)val=tree3[y1][x1];
+			if(val>0){
+				var c=0;
+				if(val==1)c=9;if(val==2)c=10;
+				if(val==3)c=8;if(val==4)c=11;
+				setSprite(x1+x,y1+y,sw,sh,c);
+			}
+			
+		}}
+	}
+	
+	
+	
+	//
+	// Draw a pixel art mountain based on a screenshot
+	// of the amiga game castles 2.
+	//
+	//
+	function createMountain(x,y,sw,sh,sangle){
+		x=Math.floor(x);y=Math.floor(y);
+		sw=Math.floor(sw);sh=Math.floor(sh);
+
+		for(var y1=0;y1<sh;y1++){
+		for(var x1=0;x1<sw;x1++){
+			sprite[x1][y1]=0;
+		}}
+		//var angle = degrees_to_radians(30+(Math.random()*20));
+		var angle = degrees_to_radians(sangle+(Math.random()*20));
+		var len = (sw)/1.5;
+		var x1=8;
+		var y1=8;
+		var c = 1;
+		var lastleftc;
+		var leftcol=1;
+		var rightcol=5;
+		var lastrightc;
+		for(var i=0;i<len;i++){
+			// mountains direction modding
+			if(i>5 && i<len/2 && Math.random()<.4){
+				angle+=Math.random()/3;
+				c=2;
+			}
+			if(i>len/2 && Math.random()<.5){
+				angle+=(Math.random()/4)-Math.random()/4;
+				c=1;
+			}
+				
+			// draw light side of mountain
+			// set the colors and the lenghts
+			// for drawing the dark and light
+			// sides of the mountains
+			var lenleft = (Math.random()*2)+6;
+			//var leftcol = (Math.random()*3)+1 |0;
+			var lenright = (Math.random()*2)+6;
+			//var rightcol = (Math.random()*2)+3 |0;
+			if(i>6 && i+20<len){
+			lenleft+=1; // if near center double left draw length
+			lenright+=1;
+			}
+			if(i>9 && i+23<len){
+			lenleft+=2; // if near center double left draw length
+			lenright+=2;
+			}
+			if(i>12 && i+26<len){
+			lenleft+=3; // if near center double left draw length
+			lenright+=3;
+			}
+			
+			if(i+6>len){ // if near end darken colors
+				//lenleft/=2;
+				//lenright/=2;
+				//leftcol=3;
+				//rightcol=5;
+			}
+			if(i<5){// if start highlight the start
+				//rightcol=4;
+				//leftcol=3;
+				lenleft/=4;
+				lenright/=4;
+			}
+			if(lastleftc==1)leftcol=2;
+			if(Math.random()<.7){
+
+				if(lastleftc==2)leftcol=3;
+				if(lastleftc==3)leftcol=1;
+				if(lastleftc==3 && Math.random()<.2)leftcol=4;
+			}
+			if(lastleftc==4)leftcol=2;
+			
+			if(Math.random()<.9 && lastrightc==3)rightcol=4;
+			if(Math.random()<.2 && lastrightc==4)rightcol=3;
+			if(Math.random()<.2 && lastrightc==4)rightcol=5;
+			if(Math.random()<.7 && lastrightc==5)rightcol=3;			
+			// draw left(light)
+			drawSpriteLine(x1,y1,sw,sh,lenleft,angle+1.0,leftcol);
+			// draw right(dark)
+			drawSpriteLine(x1,y1-2,sw,sh,lenright,angle-.2,rightcol);
+			// some random fillers - drawspriteline does not overwrite
+
+			//if(i+15>len)drawSpriteLine(x1,y1,sw,sh,lenleft,angle+Math.random(),leftcol);
+			//if(i+15>len)drawSpriteLine(x1,y1-2,sw,sh,lenright,angle-(Math.random()/5),rightcol);
+			lastleftc = leftcol;
+			lastrightc = rightcol;
+			// continue drawing the top of the mountain
+			x1+=Math.cos(angle);
+			y1+=Math.sin(angle);
+			setSprite(x1,y1,sw,sh,c);
+			
+		}
+
+		// put the sprite on the map array
+		for(var y1=0;y1<sh;y1++){
+		for(var x1=0;x1<sw;x1++){
+			if(x1+x>=0 && y1+y>=0 && x1+x<mapWidth && y1+y<mapHeight){
+				if(sprite[x1][y1]!=0)map[x1+x][y1+y] = sprite[x1][y1];
+			}
+		}}
+		
+		// put the sprite on the map array - shadow
+		for(var y1=0;y1<sh;y1++){
+		for(var x1=0;x1<sw;x1++){
+
+			if(x1+x>=0 && y1+y>=0 && x1+x<mapWidth && y1+y<mapHeight){
+				for(var i=0;i<5;i++){
+				if(x1+x+i<mapWidth){
+					if(map[x1+x+i][y1+y]==0){
+						if(sprite[x1][y1]!=0)map[x1+x+i][y1+y] = 7;
+					}
+
+	 			}}
+				if(x1+x-1>=0){				
+					if(map[x1+x-1][y1+y]==0){
+						if(sprite[x1][y1]!=0)map[x1+x-1][y1+y] = 7;
+					}
+				}
+			}
+		}}
+		
+	}
+
+	// custom draw sprite line function for mountains.
+	function drawSpriteLine(x,y,sw,sh,len,angle,c){
+		for(var i=0;i<len;i++){
+			//x+=Math.cos(degrees_to_radians(angledeg));
+			//y+=Math.sin(degrees_to_radians(angledeg));
+			x+=Math.cos(angle);
+			y+=Math.sin(angle);
+			
+			setSprite(x,y,sw,sh,c);
+			setSprite(x-1,y,sw,sh,c);
+			setSprite(x+1,y,sw,sh,c);
+			setSprite(x,y+1,sw,sh,c);
+			setSprite(x,y-1,sw,sh,c);
+
+		}
+		// at the end of the lone darken the tone
+		if(Math.random()<.5){
+		x+=Math.cos(angle);
+		y+=Math.sin(angle);
+		setSprite(x,y,sw,sh,3+Math.random()*2|0);
+		}
+	}
+
+	//
+	// Draw into the sprite array. convert
+	// input x and y to integer
+	// exit if out of bounds(sw,sh)sprite width and height
+	function setSprite(x,y,sw,sh,c){
+		x = x | 0; // turn value into integer.
+		y = y | 0; // ,,
+		// return if ouside sprite array.
+		if(x<0 || y<0 || x>=sw || y>=sh)return;
+		//if(sprite[x][y]==0)sprite[x][y] = c; // set sprite value
+		sprite[x][y] = c; // set sprite value
+	}
+	// our palette
+	function setDrawColor(c){
+		if(c>11)c=0;
+		var p = [
+			"rgb(0,0,0)",
+			"rgb(158,118,91)", 	//light brown    - 1
+			"rgb(137,97,70)",  	//darker brown   - 2
+			"rgb(95,62,35)",		//,,             - 3
+			"rgb(54,24,5)",		//darkest brown  - 4
+			"rgb(16,17,3)",		//blackish brown - 5
+			"rgb(12,27,3)",		//green ground 6
+//			"rgb(9,20,2)",			// green shadow 7
+			"rgb(25,67,17)",			// green shadow 7
+			
+			"rgb(65,148,42)",		//lightest green  - 8
+			"rgb(44,101,28)",		//darker green - 9
+			"rgb(39,83,27)",		//darkest green 10
+			"rgb(22,49,5)"			// green shadow 11
+		];
+		ctx.strokeStyle=p[c];
+		ctx.fillStyle=p[c];
+	}
+	// draw our map to the canvas
+	function drawMap(){
+		ctx.borderWidth=1;
+		for(var y=0;y<mapHeight;y++){
+		for(var x=0;x<mapWidth;x++){
+			if(map[x][y]>0){
+				setDrawColor(map[x][y]);
+				point(x,y);
+				ctx.fillRect(x,y,1,1);				
+			}
+		}}
+	}
+	function point(x, y){
+  		ctx.beginPath();
+  		ctx.moveTo(x, y);
+  		ctx.lineTo(x+1, y);
+  		ctx.stroke();
+	}	
+	function degrees_to_radians(degrees) {
+  		return degrees * (Math.PI / 180);
+	}
+	function radians_to_degrees(radians) {
+ 		return radians * (180 / Math.PI);
+	}	
+	function clearMap(){
+		for(var y=0;y<mapHeight;y++){
+		for(var x=0;x<mapWidth;x++){
+			map[x][y]=0;
+		}}
+	}
+</script>
+</body>
+</html>
