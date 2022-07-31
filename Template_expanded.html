@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<div id="test"></div>
+<style>#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var mapWidth = 160*2;
+	var mapHeight = 120*2;
+	var hs; // horizontal and vertical scale
+	var vs;
+	// setup a map array.
+	map = [];
+	for(var i=0;i<mapWidth;i++){
+		map[i] = new Array();
+		for(var j=0;j<mapHeight;j++){
+			map[i][j]=0;
+		}
+	}	
+
+	gameloop=setInterval(doGameLoop,16);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		hs = myCanvas.width/mapWidth;
+		vs = myCanvas.height/mapHeight;
+		ctx.scale(hs,vs);///*  */scale canvas to mapWidth and height
+		
+		ctx.fillStyle="rgb(20,20,20)";
+		ctx.fillRect(0,0,mapWidth,mapHeight);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+	}
+</script>
+</body>
+</html>
