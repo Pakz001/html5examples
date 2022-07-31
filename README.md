@@ -1,5 +1,9 @@
 
-<h3>html5 javascript game oriented example code. ( Learn to code games by studying examples ) </h3>
+<h3>html5 javascript game oriented example code. ( Learn to code games by studying examples ) </h3><br><br>
+
+<br>
+<a href="https://cromdesi.home.xs4all.nl/html5examples/">Visit the repo site - run and view examples</a><br>
+<br>
 
 update:checked every file and removed references to a unused css file. gfx now included by base64(toDataUrl())
 
