@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight*.98;
+myCanvas.width = window.innerWidth*.96;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("A javascript/html example.",10,10); 
+
+
+// create a variable and fill
+// it with the return from
+// our mainFunction
+var a = mainFunction();
+
+ctx.fillText("Our new value : "+a,10,50); 
+
+
+
+
+}
+// our main (outer) function
+function mainFunction(){
+	var retVal = 0;
+
+	// call our inner function
+	systemsUpgrade(5);
+	
+	// this is the function inside
+	// a function(inner function)
+	function systemsUpgrade(val){
+		retVal+=val;
+	}
+	
+	return retVal;
+}
+</script>
+</body>
+</html>
