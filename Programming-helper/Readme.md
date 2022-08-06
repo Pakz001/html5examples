@@ -5,3 +5,5 @@ description of code that should do X<br>
 In the future this kind of systems wil become more used I imagine. Learning how to use this is something I started doing now<br><br>
 
 I did not store the prompts. They are sometimes written in the code. These were the comments in the code.<br><br>
+
+The code is untested(battle tested) I did look at the code to make sure there was no nonsense generated.<br><br>
