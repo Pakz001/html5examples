@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+// when wanting random values.
+// you can use a array filled
+// with values. pick a random
+// value from this array for
+// things like dealing damage.
+// add more of a certain value
+// to this (bag) array to
+// have this appear/happen more.
+var damageBag = [	1,1,1,1,
+						2,2,2,
+						3,3,
+						4,
+						5];
+
+
+gameloop=setInterval(doGameLoop,500);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight*.98;
+myCanvas.width = window.innerWidth*.96;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("A javascript/html example.",10,10); 
+
+
+// draw a randomly picked value
+// from our random bag array.
+ctx.fillText("Random Bag value :"+damageBag[Math.floor(Math.random()*damageBag.length)],10,50); 
+
+
+
+}
+</script>
+</body>
+</html>
