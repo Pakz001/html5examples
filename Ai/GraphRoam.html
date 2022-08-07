@@ -10,9 +10,22 @@
 Use different browser.
 </canvas>
   <script>
+//
+// We create a graph array. Each graph starts out as weight of 1.
+// Connections are the ones right besides a graph. We place
+// a player on top of one graph. We put a new maximum weight
+// there. We chose a new position besides it. We record
+// the path we have taken like that old game 'snake'
+// We decrease the weights every time we loop through the 
+// game loop.
+//
+//
+//
+//
     var c=document.getElementById("myCanvas");
     var ctx=c.getContext("2d");
 	var tw=th=0;
+	var maxWeight = 4;
 var graph = 	[
 				[0,0,1,0,0,0,0,0],
 				[0,1,0,1.0,0,0,0],
@@ -31,7 +44,7 @@ var player = {
 		x:2,
 		y:0
 }
-graph[player.y][player.x]=10;
+graph[player.y][player.x]=maxWeight;
 gameloop=setInterval(doGameLoop,200);
 
 function doGameLoop(){
@@ -58,44 +71,52 @@ ctx.fillStyle='red';
 ctx.fillRect(player.x*tw,
 				player.y*th,
 				tw,th);
+				
 // move ding on the graph
+// first decrease the graphs by 1(up to 1)
 decreaseGraph();
 var nposx=[];
 var nposy=[];
 var nposv=[];
 var maxVal=0;
-
+//
+// read around our current position for
+// connected graphs
 for(var y=player.y-1;y<player.y+2;y++){
 for(var x=player.x-1;x<player.x+2;x++){
 
-if(x>=0 && y>=0 && x<mw && y<mh){
-if(graph[y][x]>0){
-nposx.push(x);
-nposy.push(y);
-nposv.push(graph[y][x]);
-if(maxVal<graph[y][x])maxVal=graph[y][x];
-
-}
-}
+	if(x>=0 && y>=0 && x<mw && y<mh){
+	if(graph[y][x]>0){
+		// we have a graphs. store it
+		nposx.push(x);
+		nposy.push(y);
+		nposv.push(graph[y][x]);
+		if(maxVal<graph[y][x])maxVal=graph[y][x];
+	}
+	}
 
 }}
 
-//pick one direction below 5
+//pick one(random) direction of half max value
 var fail=20;
 while(fail>0){
 	fail-=1;
 	t=Math.floor(Math.random()*nposv.length);
+	// if this location is half
+	// the maximum weight, then pick it.
 	if(nposv[t]<=maxVal/2){
 		player.x=nposx[t];
 		player.y=nposy[t];
-		
-		graph[player.y][player.x]=4;
+		// add new maximum weight
+		graph[player.y][player.x]=maxWeight;
 		break;
 	}
 }
 
 
 }
+// decrease the graph array by 1 up
+// to 1.
 function decreaseGraph(){
 	for(var y=0;y<mh;y++){
 	for(var x=0;x<mw;x++){
@@ -103,6 +124,7 @@ function decreaseGraph(){
 	}}
 
 }
+// draw our graph array as a grid
 function drawGraph(){
 	for(var y=0;y<mh;y++){
 	for(var x=0;x<mw;x++){
