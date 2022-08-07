@@ -11,13 +11,8 @@ Use different browser.
 </canvas>
   <script>
 //
-// We create a graph array. Each graph starts out as weight of 1.
-// Connections are the ones right besides a graph. We place
-// a player on top of one graph. We put a new maximum weight
-// there. We chose a new position besides it. We record
-// the path we have taken like that old game 'snake'
-// We decrease the weights every time we loop through the 
-// game loop.
+// A graph roaming agent ai. Based a bit on the 
+// old game 'snake' (cookie crumbs)
 //
 //
 //
@@ -31,7 +26,7 @@ var graph = 	[
 				[0,1,0,1.0,0,0,0],
 				[0,1,0,0,1,0,0,0],
 				[1,0,0,0,1,0,0,0],
-				[1,0,0,0,1,1,0,0],
+				[1,0,0,1,0,1,0,0],
 				[0,1,0,1,0,0,1,0],
 				[0,0,1,0,0,0,0,1],
 				[0,1,0,0,0,0,0,0]
@@ -97,14 +92,18 @@ for(var x=player.x-1;x<player.x+2;x++){
 
 }}
 
-//pick one(random) direction of half max value
-var fail=20;
+//pick one(random) direction starting with
+// the lowest value. lowest value to pick
+// from grows randomly.
+var fail=200;
+var z=1;
 while(fail>0){
 	fail-=1;
+	if(Math.random()<.01 && t<maxVal)z+=1;
 	t=Math.floor(Math.random()*nposv.length);
 	// if this location is half
 	// the maximum weight, then pick it.
-	if(nposv[t]<=maxVal/2){
+	if(nposv[t]<=z){
 		player.x=nposx[t];
 		player.y=nposy[t];
 		// add new maximum weight
