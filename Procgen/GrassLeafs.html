@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	var mw=mh=300;
+	map = [];
+	for(var i=0;i<mw;i++){
+		map[i] = new Array();
+		for(var j=0;j<mh;j++){
+			map[i][j]=0;
+		}
+	}
+	var tw=th=0;
+
+
+//drawvine(100,100,5,100);
+doIt();
+
+var cnt=0;
+
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight*.98;
+myCanvas.width = window.innerWidth*.96;
+tw = Math.ceil(myCanvas.width/mw);
+th = Math.ceil(myCanvas.height/mh);
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("A javascript/html example.",10,10); 
+
+ctx.fillStyle="white";
+drawmap();
+
+
+cnt+=1;
+if(cnt>60){
+cnt=0;
+doIt();
+}
+
+
+}
+
+function doIt(){
+	map = [];
+	for(var i=0;i<mw;i++){
+		map[i] = new Array();
+		for(var j=0;j<mh;j++){
+			map[i][j]=0;
+		}
+	}
+	drawvine(100,100,5,100);
+}
+
+function drawvine(x,y,angle,num){
+num-=1;
+if(num<=0)return;
+
+if(Math.random()<.08){
+drawvine(x,y,angle+=(Math.random()-.5)/2,num/2);
+}
+if(Math.random()<.1){
+angle+=(Math.random()-.5)/4;
+}
+
+x+=Math.cos(angle);
+y+=Math.sin(angle);
+if(x<0 || y<0 || x>= mw || y>= mh)return;
+
+var z=1;
+if(num<32)z=2;
+map[Math.floor(x)][Math.floor(y)]=z;
+
+if(z==2 && Math.random()<.1){
+drawvine(x,y,(Math.random()*Math.PI)*2,2);
+}
+
+drawvine(x,y,angle,num);
+}
+
+
+function drawmap(){
+for(var x=0;x<mw;x++){
+for(var y=0;y<mh;y++){
+if(map[x][y]>0){
+if(map[x][y]==1)ctx.fillStyle="darkgreen";
+if(map[x][y]==2)ctx.fillStyle="green";
+
+ctx.fillRect(x*tw,
+				y*th,
+				tw,th);
+}
+}}
+}
+</script>
+</body>
+</html>
