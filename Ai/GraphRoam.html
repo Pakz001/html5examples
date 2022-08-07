@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	var tw=th=0;
+var graph = 	[
+				[0,0,1,0,0,0,0,0],
+				[0,1,0,1.0,0,0,0],
+				[0,1,0,0,1,0,0,0],
+				[1,0,0,0,1,0,0,0],
+				[1,0,0,0,1,1,0,0],
+				[0,1,0,1,0,0,1,0],
+				[0,0,1,0,0,0,0,1],
+				[0,1,0,0,0,0,0,0]
+				];
+				
+	var mw = graph[0].length;
+	var mh = graph.length;
+
+var player = {
+		x:2,
+		y:0
+}
+graph[player.y][player.x]=10;
+gameloop=setInterval(doGameLoop,200);
+
+function doGameLoop(){
+myCanvas.height = window.innerHeight*.98;
+myCanvas.width = window.innerWidth*.96;
+tw = Math.ceil(myCanvas.width/mw);
+th = Math.ceil(myCanvas.height/mh);
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+
+ctx.fillStyle='white';
+ctx.globalAlpha=0.1;
+drawGraph();
+ctx.globalAlpha=1;
+
+
+
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("A javascript/html example.",10,10); 
+
+
+// draw ding
+ctx.fillStyle='red';
+ctx.fillRect(player.x*tw,
+				player.y*th,
+				tw,th);
+// move ding on the graph
+decreaseGraph();
+var nposx=[];
+var nposy=[];
+var nposv=[];
+var maxVal=0;
+
+for(var y=player.y-1;y<player.y+2;y++){
+for(var x=player.x-1;x<player.x+2;x++){
+
+if(x>=0 && y>=0 && x<mw && y<mh){
+if(graph[y][x]>0){
+nposx.push(x);
+nposy.push(y);
+nposv.push(graph[y][x]);
+if(maxVal<graph[y][x])maxVal=graph[y][x];
+
+}
+}
+
+}}
+
+//pick one direction below 5
+var fail=20;
+while(fail>0){
+	fail-=1;
+	t=Math.floor(Math.random()*nposv.length);
+	if(nposv[t]<=maxVal/2){
+		player.x=nposx[t];
+		player.y=nposy[t];
+		
+		graph[player.y][player.x]=4;
+		break;
+	}
+}
+
+
+}
+function decreaseGraph(){
+	for(var y=0;y<mh;y++){
+	for(var x=0;x<mw;x++){
+	if(graph[y][x]>1)graph[y][x]-=1;
+	}}
+
+}
+function drawGraph(){
+	for(var y=0;y<mh;y++){
+	for(var x=0;x<mw;x++){
+	if(graph[y][x]>=1){
+	ctx.fillRect(x*tw,y*th,tw,th);
+	}
+	}}
+}
+</script>
+</body>
+</html>
