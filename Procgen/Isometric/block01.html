@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+<style>#myCanvas {touch-action: none;}</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+var debug=0;
+
+var w1=17;
+var z1=17;
+var h1=17;
+var cnt=0;
+gameloop=setInterval(doGameLoop,16);
+
+function doGameLoop(){
+ctx.scale(1,1);
+myCanvas.height = window.innerHeight*.98;
+myCanvas.width = window.innerWidth*.96;
+ctx.fillStyle="rgb(0,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("A javascript/html example."+debug,10,10); 
+
+ctx.scale(6,6);
+drawIsoBox4(0,10,w1,h1,z1)
+//drawIsoHollowBox(0,0,10+w1,8+h1,7+z2);
+
+cnt++;
+if(cnt>50){
+cnt=0;
+w1++;
+z1++;
+h1++;
+}
+}
+
+function drawIsoBox4(x,y,w,h,z){
+	w = w|0;
+	h = h|0;
+	z = z|0;
+	sprite = [];
+	temp = []
+	for(var i=0;i<=w*4+1;i++){
+		sprite[i] = new Array();
+		temp[i] = new Array();
+		for(var j=0;j<=z*4+1;j++){
+			sprite[i][j]=0;
+			temp[i][j]=0;
+		}
+	}
+	function setSpriteValue(xx,yy,val){
+		xx+=Math.floor(w*2);
+		yy+=Math.floor(z*2);
+		if(xx>=0 && yy <=z*4 && yy>=0 && xx<=w*4){
+			sprite[xx][yy]=val;
+		}		
+	}
+		function getTempValue(xx,yy){
+		xx+=Math.floor(w*2);
+		yy+=Math.floor(z*2);
+		if(xx>=0 && yy<=z*4 && yy>=0 && xx<=w*4){
+			return temp[xx][yy];
+		}		
+	}
+	function setTempValue(xx,yy,val){
+		xx+=Math.floor(w*2);
+		yy+=Math.floor(z*2);
+		if(xx>=0 && yy<=z*4 && yy>=0 && xx<=w*4){
+			temp[xx][yy]=val;
+		}		
+	}
+	function copyTempToSprite(){
+		for(var i=0;i<=w*4+1;i++){
+			for(var j=0;j<=z*4+1;j++){
+				if(temp[i][j]>0){
+					sprite[i][j]=temp[i][j];
+				}
+			}
+		}	
+	}
+	function clearTemp(){
+		temp = []
+		for(var i=0;i<=w*4+1;i++){
+			temp[i] = new Array();
+			for(var j=0;j<=z*4+1;j++){
+				temp[i][j]=0;
+			}
+		}
+	}
+
+	
+
+	function createBox(){
+		// here x1 and y1 contain
+		// center bottom coordinates
+		
+		// first left side bottom
+		//
+		//
+		//
+		var x1=x;
+		var y1=y;
+		var y2=y; 
+		var cnt=1;
+		for(var x2=x1;x2>x1-w;x2-=1){
+			setTempValue(x2,y2,2);
+			cnt++;
+			if(cnt==2){
+				y2-=1;
+				cnt=0;
+			}
+		}	
+		// here x2,y2 contains
+		// left bottom coordinates
+		
+		
+		// center up for left front side
+		var x3 = x1;
+		var y3 = y1;
+
+		for(y3=y1;y3>y1-h;y3-=1){
+			//setTempValue(x3,y3,4);
+		}
+		
+		
+		// top of left side 
+		var x4;
+		var y4 = y3;
+		var cnt=1;
+		for(x4=x1;x4>x1-w;x4-=1){
+			//setTempValue(x4,y4,4);
+			cnt++;
+			if(cnt==2){
+				y4-=1;
+				cnt=0;
+			}
+		}	
+
+		// here x4 and y5 contain
+		// left top corner coordinates
+		var tx=x2;
+		var ty=y2;
+		for(ty=y2;ty>=y4;ty-=1){
+			//setTempValue(tx,ty,4);
+		}
+
+		//
+		// Right side
+		//
+		//
+		//
+		//
+		//
+		
+		// center bottom to right side(z) 
+		var x5 = x+1;
+		var y5 = y;
+		var x6;
+		var y6=y;
+		var cnt=1;
+		for(x6=x5;x6<x5+z;x6++){
+			setTempValue(x6,y6,5);
+			cnt++;
+			if(cnt==2){
+				y6-=1;
+				cnt=0;
+			}
+		}
+		// x5,y5 = center bottom of right side
+		// x6,y6 = right bottom of right side
+			
+		// center bottom to center top of right side
+		var x7=x+1;
+		var y7;
+		for(y7=y5;y7>y5-h;y7-=1){
+			//setTempValue(x7,y7,5);
+		}	
+	
+		// x7,y7 containt top center of right side
+		var x8=x7;
+		var y8=y7;
+		var cnt=1;
+		for(x8=x7;x8<x7+z;x8++){
+			//setTempValue(x8,y8,5);
+			cnt++;
+			if(cnt==2){
+				y8-=1;
+				cnt=0;
+			}
+		}
+		
+		// x8,y8 contains top right of right side
+		var tmpx = x8;
+		var tmpy;
+		for(tmpy=y8;tmpy<=y8+h;tmpy+=1){
+			setTempValue(tmpx,tmpy,5);
+		}
+		
+		
+		//
+		// Top Face
+		//
+		//
+		//
+		//
+		
+		// left top face to back of top face
+		var x9;
+		var y9 = y4-1;
+		var cnt=0;
+		for(x9=x4+1;x9<=x4+z;x9++){
+			//setTempValue(x9,y9,6);
+			cnt++;
+			if(cnt==2){
+				y9-=1;
+				cnt=0;
+			}
+		}
+		
+		// x9,y9 contains the center back
+		// coordinates of top face
+		var tmpx;
+		var tmpy=y8-1;
+		var cnt=0;
+		for(tmpx=x8-1;tmpx>=x8-w;tmpx-=1){
+			setTempValue(tmpx,tmpy,2);
+			cnt++;
+			if(cnt==2){
+				tmpy-=1;
+				cnt=0;
+			}
+		}
+		
+		// center top right
+		// hook
+		var tmpx=x5;
+		var tmpy=y5;
+		var destx = x8;
+		var desty = y8;
+		var angle=Math.atan2(desty-tmpy,
+		destx-tmpx);
+		while(Math.floor(tmpx)!=destx){
+			setTempValue(tmpx|0,tmpy|0,-1);
+			tmpx+=Math.cos(angle)*1;
+			tmpy+=Math.sin(angle)*1;
+
+		}
+		cleanLine();
+		replace(-1,2);
+		
+	
+			// center top left
+		// hook
+		var tmpx=x2;
+		var tmpy=y2;
+		var destx = x9;
+		var desty = y9;
+		var angle=Math.atan2(desty-tmpy,
+		destx-tmpx);
+		while(Math.floor(tmpx)!=destx){
+			setTempValue(tmpx|0,tmpy|0,-1);
+			tmpx+=Math.cos(angle)*1;
+			tmpy+=Math.sin(angle)*1;
+		}
+		cleanLine();
+		replace(-1,2);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		copyTempToSprite();
+	}
+	
+	
+	function replace(val1,val2){
+		for(var ya=0-z*2;ya<z*2;ya++){
+		for(var xa=0-w;xa<w*2;xa++){
+			if(getTempValue(xa,ya)==val1){
+			
+			setTempValue(xa,ya,val2);
+			}
+		
+		}}
+	}
+	function cleanLine(){
+		for(var ya=-z*2;ya<z*2;ya++){
+		for(var xa=-w;xa<w*2;xa++){
+		if(getTempValue(xa,ya)==-1){
+		
+		if(getTempValue(xa+1,ya)==-1){
+		if(getTempValue(xa,ya+1)==-1){
+		setTempValue(xa,ya,0);
+		}}
+		
+						if(getTempValue(xa-1,ya)==-1){
+		if(getTempValue(xa,ya-1)==-1){
+		setTempValue(xa,ya,0);
+		}}}
+						
+		}}
+	}
+
+	createBox();
+
+
+	// draw the sprite
+	for(y1=0;y1<=z*4;y1+=1){
+	for(x1=0;x1<=w*4;x1++){
+	if(sprite[x1][y1]!=0){
+		setColor(sprite[x1][y1]);
+		ctx.fillRect(x+x1,y+y1,1,1);
+	}
+	}}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function setColor(col){
+if(col==1)col="rgb(40,40,40)";
+if(col==2)col="rgb(70,70,70)";
+if(col==3)col="rgb(90,90,90)";
+if(col==4)col="rgb(110,110,110)";
+if(col==5)col="rgb(150,150,150)";
+if(col==6)col="rgb(180,180,180)";
+if(col==7)col="rgb(255,255,255)";
+ctx.fillStyle = col;
+ctx.strokeStyle = col;
+}
+</script>
+</body>
+</html>
