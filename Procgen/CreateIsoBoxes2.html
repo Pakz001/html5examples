@@ -24,7 +24,7 @@ function doGameLoop(){
 ctx.scale(1,1);
 myCanvas.height = window.innerHeight*.98;
 myCanvas.width = window.innerWidth*.96;
-ctx.fillStyle="rgb(0,0,0)";
+ctx.fillStyle="rgb(0,150,150)";
 ctx.fillRect(0,0,c.width,c.height);
 ctx.fillStyle="rgb(255,255,255)";
 ctx.fillText("A javascript/html example.",10,10); 
@@ -104,7 +104,7 @@ function drawIsoRoof2Box(x,y,w,h,z){
 			
 			for(var hh=0;hh<h2;hh++){
 			
-			setValue(xx,a+hh,col);
+			setValue(xx,a+hh,5);
 			}
 			cnt2++;
 			if(cnt2==1){
@@ -135,16 +135,16 @@ function drawIsoRoof2Box(x,y,w,h,z){
 			}
 		}
 		depth=h2;
-		return [xx,a,depth];
+		return [xx,a+1,depth];
 	}
-	
+		// slightly broken
 		function rightSteepLineDown(xx,yy,l,cnt=1,h1=1,col){
 		
-		var cnt=2;
+		//var cnt=2;
 		var cnt2=0;
 		for(var a=yy;a<yy+l;a+=1){
 			for(var hh=0;hh<h1;hh++){
-			setValue(xx,a+hh,3);
+			setValue(xx,a+hh,5);
 			}
 			cnt2++;
 			if(cnt2==1){
@@ -171,10 +171,19 @@ function drawIsoRoof2Box(x,y,w,h,z){
 	
 	var nx,ny,nh;
 	var z2=Math.floor(z/2);
-	[nx,ny,nh]  = rightSteepLineUp(1,-1,z-1,1,1,7);
-	if(z % 2 != 0)z2+=1;
-
-	rightSteepLineDown(nx,ny,z2,1,nh,7)
+	[nx,ny,nh]  = rightSteepLineUp(1,-1,z,1,1,7);
+	ny+=1;
+	nx++;
+	nh-=3;
+	z2-=1;
+	if(z % 2 != 0){
+	z2+=1;
+	ny-=1;
+	nx-=1;
+	nh+=2;
+	}
+	
+	rightSteepLineDown(nx,ny,z2,1,nh+1,7)
 	//var z2=Math.floor((w-1)/2);
 	//var z3=Math.floor((z-1));
 	//rightSteepLineDown(z2,-z3,z2,1,1,7);
