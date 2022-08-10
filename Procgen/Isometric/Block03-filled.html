@@ -107,6 +107,28 @@ function drawIsoBox4(x,y,w,h,z){
 	
 
 	function floodFill(xx,yy,val){
+		var lx = [];
+		var ly = [];
+		lx.push(xx);
+		ly.push(yy);
+		var mx=[-1,0,1,0];
+		var my=[0,-1,0,1];
+		while(lx.length>0){
+			var ax=lx.pop();
+			var ay=ly.pop();
+			setTempValue(ax,ay,val);
+for(var i=0;i<mx.length;i++){
+var bx=ax+mx[i];
+var by=ay+my[i];
+if(getTempValue(bx,by)==0){
+lx.push(bx);
+ly.push(by);
+}
+}
+		}
+	}
+
+	function floodFill2(xx,yy,val){
 	
 		setTempValue(xx,yy,val);
 		if(getTempValue(xx-1,yy)==0)floodFill(xx-1,yy,val);
