@@ -44,44 +44,52 @@ h1++;
 }
 
 function drawIsoBox4(x,y,w,h,z){
+	var tox = x|0;
+	var toy = y|0;
+	x = 0;
+	y = h;
 	w = w|0;
 	h = h|0;
 	z = z|0;
+	//debug = w+","+h+","+z;
 	sprite = [];
 	temp = []
-	for(var i=0;i<=w*4+1;i++){
+	for(var i=0;i<=(w+z)*2;i++){//first width (y=[])
 		sprite[i] = new Array();
 		temp[i] = new Array();
-		for(var j=0;j<=z*4+1;j++){
+		var ny = (h+z)*2;
+		for(var j=0;j<=ny;j++){
 			sprite[i][j]=0;
 			temp[i][j]=0;
 		}
 	}
+	
 	function setSpriteValue(xx,yy,val){
-		xx+=Math.floor(w*2);
-		yy+=Math.floor(z*2);
-		if(xx>=0 && yy <=z*4 && yy>=0 && xx<=w*4){
+		xx+=Math.floor(Math.floor(temp.length/2));
+		yy+=Math.floor(Math.floor(temp[0].length*.6));
+		if(xx>=0 && yy <temp[0].length && yy>=0 && xx<temp.length){
 			sprite[xx][yy]=val;
 		}		
 	}
 	function setTempValue(xx,yy,val){
-		xx+=Math.floor(w*2);
-		yy+=Math.floor(z*2);
-		if(xx>=0 && yy<=z*4 && yy>=0 && xx<=w*4){
+		xx+=Math.floor(Math.floor(temp.length/2));
+		yy+=Math.floor(Math.floor(temp[0].length*.6));
+		if(xx>=0 && yy<temp[0].length && yy>=0 && xx<temp.length){
 			temp[xx][yy]=val;
 		}		
 	}
+	
 	function getTempValue(xx,yy){
-		xx+=Math.floor(w*2);
-		yy+=Math.floor(z*2);
-		if(xx>=0 && yy<=z*4 && yy>=0 && xx<=w*4){
+		xx+=Math.floor(Math.floor(temp.length/2));
+		yy+=Math.floor(Math.floor(temp[0].length*.6));
+		if(xx>=0 && yy<temp[0].length && yy>=0 && xx<temp.length){
 			return temp[xx][yy];
 		}		
-		return -1;
 	}
+	
 	function copyTempToSprite(){
-		for(var i=0;i<=w*4+1;i++){
-			for(var j=0;j<=z*4+1;j++){
+		for(var i=0;i<temp.length;i++){
+			for(var j=0;j<temp[0].length;j++){
 				if(temp[i][j]>0){
 					sprite[i][j]=temp[i][j];
 				}
@@ -90,21 +98,23 @@ function drawIsoBox4(x,y,w,h,z){
 	}
 	function clearTemp(){
 		temp = []
-		for(var i=0;i<=w*4+1;i++){
+		for(var i=0;i<temp.length;i++){
 			temp[i] = new Array();
-			for(var j=0;j<=z*4+1;j++){
+			for(var j=0;j<temp[0].length;j++){
 				temp[i][j]=0;
 			}
 		}
 	}
+	
+
 	function floodFill(xx,yy,val){
+	
 		setTempValue(xx,yy,val);
 		if(getTempValue(xx-1,yy)==0)floodFill(xx-1,yy,val);
 		if(getTempValue(xx+1,yy)==0)floodFill(xx+1,yy,val);
 		if(getTempValue(xx,yy-1)==0)floodFill(xx,yy-1,val);
 		if(getTempValue(xx,yy+1)==0)floodFill(xx,yy+1,val);
 	}
-
 	
 
 	function createBox(){
@@ -329,12 +339,15 @@ function drawIsoBox4(x,y,w,h,z){
 	createBox();
 
 
+
 	// draw the sprite
-	for(y1=0;y1<=z*4;y1+=1){
-	for(x1=0;x1<=w*4;x1++){
+	for(y1=0;y1<temp[0].length;y1+=1){
+	for(x1=0;x1<temp.length;x1++){
+		ctx.fillStyle='red';
+		ctx.fillRect(tox+x1,toy+y1,1,1);
 	if(sprite[x1][y1]!=0){
 		setColor(sprite[x1][y1]);
-		ctx.fillRect(x+x1,y+y1,1,1);
+		ctx.fillRect(tox+x1,toy+y1,1,1);
 	}
 	}}
 
