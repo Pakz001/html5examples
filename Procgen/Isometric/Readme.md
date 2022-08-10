@@ -1,4 +1,4 @@
-<br><img src="Media/F0355E50-36A7-4B40-AAB8-24216052C974.jpeg" width="60%"><br><br>
+<br><img src="Media/F0355E50-36A7-4B40-AAB8-24216052C974.jpeg" width="33%"><br><br>
 
 
 update : inside each createblock function(bottom): remove the draw red to make transparent.<br><br>
