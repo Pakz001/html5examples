@@ -15,6 +15,10 @@ update:checked every file and removed references to a unused css file. gfx now i
 
 Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
 
+
+<br>From the procgen folder:<br>
+<img src="Procgen/Media/C45FEA0A-71B9-4A6A-9BC9-B4EAE511A2F3.jpeg" width="60%"><br>
+
 <br><br>
 <img src="Media/A8B4083E-3FC8-47F8-A9FD-8F913AF3A322.jpeg" width="60%"><br>
 (Populous Amiga tiles made with moveTo lineTo commands)
