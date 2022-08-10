@@ -1,3 +1,5 @@
+update : inside each createblock function(bottom): remove the draw red to make transparent.<br><br>
+
 Isometric Pixel Art objects. Scalable while keeping the pixels intact.<br><br>
 
 Call the draw function for the specific shape and set the width, height and depth.<br><br>
