@@ -16,7 +16,7 @@ update:checked every file and removed references to a unused css file. gfx now i
 Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
 
 
-<br>From the procgen folder:<br>
+<br>From the procgen folder:(100% programmed graphics - random maps)<br>
 <img src="Procgen/Media/C45FEA0A-71B9-4A6A-9BC9-B4EAE511A2F3.jpeg" width="60%"><br>
 
 <br><br>
