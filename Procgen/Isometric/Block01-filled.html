@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charsetp="UTF-8">
-  <meta name="viewport" content="width=device-width" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
 </head>
 <body bgcolor="black">
-<style>#myCanvas {touch-action: none;}</style>
 <canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
 Use different browser.
 </canvas>
@@ -19,19 +29,22 @@ var w1=17;
 var z1=17;
 var h1=17;
 var cnt=0;
+var myIm = createIsoRamp1(w1,h1,z1);
 gameloop=setInterval(doGameLoop,16);
 
 function doGameLoop(){
 ctx.scale(1,1);
 myCanvas.height = window.innerHeight*.98;
 myCanvas.width = window.innerWidth*.96;
+ctx.imageSmoothingEnabled = false; // remove blurry effect
 ctx.fillStyle="rgb(0,0,0)";
 ctx.fillRect(0,0,c.width,c.height);
 ctx.fillStyle="rgb(255,255,255)";
 ctx.fillText("A javascript/html example."+debug,10,10); 
 
 ctx.scale(6,6);
-drawIsoBox4(0,10,w1,h1,z1)
+ctx.drawImage(myIm,10,10);
+//drawIsoBox4(0,10,w1,h1,z1);
 //drawIsoHollowBox(0,0,10+w1,8+h1,7+z2);
 
 cnt++;
@@ -43,11 +56,9 @@ h1++;
 }
 }
 
-function drawIsoBox4(x,y,w,h,z){
-	var tox = x|0;
-	var toy = y|0;
-	x = 0;
-	y = h;
+function createIsoRamp1(w,h,z){
+	var x = 0;
+	var y = h;
 	w = w|0;
 	h = h|0;
 	z = z|0;
@@ -106,8 +117,7 @@ function drawIsoBox4(x,y,w,h,z){
 		}
 	}
 	
-
-	function floodFill(xx,yy,val){
+		function floodFill(xx,yy,val){
 		var lx = [];
 		var ly = [];
 		lx.push(xx);
@@ -369,16 +379,30 @@ ly.push(by);
 	createBox();
 
 
+	//
+	// Create a canvas and draw the
+	// image to it and return it as 
+	// a new image.
+	//
+   var canvas = document.createElement('canvas');
+   var ctx2 = canvas.getContext('2d');
+   canvas.width = temp.length;
+   canvas.height = temp[0].length;
 	// draw the sprite
 	for(y1=0;y1<temp[0].length;y1+=1){
 	for(x1=0;x1<temp.length;x1++){
-		ctx.fillStyle='red';
-		ctx.fillRect(tox+x1,toy+y1,1,1);
-	if(sprite[x1][y1]!=0){
-		setColor(sprite[x1][y1]);
-		ctx.fillRect(tox+x1,toy+y1,1,1);
-	}
+		ctx2.fillStyle='red';
+		ctx2.fillRect(x1,y1,1,1);
+		if(sprite[x1][y1]!=0){
+			setColor(ctx2,sprite[x1][y1]);
+			ctx2.fillRect(x1,y1,1,1);
+		}
 	}}
+
+   var image = new Image();
+   image.src = canvas.toDataURL();
+
+   return image;
 
 
 
@@ -392,7 +416,7 @@ ly.push(by);
 
 
 
-function setColor(col){
+function setColor(context,col){
 if(col==1)col="rgb(40,40,40)";
 if(col==2)col="rgb(70,70,70)";
 if(col==3)col="rgb(90,90,90)";
@@ -400,8 +424,8 @@ if(col==4)col="rgb(110,110,110)";
 if(col==5)col="rgb(150,150,150)";
 if(col==6)col="rgb(180,180,180)";
 if(col==7)col="rgb(255,255,255)";
-ctx.fillStyle = col;
-ctx.strokeStyle = col;
+context.fillStyle = col;
+context.strokeStyle = col;
 }
 </script>
 </body>
