@@ -1,3 +1,5 @@
+<img src="Media/C45FEA0A-71B9-4A6A-9BC9-B4EAE511A2F3.jpeg" width="60%"><br><br>
+
 <br>
 pirates Amiga trees try 4 turned into a 'complete' remake of the world map. The screen where you sail your ship across the world. The generator has been tested of fairly large map sizes. There is no boat currently. There are clouds that float across the world. Everything is generated with code.<br>
 <br>
