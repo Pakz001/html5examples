@@ -1,6 +1,6 @@
 <br>
 The map below is made up all of programmed graphics. The game it is based on is called 'Castles 2'
-from the Amiga Home Computer.
+from the Amiga Home Computer. (castle MAIN file)
 <br><img src="Media/C45FEA0A-71B9-4A6A-9BC9-B4EAE511A2F3.jpeg" width="60%"><br><br>
 
 <br>
