@@ -29,7 +29,7 @@ Copy paste (edit) and run. ( each html file is stand alone and requires no clunk
 
 
 <br>
-<a=href"https://www.programming-helper.com/">Ai code generator(free(reg) and javascript)</a><br>
+<a href="https://www.programming-helper.com/">Ai code generator(free(reg) and javascript)</a><br>
 <br>
 Link to free online and downloadable study book : https://eloquentjavascript.net/ ( option to buy )
 <br>Rex van der Spuy also has some good books.<br><br>
