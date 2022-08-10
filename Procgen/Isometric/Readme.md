@@ -11,7 +11,7 @@ and go through a couple of arrays while they are created.<br><br>
 
 Each object is drawn line by line. Each line can manually have its color be set. I also want
 to create a list based flood fill routine. The current flood fill can bork the program if the
-object created is to large(recursive)<br><br>
+object created is to large(recursive) - edit - list based flood added.<br><br>
 
 More objects are most likely going to be created.<br><br>
 
