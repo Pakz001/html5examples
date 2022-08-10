@@ -1,6 +1,9 @@
 
 <h3>html5 javascript game oriented example code. ( Learn to code games by studying examples ) </h3><br><br>
 
+Update 10aug2022 : I think I now understand better, how to disable those system touch events. I mainly develop on a ipad. The code before this had problems with touch devices. I probably need to update a lot of code that has touch controls.<br>The template has been updated.<br>
+
+<br><br>
 <br>Link:<br>
 <a href="https://cromdesi.home.xs4all.nl/html5examples/">Visit the repo site - run and view examples</a><br>
 <br>
