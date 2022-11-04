@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			renderer.shadowMap.enabled = true;
+//renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+			
+			document.body.appendChild( renderer.domElement );
+			
+			
+					var spotLight = new THREE.SpotLight(0xffffff);
+					spotLight.position.set(20,0,100);
+					spotLight.castShadow = true;
+					
+
+					spotLight.shadow.mapSize.width = 512; // default
+					spotLight.shadow.mapSize.height = 512; // default
+					spotLight.shadow.camera.far = 130;
+					spotLight.shadow.camera.near = 0.5;
+					spotLight.shadow.focus = 1; // default
+					scene.add(spotLight);
+
+
+//Create a plane that receives shadows (but does not cast them)
+const planeGeometry = new THREE.PlaneGeometry(500,500);
+const planeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff00 } )
+const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+plane.receiveShadow = true;
+scene.add( plane );
+
+const cubeGeometry = new THREE.BoxGeometry(4,20,4);
+const cubeMaterial = new THREE.MeshLambertMaterial({
+color: 0xff0000,
+wireframe: false
+});
+const cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+cube.position.set(0,0,50);
+cube.castShadow=true;
+scene.add(cube);
+
+
+scene.fog = new THREE.FogExp2(0xffffff,0.001);
+
+
+					
+			
+					
+			//camera.position.z = 5;
+			camera.position.set( 0, -500, 250);
+			
+			camera.lookAt(scene.position);
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+				cube.rotation.x += 0.01;
+				cube.rotation.y += 0.01;
+
+
+				renderer.render( scene, camera );
+			};
+
+			animate();
+		</script>
+	</body>
+</html>
