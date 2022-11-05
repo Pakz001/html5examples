@@ -9,3 +9,5 @@ book2 = plane cube shadow rotation<br>
 book3 = plane cube spotlight rotation fog shadow<br>
 book4 = create a mesh from points.<br>
 book5 = group 2 cubes, each cube of different color.<br>
+book9 = create buffer geometry and load texture and set uv mapping<br>
+
