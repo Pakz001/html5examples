@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+		//
+		// Work in progress...
+		// MakE A CUBE face for each side of a cube
+		// using a buffer mesh. use texture atlas.
+		//
+		//
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+			
+			
+					var spotLight = new THREE.SpotLight(0xffffff);
+					spotLight.position.set(-100,100,100);
+					spotLight.castShadow = true;
+					
+					spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+					spotLight.shadow.camera.far = 130;
+					spotLight.shadow.camera.near = 40;
+					scene.add(spotLight);
+
+//-30.0,  -30.0, -60.0, //left top
+//30.0, -30.0, -60.0, //right top
+//30.0, -30.0, 30.0,//right bottom
+//-30.0, -30.0, 30.0,//left bottom
+					
+var quad_vertices =
+[
+// top box
+-30.0,  30.0, -60.0, //left top
+30.0, 30.0, -60.0, //right top
+30.0, 30.0, 0.0,//right bottom
+-30.0, 30.0, 0.0,//left bottom
+
+
+// front box
+-30.0,  30.0, 0.0, //left top
+30.0,  30.0, 0.0, //right top
+30.0, -30.0, 0.0,//right bottom
+-30.0, -30.0, 0.0,//left bottom
+
+// front box
+30.0,  30.0, 0.0, //left top
+30.0,  30.0, -60.0, //right top
+30.0, -30.0, -60.0,//right bottom
+30.0, -30.0, 0.0,//left bottom
+
+
+];
+
+
+// tile dimensions
+
+  const tileSize = 16;
+  const tileTextureWidth = 256;
+  const tileTextureHeight = 64;
+
+// x1 and y1 is the cell position on
+// the atlas.
+var x1=5,y1=2;
+var x2=x1+1;
+var y2=y1+1;
+// here we set the uv's with the atlas texture
+var quad_uvs =
+[
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+
+
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+];
+
+var quad_indices =
+[
+0, 2, 1, 0, 3, 2,
+0+4, 2+4, 1+4, 0+4, 3+4, 2+4,
+0+8, 2+8, 1+8, 0+8, 3+8, 2+8,
+];
+
+var geometry = new THREE.BufferGeometry();
+
+var vertices = new Float32Array( quad_vertices );
+// Each vertex has one uv coordinate for texture mapping
+var uvs = new Float32Array( quad_uvs);
+// Use the four vertices to draw the two triangles that make up the square.
+var indices = new Uint32Array( quad_indices )
+
+
+//geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+// itemSize = 3 because there are 3 values (components) per vertex
+geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+// Load the texture asynchronously
+let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+
+var material = new THREE.MeshBasicMaterial( {map: sprite });
+var mesh = new THREE.Mesh( geometry, material );
+mesh.position.z = -100;
+
+scene.add(mesh);
+
+
+			//camera.position.z = 5;
+			camera.position.set( 150,150, 10);
+			
+			camera.lookAt(mesh.position);
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+		
+
+
+				renderer.render( scene, camera );
+			};
+
+			animate();
+		</script>
+	</body>
+	</html>
