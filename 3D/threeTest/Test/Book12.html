@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+		//
+		// create multiple box faces(front) texture it with
+		// random textures from the atlas.
+		//
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+			
+			
+					var spotLight = new THREE.SpotLight(0xffffff);
+					spotLight.position.set(-100,100,100);
+					spotLight.castShadow = true;
+					
+					spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+					spotLight.shadow.camera.far = 130;
+					spotLight.shadow.camera.near = 40;
+					scene.add(spotLight);
+
+
+var quad_vertices =
+[
+-30.0,  30.0, 0.0,
+30.0,  30.0, 0.0,
+30.0, -30.0, 0.0,
+-30.0, -30.0, 0.0
+];
+
+// tile dimensions
+
+  const tileSize = 16;
+  const tileTextureWidth = 256;
+  const tileTextureHeight = 64;
+
+// x1 and y1 is the cell position on
+// the atlas.
+var x1=5,y1=2;
+var x2=x1+1;
+var y2=y1+1;
+// here we set the uv's with the atlas texture
+var quad_uvs =
+[
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2
+];
+
+var quad_indices =
+[
+0, 2, 1, 0, 3, 2
+];
+
+var q_vertices = [];
+var q_uvs =[];
+var q_indices = [];
+// add vertices per loop x,y,z
+var q=[
+60,0,0,
+60,0,0,
+60,0,0,
+60,0,0,
+]
+
+
+
+var cnt=0;
+for (var y=0;y<5;y++){
+for (var x=0;x<5;x++){// loop 5 times
+	
+	q=[];
+for(var i=0;i<4;i++){
+	q.push(x*60);
+	q.push(y*60);
+	q.push(0);
+}
+	
+for (var i=0;i<quad_vertices.length;i++){
+	// add quad + one grid to the rights
+	q_vertices.push(quad_vertices[i]+(q[i]));
+}
+// get a random texture from the atlas...
+quad_uvs = setquaduv(Math.floor(Math.random() * 5)+1,Math.floor(Math.random() * 2)+1);
+for (var i=0;i<quad_uvs.length;i++){
+	q_uvs.push(quad_uvs[i]);
+}
+for (var i=0;i<quad_indices.length;i++){
+	// add indices and with loop value
+	q_indices.push(quad_indices[i]+(cnt*4));
+}
+cnt++;
+
+}
+
+}
+var geometry = new THREE.BufferGeometry();
+
+var vertices = new Float32Array( q_vertices );
+// Each vertex has one uv coordinate for texture mapping
+var uvs = new Float32Array( q_uvs);
+// Use the four vertices to draw the two triangles that make up the square.
+var indices = new Uint32Array( q_indices )
+
+
+//geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+// itemSize = 3 because there are 3 values (components) per vertex
+geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+// Load the texture asynchronously
+let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+
+var material = new THREE.MeshBasicMaterial( {map: sprite });
+var mesh = new THREE.Mesh( geometry, material );
+mesh.position.z = -100;
+
+scene.add(mesh);
+
+
+			//camera.position.z = 5;
+			camera.position.set( 0, 0, 200);
+			
+			camera.lookAt(scene.position);
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+		
+
+
+				renderer.render( scene, camera );
+			};
+
+			animate();
+			
+// x1 and y1 is the cell position on
+// the atlas.
+function setquaduv(x,y){
+var x1=x,y1=y;
+var x2=x1+1;
+var y2=y1+1;
+// here we set the uv's with the atlas texture
+qw =
+[
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2
+];
+return qw;
+}
+			
+		</script>
+	</body>
+	</html>
