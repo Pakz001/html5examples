@@ -17,7 +17,8 @@
 		//
 		//
 			const scene = new THREE.Scene();
-			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 21000 );
+			scene.background = new THREE.Color( 0xffffff );	
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 8000 );
 
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -25,13 +26,13 @@
 			document.body.appendChild( renderer.domElement );
 			
 			
-					//var spotLight = new THREE.SpotLight(0xffffff);
-					//spotLight.position.set(-100,100,100);
+					var spotLight = new THREE.SpotLight(0xffffff);
+					spotLight.position.set(-100,100,100);
 					
-					//spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
-					//spotLight.shadow.camera.far = 1730;
-					//spotLight.shadow.camera.near = 40;
-					//scene.add(spotLight);
+					spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+					spotLight.shadow.camera.far = 1730;
+					spotLight.shadow.camera.near = 40;
+					scene.add(spotLight);
 
 				
 
@@ -50,9 +51,9 @@
 
 //quad_uvs = addquaduvs(5,2);
 
-	const worldwidth = 200;
+	const worldwidth = 300;
 	const worldheight = 100;
-	const worlddepth = 200;
+	const worlddepth = 300;
 
   	var world = [];
 	for(var i=-200;i<worldwidth;i++){
@@ -84,35 +85,43 @@
 	}	
 	for(var i=-100;i<100;i++){
 		for(var k=-100;k<100;k++){
-				world[i][0][k]= 1;
+				world[i][0][k]= 11;
 			}		
 	}	
 	
-		var x1 = 50;
-		var z1 = 50;
-		var pi=0;
-	for(var i=0;i<61800;i++){
-		if(Math.random()<.01){
-		x1 = Math.random()*100;
-		z1 = Math.random()*100;
+		var x1 = 30;
+		var z1 = 30;
+		var pi=Math.random()*4;
+	for(var i=0;i<800;i++){
+		if(Math.random()<.5){
+		x1 = Math.floor(Math.random()*90)-60;
+		z1 = Math.floor(Math.random()*90)-60;
 		pi=Math.random()*3;
 		}
-		x1+=Math.cos(pi)*2;
-		z1+=Math.sin(pi)*2;
-		if(x1<-80)x1=-80;
-		if(z1<-80)y1=-80;
-		if(x1>150)x1=150;
-		if(z1>150)z1=150;
+		x1+=Math.cos(pi)*1.5;
+		z1+=Math.sin(pi)*1.5;
+		if(x1<-50)x1=-50;
+		if(z1<-50)y1=-50;
+		if(x1>100)x1=100;
+		if(z1>100)z1=100;
 		x = x1;
 		z=z1;
-		var y = 100;
+		var y = 80;
 		for(var y2=y;y2>-1;y2-=1){
-			if(world[Math.floor(x)][Math.floor(y2-1)][Math.floor(z)]==1){
-				world[Math.floor(x)][Math.floor(y2)][Math.floor(z)]=1;
-				y2=-1;
+			if(world[Math.floor(x)][Math.floor(y2-1)][Math.floor(z)]>0){
+				var q1=Math.floor(Math.random()*8)+1;
+				var q2=Math.floor(Math.random()*8)+1;
+				for(var a=0;a<q1;a++){
+				for(var b=0;b<q2;b++){
+			
+					world[Math.floor(x+a)][Math.floor(y2)][Math.floor(z+b)]=1;
+					
+				}}
+			y2=-1;
 			}
 		}
 	}
+	
 	
 function makechunk(ax,ay,az){
 var quad_uvs = [];
@@ -126,14 +135,15 @@ var cnt=0;
 for(var z=az;z<az+16;z+=1){
 for(var y=ay;y<ay+16;y+=1){
 for(var x=ax;x<ax+16;x+=1){
-	if(world[x][y][z]==1){
+	if(world[x][y][z]>0){
 	var face = [];
 	face = getfaces(x,y,z);
 //quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,true,true,true,true,true,true));
 quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
 for(var i=0;i<6;i++){
 	if(face[i]==true){
-	quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 5)+1,Math.floor(Math.random() * 2)+1));
+	//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 16)+1,Math.floor(Math.random() * 3)+1));
+	quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*3)));
 	quad_indices.push(...addquadindices(cnt));
 	cnt++;
 }
@@ -168,8 +178,8 @@ return mesh;
 }
 
 mesh = [];
-for(var x=-64;x<64;x+=16){
-for(var z=-64;z<64;z+=16){
+for(var x=-128;x<128;x+=16){
+for(var z=-128;z<128;z+=16){
 mesh.push(makechunk(x,0,z));
 }
 }
@@ -179,9 +189,9 @@ scene.add(mesh[i]);
 }
 
 
-
+			scene.fog = new THREE.FogExp2(0xffffff,0.0003);
 			//camera.position.z = 5;
-			camera.position.set( -50,2000, -2000);
+			camera.position.set( -50,2000, -6000);
 			camera.lookAt(0,0,0);
 			
 			//camera.lookAt(mesh.position);
@@ -191,7 +201,7 @@ scene.add(mesh[i]);
 				requestAnimationFrame( animate );
 				camera.position.z+=dir;
 				dt++;
-				if(dt>256){
+				if(dt>512){
 					dir=-dir;
 					dt=0;
 				}
