@@ -12,7 +12,6 @@
 		<script src="js/three.js"></script>
 		<script>
 		//
-		// Work in progress...
 		// MakE A CUBE face for each side of a cube
 		// using a buffer mesh. use texture atlas.
 		//
@@ -55,11 +54,31 @@ var quad_vertices =
 30.0, -30.0, 0.0,//right bottom
 -30.0, -30.0, 0.0,//left bottom
 
-// front box
+// right side  box
 30.0,  30.0, 0.0, //left top
 30.0,  30.0, -60.0, //right top
 30.0, -30.0, -60.0,//right bottom
 30.0, -30.0, 0.0,//left bottom
+
+
+// left side  box
+-30.0,  30.0, -60.0, //left top
+-30.0,  30.0, 0.0, //right top
+-30.0, -30.0, 0.0,//right bottom
+-30.0, -30.0, -60.0,//left bottom
+
+// Back box
+30.0,  30.0, -60.0, //right top
+-30.0,  30.0,-60.0, //left top
+-30.0, -30.0, -60.0,//left bottom
+30.0, -30.0, -60.0,//right bottom
+
+// bottom box
+30.0, -30.0, -60.0, //right top
+-30.0,  -30.0, -60.0, //left top
+-30.0, -30.0, 0.0,//left bottom
+30.0, -30.0, 0.0,//right bottom
+
 
 
 ];
@@ -94,6 +113,23 @@ var quad_uvs =
 (tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
 (tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
 (tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+
+
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+
 ];
 
 var quad_indices =
@@ -101,6 +137,9 @@ var quad_indices =
 0, 2, 1, 0, 3, 2,
 0+4, 2+4, 1+4, 0+4, 3+4, 2+4,
 0+8, 2+8, 1+8, 0+8, 3+8, 2+8,
+0+12, 2+12, 1+12, 0+12, 3+12, 2+12,
+0+16, 2+16, 1+16, 0+16, 3+16, 2+16,
+0+20, 2+20, 1+20, 0+20, 3+20, 2+20,
 ];
 
 var geometry = new THREE.BufferGeometry();
@@ -129,14 +168,15 @@ scene.add(mesh);
 
 
 			//camera.position.z = 5;
-			camera.position.set( 150,150, 10);
+			camera.position.set( -50,-150, -400);
 			
 			camera.lookAt(mesh.position);
 
 			function animate() {
 				requestAnimationFrame( animate );
 
-		
+				mesh.rotation.x+=.01;
+				mesh.rotation.y+=.01;
 
 
 				renderer.render( scene, camera );
