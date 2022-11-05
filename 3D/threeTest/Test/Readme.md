@@ -1,4 +1,7 @@
-
+<br>
+the thee.min.js is a old version.<br>
+the three.js is new <11-2022 <br>
+<br>
 trying to figure out the things needed to code a voxel minecraft type game.<br>
 
 boxes, chunks, atlasses, worlds, collision, controls, ...<br>
