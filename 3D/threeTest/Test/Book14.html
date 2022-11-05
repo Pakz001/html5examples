@@ -46,27 +46,28 @@ quad_vertices = addquadverticesface(0,0,0,true,true,true,true,true,true);
 
 // x1 and y1 is the cell position on
 // the atlas.
-var x1=5,y1=2;
-var x2=x1+1;
-var y2=y1+1;
+//var x1=5,y1=2;
+//var x2=x1+1;
+//var y2=y1+1;
 // here we set the uv's with the atlas texture
 
 //quad_uvs = addquaduvs(5,2);
 
 var quad_uvs = [];
+var quad_indices = [];
+
+quad_vertices = [];
+
+var cnt=0;
+for(var x=0;x<128;x+=60){
+quad_vertices .push(...addquadverticesface(x,0,0,true,true,true,true,true,true));
+
 for(var i=0;i<6;i++){
 	quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 5)+1,Math.floor(Math.random() * 2)+1));
+	quad_indices.push(...addquadindices(cnt));
+	cnt++;
 }
-
-var quad_indices =
-[
-0, 2, 1, 0, 3, 2,
-0+4, 2+4, 1+4, 0+4, 3+4, 2+4,
-0+8, 2+8, 1+8, 0+8, 3+8, 2+8,
-0+12, 2+12, 1+12, 0+12, 3+12, 2+12,
-0+16, 2+16, 1+16, 0+16, 3+16, 2+16,
-0+20, 2+20, 1+20, 0+20, 3+20, 2+20,
-];
+}
 
 var geometry = new THREE.BufferGeometry();
 
@@ -109,6 +110,13 @@ scene.add(mesh);
 			};
 
 			animate();
+			
+			function addquadindices(num){
+				q = [0+4*num, 2+4*num, 1+4*num, 0+4*num, 3+4*num, 2+4*num,
+				];
+				
+				return q;
+			}
 			
 			function addquaduvs(x,y){
 				var x1=x,y1=y;
