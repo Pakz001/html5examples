@@ -6,6 +6,24 @@ trying to figure out the things needed to code a voxel minecraft type game.<br>
 
 boxes, chunks, atlasses, worlds, collision, controls, ...<br>
 <br>
+Book = Notes:<br>
+I'm getting to know how to use tree.js using tutorials and forum and a book.<br>
+Learning how to create a voxel world. Building from a 3d scene and
+getting a chunk system working. My ipad has no multi core support in
+the editors. So the world generation wil not be fast.<br>
+The chunks are made up from cubes. Each cube is made from a quad. Each
+quad has a texture from a atlas. Each cube can have its face turned on or
+off. This allows it to save on memory and gpu/cpu.<br>
+When two cubes are set side by side. The sides that touch have the
+faces they share not be generated.<br>
+A chunck is a sort of block of blocks. A world is made from a series
+of chunks. The collision would(i think) be done by shooting a bullet from
+the camera. The position divided by the cell w/h/d and if occupied in the array
+means collide and remove/work/place.<br>
+I have done loads of map generators over the years. These wil show up in the
+series<br>
+Touch and keyboard and maybe controller support(ipad).
+<br><br>
 book1 = plane cube camera spotlight<br>
 book2 = plane cube shadow rotation<br>
 book3 = plane cube spotlight rotation fog shadow<br>
