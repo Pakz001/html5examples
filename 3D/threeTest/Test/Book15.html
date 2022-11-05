@@ -13,7 +13,7 @@
 		<script>
 		//
 		// 
-		// Make a cube 
+		// Make a cube chunk voxel world..
 		//
 		//
 			const scene = new THREE.Scene();
@@ -66,13 +66,26 @@
 		
 	}	
 	
-	for(var i=0;i<5;i++){
-		for(var j=0;j<10;j++){
-			for(var k=0;k<10;k++){
+	for(var i=10;i<15;i++){
+		for(var j=10;j<15;j++){
+			for(var k=10;k<15;k++){
 				world[i][j][k]= 1;
 			}
 		}
 		
+	}	
+	for(var i=2;i<5;i++){
+		for(var j=2;j<5;j++){
+			for(var k=2;k<5;k++){
+				world[i][j][k]= 1;
+			}
+		}
+		
+	}	
+	for(var i=-50;i<50;i++){
+		for(var k=-50;k<50;k++){
+				world[i][0][k]= 1;
+			}		
 	}	
 	
 
@@ -84,10 +97,12 @@ quad_vertices = [];
 
 
 var cnt=0;
-for(var z=0;z<16;z+=1){
-for(var y=0;y<16;y+=1){
-for(var x=0;x<16;x+=1){
-var face = getfaces(x,y,z);
+for(var z=0;z<15;z+=1){
+for(var y=0;y<15;y+=1){
+for(var x=0;x<15;x+=1){
+	if(world[x][y][z]==1){
+	var face = [];
+	face = getfaces(x,y,z);
 //quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,true,true,true,true,true,true));
 quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
 for(var i=0;i<6;i++){
@@ -95,6 +110,7 @@ for(var i=0;i<6;i++){
 	quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 5)+1,Math.floor(Math.random() * 2)+1));
 	quad_indices.push(...addquadindices(cnt));
 	cnt++;
+}
 }
 }
 }
@@ -127,15 +143,16 @@ scene.add(mesh);
 
 
 			//camera.position.z = 5;
-			camera.position.set( -50,-850, -1800);
+			camera.position.set( -50,-1850, -900);
 			
 			camera.lookAt(mesh.position);
 
 			function animate() {
 				requestAnimationFrame( animate );
 
-				mesh.rotation.x+=.01;
-				mesh.rotation.y+=.01;
+				mesh.rotation.x+=.02;
+				mesh.rotation.y+=.02;
+				mesh.rotation.z+=.02;
 
 
 				renderer.render( scene, camera );
@@ -147,42 +164,43 @@ scene.add(mesh);
 			function getfaces(x,y,z){
 				var face = [];
 				//top
-				if(world[x][y-1][z] == 0){
+				if(world[x][y+1][z] == 1){
 					face.push(false);
 					}else{
 						face.push(true);
 					}
 				//front
-				if(world[x][y-1][z] == 0){
+				if(world[x][y][z+1] == 1){
 					face.push(false);
 					}else{
 						face.push(true);
 					}
 					
 				//right
-				if(world[x][y-1][z] == 0){
+				if(world[x+1][y][z] == 1){
 					face.push(false);
 					}else{
 						face.push(true);
 					}
 				//left
-				if(world[x][y-1][z] == 0){
+				if(world[x-1][y][z] == 1){
 					face.push(false);
 					}else{
 						face.push(true);
 					}
 				//back
-				if(world[x][y-1][z] == 0){
+				if(world[x][y][z-1] == 1){
 					face.push(false);
 						}else{
 						face.push(true);
 					}
 				//bottom
-				if(world[x][y-1][z] == 0){
+				if(world[x][y-1][z] == 1){
 					face.push(false);
 					}else{
 						face.push(true);
 					}
+
 				return face;
 			}
 			
@@ -212,7 +230,7 @@ scene.add(mesh);
 			
 			function addquadverticesface(x,y,z,top=false,front=false,right=false,left=false,back=false,bottom=false){
 				var q = [];
-				if(top){
+				if(top==true){
 					// top box
 					q.push(
 					-30.0+x,  30.0+y, -60.0+z, //left top
@@ -221,7 +239,7 @@ scene.add(mesh);
 					-30.0+x, 30.0+y, 0.0+z,//left bottom
 					);
 				}
-				if(front){
+				if(front==true){
 					// front box
 					q.push(
 					-30.0+x,  30.0+y, 0.0+z, //left top
@@ -230,7 +248,7 @@ scene.add(mesh);
 					-30.0+x, -30.0+y, 0.0+z,//left bottom
 					);
 				}
-				if(right){
+				if(right==true){
 					// right side  box
 					q.push(
 					30.0+x,  30.0+y, 0.0+z, //left top
@@ -239,7 +257,7 @@ scene.add(mesh);
 					30.0+x, -30.0+y, 0.0+z,//left bottom
 					);
 				}	
-				if(left){
+				if(left==true){
 					// left side  box
 					q.push(
 					-30.0+x,  30.0+y, -60.0+z, //left top
@@ -248,7 +266,7 @@ scene.add(mesh);
 					-30.0+x, -30.0+y, -60.0+z,//left bottom
 					);
 				}	
-				if(back){
+				if(back==true){
 					// Back box
 					q.push(
 					30.0+x,  30.0+y, -60.0+z, //right top
@@ -257,7 +275,7 @@ scene.add(mesh);
 					30.0+x, -30.0+y, -60.0+z,//right bottom
 					);
 				}	
-				if(bottom){
+				if(bottom==true){
 					// bottom box
 					q.push(
 					30.0+x, -30.0+y, -60.0+z, //right top
