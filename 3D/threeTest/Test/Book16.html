@@ -167,11 +167,17 @@ var mesh = new THREE.Mesh( geometry, material );
 return mesh;
 }
 
-mesh1 = makechunk(0,0,0);
-mesh2 = makechunk(16,0,0);
+mesh = [];
+for(var x=-64;x<64;x+=16){
+for(var z=-64;z<64;z+=16){
+mesh.push(makechunk(x,0,z));
+}
+}
 
-scene.add(mesh1);
-scene.add(mesh2);
+for (var i=0;i<mesh.length;i++){
+scene.add(mesh[i]);
+}
+
 
 
 			//camera.position.z = 5;
@@ -179,10 +185,16 @@ scene.add(mesh2);
 			camera.lookAt(0,0,0);
 			
 			//camera.lookAt(mesh.position);
-
+			var dt=0;
+			var dir=10;
 			function animate() {
 				requestAnimationFrame( animate );
-
+				camera.position.z+=dir;
+				dt++;
+				if(dt>256){
+					dir=-dir;
+					dt=0;
+				}
 				//mesh.rotation.x+=.002;
 				//mesh.rotation.y+=.002;
 				//mesh.rotation.z+=.002;
