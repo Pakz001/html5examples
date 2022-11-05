@@ -88,6 +88,32 @@
 			}		
 	}	
 	
+		var x1 = 50;
+		var z1 = 50;
+		var pi=0;
+	for(var i=0;i<618000;i++){
+		if(Math.random()<.01){
+		x1 = Math.random()*100;
+		z1 = Math.random()*100;
+		pi=Math.random()*3;
+		}
+		x1+=Math.cos(pi)*2;
+		z1+=Math.sin(pi)*2;
+		if(x1<-80)x1=-80;
+		if(z1<-80)y1=-80;
+		if(x1>150)x1=150;
+		if(z1>150)z1=150;
+		x = x1;
+		z=z1;
+		var y = 150;
+		for(var y2=y;y2>-1;y2-=1){
+			if(world[Math.floor(x)][Math.floor(y2-1)][Math.floor(z)]==1){
+				world[Math.floor(x)][Math.floor(y2)][Math.floor(z)]=1;
+				y2=-1;
+			}
+		}
+	}
+	
 
 var quad_uvs = [];
 var quad_indices = [];
@@ -97,9 +123,9 @@ quad_vertices = [];
 
 
 var cnt=0;
-for(var z=0;z<15;z+=1){
-for(var y=0;y<15;y+=1){
-for(var x=0;x<15;x+=1){
+for(var z=0;z<115;z+=1){
+for(var y=0;y<115;y+=1){
+for(var x=0;x<115;x+=1){
 	if(world[x][y][z]==1){
 	var face = [];
 	face = getfaces(x,y,z);
@@ -150,9 +176,9 @@ scene.add(mesh);
 			function animate() {
 				requestAnimationFrame( animate );
 
-				mesh.rotation.x+=.02;
-				mesh.rotation.y+=.02;
-				mesh.rotation.z+=.02;
+				mesh.rotation.x+=.002;
+				mesh.rotation.y+=.002;
+				mesh.rotation.z+=.002;
 
 
 				renderer.render( scene, camera );
