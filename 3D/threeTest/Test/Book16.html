@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 	<head>
@@ -17,21 +16,25 @@
 		//
 		//
 			const scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xffffff );	
-			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 8000 );
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 21000 );
 
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			
+			
+
 			//renderer.shadowMap.Enabled=true;
 			document.body.appendChild( renderer.domElement );
+		
 			
+			let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
 			
 					var spotLight = new THREE.SpotLight(0xffffff);
-					spotLight.position.set(-100,100,100);
-					
-					spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
-					spotLight.shadow.camera.far = 1730;
-					spotLight.shadow.camera.near = 40;
+					spotLight.position.set(0,11500,0);
+					//spotLight.castShadow = true;
+					//spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+					//spotLight.shadow.camera.far = 10000;
+					//spotLight.shadow.camera.near = 40;
 					scene.add(spotLight);
 
 				
@@ -51,16 +54,16 @@
 
 //quad_uvs = addquaduvs(5,2);
 
-	const worldwidth = 300;
-	const worldheight = 100;
-	const worlddepth = 300;
+	const worldwidth = 155;
+	const worldheight = 155;
+	const worlddepth = 155;
 
   	var world = [];
-	for(var i=-200;i<worldwidth;i++){
+	for(var i=-100;i<worldwidth;i++){
 		world[i] = new Array();
-		for(var j=-10;j<worldheight;j++){
+		for(var j=-100;j<worldheight;j++){
 			world[i][j]= new Array();
-			for(var k=-200;k<worlddepth;k++){
+			for(var k=-100;k<worlddepth;k++){
 				world[i][j][k]= 0;
 			}
 		}
@@ -83,9 +86,11 @@
 		}
 		
 	}	
-	for(var i=-100;i<100;i++){
-		for(var k=-100;k<100;k++){
-				world[i][0][k]= 11;
+	for(var i=-50;i<50;i++){
+		for(var k=-50;k<50;k++){
+			world[i][2][k]= 1;
+				world[i][1][k]= 1;
+				world[i][0][k]= 1;
 			}		
 	}	
 	
@@ -109,8 +114,8 @@
 		var y = 80;
 		for(var y2=y;y2>-1;y2-=1){
 			if(world[Math.floor(x)][Math.floor(y2-1)][Math.floor(z)]>0){
-				var q1=Math.floor(Math.random()*8)+1;
-				var q2=Math.floor(Math.random()*8)+1;
+				var q1=Math.floor(Math.random()*2)+1;
+				var q2=Math.floor(Math.random()*2)+1;
 				for(var a=0;a<q1;a++){
 				for(var b=0;b<q2;b++){
 			
@@ -122,8 +127,7 @@
 		}
 	}
 	
-	
-function makechunk(ax,ay,az){
+
 var quad_uvs = [];
 var quad_indices = [];
 
@@ -132,18 +136,17 @@ quad_vertices = [];
 
 
 var cnt=0;
-for(var z=az;z<az+16;z+=1){
-for(var y=ay;y<ay+16;y+=1){
-for(var x=ax;x<ax+16;x+=1){
-	if(world[x][y][z]>0){
+for(var z=0;z<16;z+=1){
+for(var y=0;y<16;y+=1){
+for(var x=0;x<16;x+=1){
+	if(world[x][y][z]==1){
 	var face = [];
 	face = getfaces(x,y,z);
 //quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,true,true,true,true,true,true));
 quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
 for(var i=0;i<6;i++){
 	if(face[i]==true){
-	//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 16)+1,Math.floor(Math.random() * 3)+1));
-	quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*3)));
+	quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 5)+1,Math.floor(Math.random() * 2)+1));
 	quad_indices.push(...addquadindices(cnt));
 	cnt++;
 }
@@ -169,45 +172,37 @@ geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 // Load the texture asynchronously
-let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+//let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
 
-var material = new THREE.MeshBasicMaterial( {map: sprite });
+var material = new THREE.MeshLambertMaterial( {map: sprite});
+material.flatShading=true;
+//material.needsUpdate=true;
 var mesh = new THREE.Mesh( geometry, material );
-//mesh.position.z = -100;
-return mesh;
-}
+mesh.position.z = -100;
 
-mesh = [];
-for(var x=-128;x<128;x+=16){
-for(var z=-128;z<128;z+=16){
-mesh.push(makechunk(x,0,z));
-}
-}
-
-for (var i=0;i<mesh.length;i++){
-scene.add(mesh[i]);
-}
+scene.add(mesh);
 
 
-			scene.fog = new THREE.FogExp2(0xffffff,0.0003);
 			//camera.position.z = 5;
-			camera.position.set( -50,2000, -6000);
-			camera.lookAt(0,0,0);
+			camera.position.set( -50,1850, -900);
 			
-			//camera.lookAt(mesh.position);
-			var dt=0;
-			var dir=10;
+			var ambient = new THREE.AmbientLight( 0xffffff, .5 );
+			scene.add( ambient );
+			 
+	
+	
+			
+	  
+			
+			
+			camera.lookAt(mesh.position);
+
 			function animate() {
 				requestAnimationFrame( animate );
-				camera.position.z+=dir;
-				dt++;
-				if(dt>512){
-					dir=-dir;
-					dt=0;
-				}
-				//mesh.rotation.x+=.002;
-				//mesh.rotation.y+=.002;
-				//mesh.rotation.z+=.002;
+
+				mesh.rotation.x+=.0008;
+				mesh.rotation.y+=.0008;
+				mesh.rotation.z+=.0008;
 
 
 				renderer.render( scene, camera );
