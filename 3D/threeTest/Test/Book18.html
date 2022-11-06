@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+		//
+		// 
+		// Make a cube chunk voxel world..
+		//
+		//
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 21000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			
+			
+
+			//renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+		
+			
+			let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+			
+					var spotLight = new THREE.SpotLight(0xffffff);
+					spotLight.position.set(0,11500,0);
+					//spotLight.castShadow = true;
+					//spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+					//spotLight.shadow.camera.far = 10000;
+					//spotLight.shadow.camera.near = 40;
+					scene.add(spotLight);
+
+				
+
+// tile dimensions
+
+  const tileSize = 16;
+  const tileTextureWidth = 256;
+  const tileTextureHeight = 64;
+
+// x1 and y1 is the cell position on
+// the atlas.
+//var x1=5,y1=2;
+//var x2=x1+1;
+//var y2=y1+1;
+// here we set the uv's with the atlas texture
+
+//quad_uvs = addquaduvs(5,2);
+
+	const worldwidth = 155;
+	const worldheight = 155;
+	const worlddepth = 155;
+
+  	var world = [];
+	for(var i=-100;i<worldwidth;i++){
+		world[i] = new Array();
+		for(var j=-100;j<worldheight;j++){
+			world[i][j]= new Array();
+			for(var k=-100;k<worlddepth;k++){
+				world[i][j][k]= 0;
+			}
+		}
+		
+	}	
+	
+	for(var i=10;i<15;i++){
+		for(var j=10;j<15;j++){
+			for(var k=10;k<15;k++){
+				world[i][j][k]= 1;
+			}
+		}
+		
+	}	
+	for(var i=2;i<5;i++){
+		for(var j=2;j<5;j++){
+			for(var k=2;k<5;k++){
+				world[i][j][k]= 1;
+			}
+		}
+		
+	}	
+	for(var i=-50;i<50;i++){
+		for(var k=-50;k<50;k++){
+			world[i][2][k]= 1;
+				world[i][1][k]= 1;
+				world[i][0][k]= 1;
+			}		
+	}	
+	
+		var x1 = 30;
+		var z1 = 30;
+		var pi=Math.random()*4;
+	for(var i=0;i<800;i++){
+		if(Math.random()<.5){
+		x1 = Math.floor(Math.random()*90)-60;
+		z1 = Math.floor(Math.random()*90)-60;
+		pi=Math.random()*3;
+		}
+		x1+=Math.cos(pi)*1.5;
+		z1+=Math.sin(pi)*1.5;
+		if(x1<-50)x1=-50;
+		if(z1<-50)y1=-50;
+		if(x1>100)x1=100;
+		if(z1>100)z1=100;
+		x = x1;
+		z=z1;
+		var y = 80;
+		for(var y2=y;y2>-1;y2-=1){
+			if(world[Math.floor(x)][Math.floor(y2-1)][Math.floor(z)]>0){
+				var q1=Math.floor(Math.random()*2)+1;
+				var q2=Math.floor(Math.random()*2)+1;
+				for(var a=0;a<q1;a++){
+				for(var b=0;b<q2;b++){
+			
+					world[Math.floor(x+a)][Math.floor(y2)][Math.floor(z+b)]=1;
+					
+				}}
+			y2=-1;
+			}
+		}
+	}
+	
+
+var quad_uvs = [];
+var quad_indices = [];
+
+quad_vertices = [];
+
+
+
+var cnt=0;
+for(var z=0;z<16;z+=1){
+for(var y=0;y<16;y+=1){
+for(var x=0;x<16;x+=1){
+	if(world[x][y][z]==1){
+	var face = [];
+	face = getfaces(x,y,z);
+//quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,true,true,true,true,true,true));
+quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
+for(var i=0;i<6;i++){
+	if(face[i]==true){
+	quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 5)+1,Math.floor(Math.random() * 2)+1));
+	quad_indices.push(...addquadindices(cnt));
+	cnt++;
+}
+}
+}
+}
+}
+}
+
+var geometry = new THREE.BufferGeometry();
+
+var vertices = new Float32Array( quad_vertices );
+// Each vertex has one uv coordinate for texture mapping
+var uvs = new Float32Array( quad_uvs);
+// Use the four vertices to draw the two triangles that make up the square.
+var indices = new Uint32Array( quad_indices )
+
+
+//geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+// itemSize = 3 because there are 3 values (components) per vertex
+geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+// Load the texture asynchronously
+//let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+
+var material = new THREE.MeshLambertMaterial( {map: sprite});
+material.flatShading=true;
+//material.needsUpdate=true;
+var mesh = new THREE.Mesh( geometry, material );
+mesh.position.z = -100;
+
+scene.add(mesh);
+
+
+
+
+
+
+
+
+const map = new THREE.TextureLoader().load( "resources/star.png" );
+
+const material2 = new THREE.SpriteMaterial( { map: map, side: THREE.DoubleSide,color:"white"} );
+material2.flatShading=true;
+const sprite2 = new THREE.Sprite( material2 );
+sprite2.scale.set(1,0.1,1);
+scene.add( sprite2);
+
+
+			camera.position.z = 5;
+			camera.position.set( -50,1850, -900);
+			
+			var ambient = new THREE.AmbientLight( 0xffffff, .5 );
+			scene.add( ambient );
+			 
+			
+			//
+			// Create a Raycaster
+			///
+	
+	raycaster = new THREE.Raycaster();
+	const pointer = new THREE.Vector2();
+			
+			
+			
+			camera.lookAt(mesh.position);
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+
+				// shoot a ray from the camera into its direction.
+				// Draw the sprite2 there (hud) (test)		
+				var vector = new THREE.Vector3(0, -0.5, -1.0);
+                vector = camera.localToWorld(vector);
+                vector.sub(camera.position); // Now vector is a unit vector with the same direction as the camera
+
+                var raycaster = new THREE.Raycaster( camera.position, vector);				
+				raycaster.ray.at(1,sprite2.position);
+				//sprite2.position.x-=10;
+				
+				camera.rotation.x+=.01;
+				camera.rotation.y+=.01;
+				camera.rotation.z+=.01;
+								
+				mesh.rotation.x+=.008;				
+				mesh.rotation.y+=.008;
+				mesh.rotation.z+=.008;
+
+
+				renderer.render( scene, camera );
+			};
+
+			animate();
+			
+			// get from world[][][];
+			function getfaces(x,y,z){
+				var face = [];
+				//top
+				if(world[x][y+1][z] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+				//front
+				if(world[x][y][z+1] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+					
+				//right
+				if(world[x+1][y][z] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+				//left
+				if(world[x-1][y][z] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+				//back
+				if(world[x][y][z-1] == 1){
+					face.push(false);
+						}else{
+						face.push(true);
+					}
+				//bottom
+				if(world[x][y-1][z] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+
+				return face;
+			}
+			
+			function addquadindices(num){
+				q = [0+4*num, 2+4*num, 1+4*num, 0+4*num, 3+4*num, 2+4*num,
+				];
+				
+				return q;
+			}
+			
+			function addquaduvs(x,y){
+				var x1=x,y1=y;
+				var x2=x1+1;
+				var y2=y1+1;
+				
+				// here we set the uv's with the atlas texture
+				var q = [
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+				];
+				
+				
+				return q;
+			}
+			
+			function addquadverticesface(x,y,z,top=false,front=false,right=false,left=false,back=false,bottom=false){
+				var q = [];
+				if(top==true){
+					// top box
+					q.push(
+					-30.0+x,  30.0+y, -60.0+z, //left top
+					30.0+x, 30.0+y, -60.0+z, //right top
+					30.0+x, 30.0+y, 0.0+z,//right bottom
+					-30.0+x, 30.0+y, 0.0+z,//left bottom
+					);
+				}
+				if(front==true){
+					// front box
+					q.push(
+					-30.0+x,  30.0+y, 0.0+z, //left top
+					30.0+x,  30.0+y, 0.0+z, //right top
+					30.0+x, -30.0+y, 0.0+z,//right bottom
+					-30.0+x, -30.0+y, 0.0+z,//left bottom
+					);
+				}
+				if(right==true){
+					// right side  box
+					q.push(
+					30.0+x,  30.0+y, 0.0+z, //left top
+					30.0+x,  30.0+y, -60.0+z, //right top
+					30.0+x, -30.0+y, -60.0+z,//right bottom
+					30.0+x, -30.0+y, 0.0+z,//left bottom
+					);
+				}	
+				if(left==true){
+					// left side  box
+					q.push(
+					-30.0+x,  30.0+y, -60.0+z, //left top
+					-30.0+x,  30.0+y, 0.0+z, //right top
+					-30.0+x, -30.0+y, 0.0+z,//right bottom
+					-30.0+x, -30.0+y, -60.0+z,//left bottom
+					);
+				}	
+				if(back==true){
+					// Back box
+					q.push(
+					30.0+x,  30.0+y, -60.0+z, //right top
+					-30.0+x,  30.0+y,-60.0+z, //left top
+					-30.0+x, -30.0+y, -60.0+z,//left bottom
+					30.0+x, -30.0+y, -60.0+z,//right bottom
+					);
+				}	
+				if(bottom==true){
+					// bottom box
+					q.push(
+					30.0+x, -30.0+y, -60.0+z, //right top
+					-30.0+x,  -30.0+y, -60.0+z, //left top
+					-30.0+x, -30.0+y, 0.0+z,//left bottom
+					30.0+x, -30.0+y, 0.0+z,//right bottom
+					);
+				}
+			
+				return q;
+
+
+
+				
+			}
+		</script>
+	</body>
+	</html>
