@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        camera2 = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 1000);
+        camera2.position.copy(camera.position);
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+			
+			
+					var spotLight = new THREE.SpotLight(0xffffff);
+					spotLight.position.set(-100,100,100);
+					spotLight.castShadow = true;
+					
+					spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+					spotLight.shadow.camera.far = 130;
+					spotLight.shadow.camera.near = 40;
+					scene.add(spotLight);
+
+
+const geometry = new THREE.PlaneGeometry( 60,20);
+		const material = new THREE.MeshLambertMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+		const plane = new THREE.Mesh( geometry, material );
+		scene.add( plane );
+
+const cubeGeometry = new THREE.BoxGeometry(4,20,1);
+const cubeMaterial = new THREE.MeshLambertMaterial({
+color: 0xff0000,
+wireframe: false
+});
+const cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+cube.position.set(-4,3,5);
+scene.add(cube);
+
+const hud = new THREE.Mesh(cubeGeometry,cubeMaterial);
+
+//hud.scale.set(1,1,1);
+
+					
+			
+					
+			//camera.position.z = 5;
+			camera.position.set( 122, 5, 100);
+			scene.add(hud);
+			hud.position.set(0,0,-5);
+
+			camera.lookAt(scene.position);
+
+			function animate() {
+				requestAnimationFrame( animate );
+        renderer.setClearColor( 0x000000, 1 );
+		
+	 
+				
+				camera.rotation.x += 0.01;
+				//cube.rotation.y += 0.01;
+	        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+				renderer.render( scene, camera );
+				//camera2.rotation.x+=0.1;		
+				// inset scene
+        renderer.clearDepth(); // important!
+        renderer.setScissorTest(true);
+        renderer.setScissor(20, 20, window.innerHeight/4, window.innerHeight/4);
+        renderer.setViewport(20, 20, window.innerWidth/4, window.innerHeight/4);
+        renderer.setClearColor( 0x222222, 1 );
+        
+        
+        renderer.render(scene, camera2);
+        
+        renderer.setScissorTest(false);
+	};
+
+			animate();
+		</script>
+	</body>
+	</html>
