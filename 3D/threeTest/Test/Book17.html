@@ -22,10 +22,14 @@
 
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			scene.background = new THREE.Color( 0x4477ff);
 			//renderer.shadowMap.Enabled=true;
 			document.body.appendChild( renderer.domElement );
 			// Load the texture asynchronously
 			let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+			
+
+			scene.fog = new THREE.FogExp2(0xffffff,0.0003);
 			
 					var spotLight = new THREE.SpotLight(0xffffff);
 					spotLight.position.set(0,11500,0);
@@ -34,7 +38,10 @@
 					//spotLight.shadow.camera.far = 10000;
 					//spotLight.shadow.camera.near = 40;
 					scene.add(spotLight);
-					
+					const color = 0xFFFFFF;
+					const intensity = .4;
+					const light = new THREE.AmbientLight(color, intensity);
+					scene.add(light);
 
 // tile dimensions
 
@@ -191,9 +198,9 @@ scene.add(mesh[i]);
 }
 
 
-			scene.fog = new THREE.FogExp2(0xffffff,0.0001);
+			
 			//camera.position.z = 5;
-			camera.position.set( -50,2000, -6000);
+			camera.position.set( -50,1000, -6000);
 			camera.lookAt(0,0,0);
 			
 			
