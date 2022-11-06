@@ -36,5 +36,6 @@ book12 = create multiple box front faces in a grid as a single buffer mesh using
 book13 = create a quad face for each side of a cube, one single mesh, each face a texture from a atlas.<br>
 book14 = create a mesh from a series of cubes with atlassed textured faces(random texture) - Functionised<br>
 book15 = chunck world block simple height map(texture/atlas)<br>
-book16 = chunk function make world.
+book16 = chunk with light.
+book17 = chunks to world. lighted world and fog.
 
