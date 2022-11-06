@@ -39,4 +39,5 @@ book15 = chunck world block simple height map(texture/atlas)<br>
 book16 = chunk with light.<br>
 book17 = chunks to world. lighted world and fog.<br>
 book18 = test with chunk and raycasting hud. (ray.at)<br>
+book19 = Hud using a secondary camera and viewport clipping.<br>
 
