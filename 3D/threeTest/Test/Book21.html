@@ -6,6 +6,17 @@
 		<title>My first three.js app</title>
 		<style>
 			body { margin: 0; }
+
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+			
 		</style>
 	</head>
 	<body>
@@ -42,8 +53,12 @@
 					const intensity = .4;
 					const light = new THREE.AmbientLight(color, intensity);
 					scene.add(light);
-					
+
 			        window.addEventListener('keydown', moveCamera, false);		
+					window.addEventListener("touchend", touchHandler,false);
+					window.addEventListener("touchstart", touchHandler,false);					
+					window.addEventListener("touchmove", touchHandler,false);
+										
 
 // tile dimensions
 
@@ -255,6 +270,8 @@ material.flatShading=true;
 	meshz.scale.set(.1,.1,.1);
     scene.add( meshz );
 	
+	var movecamera = false;
+	var lastx,lasty;
 	var vv = new THREE.Vector3();
 	var an = 0;
 	var an2 = Math.PI/2;
@@ -283,6 +300,19 @@ material.flatShading=true;
 				
 				camera.lookAt(meshz.position);
 			
+				
+				if(movecamera){
+			if(lastx<window.innerWidth/2-64)an2-=0.01;		
+			if(lastx>window.innerWidth/2+64)an2+=0.01;		
+			if(lasty<window.innerHeight/2-64)an+=0.01;
+			if(lasty>window.innerHeight/2+64)an-=0.01;
+			
+			var dir = new THREE.Vector3();
+			camera.getWorldDirection( dir );
+			
+			camera.position.add(dir.multiplyScalar(5) )
+			
+				}
 
 				
 				renderer.render( scene, camera );
@@ -291,6 +321,54 @@ material.flatShading=true;
 			animate();
 	
 	
+	function touchHandler(e){
+
+		if(e.type=="touchstart" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lastx = x;
+			lasty = y;
+			movecamera=true;
+			//lasttouchx = x;
+			//lasttouchy = y;
+			//autoscroll = true;
+			//colx = x-colw/2;
+			//coly = y-colh/2;
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+	}
+		if(e.type=="touchmove" && e.touches) {
+			
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lastx = x;
+			lasty = y;
+			movecamera=true;
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+		
+	if(e.type=="touchend" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			movecamera=false;
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+
+	}		
 	
 	
       function moveCamera( evt ) {
