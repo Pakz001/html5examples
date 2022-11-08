@@ -274,10 +274,11 @@ material.flatShading=true;
     meshz = new THREE.Mesh( geom, material	);
 	meshz.position.set(50,50,50);
 	meshz.scale.set(.1,.1,.1);
+	meshz.visible=false;
     scene.add( meshz );
 	
 	var movecamera = false;
-	var lastx,lasty;
+	var lastx,lasty,startx,starty;
 	var vv = new THREE.Vector3();
 	var an = 0;
 	var an2 = Math.PI/2;
@@ -308,19 +309,28 @@ material.flatShading=true;
 			
 				
 				if(movecamera){
-					var d = Math.hypot(	lasty-window.innerHeight/2,
-										lastx-window.innerWidth/2);
-					d/=window.innerWidth/6;
+					//var d = Math.hypot(	lasty-window.innerHeight/2,
+					//					lastx-window.innerWidth/2);
+					// attempt at minecraft style camera controls touchscreen bedrock iphone
+					var d1 = Math.hypot(lasty-starty,lastx-startx);
+					if(d1<window.innerWidth/8){
+					d1 = d1 / (window.innerWidth/128);
+					if(lastx<startx)an2-=(0.005*d1);		
+					if(lastx>startx)an2+=(0.005*d1);
+					if(lasty<starty)an+=(0.005*d1);
+					if(lasty>starty)an-=(0.005*d1);
+					}
+					//d/=window.innerWidth/10;
 										//y2-y1,
 										//x2-x1);
 					// move left,right,up,down
 					// if touch screen edges turn
-					var w=window.innerWidth/12;
-					var h=window.innerHeight/12;
-					if(lastx<window.innerWidth/2-w)an2-=(0.015*d);		
-					if(lastx>window.innerWidth/2+w)an2+=(0.015*d);		
-					if(lasty<window.innerHeight/2-h)an+=(0.015*d);
-					if(lasty>window.innerHeight/2+h)an-=(0.015*d);
+					//var w=window.innerWidth/12;
+					//var h=window.innerHeight/12;
+					//if(lastx<window.innerWidth/2-w)an2-=(0.015*d);		
+					//if(lastx>window.innerWidth/2+w)an2+=(0.015*d);		
+					//if(lasty<window.innerHeight/2-h)an+=(0.015*d);
+					//if(lasty>window.innerHeight/2+h)an-=(0.015*d);
 					
 					// move forward touch
 					// if touch center then move forward
@@ -357,7 +367,7 @@ material.flatShading=true;
 							//var d1 = dir.multiplyScalar(30);
 							p1.x+=dir.x*30;
 							p1.z+=dir.y*30;
-							p1.y+=10;
+							p1.y+=30;
 							
 							if(	collideCameraMap(p1,dir.multiplyScalar(30))==false ){
 								//var dir = new THREE.Vector3();
@@ -453,6 +463,8 @@ material.flatShading=true;
 			var y = e.changedTouches[0].clientY;
 			lastx = x;
 			lasty = y;
+			startx=x;
+			starty=y;
 			movecamera=true;
 			//lasttouchx = x;
 			//lasttouchy = y;
