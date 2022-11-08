@@ -311,15 +311,10 @@ material.flatShading=true;
 				if(movecamera){
 					//var d = Math.hypot(	lasty-window.innerHeight/2,
 					//					lastx-window.innerWidth/2);
-					// attempt at minecraft style camera controls touchscreen bedrock iphone
-					var d1 = Math.hypot(lasty-starty,lastx-startx);
-					if(d1<window.innerWidth/8){
-					d1 = d1 / (window.innerWidth/128);
-					if(lastx<startx)an2-=(0.005*d1);		
-					if(lastx>startx)an2+=(0.005*d1);
-					if(lasty<starty)an+=(0.005*d1);
-					if(lasty>starty)an-=(0.005*d1);
-					}
+				
+					
+					
+				
 					//d/=window.innerWidth/10;
 										//y2-y1,
 										//x2-x1);
@@ -336,6 +331,19 @@ material.flatShading=true;
 					// if touch center then move forward
 					var w=window.innerWidth/3;
 					var h=window.innerHeight/3;
+					
+					// attempt at minecraft style camera controls touchscreen bedrock iphone
+					if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
+					}else{
+					var d1 = Math.hypot(lasty-starty,lastx-startx);
+					if(d1<window.innerWidth/8){
+					d1 = d1 / (window.innerWidth/128);
+					if(lastx<startx)an2-=(0.005*d1);		
+					if(lastx>startx)an2+=(0.005*d1);
+					if(lasty<starty)an+=(0.005*d1);
+					if(lasty>starty)an-=(0.005*d1);
+				}
+					}
 					
 					var gravdelay=false;
 					if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
@@ -365,19 +373,24 @@ material.flatShading=true;
 							var p2 = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
 							
 							//var d1 = dir.multiplyScalar(30);
-							p1.x+=dir.x*30;
-							p1.z+=dir.y*30;
-							p1.y+=30;
-							
-							if(	collideCameraMap(p1,dir.multiplyScalar(30))==false ){
+							p1.x+=dir.x*15;
+							p1.z+=dir.y*15;
+							p1.y+=33;
+							var dir = new THREE.Vector3();
+							camera.getWorldDirection( dir );
+							//dir.y=0; // stay on the ground
+							if(	collideCameraMap(p1,dir.multiplyScalar(10))==false ){
 								//var dir = new THREE.Vector3();
 								//camera.getWorldDirection( dir );
 								//dir.y=0;
-								camera.position.y+=5;
+								camera.position.y+=10;
+								//var dir = new THREE.Vector3();
+								//camera.getWorldDirection( dir );
 								gravdelay=true;
 								//camera.position.add(dir.multiplyScalar(10) )
 							}												
-						}		
+							
+						}	
 						
 					}
 					
