@@ -7,10 +7,11 @@
 		<style>
 			body { margin: 0; }
 
-body {touch-action: none;
+body {
+	touch-action: none;
 -webkit-touch-callout:none;
--webkit-user-select:none;
--khtml-user-select:none;
+
+	-khtml-user-select:none;
 -moz-user-select:none;
 -ms-user-select:none;
 user-select:none;
@@ -22,8 +23,13 @@ user-select:none;
 	<body>
 		<script src="js/three.js"></script>
 		<script>
-		//
-		// 
+			/*
+			zoom google diable keyboard disable in <Mstyle>
+			-webkit-user-select:none;
+			*/
+
+		//touch-action: none;
+		// user-select:none;
 		// Camera controls (native) Keyboard - w a s d (left right up down )-  q e (forward backwards)
 		//
 		//
@@ -471,10 +477,18 @@ material.flatShading=true;
 			an2+=0.1;		  			
 									break;
 			case 'q':
-			camera.position.add(dir.multiplyScalar(45) )
+			if(collideCameraMap(dir.multiplyScalar(100))==false){
+				var dir = new THREE.Vector3();
+				camera.getWorldDirection( dir );
+				camera.position.add(dir.multiplyScalar(45) )
+			}
 		break;        	
 			case 'e':
-			camera.position.add(dir.multiplyScalar(-45) )
+			if(collideCameraMap(dir.multiplyScalar(-100))==false){
+				var dir = new THREE.Vector3();
+				camera.getWorldDirection( dir );				
+				camera.position.add(dir.multiplyScalar(-45) )
+			}
 		break;        	
 		
 	}
