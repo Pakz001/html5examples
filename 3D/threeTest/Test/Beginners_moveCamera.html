@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			body {touch-action: none;
+			-webkit-touch-callout:none;
+			-webkit-user-select:none;
+			-khtml-user-select:none;
+			-moz-user-select:none;
+			-ms-user-select:none;
+			user-select:none;
+			-webkit-tap-highlight-color:rgba(0,0,0,0);
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+	 		window.addEventListener('keydown', moveTheCamera, false);		
+			window.addEventListener("touchend", touchHandler,false);
+			window.addEventListener("touchstart", touchHandler,false);					
+			window.addEventListener("touchmove", touchHandler,false);
+			
+			
+			var spotLight = new THREE.SpotLight(0xffffff);
+			spotLight.position.set(-100,100,100);
+			spotLight.castShadow = true;
+					
+			spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+			spotLight.shadow.camera.far = 130;
+			spotLight.shadow.camera.near = 40;
+			scene.add(spotLight);
+
+
+			const geometry = new THREE.PlaneGeometry( 60,20);
+			const material = new THREE.MeshLambertMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+			const plane = new THREE.Mesh( geometry, material );
+			scene.add( plane );
+
+			const cubeGeometry = new THREE.BoxGeometry(4,20,4);
+			const cubeMaterial = new THREE.MeshLambertMaterial({
+				color: 0xff0000,
+				wireframe: false
+			});
+			const cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+			cube.position.set(-4,3,5);
+			scene.add(cube);					
+			//camera.position.z = 5;
+			camera.position.set( 122, 5, 100);
+			
+
+			meshz = new THREE.Mesh( cubeGeometry, cubeMaterial	);
+			meshz.scale.set(.1,.01,.1);
+    		scene.add( meshz );
+	
+			var movecamera = false;
+			var lastx,lasty;
+			var vv = new THREE.Vector3();
+			var an = 0;
+			var an2 = Math.PI*1.2;
+			
+			
+			function animate() {
+				requestAnimationFrame( animate );
+
+				// canera move function.
+				moveTheCamera();
+
+				renderer.render( scene, camera );
+			};
+			
+			function moveTheCamera(){
+				// move mesh in front of camera based
+				// on angle variables.
+				meshz.position.x = camera.position.x+(Math.cos(an2)*10);
+								
+				meshz.position.z = camera.position.z+(Math.sin(an2)*10);
+								
+				meshz.position.y = camera.position.y+(Math.sin(an)*10);
+				// look point the camera to the mesh
+				camera.lookAt(meshz.position);
+			
+				// if we are moving(touch)
+				if(movecamera){
+					// move left,right,up,down
+					// if touch screen edges turn
+					var w=window.innerWidth/8;
+					var h=window.innerHeight/8;
+					if(lastx<window.innerWidth/2-w)an2-=0.015;		
+					if(lastx>window.innerWidth/2+w)an2+=0.015;		
+					if(lasty<window.innerHeight/2-h)an+=0.015;
+					if(lasty>window.innerHeight/2+h)an-=0.015;
+			
+					// move forward touch
+					// if touch center then move forward
+					var w=window.innerWidth/3;
+					var h=window.innerHeight/3;
+					if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
+						var dir = new THREE.Vector3();
+						camera.getWorldDirection( dir );		
+						camera.position.add(dir.multiplyScalar(5) )
+					}
+				}
+			}
+			
+			
+			function touchHandler(e){
+
+		if(e.type=="touchstart" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lastx = x;
+			lasty = y;
+			movecamera=true;
+			//lasttouchx = x;
+			//lasttouchy = y;
+			//autoscroll = true;
+			//colx = x-colw/2;
+			//coly = y-colh/2;
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+	}
+		if(e.type=="touchmove" && e.touches) {
+			
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lastx = x;
+			lasty = y;
+			movecamera=true;
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+		
+	if(e.type=="touchend" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			movecamera=false;
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+
+	}		
+
+			animate();
+		</script>
+	</body>
+	</html>
