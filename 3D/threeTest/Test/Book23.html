@@ -152,6 +152,14 @@ user-select:none;
 		}
 	}
 	
+	for(var z=-25;z<50;z++){
+		for(var x=-70;x<50;x++){
+			world[x][0][z]=1;
+			world[x][1][z]=1;
+			world[x][2][z]=1;
+		}
+	}
+	
 	
 function makechunk(ax,ay,az){
 var quad_uvs = [];
@@ -262,7 +270,7 @@ scene.add(plane);
 
 			
 			//camera.position.z = 5;
-			camera.position.set( -50,150, -4000);
+			camera.position.set( -4500,150, -1400);
 			camera.lookAt(0,0,0);
 			
 	const geom = new THREE.BoxGeometry();
@@ -375,11 +383,14 @@ material.flatShading=true;
 							//var d1 = dir.multiplyScalar(30);
 							p1.x+=dir.x*15;
 							p1.z+=dir.y*15;
-							p1.y+=33;
+							p1.y+=30;
 							var dir = new THREE.Vector3();
 							camera.getWorldDirection( dir );
+							dir.y=0;
 							//dir.y=0; // stay on the ground
-							if(	collideCameraMap(p1,dir.multiplyScalar(10))==false ){
+							if(	collideCameraMap(p1,dir.multiplyScalar(30))==false ){
+								p1.y+=60;
+								if(	collideCameraMap(p1,dir.multiplyScalar(30))==false ){
 								//var dir = new THREE.Vector3();
 								//camera.getWorldDirection( dir );
 								//dir.y=0;
@@ -388,6 +399,7 @@ material.flatShading=true;
 								//camera.getWorldDirection( dir );
 								gravdelay=true;
 								//camera.position.add(dir.multiplyScalar(10) )
+								}
 							}												
 							
 						}	
@@ -399,11 +411,12 @@ material.flatShading=true;
 				// gravity
 				if(gravdelay==false){
 				for(var i=0;i<8;i++){
-				if(collideCameraMap(camera.position,new THREE.Vector3(0,-30,0))==false){
+				if(collideCameraMap(camera.position,new THREE.Vector3(0,-45,0))==false){
 					camera.position.y-=1;
-				};
+				}else{
+					camera.position.y+=1;
+				}
 				}}
-
 				
 				renderer.render( scene, camera );
 			};
@@ -412,9 +425,9 @@ material.flatShading=true;
 	
 			function collideCameraMap(position,pos){
 				
-				var x=position.x+pos.x+40;
+				var x=position.x+pos.x+30;
 				var y=position.y+pos.y;
-				var z=position.z+pos.z+40;
+				var z=position.z+pos.z+30;
 				x/=60;
 				y/=60;
 				z/=60;
@@ -429,11 +442,12 @@ material.flatShading=true;
 					var ax=(x+bx)*60;
 					var ay=(y+by)*60;
 					var az=(z+bz)*60;
+					/*
 					if(sphereboxcollision(
 						position.x+pos.x+40,
 						position.y+pos.y,
 						position.z+pos.z+40,
-						40,
+						20,//40
 						ax,
 						ay,
 						az,
@@ -442,6 +456,22 @@ material.flatShading=true;
 					)){
 						return true;
 					}
+					*/
+					if(boxcollision(
+						position.x+pos.x+30,
+						position.y+pos.y,
+						position.z+pos.z+30,
+						30,30,30,
+						ax,
+						ay,
+						az,
+						60,60,60
+						
+					)){
+						return true;
+					}
+					
+					
 					
 				}}}}
 				return false;
