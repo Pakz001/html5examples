@@ -10,7 +10,7 @@
 body {
 	touch-action: none;
 -webkit-touch-callout:none;
-
+-webkit-user-select:none;
 	-khtml-user-select:none;
 -moz-user-select:none;
 -ms-user-select:none;
@@ -298,24 +298,29 @@ material.flatShading=true;
 				//mesh.rotation.z+=.002;
 				
 				//meshz.position.x = meshz.position.y+Math.cos(an)*10;
-				meshz.position.x = camera.position.x+(Math.cos(an2)*10);
+				meshz.position.x = camera.position.x+(Math.cos(an2)*15);
 								
-				meshz.position.z = camera.position.z+(Math.sin(an2)*10);
+				meshz.position.z = camera.position.z+(Math.sin(an2)*15);
 								
-				meshz.position.y = camera.position.y+(Math.sin(an)*10);
+				meshz.position.y = camera.position.y+(Math.sin(an)*15);
 				
 				camera.lookAt(meshz.position);
 			
 				
 				if(movecamera){
+					var d = Math.hypot(	lasty-window.innerHeight/2,
+										lastx-window.innerWidth/2);
+					d/=window.innerWidth/6;
+										//y2-y1,
+										//x2-x1);
 					// move left,right,up,down
 					// if touch screen edges turn
-					var w=window.innerWidth/8;
-					var h=window.innerHeight/8;
-			if(lastx<window.innerWidth/2-w)an2-=0.015;		
-			if(lastx>window.innerWidth/2+w)an2+=0.015;		
-			if(lasty<window.innerHeight/2-h)an+=0.015;
-			if(lasty>window.innerHeight/2+h)an-=0.015;
+					var w=window.innerWidth/12;
+					var h=window.innerHeight/12;
+			if(lastx<window.innerWidth/2-w)an2-=(0.015*d);		
+			if(lastx>window.innerWidth/2+w)an2+=(0.015*d);		
+			if(lasty<window.innerHeight/2-h)an+=(0.015*d);
+			if(lasty>window.innerHeight/2+h)an-=(0.015*d);
 			
 			// move forward touch
 			// if touch center then move forward
@@ -326,10 +331,10 @@ material.flatShading=true;
 			if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
 				var dir = new THREE.Vector3();
 				camera.getWorldDirection( dir );
-				if(collideCameraMap(dir.multiplyScalar(16))==false){
+				if(collideCameraMap(dir.multiplyScalar(30))==false){
 											var dir = new THREE.Vector3();
 											camera.getWorldDirection( dir );
-				camera.position.add(dir.multiplyScalar(5) )
+				camera.position.add(dir.multiplyScalar(10) )
 			}
 				}}
 
@@ -341,9 +346,9 @@ material.flatShading=true;
 	
 			function collideCameraMap(pos){
 				
-				var x=camera.position.x+pos.x;
+				var x=camera.position.x+pos.x+40;
 				var y=camera.position.y+pos.y;
-				var z=camera.position.z+pos.z;
+				var z=camera.position.z+pos.z+40;
 				x/=60;
 				y/=60;
 				z/=60;
@@ -359,10 +364,10 @@ material.flatShading=true;
 					var ay=(y+by)*60;
 					var az=(z+bz)*60;
 					if(sphereboxcollision(
-						camera.position.x,
-						camera.position.y,
-						camera.position.z,
-						60,
+						camera.position.x+pos.x+40,
+						camera.position.y+pos.y,
+						camera.position.z+pos.z+40,
+						40,
 						ax,
 						ay,
 						az,
