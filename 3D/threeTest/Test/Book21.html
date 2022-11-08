@@ -302,16 +302,24 @@ material.flatShading=true;
 			
 				
 				if(movecamera){
-			if(lastx<window.innerWidth/2-64)an2-=0.01;		
-			if(lastx>window.innerWidth/2+64)an2+=0.01;		
-			if(lasty<window.innerHeight/2-64)an+=0.01;
-			if(lasty>window.innerHeight/2+64)an-=0.01;
+					// move left,right,up,down
+					// if touch screen edges turn
+					var w=window.innerWidth/8;
+					var h=window.innerHeight/8;
+			if(lastx<window.innerWidth/2-w)an2-=0.015;		
+			if(lastx>window.innerWidth/2+w)an2+=0.015;		
+			if(lasty<window.innerHeight/2-h)an+=0.015;
+			if(lasty>window.innerHeight/2+h)an-=0.015;
 			
-			var dir = new THREE.Vector3();
-			camera.getWorldDirection( dir );
-			
-			camera.position.add(dir.multiplyScalar(5) )
-			
+			// move forward touch
+			// if touch center then move forward
+			var w=window.innerWidth/3;
+			var h=window.innerHeight/3;
+			if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
+				var dir = new THREE.Vector3();
+				camera.getWorldDirection( dir );		
+				camera.position.add(dir.multiplyScalar(5) )
+			}
 				}
 
 				
