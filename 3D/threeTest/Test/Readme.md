@@ -1,5 +1,5 @@
 <br><br>
-<img src="Media/A8B4083E-3FC8-47F8-A9FD-8F913AF3A322.jpeg" width="60%"><br>
+<img src="Media/7B129187-D317-49F5-8A8A-3A95F9550603.jpeg" width="60%"><br>
 (Populous Amiga tiles made with moveTo lineTo commands)
 <br><br>
 
