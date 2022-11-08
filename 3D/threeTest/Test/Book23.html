@@ -152,11 +152,36 @@ user-select:none;
 		}
 	}
 	
-	for(var z=-25;z<50;z++){
-		for(var x=-70;x<50;x++){
+	for(var z=-25;z<-8;z++){
+		for(var x=-71;x<-58;x++){
 			world[x][0][z]=1;
 			world[x][1][z]=1;
+			//world[x][2][z]=1;
+		}
+	}
+	for(var z=-24;z<-9;z++){
+		for(var x=-70;x<-59;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
 			world[x][2][z]=1;
+		}
+	}
+
+	for(var z=-23;z<-10;z++){
+		for(var x=-69;x<-60;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			world[x][3][z]=1;
+		}
+	}
+
+	for(var z=-21;z<-12;z++){
+		for(var x=-67;x<-62;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			world[x][4][z]=1;
+			world[x][5][z]=1;
+			
 		}
 	}
 	
@@ -361,7 +386,7 @@ material.flatShading=true;
 						camera.getWorldDirection( dir );
 						dir.y=0; // stay on the ground
 						// see if our direction ahead collides
-						if(collideCameraMap(camera.position,dir.multiplyScalar(30))==false){
+						if(collideCameraMap(camera.position,dir.multiplyScalar(10))==false){
 							var dir = new THREE.Vector3();
 							camera.getWorldDirection( dir );
 							dir.y=0;
@@ -372,7 +397,7 @@ material.flatShading=true;
 						var dir = new THREE.Vector3();
 						camera.getWorldDirection( dir );
 						dir.y=0; // stay on the ground
-						if(collideCameraMap(camera.position,dir.multiplyScalar(30))==true){						
+						if(collideCameraMap(camera.position,dir.multiplyScalar(10))==true){						
 							//check ahead above us and then movce up on step
 							//var dir = new THREE.Vector3();							
 							//camera.getWorldDirection( dir );
@@ -381,20 +406,25 @@ material.flatShading=true;
 							var p2 = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
 							
 							//var d1 = dir.multiplyScalar(30);
-							p1.x+=dir.x*15;
-							p1.z+=dir.y*15;
-							p1.y+=30;
+							//p1.x+=dir.x*30;
+							//p1.z+=dir.y*30;
+							//p1.y+=60;//35
 							var dir = new THREE.Vector3();
 							camera.getWorldDirection( dir );
-							dir.y=0;
+							dir.y=.6;
+							
+							p1.add(dir.multiplyScalar(5));
+							p1.y+=30;
+							//p1.y+=120;
 							//dir.y=0; // stay on the ground
-							if(	collideCameraMap(p1,dir.multiplyScalar(30))==false ){
-								p1.y+=60;
-								if(	collideCameraMap(p1,dir.multiplyScalar(30))==false ){
+							if(	collideCameraMap(p1,dir.multiplyScalar(5))==false ){
+								p1.y+=30;//65
+								//camera.position.y+=10;
+								if(	collideCameraMap(p1,dir.multiplyScalar(5))==false ){
 								//var dir = new THREE.Vector3();
 								//camera.getWorldDirection( dir );
 								//dir.y=0;
-								camera.position.y+=10;
+								camera.position.y+=30;
 								//var dir = new THREE.Vector3();
 								//camera.getWorldDirection( dir );
 								gravdelay=true;
@@ -409,14 +439,15 @@ material.flatShading=true;
 				}
 				
 				// gravity
-				if(gravdelay==false){
+				//if(gravdelay==false){
 				for(var i=0;i<8;i++){
-				if(collideCameraMap(camera.position,new THREE.Vector3(0,-45,0))==false){
+				if(collideCameraMap(camera.position,new THREE.Vector3(0,-60,0))==false){
 					camera.position.y-=1;
 				}else{
-					camera.position.y+=1;
+					//camera.position.y+=1;
 				}
-				}}
+				}
+				//}
 				
 				renderer.render( scene, camera );
 			};
@@ -425,9 +456,9 @@ material.flatShading=true;
 	
 			function collideCameraMap(position,pos){
 				
-				var x=position.x+pos.x+30;
+				var x=position.x+pos.x+40;
 				var y=position.y+pos.y;
-				var z=position.z+pos.z+30;
+				var z=position.z+pos.z+40;
 				x/=60;
 				y/=60;
 				z/=60;
@@ -442,12 +473,12 @@ material.flatShading=true;
 					var ax=(x+bx)*60;
 					var ay=(y+by)*60;
 					var az=(z+bz)*60;
-					/*
+					
 					if(sphereboxcollision(
 						position.x+pos.x+40,
 						position.y+pos.y,
 						position.z+pos.z+40,
-						20,//40
+						30,//40
 						ax,
 						ay,
 						az,
@@ -456,7 +487,7 @@ material.flatShading=true;
 					)){
 						return true;
 					}
-					*/
+					/*
 					if(boxcollision(
 						position.x+pos.x+30,
 						position.y+pos.y,
@@ -470,7 +501,7 @@ material.flatShading=true;
 					)){
 						return true;
 					}
-					
+					*/
 					
 					
 				}}}}
