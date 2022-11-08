@@ -1,3 +1,8 @@
+<br><br>
+<img src="Media/A8B4083E-3FC8-47F8-A9FD-8F913AF3A322.jpeg" width="60%"><br>
+(Populous Amiga tiles made with moveTo lineTo commands)
+<br><br>
+
 <br>
 the thee.min.js is a old version.<br>
 the three.js is new <11-2022 <br>
