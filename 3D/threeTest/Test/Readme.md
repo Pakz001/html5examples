@@ -40,5 +40,7 @@ book16 = chunk with light.<br>
 book17 = chunks to world. lighted world and fog.<br>
 book18 = test with chunk and raycasting hud. (ray.at)<br>
 book19 = Hud using a secondary camera and viewport clipping.<br>
-book21 = World with camera keyboard control and buggy? touch controls.
+book21 = World with camera keyboard control and buggy? touch controls.<br>
+book22 - World with canera fpsfly control and collision camera/world.<br>
+
 
