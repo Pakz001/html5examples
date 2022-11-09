@@ -2,8 +2,9 @@
 <img src="Media/7B129187-D317-49F5-8A8A-3A95F9550603.jpeg" width="60%"><br>
 (book23.html version / touch control / first person camera / voxels / camera vs map collision / gravity / walking)
 <br><br>
-
-<br>
+Current controls touch : touch center = move forward, touch left bottom = move backwards, double tap center bottom = jump,
+elsewhere touch and drag = rotate camera.<br>
+<br><br>
 the thee.min.js is a old version.<br>
 the three.js is new <11-2022 <br>
 <br>
