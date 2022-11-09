@@ -102,6 +102,10 @@ geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 // Load the texture asynchronously
 let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa2.png');
+//sprite.minFilter = THREE.NearestFilter;
+sprite.minFilter = THREE.NearestFilter;
+sprite.magFilter = THREE.NearestFilter;
+			
 
 var material = new THREE.MeshLambertMaterial( {map: sprite , transparent: true});
 material.flatShading=true;
