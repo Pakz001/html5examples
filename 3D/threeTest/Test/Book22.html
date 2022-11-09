@@ -44,6 +44,8 @@ user-select:none;
 			document.body.appendChild( renderer.domElement );
 			// Load the texture asynchronously
 			let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+			sprite.minFilter = THREE.NearestFilter;
+			sprite.magFilter = THREE.NearestFilter;
 			
 
 			scene.fog = new THREE.FogExp2(0xffffff,0.0003);
