@@ -41,7 +41,7 @@ quad_vertices = addquadverticesface(0,0,0,true,true,true,true,true,true);
 // tile dimensions
 
   const tileSize = 16.0;
-  const tileTextureWidth = 255.0;
+  const tileTextureWidth = 256.0;
   const tileTextureHeight = 64.0;
 
 // x1 and y1 is the cell position on
@@ -59,28 +59,32 @@ var quad_indices = [];
 quad_vertices = [];
 
 var cnt=0;
-for(var x=0;x<180;x+=60){
+for(var z=0;z<380;z+=60){
+for(var x=0;x<680;x+=60){
 var fa = [true,true,true,true,true,true];
-quad_vertices .push(...addquadverticesface(x,0,0,fa[0],fa[1],fa[2],fa[3],fa[4],fa[5]));
+quad_vertices .push(...addquadverticesface(x,0,z,fa[0],fa[1],fa[2],fa[3],fa[4],fa[5]));
 
 for(var i=0;i<6;i++){
 	if(fa[i]==true){
-	quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 5)+1,Math.floor(Math.random() * 2)+1));
+	//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 5)+1,Math.floor(Math.random() * 2)+1));
+	quad_uvs.push(...addquaduvs(10,0));
 	quad_indices.push(...addquadindices(cnt));
 	cnt++;
-}
+}}
 }
 }
 
+for(var z=0;z<380;z+=60){
+for(var x=0;x<680;x+=60){
 
-for(var x=0;x<180;x+=60){
-quad_vertices .push(...addflowerquadverticesface(x+(Math.random()*20)-10,60,(Math.random()*20)-10));
-
+if(Math.random()<.8){
+quad_vertices .push(...addflowerquadverticesface(x+(Math.random()*20)-10,60,((Math.random()*20)-10)+z));
+var t=Math.floor(Math.random()*3);
 for(var i=0;i<4;i++){
-	quad_uvs.push(...addquaduvs(Math.floor(0),Math.floor(0)));
+	quad_uvs.push(...addquaduvs(t,Math.floor(0)));
 	quad_indices.push(...addquadindices(cnt));
 	cnt++;
-}
+}}}
 }
 
 
@@ -101,7 +105,7 @@ geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 // Load the texture asynchronously
-let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa2.png');
+let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa3.png');
 //sprite.minFilter = THREE.NearestFilter;
 sprite.minFilter = THREE.NearestFilter;
 sprite.magFilter = THREE.NearestFilter;
@@ -115,18 +119,20 @@ mesh.position.z = -100;
 scene.add(mesh);
 
 var ambient = new THREE.AmbientLight( 0xffffff, .5 );
+
 scene.add( ambient );
 
 			//camera.position.z = 5;
-			camera.position.set( -50,-150, -400);
+			camera.position.set( -200,300, -250);
 			
 			camera.lookAt(mesh.position);
+//			mesh.rotation.x+=5.5;
 
 			function animate() {
 				requestAnimationFrame( animate );
 
-				mesh.rotation.x+=.01;
 				mesh.rotation.y+=.01;
+				//mesh.rotation.y+=.01;
 
 
 				renderer.render( scene, camera );
@@ -159,50 +165,49 @@ scene.add( ambient );
 			}
 			
 			function addflowerquadverticesface(x,y,z,front=true,right=true,left=true,back=true){
-				var q = [];
+				var q = [];				
 				if(front){
 					// front box
 					q.push(
-					5.0+x, -30.0+y, -30.0+z,//right bottom
-					-5.0+x, -30.0+y, -30.0+z,//left bottom
+					30.0+x, -30.0+y, -30.0+z,//right bottom
+					-30.0+x, -30.0+y, -30.0+z,//left bottom
 					
-					-5.0+x,  0.0+y, -30.0+z, //left top
-					5.0+x,  0.0+y, -30.0+z, //right top
+					-30.0+x,  0.0+y, -30.0+z, //left top
+					30.0+x,  0.0+y, -30.0+z, //right top
 					);
 				}
 				if(right){
 					// right side  box
 					q.push(
-					0.0+x, -30.0+y, -35.0+z,//right bottom
-					0.0+x, -30.0+y, -25.0+z,//left bottom
+					0.0+x, -30.0+y, -60.0+z,//right bottom
+					0.0+x, -30.0+y, -0.0+z,//left bottom
 					
-					0.0+x,  0.0+y, -25.0+z, //left top
-					0.0+x,  0.0+y, -35.0+z, //right top
+					0.0+x,  0.0+y, 0.0+z, //left top
+					0.0+x,  0.0+y, -60.0+z, //right top
 					);
 				}	
 				if(left){
 					// left side  box
 					q.push(
-					0.0+x, -30.0+y, -25.0+z,//right bottom
-					0.0+x, -30.0+y, -35.0+z,//left bottom
+					0.0+x, -30.0+y, -0.0+z,//right bottom
+					0.0+x, -30.0+y, -60.0+z,//left bottom
 					
-					0.0+x,  0.0+y, -35.0+z, //left top
-					0.0+x,  0.0+y, -25.0+z, //right top
+					0.0+x,  0.0+y, -60.0+z, //left top
+					0.0+x,  0.0+y, -0.0+z, //right top
 					);
 				}	
 				if(back){
 					// Back box
 					q.push(
-					-5.0+x, -30.0+y, -30.0+z,//left bottom
-					5.0+x, -30.0+y, -30.0+z,//right bottom
+					-30.0+x, -30.0+y, -30.0+z,//left bottom
+					30.0+x, -30.0+y, -30.0+z,//right bottom
 					
-					5.0+x,  0.0+y, -30.0+z, //right top
-					-5.0+x,  0.0+y,-30.0+z, //left top
+					30.0+x,  0.0+y, -30.0+z, //right top
+					-30.0+x,  0.0+y,-30.0+z, //left top
 					);
 				}				
 				return q;
-
-
+				
 
 				
 			}
