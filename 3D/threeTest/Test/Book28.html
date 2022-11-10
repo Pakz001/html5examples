@@ -208,7 +208,11 @@ for(var x=ax;x<ax+16;x+=1){
 		for(var i=0;i<6;i++){
 			if(face[i]==true){
 			//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 16)+1,Math.floor(Math.random() * 3)+1));
-			quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*3)));
+			if(world[x][y][z]==11){
+				quad_uvs.push(...addquaduvs(10,0));
+			}else{
+				quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*3)));
+			}
 			quad_indices.push(...addquadindices(cnt));
 			cnt++;
 			}
