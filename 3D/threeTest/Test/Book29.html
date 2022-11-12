@@ -1,0 +1,955 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+
+body {
+	touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+	-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+			
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+			/*
+			zoom google diable keyboard disable in <Mstyle>
+			-webkit-user-select:none;
+			*/
+
+		//touch-action: none;
+		// user-select:none;
+		// Camera controls (native) Keyboard - w a s d (left right up down )-  q e (forward backwards)
+		//
+		//
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xffffff );	
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 8000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			scene.background = new THREE.Color( 0x4477ff);
+			//renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+			// Load the texture asynchronously
+			let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa3.png');
+			sprite.minFilter = THREE.NearestFilter;
+			sprite.magFilter = THREE.NearestFilter;
+			
+			scene.fog = new THREE.FogExp2(0xffffff,0.0003);
+			
+					var spotLight = new THREE.SpotLight(0xffffff);
+					spotLight.distance = 30000;
+					spotLight.intensity = 1.0;
+					spotLight.decay = 0.5;
+					spotLight.position.set(0,9000,0);
+
+					//spotLight.castShadow = true;
+					//spotLight.shadow.mapSize = new THREE.Vector2(2048,2048);
+					//spotLight.shadow.camera.far = 10024;
+					//spotLight.shadow.camera.near = 500;
+					//spotLight.shadow.camera.fov = 30;
+					scene.add(spotLight);
+					
+					const color = 0xFFAA99;
+					const intensity = .4;
+					const light = new THREE.AmbientLight(color, intensity);
+					scene.add(light);
+
+			        window.addEventListener('keydown', moveCamera, false);		
+					window.addEventListener("touchend", touchHandler,false);
+					window.addEventListener("touchstart", touchHandler,false);					
+					window.addEventListener("touchmove", touchHandler,false);
+										
+
+// tile dimensions
+
+  const tileSize = 16;
+  const tileTextureWidth = 256;
+  const tileTextureHeight = 64;
+
+// x1 and y1 is the cell position on
+// the atlas.
+//var x1=5,y1=2;
+//var x2=x1+1;
+//var y2=y1+1;
+// here we set the uv's with the atlas texture
+
+//quad_uvs = addquaduvs(5,2);
+
+	const worldWidth = 128;
+	const worldHeight = 96;
+	const worldDepth = 128;
+
+  	var world = new Array();
+
+	for(var i=-worldWidth;i<worldWidth;i++){
+		world[i] = new Array();
+
+		for(var j=-worldHeight;j<worldHeight;j++){
+			world[i][j]= new Array();
+
+			for(var k=-worldDepth;k<worldDepth;k++){
+				world[i][j][k]= 0;
+
+			}
+		}
+		
+	}	
+	
+	for(var i=10;i<15;i++){
+		for(var j=10;j<15;j++){
+			for(var k=10;k<15;k++){
+				world[i][j][k]= 1;
+			}
+		}
+		
+	}	
+	for(var i=2;i<5;i++){
+		for(var j=2;j<5;j++){
+			for(var k=2;k<5;k++){
+				world[i][j][k]= 1;
+			}
+		}
+		
+	}	
+	for(var i=-worldWidth;i<worldWidth;i++){
+		for(var k=-worldDepth;k<worldDepth;k++){
+				world[i][0][k]= 11;
+			}		
+	}	
+	
+		var x1 = 30;
+		var z1 = 30;
+		var pi=Math.random()*4;
+	for(var i=0;i<800;i++){
+		if(Math.random()<.5){
+		x1 = Math.floor(Math.random()*60)-60;
+		z1 = Math.floor(Math.random()*60)-60;
+		pi=Math.random()*3;
+		}
+		x1+=Math.cos(pi)*1.5;
+		z1+=Math.sin(pi)*1.5;
+		if(x1<-50)x1=-50;
+		if(z1<-50)y1=-50;
+		if(x1>100)x1=100;
+		if(z1>100)z1=100;
+		x = x1;
+		z=z1;
+		var y = 80;
+		for(var y2=y;y2>-1;y2-=1){
+			if(world[Math.floor(x)][Math.floor(y2-1)][Math.floor(z)]>0){
+				var q1=Math.floor(Math.random()*8)+1;
+				var q2=Math.floor(Math.random()*8)+1;
+				for(var a=0;a<q1;a++){
+				for(var b=0;b<q2;b++){
+			
+					world[Math.floor(x+a)][Math.floor(y2)][Math.floor(z+b)]=1;
+					
+				}}
+			y2=-1;
+			}
+		}
+	}
+	
+	for(var z=-25;z<-8;z++){
+		for(var x=-71;x<-58;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			//world[x][2][z]=1;
+		}
+	}
+	/*
+	for(var z=-24;z<-9;z++){
+		for(var x=-70;x<-59;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			world[x][2][z]=1;
+		}
+	}
+
+	for(var z=-23;z<-10;z++){
+		for(var x=-69;x<-60;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			world[x][3][z]=1;
+		}
+	}
+
+	for(var z=-21;z<-12;z++){
+		for(var x=-67;x<-62;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			world[x][4][z]=1;
+			world[x][5][z]=1;
+			
+		}
+	}\
+	*/
+	var x1 = -69;
+	var z1 = -24;
+	var y1 = 1;
+	var az1 = 4;
+	var az2 = 1.5;
+	for(var a=0;a<40;a++){
+		az1+=Math.random()/10;
+		az2+=Math.random()/30;
+		x1+=Math.cos(az1)*1;
+		y1+=Math.sin(az1)*1;
+		z1+=Math.sin(az2)*1;
+		mapblock(Math.floor(x1),Math.floor(y1)-1,Math.floor(z1),12,3,12,1);
+		mapblock(Math.floor(x1)+2,Math.floor(y1),Math.floor(z1)+2,6,2,7,0);
+		
+	}
+	mapblock(Math.floor(x1)-15,Math.floor(y1)-5,Math.floor(z1)-15,30,20,30,1);
+		
+function mapblock(x,y,z,w,h,d,v)
+{
+	for(var x1=x;x1<x+w;x1++){
+		for(var y1=y;y1<y+h;y1++){
+			for(var z1=z;z1<z+d;z1++){
+				world[x1][y1][z1]=v;
+			}
+		}
+	}
+}
+
+
+
+function makechunk(ax,ay,az){
+var quad_uvs = [];
+var quad_indices = [];
+
+quad_vertices = [];
+
+
+
+var cnt=0;
+for(var z=az;z<az+16;z+=1){
+for(var y=ay;y<ay+16;y+=1){
+for(var x=ax;x<ax+16;x+=1){
+	if(world[x][y][z]>0){
+		
+		var face = [];
+		face = getfaces(x,y,z);
+//quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,true,true,true,true,true,true));
+	quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
+		for(var i=0;i<6;i++){
+			if(face[i]==true){
+			//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 16)+1,Math.floor(Math.random() * 3)+1));
+			if(world[x][y][z]==11){
+				quad_uvs.push(...addquaduvs(10,0));
+			}else{
+				quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*3)));
+			}
+			quad_indices.push(...addquadindices(cnt));
+			cnt++;
+			}
+		}
+	}
+	if(world[x][y][z]==11 && world[x][y-1][z]==0){
+		
+		if(Math.random()<.05){
+			quad_vertices .push(...addflowerquadverticesface(
+					x*60,
+					60,
+					z*60
+					));
+	//				((x*meshSize)+xa)+(Math.random()*20)-10,160,
+	//				((Math.random()*20)-10)+((z*meshSize)+za))
+	//				);
+			var t=Math.floor(Math.random()*3);
+			for(var i=0;i<4;i++){
+				quad_uvs.push(...addquaduvs(t,Math.floor(0)));
+				quad_indices.push(...addquadindices(cnt));
+				cnt++;
+			}
+		}
+	}
+	
+	
+	
+}
+}
+}
+
+var geometry = new THREE.BufferGeometry();
+
+var vertices = new Float32Array( quad_vertices );
+// Each vertex has one uv coordinate for texture mapping
+var uvs = new Float32Array( quad_uvs);
+// Use the four vertices to draw the two triangles that make up the square.
+var indices = new Uint32Array( quad_indices )
+
+
+//geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+// itemSize = 3 because there are 3 values (components) per vertex
+geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+// Load the texture asynchronously
+//let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+
+var material = new THREE.MeshLambertMaterial( {	map: sprite , 
+												transparent: true,
+												alphaTest:0.5,
+												color:0xFFFFFF,// note darkness for torches
+											});
+material.flatShading=true;
+var mesh = new THREE.Mesh( geometry, material );
+//mesh.receiveShadow=true;
+//mesh.castShadow=true;
+//mesh.position.z = -100;
+//mesh.receiveShadow=true;
+return mesh;
+}
+//var a = makechunk(0,0);
+//mesh = [];
+var mesh = [];
+for(var y=-64;y<64;y+=16){
+for(var x=-96;x<96;x+=16){
+for(var z=-96;z<96;z+=16){
+	var m = makechunk(x,y,z);
+	//m.material =  new THREE.MeshStandardMaterial( {	map: sprite , 
+	//											transparent: false,
+	//											alphaTest:0.5,
+	//											color:0x000000,
+	//										});// note darkness for torches
+	//m.material.flatShading=true;
+	//m.material.needsUpdate = true;	
+	//a.geometry.merge(a.geometry,m.matrix);
+	//if(m)"a = THREE.BufferGeometryUtils.mergeBufferGeometries([a, m], false);
+//a = new THREE.Mesh(mergedGeom,new THREE.MeshNormalMaterial());
+  
+	
+
+mesh.push(m);
+}}
+}
+//scene.add(a);
+for (var i=0;i<mesh.length;i++){
+scene.add(mesh[i]);
+}
+
+//for (var i=0;i<mesh.length;i++){
+//	mesh[i].material = new THREE.MeshStandardMaterial( {	map: sprite , 
+//												transparent: false,
+//												alphaTest:0.5,
+//												color:0x777777,
+//											});// note darkness for torches
+//	mesh[i].material.flatShading=true;
+//	mesh[i].material.needsUpdate = true;											;
+//}
+
+
+
+
+
+
+
+
+
+
+			
+			//camera.position.z = 5;
+			camera.position.set( -4500,150, -1400);
+			camera.lookAt(0,0,0);
+			
+	const geom = new THREE.BoxGeometry();
+    const mat = new THREE.MeshNormalMaterial();
+var material = new THREE.MeshLambertMaterial( {map: sprite });
+material.flatShading=true;
+
+
+    meshz = new THREE.Mesh( geom, material	);
+	meshz.position.set(50,50,50);
+	meshz.scale.set(.1,.1,.1);
+	meshz.visible=false;
+    scene.add( meshz );
+	
+	var movecamera = false;
+	var lastx,lasty,startx,starty;
+	var vv = new THREE.Vector3();
+	var an = 0;
+	var an2 = Math.PI/2;
+	// For Camera player jumping
+	var jumpTime = 0;
+	var jumpCount = 0;
+	var doJump = false;
+	var jumpInc = 0;
+	//spotLight.lookAt(meshz);
+			
+			//camera.lookAt(mesh.position);
+			var dt=0;
+			var dir=10;
+			function animate() {
+				requestAnimationFrame( animate );
+				//camera.position.z+=dir;
+				//dt++;
+				//if(dt>512){
+				//	dir=-dir;
+				//	dt=0;
+				//}
+				//mesh.rotation.x+=.002;
+				//mesh.rotation.y+=.002;
+				//mesh.rotation.z+=.002;
+				if(an>Math.PI/2)an=Math.PI/2;
+				if(an<-Math.PI/2)an=-Math.PI/2;
+				//meshz.position.x = meshz.position.y+Math.cos(an)*10;
+				meshz.position.x = camera.position.x+(Math.cos(an2)*15);
+								
+				meshz.position.z = camera.position.z+(Math.sin(an2)*15);
+								
+				meshz.position.y = camera.position.y+(Math.sin(an)*15);
+				
+				camera.lookAt(meshz.position);
+			
+				
+				if(movecamera){
+					//var d = Math.hypot(	lasty-window.innerHeight/2,
+					//					lastx-window.innerWidth/2);
+				
+					
+					
+				
+					//d/=window.innerWidth/10;
+										//y2-y1,
+										//x2-x1);
+					// move left,right,up,down
+					// if touch screen edges turn
+					//var w=window.innerWidth/12;
+					//var h=window.innerHeight/12;
+					//if(lastx<window.innerWidth/2-w)an2-=(0.015*d);		
+					//if(lastx>window.innerWidth/2+w)an2+=(0.015*d);		
+					//if(lasty<window.innerHeight/2-h)an+=(0.015*d);
+					//if(lasty>window.innerHeight/2+h)an-=(0.015*d);
+					
+					// move forward touch
+					// if touch center then move forward
+					var w=window.innerWidth/3;
+					var h=window.innerHeight/3;
+					
+					// rotate camera
+					// attempt at minecraft style camera controls touchscreen bedrock iphone
+					if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
+						}else{
+						var d1 = Math.hypot(lasty-starty,lastx-startx);
+						if(d1<window.innerWidth/8){
+							d1 = d1 / (window.innerWidth/128);
+							if(lastx<startx)an2-=(0.005*d1);		
+							if(	lastx>startx)an2+=(0.005*d1);
+							if(lasty<starty)an+=(0.005*d1);
+							if(lasty>starty)an-=(0.005*d1);
+						}
+					}
+					
+					// Move forward
+					var gravdelay=false;
+					moveForward();					
+					moveBackward();
+				}
+				jump();
+					
+				// gravity
+				//if(gravdelay==false){
+				for(var i=0;i<8;i++){
+					if(doJump==false){
+						if(collideCameraMap(camera.position,new THREE.Vector3(0,-60,0))==false){
+							camera.position.y-=jumpInc;
+							if(jumpInc<3)jumpInc+=.01;
+							
+						}else{
+							jumpInc=0;
+						}
+					}else{
+						if(collideCameraMap(camera.position,new THREE.Vector3(0,jumpInc,0))==false){
+							camera.position.y+=jumpInc;
+							jumpInc-=.01;
+							if(jumpInc<0)doJump=false;
+						}else{
+							doJump=false;
+						}
+						
+					}	
+				}
+				//}
+				
+				renderer.render( scene, camera );
+			};
+
+			animate();
+			
+			function jump(){
+				jumpTime++;
+				var w=window.innerWidth/2.5;
+				var h=window.innerHeight/7;
+					
+				if (lastx>(w) && lastx<w+window.innerWidth/6 && lasty>(window.innerHeight/1.5) && lasty<window.innerHeight-	h){				
+					if(jumpTime > 26 || jumpCount==0 || jumpCount>3){
+						jumpCount=0;
+						jumpTime=0;
+					}
+					if(jumpCount==2){
+						jumpCount=0;
+						jumpTime=0;
+						jumpInc = 3;
+						//camera.position.y+=150;
+						doJump=true;
+					}
+				}
+			}
+			
+			function moveBackward(){
+				var w=window.innerWidth/7;
+				var h=window.innerHeight/7;
+					
+				if (lastx>(w) && lastx<w+window.innerWidth/6 && lasty>(window.innerHeight/1.5) && lasty<window.innerHeight-h){
+					var dir = new THREE.Vector3();
+					camera.getWorldDirection( dir );
+					dir.y=0; // stay on the ground
+					// see if our direction ahead collides
+					if(collideCameraMap(camera.position,dir.multiplyScalar(-10))==false){
+						var dir = new THREE.Vector3();
+						camera.getWorldDirection( dir );
+						dir.y=0;
+						camera.position.add(dir.multiplyScalar(-10) )
+					}															
+				}
+			}
+			
+			function moveForward(){	
+				// get 
+				var w=window.innerWidth/3;
+				var h=window.innerHeight/3;
+					
+				if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
+
+
+					var dir = new THREE.Vector3();
+					camera.getWorldDirection( dir );
+					dir.y=0; // stay on the ground
+					// see if our direction ahead collides
+					if(collideCameraMap(camera.position,dir.multiplyScalar(10))==false){
+						var dir = new THREE.Vector3();
+						camera.getWorldDirection( dir );
+						dir.y=0;
+						camera.position.add(dir.multiplyScalar(10) )
+					}
+					
+					
+					var dir = new THREE.Vector3();
+					camera.getWorldDirection( dir );
+					dir.y=0; // stay on the ground
+					if(collideCameraMap(camera.position,dir.multiplyScalar(10))==true){						
+						//check ahead above us and then movce up on step
+						//var dir = new THREE.Vector3();							
+						//camera.getWorldDirection( dir );
+						//dir.y=0;
+						var p1 = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
+						var p2 = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
+						
+						//var d1 = dir.multiplyScalar(30);
+						//p1.x+=dir.x*30;
+						//p1.z+=dir.y*30;
+						//p1.y+=60;//35
+						var dir = new THREE.Vector3();
+						camera.getWorldDirection( dir );
+						dir.y=.6;
+						
+						p1.add(dir.multiplyScalar(5));
+						p1.y+=30;
+						//p1.y+=120;
+						//dir.y=0; // stay on the ground
+						if(	collideCameraMap(p1,dir.multiplyScalar(5))==false ){
+							p1.y+=30;//65
+							//camera.position.y+=10;
+							if(	collideCameraMap(p1,dir.multiplyScalar(5))==false ){
+							//var dir = new THREE.Vector3();
+							//camera.getWorldDirection( dir );
+							//dir.y=0;
+							camera.position.y+=30;
+							//var dir = new THREE.Vector3();
+							//camera.getWorldDirection( dir );
+							gravdelay=true;
+							//camera.position.add(dir.multiplyScalar(10) )
+							}
+						}												
+						
+					}	
+					
+				}
+			}
+			
+	
+			function collideCameraMap(position,pos){
+				
+				var x=position.x+pos.x+40;
+				var y=position.y+pos.y;
+				var z=position.z+pos.z+40;
+				x/=60;
+				y/=60;
+				z/=60;
+				x=Math.floor(x);
+				y=Math.floor(y);
+				z=Math.floor(z);
+				//fif(world[x][y][z]>0)return true;
+				for(var bz=-1;bz<2;bz++){
+				for(var bx=-1;bx<2;bx++){
+				for(var by=-1;by<2;by++){
+				if(world[x+bx][y+by][z+bz]>0){
+					var ax=(x+bx)*60;
+					var ay=(y+by)*60;
+					var az=(z+bz)*60;
+					
+					if(sphereboxcollision(
+						position.x+pos.x+40,
+						position.y+pos.y,
+						position.z+pos.z+40,
+						30,//40
+						ax,
+						ay,
+						az,
+						60,60,60
+						
+					)){
+						return true;
+					}
+					/*
+					if(boxcollision(
+						position.x+pos.x+30,
+						position.y+pos.y,
+						position.z+pos.z+30,
+						30,30,30,
+						ax,
+						ay,
+						az,
+						60,60,60
+						
+					)){
+						return true;
+					}
+					*/
+					
+					
+				}}}}
+				return false;
+			}
+	
+			function sphereboxcollision(     x1,  y1,  z1,  radius,
+                             x2,  y2,  z2,  w,  h,  d) {
+  // get box closest point to sphere center by clamping
+  var x = Math.max(x2, Math.min(x1, x2+w));
+  var y = Math.max(y2, Math.min(y1, y2+h));
+  var z = Math.max(z2, Math.min(z1, z2+d));
+
+  // this is the same as isPointInsideSphere
+  var distance =      Math.sqrt(   (x - x1) * (x - x1) +
+                                (y - y1) * (y - y1) +
+                                (z - z1) * (z - z1));
+  
+  return distance < radius;
+};
+			
+			function boxcollision( x1,y1, z1,w1,h1, d1, 
+                     x2,  y2,  z2, w2, h2, d2){
+    return  (x1 <= x2+w2 && x1+w1 >= x2) &&
+            (y1 <= y2+h2 && y1+h1 >= y2) &&
+            (z1 <= z2+d2 && z1+d1 >= z2);
+		}
+			
+	function touchHandler(e){
+
+		if(e.type=="touchstart" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lastx = x;
+			lasty = y;
+			startx=x;
+			starty=y;
+			movecamera=true;
+			
+			//lasttouchx = x;
+			//lasttouchy = y;
+			//autoscroll = true;
+			//colx = x-colw/2;
+			//coly = y-colh/2;
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+	}
+		if(e.type=="touchmove" && e.touches) {
+			
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lastx = x;
+			lasty = y;
+			movecamera=true;
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+		
+	if(e.type=="touchend" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			movecamera=false;
+			jumpCount++;
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+
+	}		
+	
+	
+      function moveCamera( evt ) {
+      
+		  //dir.applyQuaternion( mesh.quaternion );
+			var dir = new THREE.Vector3();
+			camera.getWorldDirection( dir );
+			
+      	switch( evt.key ) {
+        
+        	case 'w':
+			
+					  							an+=.1;
+
+				
+            break;
+           
+          case 's':
+				an-=.1;		  
+
+            break;
+            
+          case 'a':
+
+			an2-=0.1;									
+            break;
+            
+          case 'd':
+			an2+=0.1;		  			
+									break;
+			case 'q':
+			if(collideCameraMap(dir.multiplyScalar(100))==false){
+				var dir = new THREE.Vector3();
+				camera.getWorldDirection( dir );
+				camera.position.add(dir.multiplyScalar(45) )
+			}
+		break;        	
+			case 'e':
+			if(collideCameraMap(dir.multiplyScalar(-100))==false){
+				var dir = new THREE.Vector3();
+				camera.getWorldDirection( dir );				
+				camera.position.add(dir.multiplyScalar(-45) )
+			}
+		break;        	
+		
+	}
+      
+	}
+	
+			
+			// get from world[][][];
+			function getfaces(x,y,z){
+				var face = [];
+				//top
+				if(world[x][y+1][z] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+				//front
+				if(world[x][y][z+1] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+					
+				//right
+				if(world[x+1][y][z] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+				//left
+				if(world[x-1][y][z] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+				//back
+				if(world[x][y][z-1] == 1){
+					face.push(false);
+						}else{
+						face.push(true);
+					}
+				//bottom
+				if(world[x][y-1][z] == 1){
+					face.push(false);
+					}else{
+						face.push(true);
+					}
+
+				return face;
+			}
+			
+			function addquadindices(num){
+				q = [0+4*num, 2+4*num, 1+4*num, 0+4*num, 3+4*num, 2+4*num,
+				];
+				
+				return q;
+			}
+			
+			function addquaduvs(x,y){
+				var x1=x,y1=y;
+				var x2=x1+1.0;
+				var y2=y1+1.0;
+				
+				// here we set the uv's with the atlas texture
+				var q = [
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+				];
+				
+				
+				return q;
+			}
+			
+			function addquadverticesface(x,y,z,top=false,front=false,right=false,left=false,back=false,bottom=false){
+				var q = [];
+				if(top==true){
+					// top box
+					q.push(
+					-30.0+x,  30.0+y, -60.0+z, //left top
+					30.0+x, 30.0+y, -60.0+z, //right top
+					30.0+x, 30.0+y, 0.0+z,//right bottom
+					-30.0+x, 30.0+y, 0.0+z,//left bottom
+					);
+				}
+				if(front==true){
+					// front box
+					q.push(
+					-30.0+x,  30.0+y, 0.0+z, //left top
+					30.0+x,  30.0+y, 0.0+z, //right top
+					30.0+x, -30.0+y, 0.0+z,//right bottom
+					-30.0+x, -30.0+y, 0.0+z,//left bottom
+					);
+				}
+				if(right==true){
+					// right side  box
+					q.push(
+					30.0+x,  30.0+y, 0.0+z, //left top
+					30.0+x,  30.0+y, -60.0+z, //right top
+					30.0+x, -30.0+y, -60.0+z,//right bottom
+					30.0+x, -30.0+y, 0.0+z,//left bottom
+					);
+				}	
+				if(left==true){
+					// left side  box
+					q.push(
+					-30.0+x,  30.0+y, -60.0+z, //left top
+					-30.0+x,  30.0+y, 0.0+z, //right top
+					-30.0+x, -30.0+y, 0.0+z,//right bottom
+					-30.0+x, -30.0+y, -60.0+z,//left bottom
+					);
+				}	
+				if(back==true){
+					// Back box
+					q.push(
+					30.0+x,  30.0+y, -60.0+z, //right top
+					-30.0+x,  30.0+y,-60.0+z, //left top
+					-30.0+x, -30.0+y, -60.0+z,//left bottom
+					30.0+x, -30.0+y, -60.0+z,//right bottom
+					);
+				}	
+				if(bottom==true){
+					// bottom box
+					q.push(
+					30.0+x, -30.0+y, -60.0+z, //right top
+					-30.0+x,  -30.0+y, -60.0+z, //left top
+					-30.0+x, -30.0+y, 0.0+z,//left bottom
+					30.0+x, -30.0+y, 0.0+z,//right bottom
+					);
+				}
+			
+				return q;
+
+
+
+				
+			}
+			
+			function addflowerquadverticesface(x,y,z,front=true,right=true,left=true,back=true){
+				var q = [];				
+				if(front){
+					// front box
+					q.push(
+					30.0+x, -30.0+y, -30.0+z,//right bottom
+					-30.0+x, -30.0+y, -30.0+z,//left bottom
+					
+					-30.0+x,  0.0+y, -30.0+z, //left top
+					30.0+x,  0.0+y, -30.0+z, //right top
+					);
+				}
+				if(right){
+					// right side  box
+					q.push(
+					0.0+x, -30.0+y, -60.0+z,//right bottom
+					0.0+x, -30.0+y, -0.0+z,//left bottom
+					
+					0.0+x,  0.0+y, 0.0+z, //left top
+					0.0+x,  0.0+y, -60.0+z, //right top
+					);
+				}	
+				if(left){
+					// left side  box
+					q.push(
+					0.0+x, -30.0+y, -0.0+z,//right bottom
+					0.0+x, -30.0+y, -60.0+z,//left bottom
+					
+					0.0+x,  0.0+y, -60.0+z, //left top
+					0.0+x,  0.0+y, -0.0+z, //right top
+					);
+				}	
+				if(back){
+					// Back box
+					q.push(
+					-30.0+x, -30.0+y, -30.0+z,//left bottom
+					30.0+x, -30.0+y, -30.0+z,//right bottom
+					
+					30.0+x,  0.0+y, -30.0+z, //right top
+					-30.0+x,  0.0+y,-30.0+z, //left top
+					);
+				}				
+				return q;
+				
+
+				
+			}
+		</script>
+	</body>
+	</html>
