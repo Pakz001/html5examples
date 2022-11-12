@@ -31,11 +31,13 @@ Use different browser.
 	var world = [];
 	var x1=y1=0;
 	var x2=y2=5;
-	expandArray(world,0,0,5,5);
-	world[0][0]=100;
-	world[1][0]=100;
-	expandArray(world,-3,-3,5,5);
-	world[-3][-3]=100;
+	setIndex(world,0,0,10);
+	setIndex(world,3,3,20);
+	//expandArray(world,0,0,5,5);
+	//world[0][0]=100;
+	//world[1][0]=100;
+	//expandArray(world,-3,-3,5,5);
+	//world[-3][-3]=100;
 	
 	gameloop=setInterval(doGameLoop,1000);
 
@@ -54,6 +56,9 @@ Use different browser.
 			}
 		}
 	}
+	function setIndex(arr,x,y,val){
+		expandArray(arr,x,y,x+1,y+1,val);
+	}
 	function checkIndex(arr, index1,index2) {
 			if(arr[index1] === undefined){
 				return false;
@@ -63,11 +68,11 @@ Use different browser.
 			}
 			return true;
 		}
-	function expandArray(arr,x1,y1,x2,y2){
+	function expandArray(arr,x1,y1,x2,y2,val=0){
 		for (x=x1; x<x2; x++){
 			if(arr[x]===undefined)arr[x] = new Array();
 		 	for (y=y1; y<y2; y++){
-				if(arr[x][y]===undefined)arr[x][y] = x+y;
+				if(arr[x][y]===undefined)arr[x][y] = val;
 			  }
 		}
 	}
