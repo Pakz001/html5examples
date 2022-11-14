@@ -388,6 +388,24 @@ material.flatShading=true;
 	meshz.visible=false;
     scene.add( meshz );
 	
+
+	//
+	// UI - forward
+	//
+  const material2 = new THREE.MeshPhongMaterial({
+    color,
+    opacity: 0.5,
+    transparent: true,
+});	
+	
+    meshf = new THREE.Mesh( geom, material2	);
+	//meshf.position.set(50,50,50);
+	meshf.scale.set(4,4,4);
+	//meshf.visible=false;
+    scene.add( meshf );
+
+	
+	
 	var movecamera = false;
 	var lastx,lasty,startx,starty;
 	var vv = new THREE.Vector3();
@@ -412,6 +430,17 @@ material.flatShading=true;
 				//	dir=-dir;
 				//	dt=0;
 				//}
+				/*
+				var dir=new THREE.Vector3();
+				meshf.position.set(camera.getWorldPosition());
+				camera.getWorldDirection( dir );
+				// see if our direction ahead collides
+				meshf.position.x+=dir.x*4;
+				meshf.position.y+=dir.y*4;
+				meshf.position.z+=dir.z*4;
+				*/
+				
+				
 				//mesh.rotation.x+=.002;
 				//mesh.rotation.y+=.002;
 				//mesh.rotation.z+=.002;
@@ -510,6 +539,20 @@ material.flatShading=true;
 					}	
 				}
 				//}
+				
+				// forward ui
+				var dir = new THREE.Vector3();
+				camera.getWorldDirection( dir );
+				meshf.position.set(camera.position.x,camera.position.y,camera.position.z);
+				meshf.position.x+=dir.x*15;
+				meshf.position.y+=dir.y*15;
+				meshf.position.y+=2.7;
+				meshf.position.z+=dir.z*15;	
+				meshf.lookAt(camera.position);
+				// backwards ui
+//				var dir = new THREE.Vector3();
+//				camera.getWorldDirection( dir );
+
 				
 				renderer.render( scene, camera );
 			};
