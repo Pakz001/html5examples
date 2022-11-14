@@ -706,7 +706,7 @@ material.flatShading=true;
 			startx=x;
 			starty=y;
 			movecamera=true;
-			
+			dig();
 			//lasttouchx = x;
 			//lasttouchy = y;
 			//autoscroll = true;
@@ -742,6 +742,28 @@ material.flatShading=true;
 			//if(x>window.innerWidth/2+48)an2+=0.1;		
 			//if(y<window.innerHeight/2-48)an+=0.1;
 			//if(y>window.innerHeight/2+48)an-=0.1;
+			//dig();
+			//scene.remove(mesh[Id]);
+					//mesh.splice(Id,1);
+					//meshId.splice(Id,1);
+					//mesh.push(makechunk(x3*16,y3*16,z3*16));
+					//meshId.push({x:x3,y:y3,z:z3});
+					//scene.add(mesh[mesh.length-1]);
+					
+			
+	   
+	   
+
+
+
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+
+	}		
+
+	function dig(){
 			var w=window.innerWidth/2.5;
 			var h=window.innerHeight;
 				
@@ -835,10 +857,10 @@ material.flatShading=true;
 				var az = (Math.floor(pz/16)-pz);		
 				if(ax==0)rm(x3-1,y3,z3);
 				if(ax==15)rm(x3+1,y3,z3);
-				if(ay==0)rm(x3,y3-1,z3);
-				if(ay==15)rm(x3,y3+1,z3);
-				if(az==0)rm(x3,y3,z3+1);
-				if(az==15)rm(x3,y3-1,z3-1);
+				if(ay==0)rm(x3,y3-1,z3);//fixed
+				if(ay==15)rm(x3,y3+1,z3);//fixed
+				if(az==0)rm(x3,y3,z3-1);//fixed
+				if(az==15)rm(x3,y3,z3+1);//fixed
 				rm(x3,y3,z3);
 			}
 			function rm(x4,y4,z4){
@@ -854,26 +876,8 @@ material.flatShading=true;
 					}
 				}
 			}
-			//scene.remove(mesh[Id]);
-					//mesh.splice(Id,1);
-					//meshId.splice(Id,1);
-					//mesh.push(makechunk(x3*16,y3*16,z3*16));
-					//meshId.push({x:x3,y:y3,z:z3});
-					//scene.add(mesh[mesh.length-1]);
-					
-			
-	   }
-	   
-
-
-
-			
-			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
-      	e.preventDefault();
-		}
-
-	}		
-	
+		}	
+	}
 	
       function moveCamera( evt ) {
       
