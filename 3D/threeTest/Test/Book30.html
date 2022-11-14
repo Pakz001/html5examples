@@ -399,11 +399,12 @@ material.flatShading=true;
 });	
 	
     meshf = new THREE.Mesh( geom, material2	);
-	//meshf.position.set(50,50,50);
-	meshf.scale.set(4,4,4);
-	//meshf.visible=false;
+	meshf.scale.set(2,2,.1);
     scene.add( meshf );
-
+    meshb = new THREE.Mesh( geom, material2	);
+	meshb.scale.set(2,2,.1);
+    scene.add( meshb );
+	
 	
 	
 	var movecamera = false;
@@ -541,6 +542,7 @@ material.flatShading=true;
 				//}
 				
 				// forward ui
+				/*
 				var dir = new THREE.Vector3();
 				camera.getWorldDirection( dir );
 				meshf.position.set(camera.position.x,camera.position.y,camera.position.z);
@@ -549,6 +551,12 @@ material.flatShading=true;
 				meshf.position.y+=2.7;
 				meshf.position.z+=dir.z*15;	
 				meshf.lookAt(camera.position);
+				*/
+				setUi();				
+				
+				
+				
+				
 				// backwards ui
 //				var dir = new THREE.Vector3();
 //				camera.getWorldDirection( dir );
@@ -558,6 +566,48 @@ material.flatShading=true;
 			};
 
 			animate();
+		
+		//
+		// Draw some cubes in front of the camera
+		// where the touch screen has effects. (UI)
+		//	
+		function setUi(){				
+				var pointer = new THREE.Vector2();
+				pointer.x = ( (window.innerWidth/2) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight/2-70) / window.innerHeight ) * 2 +1;
+				var raycaster = new THREE.Raycaster()
+			    raycaster.setFromCamera(pointer, camera);
+				var bulld = new THREE.Vector3();
+				bulld = raycaster.ray.direction;
+				var bull = new THREE.Vector3();
+				bull.x = camera.position.x;
+				bull.y = camera.position.y;
+				bull.z = camera.position.z;
+				bull.x += bulld.x*10;
+				bull.y += bulld.y*10;
+				bull.z += bulld.z*10;
+				meshf.position.set(bull.x,bull.y,bull.z);
+				meshf.lookAt(camera.position);
+				
+				var pointer = new THREE.Vector2();
+				pointer.x = ( (window.innerWidth*.2) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight*.7) / window.innerHeight ) * 2 +1;
+				var raycaster = new THREE.Raycaster()
+			    raycaster.setFromCamera(pointer, camera);
+				var bulld = new THREE.Vector3();
+				bulld = raycaster.ray.direction;
+				var bull = new THREE.Vector3();
+				bull.x = camera.position.x;
+				bull.y = camera.position.y;
+				bull.z = camera.position.z;
+				bull.x += bulld.x*10;
+				bull.y += bulld.y*10;
+				bull.z += bulld.z*10;
+				meshb.position.set(bull.x,bull.y,bull.z);
+				meshb.lookAt(camera.position);				
+				
+		}			
+	
 			
 			function jump(){
 				jumpTime++;
