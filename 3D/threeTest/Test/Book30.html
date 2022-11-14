@@ -783,6 +783,7 @@ material.flatShading=true;
 	  //raycaster.at(50,coords);
 		 	var eloop=false;
 			var x3,y3,z3,Id;
+			var px,py;
 	  		for(var q=130;q<600;q++){
 				bull.x += bulld.x;
 				bull.y += bulld.y;
@@ -813,6 +814,9 @@ material.flatShading=true;
 						if(x2===meshId[i].x && y2===meshId[i].y && z2===meshId[i].z){
 							eloop=true;
 							Id = i;
+							px = x;
+							py = y;
+							pz = z;
 							x3=x2;
 							y3=y2;
 							z3=z2;
@@ -823,14 +827,41 @@ material.flatShading=true;
 				}
 			}
 			if(eloop==true){
-					scene.remove(mesh[Id]);
-					mesh.splice(Id,1);
-					meshId.splice(Id,1);
-					mesh.push(makechunk(x3*16,y3*16,z3*16));
-					meshId.push({x:x3,y:y3,z:z3});
-					scene.add(mesh[mesh.length-1]);
-					
+				//
+				// If we are to edge of chunks remake chunk nexto to it(testing)
+				//
+				var ax = (Math.floor(px/16)-px);
+				var ay = (Math.floor(py/16)-py);
+				var az = (Math.floor(pz/16)-pz);		
+				if(ax==0)rm(x3-1,y3,z3);
+				if(ax==15)rm(x3+1,y3,z3);
+				if(ay==0)rm(x3,y3-1,z3);
+				if(ay==15)rm(x3,y3+1,z3);
+				if(az==0)rm(x3,y3,z3+1);
+				if(az==15)rm(x3,y3-1,z3-1);
+				rm(x3,y3,z3);
 			}
+			function rm(x4,y4,z4){
+				for(var i=0;i<meshId.length;i++){
+					if(meshId[i].x===x4 && meshId[i].y===y4 && meshId[i].z===z4){
+						scene.remove(mesh[i]);
+						mesh.splice(i,1);
+						meshId.splice(i,1);
+						mesh.push(makechunk(x4*16,y4*16,z4*16));
+						meshId.push({x:x4,y:y4,z:z4});
+						scene.add(mesh[mesh.length-1]);
+				
+					}
+				}
+			}
+			//scene.remove(mesh[Id]);
+					//mesh.splice(Id,1);
+					//meshId.splice(Id,1);
+					//mesh.push(makechunk(x3*16,y3*16,z3*16));
+					//meshId.push({x:x3,y:y3,z:z3});
+					//scene.add(mesh[mesh.length-1]);
+					
+			
 	   }
 	   
 
