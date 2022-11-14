@@ -400,13 +400,13 @@ material.flatShading=true;
 });	
 	
     meshf = new THREE.Mesh( geom, material2	);
-		var sch=window.innerWidth/1000;
-		var scv=window.innerHeight/1150;
-		if(sch<scv){
+		var sch=(window.innerWidth/7.5)/100;
+		var scv=(window.innerHeight/7)/100;
+		if(sch>scv){
 			//scv/=2;
 		}else{
-		  sch*=3.2;
-			scv*=4;
+			sch/=1.5;
+			scv/=1.5;
 		}
 	//meshf.scale.set(2,2,.1);
 	meshf.scale.set(sch,scv,sch);
@@ -585,7 +585,7 @@ material.flatShading=true;
 		function setUi(){				
 				var pointer = new THREE.Vector2();
 				pointer.x = ( (window.innerWidth/2) / window.innerWidth ) * 2 -1;
-				pointer.y = -( (window.innerHeight*.40) / window.innerHeight ) * 2 +1;
+				pointer.y = -( (window.innerHeight*.365) / window.innerHeight ) * 2 +1;
 				var raycaster = new THREE.Raycaster()
 			    raycaster.setFromCamera(pointer, camera);
 				var bulld = new THREE.Vector3();
@@ -602,7 +602,7 @@ material.flatShading=true;
 				
 				var pointer = new THREE.Vector2();
 				pointer.x = ( (window.innerWidth*.2) / window.innerWidth ) * 2 -1;
-				pointer.y = -( (window.innerHeight*.70) / window.innerHeight ) * 2 +1;
+				pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
 				var raycaster = new THREE.Raycaster()
 			    raycaster.setFromCamera(pointer, camera);
 				var bulld = new THREE.Vector3();
@@ -645,7 +645,7 @@ material.flatShading=true;
 				var w=window.innerWidth/7;
 				var h=window.innerHeight/5;
 					
-				if (lastx>(w) && lastx<w+window.innerWidth/6 && lasty>(window.innerHeight/1.5) && lasty<window.innerHeight-h){
+				if (lastx>(w) && lastx<w+window.innerWidth/8 && lasty>(window.innerHeight/1.5) && lasty<window.innerHeight-h){
 										turnCountDown=40;
 					var dir = new THREE.Vector3();
 					camera.getWorldDirection( dir );
@@ -1219,3 +1219,4 @@ material.flatShading=true;
 		</script>
 	</body>
 	</html>
+	
