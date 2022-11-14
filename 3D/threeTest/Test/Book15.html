@@ -23,6 +23,10 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			//renderer.shadowMap.Enabled=true;
 			document.body.appendChild( renderer.domElement );
+			let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+			window.addEventListener("touchend", touchHandler,false);
+			window.addEventListener("touchstart", touchHandler,false);					
+			window.addEventListener("touchmove", touchHandler,false);
 			
 			
 					//var spotLight = new THREE.SpotLight(0xffffff);
@@ -87,7 +91,7 @@
 				world[i][0][k]= 1;
 			}		
 	}	
-	
+	/*
 		var x1 = 50;
 		var z1 = 50;
 		var pi=0;
@@ -113,8 +117,8 @@
 			}
 		}
 	}
-	
-
+	*/
+function makemesh(){
 var quad_uvs = [];
 var quad_indices = [];
 
@@ -123,9 +127,9 @@ quad_vertices = [];
 
 
 var cnt=0;
-for(var z=0;z<115;z+=1){
-for(var y=0;y<115;y+=1){
-for(var x=0;x<115;x+=1){
+for(var z=0;z<6;z+=1){
+for(var y=0;y<6;y+=1){
+for(var x=0;x<6;x+=1){
 	if(world[x][y][z]==1){
 	var face = [];
 	face = getfaces(x,y,z);
@@ -159,32 +163,137 @@ geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 
 // Load the texture asynchronously
-let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+
 
 var material = new THREE.MeshBasicMaterial( {map: sprite });
 var mesh = new THREE.Mesh( geometry, material );
-mesh.position.z = -100;
+return mesh;
+}
 
+var mesh = makemesh();
+let objects = [];
+
+objects.push(mesh);
 scene.add(mesh);
+var lastx,lasty,startx,starty;
+
 
 
 			//camera.position.z = 5;
-			camera.position.set( -50,-1850, -900);
+			camera.position.set( 0,850, -500);
 			
-			camera.lookAt(mesh.position);
+			camera.lookAt(50,0,50);
 
+			
+		
+
+
+			
 			function animate() {
 				requestAnimationFrame( animate );
 
-				mesh.rotation.x+=.002;
-				mesh.rotation.y+=.002;
-				mesh.rotation.z+=.002;
-
+				//mesh.rotation.x+=.002;
+				//mesh.rotation.y+=.002;
+				//mesh.rotation.z+=.002;
+				
+  
 
 				renderer.render( scene, camera );
 			};
 
 			animate();
+			
+			
+						function touchHandler(e){
+
+		if(e.type=="touchstart" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			startx = x;
+			starty = y;
+			lastx = x;
+			lasty = y;
+			//movecamera=true;
+			//lasttouchx = x;
+			//lasttouchy = y;
+			//autoscroll = true;
+			//colx = x-colw/2;
+			//coly = y-colh/2;
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+	}
+		if(e.type=="touchmove" && e.touches) {
+			
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lastx = x;
+			lasty = y;
+			//movecamera=true;
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+		
+	if(e.type=="touchend" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			//movecamera=false;
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//x
+			// here we set up a raycaster and aim it
+			// into the direction of the touch position.
+			// we then use the raycasters ray at position
+			// to find the first voxel it touched
+			// and remove that from the world
+			// array and rebuild the chunk.
+			//
+			var pointer = new THREE.Vector2();
+			pointer.x = ( startx / window.innerWidth ) * 2 - 1;
+			pointer.y = -( starty / window.innerHeight ) * 2 + 1;
+			pointer.y+=.15;
+			pointer.x-=.05;
+			
+			//pointer.x = startx;
+			//pointer.y = starty;
+	// update the picking ray with the camera and pointer position
+	    const raycaster = new THREE.Raycaster()
+    raycaster.setFromCamera(pointer, camera);
+	
+	   const coords=new THREE.Vector3();
+	  //raycaster.at(50,coords);
+	  for(var q=0;q<1200;q++){
+	  	raycaster.ray.at(q,coords);
+		var x=Math.floor(coords.x/60);
+		var y=Math.floor(coords.y/60);
+		var z=Math.floor(coords.z/60);
+		if(x>=0 && y>=0 && z>=0 && x<6 && y<6 && z<6){
+			if(world[x][y][z]>0){
+			world[x][y][z]=0;
+			break;
+		}
+		}
+	   }
+	   
+	   scene.remove(mesh);
+	   mesh = makemesh();
+	   scene.add(mesh);
+	   
+      	e.preventDefault();
+		}
+
+	}		
+	
+			
 			
 			// get from world[][][];
 			function getfaces(x,y,z){
