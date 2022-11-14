@@ -53,4 +53,5 @@ BOOK25 - World with camera fps jumping backwards map collision touch-controls<br
 book26 - Flower mesh build. small<br>
 book27 - Grass flower plants large map test<br>
 book28 - MAIN engine with plants<br>
-book29 - MAIN engine with tunnel test and modified fps camera.
+book29 - MAIN engine with tunnel test and modified fps camera.<br>
+book30 - MAIN engine with block remove (needs user controls remake)<br>
