@@ -258,7 +258,7 @@ for(var x=ax;x<ax+16;x+=1){
 			if(world[x][y][z]==11){
 				quad_uvs.push(...addquaduvs(10,0));
 			}else{
-				quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*3)));
+				quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*1)));
 			}
 			quad_indices.push(...addquadindices(cnt));
 			cnt++;
@@ -915,7 +915,7 @@ material.flatShading=true;
 	  //raycaster.at(50,coords);
 		 	var eloop=false;
 			var x3,y3,z3,Id;
-			var px,py;
+			var px,py,pz;
 	  		for(var q=0;q<400;q++){
 				bull.x += bulld.x;
 				bull.y += bulld.y;
@@ -962,13 +962,20 @@ material.flatShading=true;
 				//
 				// If we are to edge of chunks remake chunk nexto to it(testing)
 				//
-				var ax = (Math.floor(px/16)-px);
-				var ay = (Math.floor(py/16)-py);
-				var az = (Math.floor(pz/16)-pz);		
+				var ax = Math.floor((px/16));
+				var ay = Math.floor((py/16));
+				var az = Math.floor((pz/16));
+				ax=Math.abs(ax*16-px);		
+				ay=Math.abs(ay*16-py);		
+				az=Math.abs(az*16-pz);		
+				//console.log(ax+","+ay+","+az);
 				if(ax==0)rm(x3-1,y3,z3);
 				if(ax==15)rm(x3+1,y3,z3);
+				//if(ay==0)rm(x3,y3-1,z3);//fixed
+				//if(ay==15)rm(x3,y3+1,z3);//fixed
 				if(ay==0)rm(x3,y3-1,z3);//fixed
 				if(ay==15)rm(x3,y3+1,z3);//fixed
+				
 				if(az==0)rm(x3,y3,z3-1);//fixed
 				if(az==15)rm(x3,y3,z3+1);//fixed
 				rm(x3,y3,z3);
