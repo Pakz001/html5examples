@@ -398,6 +398,7 @@ material.flatShading=true;
 	var jumpCount = 0;
 	var doJump = false;
 	var jumpInc = 0;
+	var turnCountDown = 0;
 	//spotLight.lookAt(meshz);
 			
 			//camera.lookAt(mesh.position);
@@ -417,6 +418,14 @@ material.flatShading=true;
 				if(an>Math.PI/2)an=Math.PI/2;
 				if(an<-Math.PI/2)an=-Math.PI/2;
 				//meshz.position.x = meshz.position.y+Math.cos(an)*10;
+				var ox,oy,oz;
+				ox = meshz.position.x;
+								
+				oz = meshz.position.z;
+								
+				oy = meshz.position.y;
+				
+				
 				meshz.position.x = camera.position.x+(Math.cos(an2)*15);
 								
 				meshz.position.z = camera.position.z+(Math.sin(an2)*15);
@@ -425,6 +434,13 @@ material.flatShading=true;
 				
 				camera.lookAt(meshz.position);
 			
+				if(ox!=meshz.position.x || oy!=meshz.position.y || oz!=meshz.position.z ){
+					turnCountDown=40;
+				}
+				
+				// after we have turned then wait for block placement.
+				turnCountDown-=1;
+				if(turnCountDown<0)turnCountDown=0;
 				
 				if(movecamera){
 					//var d = Math.hypot(	lasty-window.innerHeight/2,
@@ -503,9 +519,10 @@ material.flatShading=true;
 			function jump(){
 				jumpTime++;
 				var w=window.innerWidth/2.5;
-				var h=window.innerHeight/7;
+				var h=window.innerHeight;
 					
-				if (lastx>(w) && lastx<w+window.innerWidth/6 && lasty>(window.innerHeight/1.5) && lasty<window.innerHeight-	h){				
+				if (startx>(w) && startx<w+window.innerWidth/6 && starty>(window.innerHeight-window.innerHeight/7)
+				&& starty<window.innerHeight){				
 					if(jumpTime > 26 || jumpCount==0 || jumpCount>3){
 						jumpCount=0;
 						jumpTime=0;
@@ -525,6 +542,7 @@ material.flatShading=true;
 				var h=window.innerHeight/7;
 					
 				if (lastx>(w) && lastx<w+window.innerWidth/6 && lasty>(window.innerHeight/1.5) && lasty<window.innerHeight-h){
+										turnCountDown=40;
 					var dir = new THREE.Vector3();
 					camera.getWorldDirection( dir );
 					dir.y=0; // stay on the ground
@@ -540,11 +558,11 @@ material.flatShading=true;
 			
 			function moveForward(){	
 				// get 
-				var w=window.innerWidth/3;
+				var w=window.innerWidth/2.2;
 				var h=window.innerHeight/3;
 					
-				if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
-
+				if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-(h*1.4)){
+					turnCountDown=40;
 
 					var dir = new THREE.Vector3();
 					camera.getWorldDirection( dir );
@@ -724,7 +742,11 @@ material.flatShading=true;
 			//if(x>window.innerWidth/2+48)an2+=0.1;		
 			//if(y<window.innerHeight/2-48)an+=0.1;
 			//if(y>window.innerHeight/2+48)an-=0.1;
-
+			var w=window.innerWidth/2.5;
+			var h=window.innerHeight;
+				
+			if (startx>(w) && startx<w+window.innerWidth/6 && starty>(window.innerHeight-window.innerHeight/7))return;
+			if(turnCountDown>0)return;	
 			var pointer = new THREE.Vector2();
 			//pointer.x = ( startx / window.innerWidth ) * 2 - 1;
 			//pointer.y = -( starty / window.innerHeight ) * 2 + 1;
