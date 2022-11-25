@@ -438,6 +438,7 @@ material.flatShading=true;
 	var doJump = false;
 	var jumpInc = 0;
 	var turnCountDown = 0;
+	var lastPressTime = 0;
 	//spotLight.lookAt(meshz);
 			
 			//camera.lookAt(mesh.position);
@@ -445,6 +446,8 @@ material.flatShading=true;
 			var dir=10;
 			function animate() {
 				requestAnimationFrame( animate );
+				
+				lastPressTime+=1;
 				//camera.position.z+=dir;
 				//dt++;
 				//if(dt>512){
@@ -819,8 +822,11 @@ material.flatShading=true;
 			startx=x;
 			starty=y;
 			movecamera=true;
+			// When touch start then start counting the press timer.
+			// this for digging..
+			lastPressTime = 0;
 			highlight();
-			dig();
+			//dig();
 			//lasttouchx = x;
 			//lasttouchy = y;
 			//autoscroll = true;
@@ -855,6 +861,11 @@ material.flatShading=true;
 						lastx = x;
 						lasty = y;
 			highlight();
+			// if the time between touch start and
+			// touch end is > x, then dig();
+			if(lastPressTime>40){
+				dig();
+			}
 			//autoscroll = false;
 			//if(x<window.innerWidth/2-48)an2-=0.1;		
 			//if(x>window.innerWidth/2+48)an2+=0.1;		
