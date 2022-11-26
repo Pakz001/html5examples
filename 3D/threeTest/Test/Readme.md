@@ -60,3 +60,4 @@ book31 - MAIN - engine with block highlighting. Delay for digging(long hold then
 book32 - MAIN - engine. Continue digging/placing when finger stays down. (dig/place distance now 500) !dig and place block<br>
 book33 - Billboard / Canvasses on top of 3d view as user interface(ui) example.<br>
 book34 - MAIN - engine - Changed camera movement drag and turn. Forward.<br>
+book35 - MAIN - engine - Multi touch - move and turn (!)<br>
