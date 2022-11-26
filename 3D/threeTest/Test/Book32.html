@@ -426,6 +426,14 @@ material.flatShading=true;
     scene.add( meshb );
 	
 	
+	var meshDig = new THREE.Mesh( geom, material2	);
+	meshDig.scale.set(sch,scv,sch);
+    scene.add( meshDig );
+	var meshPlace = new THREE.Mesh( geom, material2	);
+	meshPlace.scale.set(sch,scv,sch);
+    scene.add( meshPlace );
+	
+	
 	
 	var movecamera = false;
 	var lastx,lasty,startx,starty;
@@ -440,6 +448,7 @@ material.flatShading=true;
 	var turnCountDown = 0; // do not dig after turn
 	var continueDig = false; // uses lastPressTime to continue digging.
 	var continueDigTime = 0;
+	var playerTouchMode = 1; // 1=dig 2 = place
 	
 	//spotLight.lookAt(meshz);
 			
@@ -471,7 +480,13 @@ material.flatShading=true;
 					continueDigCount+=1;
 					if(continueDigCount>50){
 						continueDigCount=0;
-						dig();
+						//dig();
+						//placeBlock();
+						if(playerTouchMode==1){
+							dig();
+						}else{
+							placeBlock();
+						}
 						highlight();
 					}	
 				}
@@ -639,7 +654,42 @@ material.flatShading=true;
 				bull.z += bulld.z*10;
 				meshb.position.set(bull.x,bull.y,bull.z);
 				meshb.lookAt(camera.position);				
-				
+
+				// dig icon
+				var pointer = new THREE.Vector2();
+				pointer.x = ( (window.innerWidth*.78) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
+				var raycaster = new THREE.Raycaster()
+			    raycaster.setFromCamera(pointer, camera);
+				var bulld = new THREE.Vector3();
+				bulld = raycaster.ray.direction;
+				var bull = new THREE.Vector3();
+				bull.x = camera.position.x;
+				bull.y = camera.position.y;
+				bull.z = camera.position.z;
+				bull.x += bulld.x*10;
+				bull.y += bulld.y*10;
+				bull.z += bulld.z*10;
+				meshDig.position.set(bull.x,bull.y,bull.z);
+				meshDig.lookAt(camera.position);				
+				// place block icon
+				// dig icon
+				var pointer = new THREE.Vector2();
+				pointer.x = ( (window.innerWidth*.92) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
+				var raycaster = new THREE.Raycaster()
+			    raycaster.setFromCamera(pointer, camera);
+				var bulld = new THREE.Vector3();
+				bulld = raycaster.ray.direction;
+				var bull = new THREE.Vector3();
+				bull.x = camera.position.x;
+				bull.y = camera.position.y;
+				bull.z = camera.position.z;
+				bull.x += bulld.x*10;
+				bull.y += bulld.y*10;
+				bull.z += bulld.z*10;
+				meshPlace.position.set(bull.x,bull.y,bull.z);
+				meshPlace.lookAt(camera.position);					
 		}			
 	
 			
@@ -836,6 +886,22 @@ material.flatShading=true;
 			highlight(); //highlighted block
 			continueDig = true; // continue digging if hold down.
 			continueDigCount=0;
+			
+				//			pointer.x = ( (window.innerWidth*.78) / window.innerWidth ) * 2 -1;
+				//pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
+				
+			if(startx>(window.innerWidth*.78) && startx<window.innerWidth*.86 && starty>window.innerHeight*.68 && starty<window.innerHeight*.78){
+				playerTouchMode = 1;
+				meshDig.scale.set(sch*1.5,scv*1.5,sch*1.5);
+				meshPlace.scale.set(sch,scv,sch);
+			}
+			if(startx>(window.innerWidth*.88) && startx<window.innerWidth*.98 && starty>window.innerHeight*.68 && starty<window.innerHeight*.78){
+				playerTouchMode = 2;
+				meshDig.scale.set(sch,scv,sch);
+				meshPlace.scale.set(sch*1.5,scv*1.5,sch*1.5);
+				
+			}
+			
 			//dig();
 			//lasttouchx = x;
 			//lasttouchy = y;
@@ -998,6 +1064,144 @@ material.flatShading=true;
 		
 		
 	}
+	
+	function placeBlock(){
+		// exit if moving backwards
+			var w=window.innerWidth/7;
+				var h=window.innerHeight/5;
+					
+				if (startx>(w) && startx<w+window.innerWidth/6 && starty>(window.innerHeight/1.5) && starty<window.innerHeight-h)return;
+				
+			
+			if(turnCountDown>0)return;	
+			var pointer = new THREE.Vector2();
+			//pointer.x = ( startx / window.innerWidth ) * 2 - 1;
+			//pointer.y = -( starty / window.innerHeight ) * 2 + 1;
+			pointer.x = ( (startx) / window.innerWidth ) * 2 -1;
+			pointer.y = -( (starty-(window.innerHeight/20)) / window.innerHeight ) * 2 +1;
+			//pointer.y+=.25;
+			//pointer.x-=.03;
+			
+			//pointer.x = startx;
+			//pointer.y = starty;
+	// update the picking ray with the camera and pointer position
+	    	
+			const raycaster = new THREE.Raycaster()
+
+			//raycaster.params.Line.threshold = 60;
+			//var vec = new THREE.Vector3();
+			//camera.getWorldPosition(vec);
+			//var dir = new THREE.Vector3();
+			//camera.getWorldDirection(dir);
+			
+			//const ray = new THREE.ray(vec,camera.getWorldDirection());
+			//raycaster.params.Points.threshold = 60;
+		    raycaster.setFromCamera(pointer, camera);
+			var bulld = new THREE.Vector3();
+			bulld = raycaster.ray.direction;
+			//bulld.y+=.25;
+			//bulld.x+=.45;
+			var oldBull = new THREE.Vector3();
+			var bull = new THREE.Vector3();
+			bull.x = camera.position.x+30;
+			bull.y = camera.position.y+30;
+			bull.z = camera.position.z+60;
+			bull.x += bulld.x*30;
+			bull.y += bulld.y*30;
+			bull.z += bulld.z*30;
+	   		const coords=new THREE.Vector3();
+
+	  //raycaster.at(50,coords);
+		 	var eloop=false;
+			var x3,y3,z3,Id;
+			var px,py,pz;
+	  		for(var q=0;q<500;q++){
+				oldBull.x = bull.x;
+				oldBull.y = bull.y;
+				oldBull.z = bull.z;
+				bull.x += bulld.x;
+				bull.y += bulld.y;
+				bull.z += bulld.z;
+				var x=Math.floor(bull.x/60);
+				var y=Math.floor(bull.y/60);
+				var z=Math.floor(bull.z/60);
+				
+	  			//raycaster.ray.at(q,coords);
+				//raycaster.ray.at(q,coords);
+				//var x=Math.floor(coords.x/60);
+				//var y=Math.floor(coords.y/60);
+				//var z=Math.floor(coords.z/60);
+				if(x>=-worldWidth && y>=-worldHeight && z>=-worldDepth && x<worldWidth && y<worldHeight && z<worldHeight){
+				if(world[x][y][z]>0){
+					meshSelect.position.set(x*60,y*60,z*60-30);
+					for(var xq=-1;xq<2;xq++){
+					for(var yq=-1;yq<1;yq++){
+					for(var zq=-1;zq<2;zq++){	
+					if(world[x+xq][y+yq][z+zq]==undefined)world[x+xq][y+yq][z+zq]=1;
+				}}}
+				//world[x][y][z]=0;
+					// rebuild chunks
+					var x2=Math.floor(x/chunkSize);
+					var y2=Math.floor(y/chunkSize);
+					var z2=Math.floor(z/chunkSize);
+					for(var i=0;i<meshId.length;i++){
+						if(x2===meshId[i].x && y2===meshId[i].y && z2===meshId[i].z){
+							eloop=true;
+							Id = i;
+							px=Math.floor(oldBull.x/60);
+							py=Math.floor(oldBull.y/60);
+							pz=Math.floor(oldBull.z/60);
+							world[px][py][pz]=1;
+				
+							//px = x;
+							//py = y;
+							//pz = z;
+							x3=x2;
+							y3=y2;
+							z3=z2;
+							q=1200;
+							break;
+						}
+				}			
+				}
+			}
+			if(eloop==true){
+				//
+				// If we are to edge of chunks remake chunk nexto to it(testing)
+				//
+				var ax = Math.floor((px/16));
+				var ay = Math.floor((py/16));
+				var az = Math.floor((pz/16));
+				ax=Math.abs(ax*16-px);		
+				ay=Math.abs(ay*16-py);		
+				az=Math.abs(az*16-pz);		
+				//console.log(ax+","+ay+","+az);
+				if(ax==0)rm(x3-1,y3,z3);
+				if(ax==15)rm(x3+1,y3,z3);
+				//if(ay==0)rm(x3,y3-1,z3);//fixed
+				//if(ay==15)rm(x3,y3+1,z3);//fixed
+				if(ay==0)rm(x3,y3-1,z3);//fixed
+				if(ay==15)rm(x3,y3+1,z3);//fixed
+				
+				if(az==0)rm(x3,y3,z3-1);//fixed
+				if(az==15)rm(x3,y3,z3+1);//fixed
+				rm(x3,y3,z3);
+			}
+			function rm(x4,y4,z4){
+				for(var i=0;i<meshId.length;i++){
+					if(meshId[i].x===x4 && meshId[i].y===y4 && meshId[i].z===z4){
+						scene.remove(mesh[i]);
+						mesh.splice(i,1);
+						meshId.splice(i,1);
+						mesh.push(makechunk(x4*16,y4*16,z4*16));
+						meshId.push({x:x4,y:y4,z:z4});
+						scene.add(mesh[mesh.length-1]);
+				
+					}
+				}
+			}
+		}	
+		}
 	
 	function dig(){
 		// exit if moving backwards
