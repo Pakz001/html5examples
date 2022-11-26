@@ -403,8 +403,8 @@ material.flatShading=true;
 	// UI - forward
 	//
   const material2 = new THREE.MeshPhongMaterial({
-    color,
-    opacity: 0.5,
+    color: 0xffff00,
+    opacity: 0.8,
     transparent: true,
 });	
 	
@@ -421,7 +421,7 @@ material.flatShading=true;
 	meshf.scale.set(sch,scv,sch);
     scene.add( meshf );
     meshb = new THREE.Mesh( geom, material2	);
-		meshb.scale.set(sch,scv,sch);
+	meshb.scale.set(sch,scv,sch);
 	//meshb.scale.set(2,2,.1);
     scene.add( meshb );
 	
@@ -547,8 +547,8 @@ material.flatShading=true;
 					
 					// rotate camera
 					// attempt at minecraft style camera controls touchscreen bedrock iphone
-					if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
-						}else{
+//					if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
+//						}else{
 						var d1 = Math.hypot(lasty-starty,lastx-startx);
 						//if(d1<window.innerWidth/8){
 							//d1 = d1 / (window.innerWidth/128);
@@ -560,13 +560,15 @@ material.flatShading=true;
 							startx = lastx;
 							starty = lasty;
 						//}
-					}
+//					}
 					
 					// Move forward
 					var gravdelay=false;
 					moveForward();					
 					moveBackward();
+					
 				}
+				
 				jump();
 					
 				// gravity
@@ -625,8 +627,8 @@ material.flatShading=true;
 		//	
 		function setUi(){				
 				var pointer = new THREE.Vector2();
-				pointer.x = ( (window.innerWidth/2) / window.innerWidth ) * 2 -1;
-				pointer.y = -( (window.innerHeight*.365) / window.innerHeight ) * 2 +1;
+				pointer.x = ( (window.innerWidth*.3) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
 				var raycaster = new THREE.Raycaster()
 			    raycaster.setFromCamera(pointer, camera);
 				var bulld = new THREE.Vector3();
@@ -718,10 +720,10 @@ material.flatShading=true;
 			}
 			
 			function moveBackward(){
-				var w=window.innerWidth/7;
+				var w=window.innerWidth/6;
 				var h=window.innerHeight/5;
 					
-				if (lastx>(w) && lastx<w+window.innerWidth/8 && lasty>(window.innerHeight/1.5) && lasty<window.innerHeight-h){
+				if (lastx>(w) && lastx<w+window.innerWidth/14 && lasty>(window.innerHeight/1.45) && lasty<window.innerHeight-h){
 										turnCountDown=40;
 					var dir = new THREE.Vector3();
 					camera.getWorldDirection( dir );
@@ -737,11 +739,12 @@ material.flatShading=true;
 			}
 			
 			function moveForward(){	
+
 				// get 
-				var w=window.innerWidth/2.2;
-				var h=window.innerHeight/3;
+				var w=window.innerWidth/4;
+				var h=window.innerHeight/5;
 					
-				if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-(h*1.6)){
+				if (lastx>(w) && lastx<w+window.innerWidth/14 && lasty>(window.innerHeight/1.45) && lasty<window.innerHeight-h){
 					turnCountDown=40;
 
 					var dir = new THREE.Vector3();
