@@ -3,8 +3,9 @@
 (book23.html version / touch control / first person camera / voxels / Minecraft / camera vs map collision / gravity / walking)
 <br><br>
 Current controls touch : touch center = move forward, touch left bottom = move backwards, double tap center bottom = jump,
-elsewhere touch and drag = rotate camera.<br>
+elsewhere touch and drag = rotate camera. touch+hold then release to break block<br>
 <br><br>
+<a href="https://cromdesi.home.xs4all.nl/html5/voxelthing/">Play run test here(touchscreen)</a><br><br>
 the thee.min.js is a old version.<br>
 the three.js is new <11-2022 <br>
 <br>
