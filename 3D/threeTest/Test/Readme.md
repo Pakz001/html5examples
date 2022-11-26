@@ -57,3 +57,4 @@ book28 - MAIN engine with plants<br>
 book29 - MAIN engine with tunnel test and modified fps camera.<br>
 book30 - MAIN engine with block remove (needs user controls remake)<br>
 book31 - MAIN - engine with block highlighting. Delay for digging(long hold then release)
+book32 - MAIN - engine. Continue digging when finger stays down.
