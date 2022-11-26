@@ -5,12 +5,21 @@
 		<title>My first three.js app</title>
 		<style>
 			body { margin: 0; }
-			
+body {
+	touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+	-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}			
 			#drawing-canvas {
 				position: absolute;
 				background-color: #000000;
-				top: 0px;
-				right: 0px;
+				top: 70%;
+				left: 10%;
 				z-index: 3000;
 				cursor: crosshair;
 				touch-action: none;
@@ -18,8 +27,18 @@
 			#drawing-canvas2 {
 				position: absolute;
 				background-color: #000000;
-				top: 0px;
-				right: 0px;
+				top: 70%;
+				right: 10%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#drawing-canvas3 {
+				position: absolute;
+				background-color: #000000;
+				top:70%;
+				left:40%;
+				width:300;
 				z-index: 3000;
 				cursor: crosshair;
 				touch-action: none;
@@ -30,6 +49,7 @@
 	<body>
 		<canvas id="drawing-canvas" height="128" width="128"></canvas>		
 		<canvas id="drawing-canvas2" height="128" width="128"></canvas>		
+		<canvas id="drawing-canvas3" width="300" height="96"></canvas>		
 		
 		<script src="js/three.js"></script>
 		<script>
@@ -55,7 +75,7 @@
 			UImaterial = new THREE.MeshBasicMaterial();			
 			const drawingCanvas = document.getElementById( 'drawing-canvas' );
 			const drawingContext = drawingCanvas.getContext( '2d' );
-			drawingCanvas.style.left = 0;			
+			//drawingCanvas.style.left = 0;			
 			// draw white background
 			drawingContext.fillStyle = '#FFFFFF';
 			drawingContext.fillRect( 0, 0, 128, 128 );
@@ -76,6 +96,25 @@
 			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
 			//				material.map.needsUpdate = true;
 			UImaterial2.map = new THREE.CanvasTexture( drawingCanvas2 );
+			
+			UImaterial3 = new THREE.MeshBasicMaterial();			
+			const drawingCanvas3 = document.getElementById( 'drawing-canvas3' );
+			const drawingContext3 = drawingCanvas3.getContext( '2d' );
+//			var ctx = document.getElementById("drawing-canvas3");
+//			ctx.height=96;
+//			ctx.width=32*10;			
+//			ctx.left=700;
+//			ctx.top=100;
+			// draw white background
+			drawingContext3.fillStyle = '#FFFFFF';
+			drawingContext3.fillRect( 0, 0, 300, 96 );
+			// text
+			drawingContext3.fillStyle = '#000000';	
+			drawingContext3.font = "48px serif";			
+			drawingContext3.fillText("hello",10,50);
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			//				material.map.needsUpdate = true;
+			UImaterial3.map = new THREE.CanvasTexture( drawingCanvas3 );
 			
 			
 			var spotLight = new THREE.SpotLight(0xffffff);
