@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+body {
+	touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+	-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}			
+			#drawing-canvas {
+				position: absolute;
+				background-color: #000000;
+				top: 70%;
+				left: 10%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#drawing-canvas2 {
+				position: absolute;
+				background-color: #000000;
+				top: 70%;
+				right: 10%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#drawing-canvas3 {
+				position: absolute;
+				background-color: #000000;
+				top:70%;
+				left:40%;
+				width:300;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			
+		</style>
+	</head>
+	<body>
+		<canvas id="drawing-canvas" height="128" width="128"></canvas>		
+		<canvas id="drawing-canvas2" height="128" width="128"></canvas>		
+		<canvas id="drawing-canvas3" width="300" height="96"></canvas>		
+		
+		<script src="js/three.js"></script>
+	
+		<script>
+			
+			//
+			// rotate mesh inside mesh. this for animating
+			// items and character. these made inside
+			// the three.js model editor(browser) saved
+			// as scene json.
+			//
+			//
+			
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+			
+			const loader = new THREE.ObjectLoader();
+
+			//
+			// Here we set up a canvas that we draw ontop of the 3d view.
+			// it is partly initiated in the html style part
+			// and needs to be initiated below the body part to.
+			UImaterial = new THREE.MeshBasicMaterial();			
+			const drawingCanvas = document.getElementById( 'drawing-canvas' );
+			const drawingContext = drawingCanvas.getContext( '2d' );
+			//drawingCanvas.style.left = 0;			
+			// draw white background
+			drawingContext.fillStyle = '#FFFFFF';
+			drawingContext.fillRect( 0, 0, 128, 128 );
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			UImaterial.map = new THREE.CanvasTexture( drawingCanvas );
+
+			UImaterial2 = new THREE.MeshBasicMaterial();			
+			const drawingCanvas2 = document.getElementById( 'drawing-canvas2' );
+			const drawingContext2 = drawingCanvas2.getContext( '2d' );
+//			drawingCanvas2.style.left = 0;			
+			// draw white background
+			drawingContext2.fillStyle = '#FFFFFF';
+			drawingContext2.fillRect( 0, 0, 128, 128 );
+			// text
+			drawingContext2.fillStyle = '#000000';	
+			drawingContext2.font = "48px serif";			
+			drawingContext2.fillText("hello",10,50);
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			//				material.map.needsUpdate = true;
+			UImaterial2.map = new THREE.CanvasTexture( drawingCanvas2 );
+			
+			UImaterial3 = new THREE.MeshBasicMaterial();			
+			const drawingCanvas3 = document.getElementById( 'drawing-canvas3' );
+			const drawingContext3 = drawingCanvas3.getContext( '2d' );
+//			var ctx = document.getElementById("drawing-canvas3");
+//			ctx.height=96;
+//			ctx.width=32*10;			
+//			ctx.left=700;
+//			ctx.top=100;
+			// draw white background
+			drawingContext3.fillStyle = '#FFFFFF';
+			drawingContext3.fillRect( 0, 0, 300, 96 );
+			// text
+			drawingContext3.fillStyle = '#000000';	
+			drawingContext3.font = "48px serif";			
+			drawingContext3.fillText("hello",10,50);
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			//				material.map.needsUpdate = true;
+			UImaterial3.map = new THREE.CanvasTexture( drawingCanvas3 );
+			
+			
+			var spotLight = new THREE.SpotLight(0xffffff);
+			spotLight.position.set(-100,100,100);
+			spotLight.castShadow = true;
+					
+			spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+			spotLight.shadow.camera.far = 130;
+			spotLight.shadow.camera.near = 40;
+			scene.add(spotLight);
+
+
+			const geometry = new THREE.PlaneGeometry( 160,120);
+			const material = new THREE.MeshLambertMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+			const plane = new THREE.Mesh( geometry, material );
+			scene.add( plane );
+
+			const cubeGeometry = new THREE.BoxGeometry(4,20,4);
+			const cubeMaterial = new THREE.MeshLambertMaterial({
+				color: 0xff0000,
+				wireframe: false
+			});
+			const cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+			cube.position.set(-4,3,5);
+			scene.add(cube);				
+		var mesh;
+//var loader = new THREE.ObjectLoader();
+loader.load(
+	// resource URL
+	"models/steve.json",
+
+	// onLoad callback
+	// Here the loaded data is assumed to be an object
+	function ( obj  ) {
+		// Add the loaded object to the scene
+		mesh = obj;
+		obj.scale.set(10, 10, 10);
+		obj.position.set(-4,3,15)
+		scene.add( obj );
+	},
+
+	// onProgress callback
+	function ( xhr ) {
+		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+	},
+
+	// onError callback
+	function ( err ) {
+		console.error( 'An error happened' );
+	}
+	);
+
+			
+	
+			
+			
+			//camera.position.z = 5;
+			camera.position.set( 12, 5, 100);
+			var pivot;
+			camera.lookAt(scene.position);
+var an=2;
+var rotarmleft=-0.02;
+var rotarmright=0.02;
+var rotlegleft=-0.025;
+var rotlegright=0.025;
+var rot=0.1;
+			function animate() {
+				requestAnimationFrame( animate );
+
+//	an+=0.1
+    if(mesh!=null){
+		mesh.children[5].material.color.setHex( 0xff0000 );
+		//mesh.children[0].rotation.y+=.05;
+		//mesh.children[1].applyMatrix( new THREE.Matrix4().makeTranslation( 0, 25, 0 ) );
+		//mesh.children[1].applyMatrix4(new THREE.Matrix4().makeTranslation(0.01, 0, 0));
+		//mesh.children[1].rotation.x+=.01;
+		//mesh.children[4].setRotationFromAxisAngle(new THREE.Vector3(.2,0,0),an );
+		//mesh.children[4].rotateOnWorldAxis ( new THREE.Vector3(.1,0,0),an );
+		if(an==2){
+			an=-1;
+			mesh.children[4].rotation.x = -Math.PI/4;
+			mesh.children[2].rotation.x = -Math.PI/4;
+			//pivot = new THREE.Group();
+   // pivot.add(mesh);
+    //pivot.position.set(-4,3,13);
+//pivot.add( mesh.children[4] );
+		//mesh.children[4].children[0].position.set(-0.5,0,0);
+		//mesh.children[4].rotation.z+=.1;
+		 	//mesh.children[4].geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(mesh.children[4].width/2,0.0, 0.0));
+			//mesh.children[4].children[0].position.set(-10.5,-10.5,-10.5);
+		}
+  				//mesh.children[4].applyMatrix4(
+				//			new THREE.Matrix4().makeTranslation(Math.cos(mesh.children[4].rotation.x)),new THREE.Matrix4().makeTranslation(Math.cos(mesh.children[4].rotation.x)),
+//							new THREE.Matrix4().makeTranslation(Math.sin(mesh.children[4].rotation.x)));
+				//mesh.children[4].rotation.x+=0.1;
+		  		//mesh.children[4].rotation.y+=0.0;
+				//mesh.children[4].rotation.z+=0.0;		
+				//mesh.children[4].applyMatrix4(new THREE.Matrix4().makeTranslation(-mesh.children[4].width/2,0.0, 0.0));
+		//pivot.rotation.x+=rot;
+		//if (pivot.rotation.z > 0.0 || pivot.rotation.z < -Math.PI/2) rot *= -1;
+						//mesh.rotation.z += 0.01;
+    //mesh.rotation.y += 0.01;
+		
+
+				//cube.rotation.x += 0.01;
+				//cube.rotation.y += 0.01;
+				mesh.children[4].rotation.x+=rotarmleft;
+				if (mesh.children[4].rotation.x > Math.PI/4 || mesh.children[4].rotation.x <-Math.PI/4) rotarmleft = -rotarmleft;
+				mesh.children[1].rotation.x+=rotarmright;
+				if (mesh.children[1].rotation.x > Math.PI/4 || mesh.children[1].rotation.x <-Math.PI/4) rotarmright = -rotarmright;				
+				mesh.children[3].rotation.x+=rotlegleft;
+				if (mesh.children[3].rotation.x > Math.PI/4 || mesh.children[3].rotation.x < -Math.PI/4) rotlegleft *= -1;
+				mesh.children[2].rotation.x+=rotlegright;
+				if (mesh.children[2].rotation.x > Math.PI/4 || mesh.children[2].rotation.x < -Math.PI/4) rotlegright *= -1;
+		}		
+				renderer.render( scene, camera );
+			};
+
+			animate();
+			
+			
+			
+			
+		</script>
+	</body>
+	</html>
