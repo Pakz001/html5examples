@@ -178,63 +178,59 @@ loader.load(
 			
 			//camera.position.z = 5;
 			camera.position.set( 12, 5, 100);
-			var pivot;
+
 			camera.lookAt(scene.position);
 var an=2;
 var rotarmleft=-0.02;
 var rotarmright=0.02;
 var rotlegleft=-0.025;
 var rotlegright=0.025;
-var rot=0.1;
+
 			function animate() {
 				requestAnimationFrame( animate );
-
-//	an+=0.1
-    if(mesh!=null){
-		mesh.children[5].material.color.setHex( 0xff0000 );
-		//mesh.children[0].rotation.y+=.05;
-		//mesh.children[1].applyMatrix( new THREE.Matrix4().makeTranslation( 0, 25, 0 ) );
-		//mesh.children[1].applyMatrix4(new THREE.Matrix4().makeTranslation(0.01, 0, 0));
-		//mesh.children[1].rotation.x+=.01;
-		//mesh.children[4].setRotationFromAxisAngle(new THREE.Vector3(.2,0,0),an );
-		//mesh.children[4].rotateOnWorldAxis ( new THREE.Vector3(.1,0,0),an );
-		if(an==2){
-			an=-1;
-			mesh.children[4].rotation.x = -Math.PI/4;
-			mesh.children[2].rotation.x = -Math.PI/4;
-			//pivot = new THREE.Group();
-   // pivot.add(mesh);
-    //pivot.position.set(-4,3,13);
-//pivot.add( mesh.children[4] );
-		//mesh.children[4].children[0].position.set(-0.5,0,0);
-		//mesh.children[4].rotation.z+=.1;
-		 	//mesh.children[4].geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(mesh.children[4].width/2,0.0, 0.0));
-			//mesh.children[4].children[0].position.set(-10.5,-10.5,-10.5);
-		}
-  				//mesh.children[4].applyMatrix4(
-				//			new THREE.Matrix4().makeTranslation(Math.cos(mesh.children[4].rotation.x)),new THREE.Matrix4().makeTranslation(Math.cos(mesh.children[4].rotation.x)),
-//							new THREE.Matrix4().makeTranslation(Math.sin(mesh.children[4].rotation.x)));
-				//mesh.children[4].rotation.x+=0.1;
-		  		//mesh.children[4].rotation.y+=0.0;
-				//mesh.children[4].rotation.z+=0.0;		
-				//mesh.children[4].applyMatrix4(new THREE.Matrix4().makeTranslation(-mesh.children[4].width/2,0.0, 0.0));
-		//pivot.rotation.x+=rot;
-		//if (pivot.rotation.z > 0.0 || pivot.rotation.z < -Math.PI/2) rot *= -1;
-						//mesh.rotation.z += 0.01;
-    //mesh.rotation.y += 0.01;
 		
-
-				//cube.rotation.x += 0.01;
-				//cube.rotation.y += 0.01;
-				mesh.children[4].rotation.x+=rotarmleft;
-				if (mesh.children[4].rotation.x > Math.PI/4 || mesh.children[4].rotation.x <-Math.PI/4) rotarmleft = -rotarmleft;
-				mesh.children[1].rotation.x+=rotarmright;
-				if (mesh.children[1].rotation.x > Math.PI/4 || mesh.children[1].rotation.x <-Math.PI/4) rotarmright = -rotarmright;				
-				mesh.children[3].rotation.x+=rotlegleft;
-				if (mesh.children[3].rotation.x > Math.PI/4 || mesh.children[3].rotation.x < -Math.PI/4) rotlegleft *= -1;
-				mesh.children[2].rotation.x+=rotlegright;
-				if (mesh.children[2].rotation.x > Math.PI/4 || mesh.children[2].rotation.x < -Math.PI/4) rotlegright *= -1;
-		}		
+		//	an+=0.1
+			    if(mesh!=null){
+					mesh.children[5].material.color.setHex( 0xff0000 );
+					
+					// set the cubes made with the three modeler
+					// so the centers of the limbs are at the top.
+					// this makes them rotate from the top parts(origin)
+					// this is done by modifying the vertices in the geometry
+					// at y moving a but up(+) except the head and body.
+					if(an==2){
+						an=-1;
+						mesh.children[4].rotation.x = Math.PI*1.3;
+						mesh.children[1].rotation.x = Math.PI*.7;
+						mesh.children[3].rotation.x = Math.PI*.7;
+						mesh.children[2].rotation.x = Math.PI*1.3;			
+						for(var zz=0;zz<mesh.children.length;zz++){
+							const positions = mesh.children[zz].geometry.attributes.position.array;
+				
+							let x, y, z, index;
+							x = y = z = index = 0;
+				
+							for ( let i = 0, l = positions.length; i < l; i ++ ) {
+								index++;
+								if(zz==0 || zz==5 ){
+									positions[index++]-=.5;
+								}else{
+								positions[index++]+=.5;
+								}
+								index++
+							}
+						}
+					}
+					// animate our steve character
+					mesh.children[4].rotation.x+=rotarmleft;
+					if (mesh.children[4].rotation.x > Math.PI*1.3 || mesh.children[4].rotation.x <Math.PI*.7) rotarmleft = -rotarmleft;
+					mesh.children[1].rotation.x+=rotarmright;
+					if (mesh.children[1].rotation.x > Math.PI*1.3 || mesh.children[1].rotation.x <Math.PI*.7) rotarmright = -rotarmright;				
+					mesh.children[3].rotation.x+=rotlegleft;
+					if (mesh.children[3].rotation.x > Math.PI*1.3 || mesh.children[3].rotation.x < Math.PI*.7) rotlegleft *= -1;
+					mesh.children[2].rotation.x+=rotlegright;
+					if (mesh.children[2].rotation.x > Math.PI*1.3 || mesh.children[2].rotation.x < Math.PI*.7) rotlegright *= -1;
+					}		
 				renderer.render( scene, camera );
 			};
 
