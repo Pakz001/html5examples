@@ -63,3 +63,4 @@ book34 - MAIN - engine - Changed camera movement drag and turn. Forward.<br>
 book35 - MAIN - engine - Multi touch - move and turn (!)<br>
 book36 - import json scenes. from https://threejs.org/editor/ Using to create game models and characters. models folder.<br>
 book37 - import json scenes and find body part and rotate this independantly inside the combined scene mesh.<br> 
+book38 - import json scene as a character and trying to animate it throught the code.<br>
