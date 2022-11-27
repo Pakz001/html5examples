@@ -61,3 +61,4 @@ book32 - MAIN - engine. Continue digging/placing when finger stays down. (dig/pl
 book33 - Billboard / Canvasses on top of 3d view as user interface(ui) example.<br>
 book34 - MAIN - engine - Changed camera movement drag and turn. Forward.<br>
 book35 - MAIN - engine - Multi touch - move and turn (!)<br>
+book36 - import json scenes. from https://threejs.org/editor/ Using to create game models and characters. models folder.<br>
