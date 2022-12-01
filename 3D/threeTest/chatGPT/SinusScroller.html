@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sinus Scroller</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: black;
+      }
+      canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scroller"></canvas>
+    <script>
+      // Set up the canvas
+      const canvas = document.getElementById('scroller');
+      const context = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Set up the scrolling message
+      const message = 'happy holidays';
+      const fontSize = 40;
+      context.font = `bold ${fontSize}px sans-serif`;
+      const messageWidth = context.measureText(message).width;
+      const x0 = canvas.width;
+      const y0 = canvas.height / 2;
+
+      // Set up the loop to animate the scroller
+      let t = 0;
+      const animate = function() {
+        requestAnimationFrame(animate);
+
+        // Clear the canvas
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Compute the position of each letter
+        let x = x0 - t;
+        let y = y0;
+        for (let i = 0; i < message.length; i++) {
+          const letter = message[i];
+          const letterWidth = context.measureText(letter).width;
+          y = y0 + Math.sin(t * 0.5 + i) * fontSize;
+
+          // Draw the letter
+          context.fillStyle = 'white';
+          context.fillText(letter, x, y);
+
+          // Update the x position
+          x += letterWidth + fontSize / 4;
+        }
+
+        // Update the time and reset it when the message is off the screen
+        t += 1;
+        if (t > messageWidth + canvas.width) {
+          t = 0;
+        }
+      };
+
+      animate();
+    </script>
+  </body>
+</html>
