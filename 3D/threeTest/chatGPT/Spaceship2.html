@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      /* Style the spaceship shapes */
+      .spaceship {
+        width: 50px;
+        height: 50px;
+        position: absolute;
+      }
+
+      .spaceship .body {
+        /* Style the body of the spaceship */
+        height: 25px;
+        width: 25px;
+        position: absolute;
+        top: 12.5px;
+        left: 12.5px;
+        border-radius: 12.5px;
+      }
+
+      .spaceship .fin {
+        /* Style the fin on the back of the spaceship */
+        height: 0;
+        width: 0;
+        position: absolute;
+        top: 25px;
+        left: 0;
+      }
+
+      .spaceship .window {
+        /* Style the window on the front of the spaceship */
+        height: 10px;
+        width: 10px;
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      // prompters note : I might need to look up specific shape art terms for the images in the grid. this
+      // tto let chatGPT know what to make. technicals.
+      // Create a grid of spaceship shapes
+      for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+          // Create a new div to represent a spaceship
+          let spaceship = document.createElement('div');
+          spaceship.className = 'spaceship';
+          spaceship.style.top = (i * 60) + 'px';
+          spaceship.style.left = (j * 60) + 'px';
+
+          // Create the body of the spaceship
+          let body = document.createElement('div');
+          body.className = 'body';
+
+          // Generate a random color for the body of the spaceship
+          let r = Math.floor(Math.random() * 256);
+          let g = Math.floor(Math.random() * 256);
+          let b = Math.floor(Math.random() * 256);
+          let color = 'rgb(' + r + ',' + g + ',' + b + ')';
+          body.style.backgroundColor = color;
+
+          // Generate a random border style for the body of the spaceship
+          let borderWidth = Math.floor(Math.random() * 3) + 1;
+          let borderStyle = 'solid';
+          let borderColor = 'black';
+          body.style.border = borderWidth + 'px ' + borderStyle + ' ' + borderColor;
+
+          spaceship.appendChild(body);
+
+          // Create the fin on the back of the spaceship
+          let fin = document.createElement('div');
+          fin.className = 'fin';
+
+          // Generate a random color and size for the fin of the spaceship
+          r = Math.floor(Math.random() * 256);
+          g = Math.floor(Math.random() * 256);
+          b = Math.floor(Math.random() * 256);
+
+		  color = 'rgb(' + r + ',' + g + ',' + b + ')';
+		  
+          let finSize = Math.floor(Math.random() * 25) + 25;
+          fin.style.borderTop = finSize + 'px ' + color + ' transparent';
+          fin.style.borderRight = finSize + 'px ' + color + ' transparent';
+          fin.style.borderBottom = finSize + 'px ' + color + ' transparent';
+
+          spaceship.appendChild(fin);
+
+          // Create the window on the front of the spaceship
+          let window = document.createElement('div');
+          window.className = 'window';
+
+          // Generate a random color for the window of the spaceship
+          r = Math.floor(Math.random() * 256);
+          g = Math.floor(Math.random() * 256);
+          b = Math.floor(Math.random() * 256);
+          color = 'rgb(' + r + ',' + g + ',' + b + ')';
+          window.style.backgroundColor = color;
+
+          spaceship.appendChild(window);
+
+          // Add the spaceship to the page
+          document.body.appendChild(spaceship);
+        }
+      }
+    </script>
+  </body>
+</html>
