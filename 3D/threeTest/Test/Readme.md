@@ -70,4 +70,4 @@ book40 - chunk example with changing texture in cube from atlas with light level
 
 
 
-[![Watch the video]()](https://youtu.be/IDWdGPViRdM)
+[![Watch the video](https://img.youtube.com/vi/IDWdGPViRdM/default.jpg)](https://youtu.be/IDWdGPViRdM)
