@@ -1,7 +1,7 @@
 
 <h3>html5 javascript game oriented example code. ( Learn to code games by studying examples ) </h3><br><br>
 
-the voxel engine is in folder 3d/threejs/test/<br><br>
+the voxel engine is in folder 3d/threetest/test/<br><br>
 
 
 
