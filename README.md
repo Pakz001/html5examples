@@ -4,10 +4,6 @@
 the voxel engine is in folder 3d/threejs/test/<br><br>
 
 
-Update 10aug2022 : I think I now understand better, how to disable those system touch events. I mainly develop on a ipad. The code before this had problems with touch devices. I probably need to update a lot of code that has touch controls.<br>The template has been updated.<br>
-<br>
-I'm now using Koder from the app store. There are some problems with it. After running program the cursor gets reset and I 
-need to find the location in the code where I was. This is quite a problem. This was with other apps too.<br>
 
 <br><br>
 <br>Link:<br>
