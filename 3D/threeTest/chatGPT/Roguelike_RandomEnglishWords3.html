@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Random English Words (Root + Prefix/Suffix)</title>
+  </head>
+  <body>
+    <h1>Random English Words (Root + Prefix/Suffix)</h1>
+    <p id="words"></p>
+    
+    <script>
+      // Create arrays of root words, prefixes, and suffixes
+      const rootWords = ["apple", "banana", "orange", "strawberry", "grape", "blueberry", "raspberry", "blackberry", "peach", "melon"];
+      const prefixes = ["un", "re", "pre", "post", "anti", "auto", "bi", "de", "dis", "en", "em", "fore", "in", "inter", "mis", "over", "pro", "sub", "super", "trans", "tri"];
+      const suffixes = ["able", "ible", "al", "ial", "ed", "en", "er", "est", "ful", "ic", "ing", "ion", "tion", "ity", "ive", "less", "ly", "ment", "ness", "ous", "ship", "ty"];
+    
+      // Function to generate a random word by combining a root word with a prefix and/or suffix
+      function generateRandomWord() {
+        // Choose a random root word
+        const randomRootIndex = Math.floor(Math.random() * rootWords.length);
+        let word = rootWords[randomRootIndex];
+    
+        // Generate a random number (0, 1, or 2) to determine whether to add a prefix and/or suffix
+        const randomNumber = Math.floor(Math.random() * 3);
+    
+        if (randomNumber >= 1) {
+          // Choose a random prefix
+          const randomPrefixIndex = Math.floor(Math.random() * prefixes.length);
+          word = prefixes[randomPrefixIndex] + word;
+        }
+    
+        if (randomNumber >= 2) {
+          // Choose a random suffix
+          const randomSuffixIndex = Math.floor(Math.random() * suffixes.length);
+          word = word + suffixes[randomSuffixIndex];
+        }
+    
+        // Return the combined word
+        return word;
+      }
+    
+      // Create an array to store the random words
+      const randomWords = [];
+    
+      // Generate 200 random words and add them to the array
+      for (let i = 0; i < 200; i++) {
+        randomWords.push(generateRandomWord());
+      }
+    
+      // Get the element to display the words
+      const wordsElement = document.getElementById("words");
+    
+      // Set the text of the element to the array of random words
+      wordsElement.textContent = randomWords.join(", ");
+    </script>
+  </body>
+</html>
