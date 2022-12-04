@@ -1,0 +1,59 @@
+<html>
+<head>
+  <title>Webcam Picture</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      text-align: center;
+    }
+    #video {
+      width: 800px;
+      height: 600px;
+    }
+    #canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Webcam Picture</h1>
+  <video id="video" autoplay></video>
+  <canvas id="canvas"></canvas>
+  <br>
+  <button id="snap">Snap Photo</button>
+  <br><br>
+  <img id="photo" src="" alt="Your Photo">
+  <script>
+    // Get the video and canvas elements
+    var video = document.getElementById('video');
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+
+    // Set the dimensions of the canvas to match the video
+    canvas.width = video.offsetWidth;
+    canvas.height = video.offsetHeight;
+
+    // Get the photo element
+    var photo = document.getElementById('photo');
+
+    // Get the snap button
+    var snap = document.getElementById('snap');
+
+    // Set up the media stream
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then(function(stream) {
+        video.srcObject = stream;
+        video.play();
+      })
+      .catch(function(err) {
+        console.log("An error occurred: " + err);
+      });
+
+    // Take a photo when the button is clicked
+    snap.addEventListener("click", function() {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      photo.setAttribute('src', canvas.toDataURL('image/png'));
+    });
+  </script>
+</body>
+</html>
