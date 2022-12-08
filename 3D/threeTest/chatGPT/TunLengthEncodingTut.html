@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Run Length Encoding</title>
+</head>
+<body>
+    <h1>Run Length Encoding</h1>
+    <p>Run length encoding is a simple way to compress a string of characters by replacing repeated characters with a single character and the number of times it appears in the original string.</p>
+
+    <h2>Example</h2>
+    <p>For example, the string "AAABBCCCD" can be compressed to "A3B2C3D1". In this example, the letter "A" appears three times in a row, so it is replaced with "A3". The letter "B" appears twice in a row, so it is replaced with "B2". The letter "C" also appears three times in a row, so it is replaced with "C3", and the letter "D" appears once, so it is replaced with "D1".</p>
+
+    <h2>JavaScript Implementation</h2>
+    <p>To implement run length encoding in JavaScript, you can use the following code:</p>
+    <pre>
+        <code>
+            function runLengthEncode(str) {
+                // Initialize variables
+                let currentChar = str[0];
+                let currentCount = 1;
+                let result = "";
+
+                // Iterate through the string character by character
+                for (let i = 1; i < str.length; i++) {
+                    // If the current character is the same as the previous character
+                    if (str[i] === currentChar) {
+                        // Increment the current count
+                        currentCount++;
+                    } else {
+                        // If the current character is different from the previous character
+                        // Append the current character and its count to the result
+                        result += currentChar + currentCount;
+
+                        // Set the current character and count to the new character and 1
+                        currentChar = str[i];
+                        currentCount = 1;
+                    }
+                }
+
+                // After the entire string has been processed, append the current character and its count to the result
+                result += currentChar + currentCount;
+
+                // Return the compressed string
+                return result;
+            }
+        </code>
+    </pre>
+
+    <h2>Usage</h2>
+    <p>To use this function, you can simply call it with a string as the argument, like this:</p>
+    <pre>
+        <code>
+            let compressedString = runLengthEncode("AAABBCCCD"); // compressedString = "A3B2C3D1"
+        </code>
+    </pre>
+
+    <h2>Caveats</h2>
+    <p>Run length encoding can only provide a significant compression for strings that contain many repeated characters. For strings with few or no repeated characters, the compressed string will actually be longer than the original string.</p>
+</body>
+</html>
