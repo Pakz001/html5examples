@@ -66,7 +66,7 @@ book37 - import json scenes and find body part and rotate this independantly ins
 book38 - import json scene as a character and trying to animate it throught the code.<br>
 book39 - chunk example with changing texture from atlas on cube inside chunk in realtime.(fast)<br>
 book40 - chunk example with changing texture in cube from atlas with light levels using vertexcolors. 2 in this example. Each face of each cube settable<br>
-
+book41 - main - testing out hide remove show chunks based on distance - precursor to generator.
 
 
 
