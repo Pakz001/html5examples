@@ -14,6 +14,9 @@ update:checked every file and removed references to a unused css file. gfx now i
 
 (Gamedev) - Snippets / templates / functions / prototypes
 
+<br><br>From the 3d / threetest / test - folder.<br>
+<img src="3D/threeTest/Test/Media/A059721A-23E7-4DB1-85C1-92B9777BD1C0.png" width="60%"><br><br>
+
 
 Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
 
