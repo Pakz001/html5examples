@@ -670,12 +670,13 @@ material.flatShading=true;
 			var x = (camera.position.x / 60)/16;
 			var y = (camera.position.y / 60)/16;
 			var z = (camera.position.z / 60)/16;
-			for(var cx=-2;cx<3;cx++){
-				for(var cy=-2;cy<3;cy++){
-					for(var cz=-2;cz<3;cz++){
+			for(var cx=-3;cx<4;cx++){
+				for(var cy=-3;cy<4;cy++){
+					for(var cz=-3;cz<4;cz++){
 						var xx=Math.floor(x+cx);
 						var yy=Math.floor(y+cy);
 						var zz=Math.floor(z+cz);
+						if(dist3d(cx,cy,cz,0,0,0)>3)continue;
 						var addIt=true;
 						for(var i=0;i<meshId.length;i++){
 							if(meshId[i].x===xx && meshId[i].y===yy && meshId[i].z===zz){
