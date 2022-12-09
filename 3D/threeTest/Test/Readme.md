@@ -68,7 +68,7 @@ book39 - chunk example with changing texture from atlas on cube inside chunk in 
 book40 - chunk example with changing texture in cube from atlas with light levels using vertexcolors. 2 in this example. Each face of each cube settable<br>
 book41 - main - testing out hide remove show chunks based on distance - precursor to generator.<br>
 book42 - main - genererate new chunks around player(unoptimized) hide/show distance and no destroy.<br>
-
+book43 - main - added a chunk creation queue pool list that generates one chunk at a time to not cause hickups.<br>
 
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=IDWdGPViRdM" target="_blank">
