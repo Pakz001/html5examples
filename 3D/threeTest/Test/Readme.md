@@ -5,7 +5,8 @@
 Current controls touch : touch center = move forward, touch left bottom = move backwards, double tap center bottom = jump,
 elsewhere touch and drag = rotate camera. touch+hold then release to break block<br>
 <br><br>
-<a href="https://cromdesi.home.xs4all.nl/html5/voxelthing/">Play run test here(touchscreen)</a><br><br>
+<a href="https://cromdesi.home.xs4all.nl/html5examples/TouchscreenVoxelEngine//">Play run test here(touchscreen - bookx)</a><br><br>
+(note the site may be gone 1 jan 2023)<br><br>
 the thee.min.js is a old version.<br>
 the three.js is new <11-2022 <br>
 <br>
