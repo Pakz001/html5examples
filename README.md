@@ -7,7 +7,7 @@ the voxel engine is in folder 3d/threetest/test/<br><br>
 
 <br><br>
 <br>Link:<br>
-<a href="https://cromdesi.home.xs4all.nl/html5examples/">Visit the repo site - run and view examples - update July</a><br>
+<a href="https://cromdesi.home.xs4all.nl/html5examples/">Visit the repo site - run and view examples - update december</a><br>
 <br>
 
 update:checked every file and removed references to a unused css file. gfx now included by base64(toDataUrl())
