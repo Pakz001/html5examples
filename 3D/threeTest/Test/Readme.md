@@ -71,6 +71,7 @@ book42 - main - genererate new chunks around player(unoptimized) hide/show dista
 book43 - main - added a chunk creation queue pool list that generates one chunk at a time to not cause hickups.<br>
 book44 - main - added water. Small problem with queue time becourse of transparancy ordering.<br>
 book45 - main - fix jump. fix place block and dig.<br>
+book46 - main - tree test.<br>
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=IDWdGPViRdM" target="_blank">
  <img src="http://img.youtube.com/vi/IDWdGPViRdM/mqdefault.jpg" alt="Watch the video" width="460" height="260" border="2" />
