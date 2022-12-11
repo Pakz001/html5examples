@@ -541,7 +541,7 @@ var watermeshId = [];
 		// there are artefacts. I solved it(i think) by creating the water at a later
 		// point when nearby chunks have been created(debug me!)
 		var waterChunkQueue = [];
-		var waterChunkQueueDelay = 3;
+		var waterChunkQueueDelay = 113;
 		var waterChunkQueueCounter = 0;
 		
 		//chunkQueue.push({x:,y:,z:});
@@ -664,12 +664,12 @@ material.flatShading=true;
 				// of the loop to prevent fps hickups caused by lots of work
 				// at once.
 				// 
-
-
+chunkDone=true;
+				for(var z=0;z<6;z++){
 				chunkQueueCounter++;
 				if(chunkQueueCounter>chunkQueueDelay){
 					chunkQueueCounter=0;
-					chunkDone=true;
+					
 					if(chunkQueue[0]){
 						chunkDone=false;
 						var xx = chunkQueue[0].x;
@@ -691,6 +691,7 @@ material.flatShading=true;
 						
 					}							
 				}
+				
 				waterChunkQueueCounter++;
 				if(waterChunkQueueCounter>waterChunkQueueDelay && chunkDone){
 					waterChunkQueueCounter=0;
@@ -709,7 +710,8 @@ material.flatShading=true;
 								
 				
 				removeDistance();
-				if(Math.random()<.3)generate();
+				if(chunkQueue.length==0)generate();
+			}
 				//camera.position.z+=dir;
 				//dt++;
 				//if(dt>512){
