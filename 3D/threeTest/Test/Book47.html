@@ -252,6 +252,7 @@ function mapblock(x,y,z,w,h,d,v)
 
 
 
+	
 
 	//
 	// Make some trees
@@ -290,9 +291,8 @@ function mapblock(x,y,z,w,h,d,v)
 		}
 		return true;
 	}
-	function droptree(x,y,z){
+	function dropTree(x,y,z){
 		for(var y1=y;y1>-5;y1-=1){
-			if(world[x][y1][z]!=11 && world[x][y1][z]!=0)return;
 			
 			if(world[x][y1][z]==11){
 				if(areaHasNoTrees(x,y1+1,z)){
@@ -304,16 +304,39 @@ function mapblock(x,y,z,w,h,d,v)
 					return true;
 				}
 			}
+			if(world[x][y1][z]!=11 && world[x][y1][z]!=0)return;
+			
 		}		
 	}
 	for(var i=0;i<1250;i++){
 		var x=Math.floor((Math.random()*200)-100);
 		var z=Math.floor((Math.random()*200)-100);	
-		droptree(x,50,z)
+		dropTree(x,50,z)
 	}
 
+		// `Just add flowers
+	
+	for(var i=0;i<2250;i++){
+		var x=Math.floor((Math.random()*200)-100);
+		var z=Math.floor((Math.random()*200)-100);	
+		dropFlower(x,50,z);
+	}
+	function dropFlower(x,y,z){
+		for(var y1=y;y1>-5;y1-=1){
+	
+			//if(world[x][y1][z]!=11 && world[x][y1][z]!=0)return;		
+			
+			if(world[x][y1][z]==11){
 
+				world[x][y1+1][z]=130;
+				if(Math.random()<.2)world[x][y1+1][z]=129;
+				if(Math.random()<.2)world[x][y1+1][z]=128;				
+				return;	
+			}
+		}		
+	}	
 
+	
 
 function makechunk(ax,ay,az){
 	ax=Math.floor(ax);
@@ -330,53 +353,52 @@ var cnt=0;
 for(var z=az;z<az+16;z+=1){
 for(var y=ay;y<ay+16;y+=1){
 for(var x=ax;x<ax+16;x+=1){
-	if(world[x][y][z]>0){
+	if(world[x][y][z]<128){
 		
 		var face = [];
 		face = getfaces(x,y,z,false);
 //quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,true,true,true,true,true,true));
-	quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
+		quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
 		for(var i=0;i<6;i++){
 			if(face[i]==true){
-			//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 16)+1,Math.floor(Math.random() * 3)+1));
-			if(world[x][y][z]==11){
-				quad_uvs.push(...addquaduvs(10,0));
-			}else if(world[x][y][z]==32){
-				quad_uvs.push(...addquaduvs(12,0));
-			}else if(world[x][y][z]==64){//tree stump
-				quad_uvs.push(...addquaduvs(9,3));
-			}else if(world[x][y][z]==65){//tree stump
-				quad_uvs.push(...addquaduvs(10,3));
-				
-			}else{
-				quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*1)));
-			}
-			quad_indices.push(...addquadindices(cnt));
-			cnt++;
+				//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 16)+1,Math.floor(Math.random() * 3)+1));
+				if(world[x][y][z]==11){
+					quad_uvs.push(...addquaduvs(10,0));
+				}else if(world[x][y][z]==32){
+					quad_uvs.push(...addquaduvs(12,0));
+				}else if(world[x][y][z]==64){//tree stump
+					quad_uvs.push(...addquaduvs(9,3));
+				}else if(world[x][y][z]==65){//tree stump
+					quad_uvs.push(...addquaduvs(10,3));
+					
+				}else{
+					quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*1)));
+				}
+				quad_indices.push(...addquadindices(cnt));
+				cnt++;
+				}
 			}
 		}
-	}
-	/*
-	if(world[x][y][z]==11 && world[x][y-1][z]==0){
-		
-		if(Math.random()<.05){
-			quad_vertices .push(...addflowerquadverticesface(
+	if(world[x][y][z]>=128 && world[x][y][z]<=130){
+		quad_vertices .push(...addflowerquadverticesface(
 					x*60,
-					60,
+					y*60,
 					z*60
 					));
 	//				((x*meshSize)+xa)+(Math.random()*20)-10,160,
 	//				((Math.random()*20)-10)+((z*meshSize)+za))
 	//				);
-			var t=Math.floor(Math.random()*3);
+			var t;
+			if(world[x][y][z]==128)t=0;
+			if(world[x][y][z]==129)t=1;
+			if(world[x][y][z]==130)t=2;			
 			for(var i=0;i<4;i++){
 				quad_uvs.push(...addquaduvs(t,Math.floor(0)));
 				quad_indices.push(...addquadindices(cnt));
 				cnt++;
 			}
-		}
 	}
-	*/
+	
 	
 	
 }
@@ -1436,7 +1458,7 @@ chunkDone=true;
 				for(var bz=-1;bz<2;bz++){
 				for(var bx=-1;bx<2;bx++){
 				for(var by=-1;by<2;by++){
-				if(world[x+bx][y+by][z+bz]>0){
+				if(world[x+bx][y+by][z+bz]>0 && world[x+bx][y+by][z+bz]<128){
 					var ax=(x+bx)*60;
 					var ay=(y+by)*60;
 					var az=(z+bz)*60;
@@ -1830,9 +1852,14 @@ chunkDone=true;
       
 	}
 	
+	function foilage(val){
+		if(val>=128 && val <=130)return true;
+		return false;
+	}
 			function solidBlock(val){
 				if(val==0)return false;
 				if(val==32)return false;
+				if(foilage(val))return false;
 				return true;
 			}			
 			function faceLogic(val1,val2,water){
@@ -1845,11 +1872,15 @@ chunkDone=true;
 				if(water){
 				if(val1==32 && val2==0)return false;
 				if(val1==32 && val2==32)return true;
+				if(val1==32 && foilage(val2))return false;
+				
 				if(val1==32 && val2==1)return true;
 				if(val1==32 && val2==11)return true;
 				}
 				if(solidBlock(val1) && val2==0)return false;
 				if(solidBlock(val1) && val2==32)return false;	
+				if(solidBlock(val1) && foilage(val2))return false;	
+				
 				if(solidBlock(val1) && solidBlock(val2))return true;			
 				//if(val1==1 && val2==0)return false;
 				//if(val1==11 && val2==0)return false;
