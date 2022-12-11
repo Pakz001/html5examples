@@ -293,7 +293,8 @@ function mapblock(x,y,z,w,h,d,v)
 	}
 	function dropTree(x,y,z){
 		for(var y1=y;y1>-5;y1-=1){
-			
+			if(world[x][y1][z]!=11 && world[x][y1][z]!=0)return;
+						
 			if(world[x][y1][z]==11){
 				if(areaHasNoTrees(x,y1+1,z)){
 					var len=Math.floor(Math.random()*5)+3;
@@ -304,7 +305,6 @@ function mapblock(x,y,z,w,h,d,v)
 					return true;
 				}
 			}
-			if(world[x][y1][z]!=11 && world[x][y1][z]!=0)return;
 			
 		}		
 	}
