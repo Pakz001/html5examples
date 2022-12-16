@@ -64,6 +64,9 @@ for(var z=0;z<380;z+=60){
 for(var x=0;x<680;x+=60){
 var fa = [true,true,true,true,true,true];
 quad_vertices .push(...addquadverticesface(x,0,z,fa[0],fa[1],fa[2],fa[3],fa[4],fa[5]));
+	// Here the color intensity or rgb is set. The function could be modded
+	// to apply torch lightness level. Setting a low(0,1 = dark setting 1.0 is light)
+	// Note the function could be shortened!
 quad_verticesColor.push(...addquadverticesColorface(fa[0],fa[1],fa[2],fa[3],fa[4],fa[5]));
 
 for(var i=0;i<6;i++){
