@@ -1,0 +1,2541 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+
+body {
+	touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+	-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+			
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+			/*
+			zoom google diable keyboard disable in <Mstyle>
+			-webkit-user-select:none;
+			*/
+
+		//touch-action: none;
+		// user-select:none;
+		// Camera controls (native) Keyboard - w a s d (left right up down )-  q e (forward backwards)
+		//
+		//
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xffffff );	
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 8000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			scene.background = new THREE.Color( 0x4477ff);
+			//renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+			// Load the texture asynchronously
+			let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa3.png');
+			sprite.minFilter = THREE.NearestFilter;
+			sprite.magFilter = THREE.NearestFilter;
+			
+			scene.fog = new THREE.FogExp2(0xffffff,0.0003);
+			
+					var spotLight = new THREE.SpotLight(0xffffff);
+					spotLight.distance = 30000;
+					spotLight.intensity = 1.0;
+					spotLight.decay = 0.5;
+					spotLight.position.set(0,9000,0);
+
+					//spotLight.castShadow = true;
+					//spotLight.shadow.mapSize = new THREE.Vector2(2048,2048);
+					//spotLight.shadow.camera.far = 10024;
+					//spotLight.shadow.camera.near = 500;
+					//spotLight.shadow.camera.fov = 30;
+					scene.add(spotLight);
+					
+					const color = 0xFFAA99;
+					const intensity = .4;
+					const light = new THREE.AmbientLight(color, intensity);
+					scene.add(light);
+
+			        window.addEventListener('keydown', moveCamera, false);		
+					window.addEventListener("touchend", touchHandler,false);
+					window.addEventListener("touchstart", touchHandler,false);					
+					window.addEventListener("touchmove", touchHandler,false);
+										
+
+// tile dimensions
+
+  const tileSize = 16;
+
+  const tileTextureWidth = 256;
+  const tileTextureHeight = 64;
+
+// x1 and y1 is the cell position on
+// the atlas.
+//var x1=5,y1=2;
+//var x2=x1+1;
+//var y2=y1+1;
+// here we set the uv's with the atlas texture
+
+//quad_uvs = addquaduvs(5,2);
+
+	const worldWidth = 128;
+	const worldHeight = 96;
+	const worldDepth = 128;
+	const chunkSize = 16;
+	
+  	var world = new Array();
+
+	for(var i=-worldWidth;i<worldWidth;i++){
+		world[i] = new Array();
+
+		for(var j=-worldHeight;j<worldHeight;j++){
+			world[i][j]= new Array();
+
+			for(var k=-worldDepth;k<worldDepth;k++){
+				world[i][j][k]= 0;
+				if(j<=0)world[i][j][k]= 11;
+
+			}
+		}
+		
+	}	
+	
+	for(var i=10;i<15;i++){
+		for(var j=10;j<15;j++){
+			for(var k=10;k<15;k++){
+				world[i][j][k]= 1;
+			}
+		}
+		
+	}	
+	for(var i=2;i<5;i++){
+		for(var j=2;j<5;j++){
+			for(var k=2;k<5;k++){
+				world[i][j][k]= 1;
+			}
+		}
+		
+	}	
+	/*
+	for(var i=-worldWidth;i<worldWidth;i++){
+		for(var k=-worldDepth;k<worldDepth;k++){
+			for(var j=-worldHeight;j<=0;j++){
+					world[i][j][k]= 11;
+				}
+			}		
+	}	
+	*/
+	
+		var x1 = 30;
+		var z1 = 30;
+		var pi=Math.random()*4;
+	for(var i=0;i<800;i++){
+		if(Math.random()<.5){
+		x1 = Math.floor(Math.random()*60)-60;
+		z1 = Math.floor(Math.random()*60)-60;
+		pi=Math.random()*3;
+		}
+		x1+=Math.cos(pi)*1.5;
+		z1+=Math.sin(pi)*1.5;
+		if(x1<-50)x1=-50;
+		if(z1<-50)y1=-50;
+		if(x1>100)x1=100;
+		if(z1>100)z1=100;
+		x = x1;
+		z=z1;
+		var y = 80;
+		for(var y2=y;y2>-1;y2-=1){
+			if(world[Math.floor(x)][Math.floor(y2-1)][Math.floor(z)]>0){
+				var q1=Math.floor(Math.random()*8)+1;
+				var q2=Math.floor(Math.random()*8)+1;
+				for(var a=0;a<q1;a++){
+				for(var b=0;b<q2;b++){
+			
+					world[Math.floor(x+a)][Math.floor(y2)][Math.floor(z+b)]=1;
+					
+				}}
+			y2=-1;
+			}
+		}
+	}
+	
+
+
+	//just add water	
+	for(var z=-23;z<10;z++){
+		for(var x=-93;x<0;x++){
+			//world[x][0][z]=11;
+			//world[x][-1][z]=11;
+			//world[x][-2][z]=11;
+			//world[x][-3][z]=11;
+			//world[x][-4][z]=11;
+			//world[x][-5][z]=11;
+			
+		}
+	}
+	
+	for(var z=-20;z<0;z++){
+		for(var x=-90;x<-80;x++){
+			world[x][0][z]=0;			
+			world[x][-1][z]=32;
+			world[x][-2][z]=32;
+			world[x][-3][z]=32;
+		}
+	}
+	
+	
+	/*
+	for(var z=-24;z<-9;z++){
+		for(var x=-70;x<-59;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			world[x][2][z]=1;
+		}
+	}
+
+	for(var z=-23;z<-10;z++){
+		for(var x=-69;x<-60;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			world[x][3][z]=1;
+		}
+	}
+
+	for(var z=-21;z<-12;z++){
+		for(var x=-67;x<-62;x++){
+			//world[x][0][z]=1;
+			//world[x][1][z]=1;
+			world[x][4][z]=1;
+			world[x][5][z]=1;
+			
+		}
+	}\
+	*/
+	var x1 = -69;
+	var z1 = -24;
+	var y1 = 1;
+	var az1 = 4;
+	var az2 = 1.5;
+	for(var a=0;a<40;a++){
+		az1+=Math.random()/10;
+		az2+=Math.random()/30;
+		x1+=Math.cos(az1)*1;
+		y1+=Math.sin(az1)*1;
+		z1+=Math.sin(az2)*1;
+		mapblock(Math.floor(x1),Math.floor(y1)-1,Math.floor(z1),12,3,12,1);
+		mapblock(Math.floor(x1)+2,Math.floor(y1),Math.floor(z1)+2,6,2,7,0);
+		
+	}
+	mapblock(Math.floor(x1)-15,Math.floor(y1)-5,Math.floor(z1)-15,30,20,30,1);
+		
+function mapblock(x,y,z,w,h,d,v)
+{
+	for(var x1=x;x1<x+w;x1++){
+		for(var y1=y;y1<y+h;y1++){
+			for(var z1=z;z1<z+d;z1++){
+				world[x1][y1][z1]=v;
+			}
+		}
+	}
+}
+
+
+
+	
+
+	//
+	// Make some trees
+	//
+	function sprayTreeTop(x,y,z){
+		var len2 = (Math.random()*32)+64;
+		for(var j=0;j<len2;j++){			
+			var x1=x+(Math.random()*5);
+			var y1=y+(Math.random()*5);
+			var z1=z+(Math.random()*5);
+			x1-=2;
+			z1-=2;
+			if(Math.random()<.2){
+				x1=x+(Math.random()*2);
+				y1=y+(Math.random()*2);
+				z1=z+(Math.random()*2);
+			}
+			if(world[Math.floor(x1)][Math.floor(y1)][Math.floor(z1)]==0){
+				world[Math.floor(x1)][Math.floor(y1)][Math.floor(z1)]=65;
+			}
+		}
+	}
+	function areaHasNoTrees(x,y,z){
+
+		for(var z1=z-4;z1<z+5;z1++){
+			
+			for(var x1=x-4;x1<x+5;x1++){
+
+				for(var y1=y;y1<y+16;y1++){
+					if(world[x1][y1][z1]>0){
+					return false;
+
+					}
+				}
+			}
+		}
+		return true;
+	}
+	function dropTree(x,y,z){
+		for(var y1=y;y1>-5;y1-=1){
+			if(world[x][y1][z]!=11 && world[x][y1][z]!=0 && world[x][y][z]!=32 )return;
+						
+			if(world[x][y1][z]==11){
+				if(areaHasNoTrees(x,y1+1,z)){
+					var len=Math.floor(Math.random()*5)+3;
+					for(var t=1;t<len;t++){
+						world[x][y1+t][z]=64;//treestump
+					}
+					sprayTreeTop(x,y1+len,z);			
+					return true;
+				}
+			}
+			
+		}		
+	}
+	for(var i=0;i<1250;i++){
+		var x=Math.floor((Math.random()*200)-100);
+		var z=Math.floor((Math.random()*200)-100);	
+		dropTree(x,50,z)
+	}
+
+		// `Just add flowers
+	
+	for(var i=0;i<2250;i++){
+		var x=Math.floor((Math.random()*200)-100);
+		var z=Math.floor((Math.random()*200)-100);	
+		dropFlower(x,50,z);
+	}
+	function dropFlower(x,y,z){
+		for(var y1=y;y1>-5;y1-=1){
+	
+			if(world[x][y1][z]!=11 && world[x][y1][z]!=0  && world[x][y][z]!=32 )return;		
+			
+			if(world[x][y1][z]==11){
+
+				world[x][y1+1][z]=130;
+				if(Math.random()<.2)world[x][y1+1][z]=129;
+				if(Math.random()<.2)world[x][y1+1][z]=128;				
+				return;	
+			}
+		}		
+	}	
+
+	
+
+function makechunk(ax,ay,az,lm=null){
+	if(lm==null){
+		var col = [];
+			// Face-dependent lighting effect
+			//top
+			col.push(1.0);
+			// front
+			col.push(0.8);
+			//right
+			col.push(0.6);
+			//left
+			col.push(0.6);
+			// back (south)
+			col.push(0.8);
+			// bottom
+			col.push(0.5);
+			
+	}
+	ax=Math.floor(ax);
+	ay=Math.floor(ay);
+	az=Math.floor(az);
+var quad_uvs = [];
+var quad_indices = [];
+
+quad_vertices = [];
+quad_verticesColor = [];
+
+
+var cnt=0;
+for(var z=az;z<az+16;z+=1){
+for(var y=ay;y<ay+16;y+=1){
+for(var x=ax;x<ax+16;x+=1){
+	if(world[x][y][z]<128){
+		
+		var face = [];
+		face = getfaces(x,y,z,false);
+//quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,true,true,true,true,true,true));
+		quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
+		if(lm!=null){
+			var col = [];
+			for(var t=0;t<6;t++){
+				col.push(lm[x-ax][y-ay][z-az]);
+
+			}
+				
+		}
+		quad_verticesColor.push(...addquadverticesColorface(face[0],face[1],face[2],face[3],face[4],face[5],1.0,col));		
+		for(var i=0;i<6;i++){
+			if(face[i]==true){
+				//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 16)+1,Math.floor(Math.random() * 3)+1));
+				if(world[x][y][z]==11){
+					quad_uvs.push(...addquaduvs(10,0));
+				}else if(world[x][y][z]==32){
+					quad_uvs.push(...addquaduvs(12,0));
+				}else if(world[x][y][z]==64){//tree stump
+					quad_uvs.push(...addquaduvs(9,3));
+				}else if(world[x][y][z]==65){//tree stump
+					quad_uvs.push(...addquaduvs(10,3));
+					
+				}else{
+					quad_uvs.push(...addquaduvs(world[x][y][z]-1,1+Math.floor(Math.random()*1)));
+				}
+				quad_indices.push(...addquadindices(cnt));
+				cnt++;
+				}
+			}
+		}
+	if(world[x][y][z]>=128 && world[x][y][z]<=130){
+		quad_vertices .push(...addflowerquadverticesface(
+					x*60,
+					y*60,
+					z*60
+					));
+		quad_verticesColor.push(...addflowerquadverticesColorface(true,true,true,true,.25));					
+	//				((x*meshSize)+xa)+(Math.random()*20)-10,160,
+	//				((Math.random()*20)-10)+((z*meshSize)+za))
+	//				);
+			var t;
+			if(world[x][y][z]==128)t=0;
+			if(world[x][y][z]==129)t=1;
+			if(world[x][y][z]==130)t=2;			
+			for(var i=0;i<4;i++){
+				quad_uvs.push(...addquaduvs(t,Math.floor(0)));
+				quad_indices.push(...addquadindices(cnt));
+				cnt++;
+			}
+	}
+	
+	
+	
+}
+}
+}
+
+var geometry = new THREE.BufferGeometry();
+
+var vertices = new Float32Array( quad_vertices );
+var verticesColor = new Float32Array( quad_verticesColor );
+// Each vertex has one uv coordinate for texture mapping
+var uvs = new Float32Array( quad_uvs);
+// Use the four vertices to draw the two triangles that make up the square.
+var indices = new Uint32Array( quad_indices )
+
+geometry.setAttribute(
+      'color',
+      new THREE.BufferAttribute(verticesColor, 3));
+//geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+// itemSize = 3 because there are 3 values (components) per vertex
+geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+// Load the texture asynchronously
+//let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+
+var material = new THREE.MeshLambertMaterial( {	map: sprite , 
+												transparent: true,
+												alphaTest:0.5,
+												color:0xFFFFFF,// note darkness for torches
+												vertexColors:true,
+											});
+//var material = new THREE.MeshLambertMaterial( {map: sprite , transparent: true,vertexColors:true});											
+material.flatShading=true;
+var mesh = new THREE.Mesh( geometry, material );
+
+//mesh.receiveShadow=true;
+//mesh.castShadow=true;
+//mesh.position.z = -100;
+//mesh.receiveShadow=true;
+return mesh;
+}
+
+
+
+
+
+function makewaterchunk(ax,ay,az){
+	ax=Math.floor(ax);
+	ay=Math.floor(ay);
+	az=Math.floor(az);
+var quad_uvs = [];
+var quad_indices = [];
+
+quad_vertices = [];
+
+
+
+var cnt=0;
+for(var z=az;z<az+16;z+=1){
+for(var y=ay;y<ay+16;y+=1){
+for(var x=ax;x<ax+16;x+=1){
+	if(world[x][y][z]==32){
+		
+		var face = [];
+		face = getfaces(x,y,z,true);
+//quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,true,true,true,true,true,true));
+		quad_vertices .push(...addquadverticesface(x*60,y*60,z*60,face[0],face[1],face[2],face[3],face[4],face[5]));
+		quad_verticesColor.push(...addquadverticesColorface(face[0],face[1],face[2],face[3],face[4],face[5],.25));	
+		for(var i=0;i<6;i++){
+			if(face[i]==true){
+			//quad_uvs.push(...addquaduvs(Math.floor(Math.random() * 16)+1,Math.floor(Math.random() * 3)+1));
+			if(world[x][y][z]==32){
+				quad_uvs.push(...addquaduvs(12,0));
+			}
+			quad_indices.push(...addquadindices(cnt));
+			cnt++;
+			}
+		}
+	}
+	/*
+	if(world[x][y][z]==11 && world[x][y-1][z]==0){
+		
+		if(Math.random()<.05){
+			quad_vertices .push(...addflowerquadverticesface(
+					x*60,
+					60,
+					z*60
+					));
+	//				((x*meshSize)+xa)+(Math.random()*20)-10,160,
+	//				((Math.random()*20)-10)+((z*meshSize)+za))
+	//				);
+			var t=Math.floor(Math.random()*3);
+			for(var i=0;i<4;i++){
+				quad_uvs.push(...addquaduvs(t,Math.floor(0)));
+				quad_indices.push(...addquadindices(cnt));
+				cnt++;
+			}
+		}
+	}
+	*/
+	
+	
+}
+}
+}
+
+var geometry = new THREE.BufferGeometry();
+
+var vertices = new Float32Array( quad_vertices );
+var verticesColor = new Float32Array( quad_verticesColor );
+// Each vertex has one uv coordinate for texture mapping
+var uvs = new Float32Array( quad_uvs);
+// Use the four vertices to draw the two triangles that make up the square.
+var indices = new Uint32Array( quad_indices )
+
+geometry.setAttribute(
+      'color',
+      new THREE.BufferAttribute(verticesColor, 3));
+//geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+// itemSize = 3 because there are 3 values (components) per vertex
+geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+// Load the texture asynchronously
+//let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa.png');
+
+var material = new THREE.MeshLambertMaterial( {	map: sprite , 
+												transparent: true,
+												alphaTest:0.5,
+												color:0xFFFFFF,// note darkness for torches
+												vertexColors:true,												
+											});
+material.flatShading=true;
+var mesh = new THREE.Mesh( geometry, material );
+
+//mesh.receiveShadow=true;
+//mesh.castShadow=true;
+//mesh.position.z = -100;
+//mesh.receiveShadow=true;
+return mesh;
+}
+
+
+
+//var a = makechunk(0,0);
+//mesh = [];
+var mesh = [];
+var meshId = [];
+var watermesh = [];
+var watermeshId = [];
+
+
+	
+
+
+
+
+
+		// Chunk Queue list
+		// Add to this list that one by
+		// one generates a chunk... (fps)
+		var chunkQueue = [];
+		var chunkQueueDelay = 1;
+		var chunkQueueCounter = 0;
+		var chunkDone = false;
+		//
+		// Water was a problem. Sorting the transparancy is done by three.js
+		// when you render the water at the same time as the normal blocks
+		// there are artefacts. I solved it(i think) by creating the water at a later
+		// point when nearby chunks have been created(debug me!)
+		var waterChunkQueue = [];
+		var waterChunkQueueDelay = 2; // make higher if water surface bug
+		var waterChunkQueueCounter = 0;
+		
+		//chunkQueue.push({x:,y:,z:});
+
+
+			
+			//camera.position.z = 5;
+			camera.position.set( -3200,150, -1400);
+			camera.lookAt(0,0,0);
+			
+	const geom = new THREE.BoxGeometry();
+    const mat = new THREE.MeshNormalMaterial();
+var material = new THREE.MeshLambertMaterial( {map: sprite });
+material.flatShading=true;
+
+
+    meshz = new THREE.Mesh( geom, material	);
+	meshz.position.set(50,50,50);
+	
+	meshz.scale.set(.1,.1,.1);
+	meshz.visible=false;
+    scene.add( meshz );
+	
+	
+	var meshBasicMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    wireframe: true,
+    wireframeLinewidth: 4
+});
+	meshSelect = new THREE.Mesh(geom, meshBasicMaterial);
+	meshSelect.scale.set(64,64,64);
+	scene.add(meshSelect);
+
+	//
+	// UI - forward
+	//
+  const material2 = new THREE.MeshPhongMaterial({
+    color: 0xffff00,
+    opacity: 0.8,
+    transparent: true,
+});	
+	
+    meshf = new THREE.Mesh( geom, material2	);
+		var sch=(window.innerWidth/7.5)/100;
+		var scv=(window.innerHeight/7)/100;
+		if(sch>scv){
+			//scv/=2;
+		}else{
+			sch/=1.5;
+			scv/=1.5;
+		}
+	//meshf.scale.set(2,2,.1);
+	meshf.scale.set(sch,scv,sch);
+    scene.add( meshf );
+    meshb = new THREE.Mesh( geom, material2	);
+	meshb.scale.set(sch,scv,sch);
+	//meshb.scale.set(2,2,.1);
+    scene.add( meshb );
+	
+	
+	var meshDig = new THREE.Mesh( geom, material2	);
+	meshDig.scale.set(sch,scv,sch);
+    scene.add( meshDig );
+	var meshPlace = new THREE.Mesh( geom, material2	);
+	meshPlace.scale.set(sch,scv,sch);
+    scene.add( meshPlace );
+	
+	
+	
+	var movecam = true;
+	var lastx,lasty,startx,starty;
+	var backwardlastx,backwardlasty,forwardlastx,forwardlasty;
+	var jumpstartx,jumpstarty;
+	var vv = new THREE.Vector3();
+	var an = 0;
+	var an2 = Math.PI/2;
+	// For Camera player jumping
+	var jumpTime = 0;
+	var jumpCount = 0;
+	var doJump = false;
+	var jumpInc = 0;
+	var turnCountDown = 0; // do not dig after turn
+	var continueDig = false; // uses lastPressTime to continue digging.
+	var continueDigTime = 0;
+	var playerTouchMode = 1; // 1=dig 2 = place
+	var gravdelay
+	var highlightx = -1;
+	var highlighty = -1;
+	var highlightz = -1;
+	var lasthighlightx = -1;
+	var lasthighlighty = -1;
+	var lasthighlightz = -1;
+	var chunkGenDist = 1; // area around player chunk grow
+	var chunkGenDistTime = 60;
+	var chunkGenDistCount = 0;
+	var chunkGenDistMax = 5;
+	var id=0;
+	var colval = 1.0;
+	var coldir=-1;
+	
+	//spotLight.lookAt(meshz);
+			var runOnce=false;
+			//camera.lookAt(mesh.position);
+			var dt=0;
+			var dir=10;
+			//var d = Math.hypot(y2-y1,x2-x1);
+			
+			// Stackoverflow - Turn float into hex (for fog!)
+			function rgbToHex(r,g,b) {
+		         r = parseInt(r);
+	    	     g = parseInt(g);
+        		 b = parseInt(b);
+         		return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+			 }
+
+			function animate() {
+				requestAnimationFrame( animate );
+
+				/*
+				//function setColor(mmesh,index,r,g,b){
+				for(var j=0;j<mesh.length/10;j++){
+				if(mesh[id]!=null){
+				setChunkColor(mesh[id],colval,colval,colval)
+				//if(Math.random()<.1)console.log(coldir);
+				}
+				id++;
+				}
+
+				if(id>mesh.length){
+					scene.background = new THREE.Color( 0,colval/2,colval );	
+					
+					scene.fog = new THREE.FogExp2(rgbToHex(0,colval/2,colval),0.0003);
+			
+					id=0;
+					if(coldir==-1){
+						colval-=.1;
+					}
+					if(coldir==1){
+						colval+=.1;
+					}
+					if(colval>1.0){
+						colval=0.9;
+						coldir=-1;
+					}
+					if(colval<0){
+						colval=0.1;
+						coldir=1;
+					}
+					
+				}
+				*/
+				
+				// When starting out we generate the new chunks
+				// first close to the player and further away
+				// ever x amount of time until it is at max.
+				if(chunkGenDist<chunkGenDistMax){
+					chunkGenDistCount++;	
+					if(chunkGenDistCount>chunkGenDistTime){
+						chunkGenDist++;		
+					}
+				}
+				
+				// Here we use the queue list that holds the chunks
+				// that are to be generated. We add a chunk every x cycle
+				// of the loop to prevent fps hickups caused by lots of work
+				// at once.
+				// 
+chunkDone=true;
+				for(var z=0;z<6;z++){
+				chunkQueueCounter++;
+				if(chunkQueueCounter>chunkQueueDelay){
+					chunkQueueCounter=0;
+					
+					if(chunkQueue[0]){
+						chunkDone=false;
+						var xx = chunkQueue[0].x;
+						var yy = chunkQueue[0].y;
+						var zz = chunkQueue[0].z;
+						chunkQueue.shift();
+						expandWorld(world,xx*16-1,yy*16-1,zz*16-1,(xx*16)+17,(yy*16)+17,(zz*16)+17,1);
+								////world[xx*16][yy*16][zz*16]=1;
+						var m = makechunk(xx*16,yy*16,zz*16);
+						mesh.push(m)
+						meshId.push({x:xx,y:yy,z:zz});
+						scene.add(mesh[mesh.length-1]);
+						waterChunkQueue.push({x:xx,y:yy,z:zz});
+						waterChunkQueueCounter=0;
+						//var m2 = makewaterchunk(xx*16,yy*16,zz*16);			
+						//watermesh.push(m2)
+						//watermeshId.push({x:xx,y:yy,z:zz});
+						//scene.add(watermesh[watermesh.length-1]);
+						
+					}							
+				}
+				
+				waterChunkQueueCounter++;
+				if(waterChunkQueueCounter>waterChunkQueueDelay && chunkDone){
+					waterChunkQueueCounter=0;
+					if(waterChunkQueue[0]){
+						var xx = waterChunkQueue[0].x;
+						var yy = waterChunkQueue[0].y;
+						var zz = waterChunkQueue[0].z;
+						waterChunkQueue.shift();
+						var m2 = makewaterchunk(xx*16,yy*16,zz*16);			
+						watermesh.push(m2)
+						watermeshId.push({x:xx,y:yy,z:zz});
+						scene.add(watermesh[watermesh.length-1]);
+						
+					}							
+				}
+								
+				
+				removeDistance();
+				if(chunkQueue.length==0)generate();
+			}
+				//camera.position.z+=dir;
+				//dt++;
+				//if(dt>512){
+				//	dir=-dir;
+				//	dt=0;
+				//}
+				/*
+				var dir=new THREE.Vector3();
+				meshf.position.set(camera.getWorldPosition());
+				camera.getWorldDirection( dir );
+				// see if our direction ahead collides
+				meshf.position.x+=dir.x*4;
+				meshf.position.y+=dir.y*4;
+				meshf.position.z+=dir.z*4;
+				*/
+				// Continue digging when continue touching the
+				// screen.
+				//
+				if(continueDig){
+					continueDigCount+=1;
+					if(continueDigCount>50){
+						continueDigCount=0;
+						//dig();
+						//placeBlock();
+						if(playerTouchMode==1){
+							//dig();
+							placeTorch();
+						}else{
+							placeBlock();
+						}
+						highlight();
+					}	
+				}
+				
+				//mesh.rotation.x+=.002;
+				//mesh.rotation.y+=.002;
+				//mesh.rotation.z+=.002;
+				if(an>Math.PI/2)an=Math.PI/2;
+				if(an<-Math.PI/2)an=-Math.PI/2;
+				//meshz.position.x = meshz.position.y+Math.cos(an)*10;
+				var ox,oy,oz;
+				ox = meshz.position.x;
+								
+				oz = meshz.position.z;
+								
+				oy = meshz.position.y;
+				
+				
+				meshz.position.x = camera.position.x+(Math.cos(an2)*15);
+								
+				meshz.position.z = camera.position.z+(Math.sin(an2)*15);
+								
+				meshz.position.y = camera.position.y+(Math.sin(an)*15);
+				
+				camera.lookAt(meshz.position);
+			
+				//if(ox!=meshz.position.x || oy!=meshz.position.y || oz!=meshz.position.z ){
+					//turnCountDown=40;
+				//}
+				
+				// after we have turned then wait for block placement.
+				//turnCountDown-=1;
+				//if(turnCountDown<0)turnCountDown=0;
+				if(Math.random()<0.01){
+						//jumpCount=0;
+						//jumpTime=0;
+						//jumpInc = 3;
+						//camera.position.y+=150;
+						//doJump=true;
+				}
+
+				
+//				if(movecam){
+					
+					
+					// move forward touch
+					// if touch center then move forward
+					var w=window.innerWidth/3;
+					var h=window.innerHeight/3;
+					
+					// rotate camera
+					// attempt at minecraft style camera controls touchscreen bedrock iphone
+//					if (lastx>w && lastx<window.innerWidth-w && lasty>h && lasty<window.innerHeight-h){
+//						}else{
+						var d1 = Math.hypot(lasty-starty,lastx-startx);
+						//if(d1<window.innerWidth/8){
+							//d1 = d1 / (window.innerWidth/128);
+							d1 *= 1.25;
+							if(lastx<startx)an2-=(0.005*d1);		
+							if(lastx>startx)an2+=(0.005*d1);
+							if(lasty<starty)an+=(0.005*d1);
+							if(lasty>starty)an-=(0.005*d1);
+							startx = lastx;
+							starty = lasty;
+						//}
+//					}
+					
+					// Move forward
+					gravdelay=false;
+					moveForward();					
+					moveBackward();
+//					
+//				}
+
+				
+				
+				jump();
+					
+				// gravity
+				if(gravdelay==false){
+				for(var i=0;i<8;i++){
+					if(doJump==false){
+						if(collideCameraMap(camera.position,new THREE.Vector3(0,-60,0))==false){
+							camera.position.y-=jumpInc;
+							if(jumpInc<3)jumpInc+=.01;
+							
+						}else{
+							jumpInc=0;
+						}
+					}else{
+						if(collideCameraMap(camera.position,new THREE.Vector3(0,jumpInc,0))==false){
+							camera.position.y+=jumpInc;
+							jumpInc-=.01;
+							if(jumpInc<0)doJump=false;
+						}else{
+							doJump=false;
+						}
+						
+					}	
+				}
+				}
+				
+				// forward ui
+				setUi();				
+				
+				
+				renderer.render( scene, camera );
+			};
+
+			animate();
+			
+			//
+			function lightFlood(x,y,z){
+				var worldColor = [];
+				var tempWorldColor = [];
+				for(var i=0;i<16;i++){
+					worldColor[i] = new Array();
+					tempWorldColor[i] = new Array();					
+					for(var j=0;j<16;j++){
+						worldColor[i][j]= new Array();
+						tempWorldColor[i][j] = new Array();											
+						for(var k=0;k<16;k++){
+							worldColor[i][j][k]= 0;
+							tempWorldColor[i][j][k]= 0;
+						}
+					}
+				}
+				worldColor[1][1][1]=1.0;
+				tempWorldColor[1][1][1]=1;
+				var x1=y1=z1=1;
+				var olx = [];
+				var oly = [];
+				var olz = [];
+				olx.push(x1);oly.push(y1);olz.push(z1);
+				while(olx.length>0){
+					x1 = olx.shift();
+					y1 = oly.shift();
+					z1 = olz.shift();
+					var q=200;
+					for(var mx=-1;mx<2;mx++){
+					for(var my=-1;my<2;my++){
+					for(var mz=-1;mz<2;mz++){
+						q=q-1;
+						if(q==0)return;
+						var x2 = x1+mx;
+						var y2 = y1+my;
+						var z2 = z1+mz;
+						if(x2>=0 && x2<16 && y2>=0 && y2<16 && z2>=0 && z2<16){
+							if(tempWorldColor[x2][y2][z2]===0){
+								tempWorldColor[x2][y2][z2]=1;
+								worldColor[x2][y2][z2]=worldColor[x1][y1][z1]-0.05;
+								if(worldColor[x2][y2][z2]<.3)worldColor[x2][y2][z2]=1.0;
+								if(worldColor[x2][y2][z2]>1.0)worldColor[x2][y2][z2]=1.0;
+								
+								olz.push(z2);
+								olx.push(x2);
+								oly.push(y2);
+								//if(Math.random()<0.01)console.log(worldColor[x2][y2][z2]);
+								
+							}
+						}
+					}}}
+				}
+				// flood 3 dimensions
+				
+				
+				return worldColor;
+				//world[x][y][z][face] = 1;
+			}
+			
+	function placeTorch(){
+		// exit if moving backwards
+			var w=window.innerWidth/7;
+				var h=window.innerHeight/5;
+					
+				if (startx>(w) && startx<w+window.innerWidth/6 && starty>(window.innerHeight/1.5) && starty<window.innerHeight-h)return;
+
+			
+			//if(turnCountDown>0)return;
+	
+			var pointer = new THREE.Vector2();
+			//pointer.x = ( startx / window.innerWidth ) * 2 - 1;
+			//pointer.y = -( starty / window.innerHeight ) * 2 + 1;
+			pointer.x = ( (startx) / window.innerWidth ) * 2 -1;
+			pointer.y = -( (starty-(window.innerHeight/20)) / window.innerHeight ) * 2 +1;
+			//pointer.y+=.25;
+			//pointer.x-=.03;
+			
+			//pointer.x = startx;
+			//pointer.y = starty;
+	// update the picking ray with the camera and pointer position
+	    	
+			const raycaster = new THREE.Raycaster()
+
+			//raycaster.params.Line.threshold = 60;
+			//var vec = new THREE.Vector3();
+			//camera.getWorldPosition(vec);
+			//var dir = new THREE.Vector3();
+			//camera.getWorldDirection(dir);
+			
+			//const ray = new THREE.ray(vec,camera.getWorldDirection());
+			//raycaster.params.Points.threshold = 60;
+		    raycaster.setFromCamera(pointer, camera);
+			var bulld = new THREE.Vector3();
+			bulld = raycaster.ray.direction;
+			//bulld.y+=.25;
+			//bulld.x+=.45;
+			var bull = new THREE.Vector3();
+			bull.x = camera.position.x+30;
+			bull.y = camera.position.y+30;
+			bull.z = camera.position.z+60;
+			bull.x += bulld.x*30;
+			bull.y += bulld.y*30;
+			bull.z += bulld.z*30;
+	   		const coords=new THREE.Vector3();
+
+	  //raycaster.at(50,coords);
+		 	var eloop=false;
+			var x3,y3,z3,Id;
+			var px,py,pz;
+	  		for(var q=0;q<500;q++){
+				bull.x += bulld.x;
+				bull.y += bulld.y;
+				bull.z += bulld.z;
+				var x=Math.floor(bull.x/60);
+				var y=Math.floor(bull.y/60);
+				var z=Math.floor(bull.z/60);
+				
+	  			//raycaster.ray.at(q,coords);
+				//raycaster.ray.at(q,coords);
+				//var x=Math.floor(coords.x/60);
+				//var y=Math.floor(coords.y/60);
+				//var z=Math.floor(coords.z/60);
+				if(x>=-worldWidth && y>=-worldHeight && z>=-worldDepth && x<worldWidth && y<worldHeight && z<worldHeight){
+				if(world[x][y][z]>0){
+					meshSelect.position.set(x*60,y*60,z*60-30);
+					for(var xq=-1;xq<2;xq++){
+					for(var yq=-1;yq<1;yq++){
+					for(var zq=-1;zq<2;zq++){	
+					if(world[x+xq][y+yq][z+zq]==undefined)world[x+xq][y+yq][z+zq]=1;
+				}}}
+				// here we remove the block in dig funtion
+				//world[x][y][z]=0;
+				
+					
+				
+					// rebuild chunks
+					var x2=Math.floor(x/chunkSize);
+					var y2=Math.floor(y/chunkSize);
+					var z2=Math.floor(z/chunkSize);
+					for(var i=0;i<meshId.length;i++){
+						if(x2===meshId[i].x && y2===meshId[i].y && z2===meshId[i].z){
+							eloop=true;
+							Id = i;
+							px = x;
+							py = y;
+							pz = z;
+							x3=x2;
+							y3=y2;
+							z3=z2;
+							q=1200;
+							break;
+						}
+				}			
+				}
+			}
+			if(eloop==true){
+				//
+				// If we are to edge of chunks remake chunk nexto to it(testing)
+				//
+				var ax = Math.floor((px/16));
+				var ay = Math.floor((py/16));
+				var az = Math.floor((pz/16));
+				ax=Math.abs(ax*16-px);		
+				ay=Math.abs(ay*16-py);		
+				az=Math.abs(az*16-pz);		
+				//console.log(ax+","+ay+","+az);
+				if(ax==0)rm(x3-1,y3,z3);
+				if(ax==15)rm(x3+1,y3,z3);
+				//if(ay==0)rm(x3,y3-1,z3);//fixed
+				//if(ay==15)rm(x3,y3+1,z3);//fixed
+				if(ay==0)rm(x3,y3-1,z3);//fixed
+				if(ay==15)rm(x3,y3+1,z3);//fixed
+				
+				if(az==0)rm(x3,y3,z3-1);//fixed
+				if(az==15)rm(x3,y3,z3+1);//fixed
+				rm(x3,y3,z3);
+			}
+			function rm(x4,y4,z4){
+				for(var i=0;i<meshId.length;i++){
+					if(meshId[i].x===x4 && meshId[i].y===y4 && meshId[i].z===z4){
+						scene.remove(mesh[i]);
+						mesh.splice(i,1);
+						meshId.splice(i,1);
+						//chunkQueue.push({x:x4*16,y:y4*16,z:z4*16});
+						mesh.push(makechunk(x4*16,y4*16,z4*16,lightFlood(x4,y4,z4)));
+						meshId.push({x:x4,y:y4,z:z4});
+						scene.add(mesh[mesh.length-1]);
+				
+					}
+				}
+				for(var i=0;i<watermeshId.length;i++){
+					if(watermeshId[i].x===x4 && watermeshId[i].y===y4 && watermeshId[i].z===z4){
+						scene.remove(watermesh[i]);
+						watermesh.splice(i,1);
+						watermeshId.splice(i,1);
+						
+						waterChunkQueue.push({x:x4,y:y4,z:z4});
+						//watermesh.push(makechunk(x4*16,y4*16,z4*16,true));
+						//watermeshId.push({x:x4,y:y4,z:z4});
+						//scene.add(watermesh[watermesh.length-1]);
+				
+					}
+				}
+				
+			}
+		}	
+	}
+	
+			//
+			// SET THE COLOR OF a index (todo:
+			// each surface of a world block has a light level with
+			// whichj this function is to be called with.)
+			//
+			function setColor(index,r,g,b){
+				//const positions = mesh.children[zz].geometry.attributes.position.array;
+				var col = mesh.geometry.attributes.color.array;
+
+				var i=index;
+			 	//for ( var i = index; i<index+8; i+=8 ) {
+				// change the uv's inside the geometry based
+				// on atlas tile position.
+				col[i]=r;
+				col[i+1]=g;
+				col[i+2]=b;
+				col[i+3]=r;
+				col[i+4]=g;
+				col[i+5]=b;
+				col[i+6]=r;
+				col[i+7]=g;
+				col[i+8]=b;
+				col[i+9]=r;
+				col[i+10]=g;
+				col[i+11]=b;
+				
+				// needded after changing the uv's.
+				mesh.geometry.attributes.color.needsUpdate = true
+									
+				//}
+			}					
+			
+			
+			
+			function jump(){
+
+				jumpTime++;
+				//var w=window.innerWidth/2.5;
+				//var h=window.innerHeight;
+					
+				//if (startx>(w) && startx<w+window.innerWidth/6 && starty>(window.innerHeight-window.innerHeight/7)
+				//&& starty<window.innerHeight){				
+				if(collideJump(jumpstartx,jumpstarty) && collideCameraMap(camera.position,new THREE.Vector3(0,-60,0))==true){
+					if(jumpTime > 26 || jumpCount==0 || jumpCount>3){
+						jumpCount=0;
+						jumpTime=0;
+					}
+					if(jumpCount==1){
+						jumpCount=0;
+						jumpTime=0;
+						jumpInc = 3;
+						//camera.position.y+=150;
+						doJump=true;
+					}
+				}
+			}
+			
+			function collideJump(x,y){
+				var w=window.innerWidth/2.5;
+				var h=window.innerHeight;
+					
+				if (startx>(w) && startx<w+window.innerWidth/6 && starty>(window.innerHeight-window.innerHeight/7)
+				&& starty<window.innerHeight){				
+					return true;
+				}
+				return false;
+			}
+
+	function touchHandler(e){
+
+		if(e.type=="touchstart" && e.touches){
+			
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;
+				if(collideForward(x,y)==true){
+					forwardlastx = x;
+					forwardlasty = y;
+					//movecam=true;	
+				}
+				if(collideBackward(x,y)==true){
+					backwardlastx = x;
+					backwardlasty = y;
+					//movecam=true;	
+				}
+				if(collideJump(x,y)){
+					jumpstartx = x;
+					jumpstarty = y;
+					//movecam=true;
+				}
+				
+				if(collideForward(x,y)==false && collideBackward(x,y)==false){
+					lastx = x;
+					lasty = y;
+					startx=x;
+					starty=y;
+					//movecam=true;
+					highlight(); //highlighted block
+					lasthighlightx = highlightx;
+					lasthighlighty = highlighty;
+					lasthighlightz = highlightz;
+				
+					continueDig = true; // continue digging if hold down.
+					continueDigCount=0;
+					
+					//			for(var i=0;i<e.changedTouches.length;i++){	
+						//			pointer.x = ( (window.innerWidth*.78) / window.innerWidth ) * 2 -1;
+						//pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
+						
+					if(startx>(window.innerWidth*.78) && startx<window.innerWidth*.86 && starty>window.innerHeight*.68 && starty<window.innerHeight*.78){
+						playerTouchMode = 1;
+						meshDig.scale.set(sch*1.5,scv*1.5,sch*1.5);
+						meshPlace.scale.set(sch,scv,sch);
+					}
+					if(startx>(window.innerWidth*.88) && startx<window.innerWidth*.98 && starty>window.innerHeight*.68 && starty<window.innerHeight*.78){
+						playerTouchMode = 2;
+						meshDig.scale.set(sch,scv,sch);
+						meshPlace.scale.set(sch*1.5,scv*1.5,sch*1.5);
+						
+					}
+				}
+			}
+			//dig();
+			//lasttouchx = x;
+			//lasttouchy = y;
+			//autoscroll = true;
+			//colx = x-colw/2;
+			//coly = y-colh/2;
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+	}
+		if(e.type=="touchmove" && e.touches) {
+			if(e.changedTouches.length>1)return;
+			for(var i=0;i<e.changedTouches.length;i++){				
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;
+				if(collideForward(x,y)==false && collideBackward(x,y)==false){
+				lastx = x;
+				lasty = y;
+				movecam=true;
+				lasthighlightx = highlightx;
+				lasthighlighty = highlighty;
+				lasthighlightz = highlightz;	
+				highlight();
+				if(	highlightx!=lasthighlightx ||
+					highlighty!=lasthighlighty ||
+					highlightz!=lasthighlightz){
+				continueDigCount=0;
+				}
+			}
+			}
+			//autoscroll = false;
+			//if(x<window.innerWidth/2-48)an2-=0.1;		
+			//if(x>window.innerWidth/2+48)an2+=0.1;		
+			//if(y<window.innerHeight/2-48)an+=0.1;
+			//if(y>window.innerHeight/2+48)an-=0.1;
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+		
+	if(e.type=="touchend" && e.touches) {
+			for(var i=0;i<e.changedTouches.length;i++){	
+			var x = e.changedTouches[i].clientX;
+			var y = e.changedTouches[i].clientY;
+			if(collideForward(x,y)==true){
+				forwardlastx = 0;
+				forwardlasty = 0;
+				//movecamera=false;	
+			}
+			if(collideBackward(x,y)==true){
+				backwardlastx = 0;
+				backwardlasty = 0;
+				//movecamera=false;	
+			}
+			
+			if(collideForward(x,y)==false && collideBackward(x,y)==false){
+				
+			//var x = e.changedTouches[0].clientX;
+			//var y = e.changedTouches[0].clientY;
+			//cameraMoveId=-1;
+			//movecamera=false;
+
+			lastx = x;
+			lasty = y;
+			startx = x; 
+			starty = y;
+
+			highlight();
+			continueDig = false; // stop digging if we were holding down
+			continueDigCount = 0;
+			}
+			if(collideJump(x,y)==true){
+				jumpCount++;	
+			}
+		}
+		
+			
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	e.preventDefault();
+		}
+
+		}					
+
+		
+	// Uses the meshSelect geometry - highlight the map>0 cube on the last touch position.
+	//
+	function highlight(){
+		
+				// exit if moving backwards
+			var w=window.innerWidth/7;
+				var h=window.innerHeight/5;
+					
+				if (lastx>(w) && lastx<w+window.innerWidth/6 && lasty>(window.innerHeight/1.5) && lasty<window.innerHeight-h)return;
+				
+			
+			//if(turnCountDown>0)return;	
+			var pointer = new THREE.Vector2();
+			//pointer.x = ( startx / window.innerWidth ) * 2 - 1;
+			//pointer.y = -( starty / window.innerHeight ) * 2 + 1;
+			pointer.x = ( (lastx) / window.innerWidth ) * 2 -1;
+			pointer.y = -( (lasty-(window.innerHeight/20)) / window.innerHeight ) * 2 +1;
+			//pointer.y+=.25;
+			//pointer.x-=.03;
+			
+			//pointer.x = startx;
+			//pointer.y = starty;
+	// update the picking ray with the camera and pointer position
+	    	
+			const raycaster = new THREE.Raycaster()
+
+			//raycaster.params.Line.threshold = 60;
+			//var vec = new THREE.Vector3();
+			//camera.getWorldPosition(vec);
+			//var dir = new THREE.Vector3();
+			//camera.getWorldDirection(dir);
+			
+			//const ray = new THREE.ray(vec,camera.getWorldDirection());
+			//raycaster.params.Points.threshold = 60;
+		    raycaster.setFromCamera(pointer, camera);
+			var bulld = new THREE.Vector3();
+			bulld = raycaster.ray.direction;
+			//bulld.y+=.25;
+			//bulld.x+=.45;
+			var bull = new THREE.Vector3();
+			bull.x = camera.position.x+30;
+			bull.y = camera.position.y+30;
+			bull.z = camera.position.z+60;
+			bull.x += bulld.x*30;
+			bull.y += bulld.y*30;
+			bull.z += bulld.z*30;
+	   		const coords=new THREE.Vector3();
+
+	  //raycaster.at(50,coords);
+		 	var eloop=false;
+			var x3,y3,z3,Id;
+			var px,py,pz;
+	  		for(var q=0;q<800;q++){
+				bull.x += bulld.x;
+				bull.y += bulld.y;
+				bull.z += bulld.z;
+				var x=Math.floor(bull.x/60);
+				var y=Math.floor(bull.y/60);
+				var z=Math.floor(bull.z/60);
+				
+	  			//raycaster.ray.at(q,coords);
+				//raycaster.ray.at(q,coords);
+				//var x=Math.floor(coords.x/60);
+				//var y=Math.floor(coords.y/60);
+				//var z=Math.floor(coords.z/60);
+				if(x>=-worldWidth && y>=-worldHeight && z>=-worldDepth && x<worldWidth && y<worldHeight && z<worldHeight){
+				if(world[x][y][z]>0){
+					
+					for(var xq=-1;xq<2;xq++){
+					for(var yq=-1;yq<1;yq++){
+					for(var zq=-1;zq<2;zq++){	
+					if(world[x+xq][y+yq][z+zq]==undefined)world[x+xq][y+yq][z+zq]=1;
+					}}}
+					//world[x][y][z]=0;
+					// rebuild chunks
+					var x2=Math.floor(x/chunkSize);
+					var y2=Math.floor(y/chunkSize);
+					var z2=Math.floor(z/chunkSize);
+					for(var i=0;i<meshId.length;i++){
+						if(x2===meshId[i].x && y2===meshId[i].y && z2===meshId[i].z){
+							eloop=true;
+							meshSelect.position.set(x*60,y*60,z*60-30);
+							Id = i;
+							px = x;
+							py = y;
+							pz = z;
+							highlightx = px;
+							highlighty = py;
+							highlightz = pz;
+							x3=x2;
+							y3=y2;
+							z3=z2;
+							q=1200;
+							break;
+						}
+					}			
+				}}
+			}
+			
+		
+		
+	}
+	
+		
+		// Generate test
+		//
+		// Todo - optimize
+		//
+		//
+		function generate(){
+			
+			//if(runOnce==false)return;
+			var x = (camera.position.x / 60)/16;
+			var y = (camera.position.y / 60)/16;
+			var z = (camera.position.z / 60)/16;
+			for(var cx=-chunkGenDist;cx<chunkGenDist+1;cx++){
+				for(var cy=-chunkGenDist;cy<chunkGenDist+1;cy++){
+					for(var cz=-chunkGenDist;cz<chunkGenDist+1;cz++){
+						var xx=Math.floor(x+cx);
+						var yy=Math.floor(y+cy);
+						var zz=Math.floor(z+cz);
+						if(dist3d(cx,cy,cz,0,0,0)>6)continue;
+						var addIt=true;
+						for(var i=0;i<meshId.length;i++){
+							if(meshId[i].x===xx && meshId[i].y===yy && meshId[i].z===zz){
+								//console.log('double');
+								addIt=false;							
+							}
+						}
+						for(var i=0;i<chunkQueue.length;i++){
+							if(chunkQueue[i].x===xx && chunkQueue[i].y===yy && chunkQueue[i].z===zz){
+								//console.log('double');
+								addIt=false;							
+							}
+						}
+						
+						if(addIt==true){
+							//console.log('new');
+							//console.log(xx);
+							//console.log(yy);
+							//console.log(zz);
+							//console.log('zzz')
+							////meshId.push({x:Math.floor(x/16),y:Math.floor(y/16),z:Math.floor(z/16)});
+							chunkQueue.push({x:xx,y:yy,z:zz});
+							//expandWorld(world,xx*16-1,yy*16-1,zz*16-1,(xx*16)+17,(yy*16)+17,(zz*16)+17,1);
+							////world[xx*16][yy*16][zz*16]=1;
+							//var m = makechunk(xx*16,yy*16,zz*16);
+							//mesh.push(m)
+							//meshId.push({x:xx,y:yy,z:zz});
+							//scene.add(mesh[mesh.length-1]);							
+						}
+					}
+				}
+			}
+
+		}
+		function expandWorld(arr,x1,y1,z1,x2,y2,z2,val=0){
+			x1 = Math.floor(x1);
+			y1 = Math.floor(y1);
+			z1 = Math.floor(z1);
+			x2 = Math.floor(x2);
+			y2 = Math.floor(y2);
+			z2 = Math.floor(z2);
+			for (x=x1; x<x2; x++){
+				if(arr[x]===undefined)arr[x] = new Array();
+			 	for (y=y1; y<y2; y++){
+					if(arr[x][y]===undefined)arr[x][y] = new Array();
+						for(var z=z1;z<z2;z++){
+							if(arr[x][y][z]===undefined)arr[x][y][z]=val;
+						}
+				  }
+			}
+		}		
+		function blockWorld(x,y,z){
+			for(x2=x*16;x2<x*16+16;x2++){
+				for(y2=y*16;y2<y*16+16;y2++){
+					for(z2=z*16;z2<z*16+16;z2++){
+						world[x2][y2][z2]=1;
+			}}}
+		}
+			
+		//
+		// Remove chunks at larger distance
+		//	
+		//
+		function removeDistance(){
+			for(var i=0;i<mesh.length;i++){
+				mesh[i].visible=false;
+			}
+							
+			for(var i=0;i<mesh.length;i++){
+				//var d = dist3d(	camera.position.x,camera.position.y,camera.position.z,
+				//mesh[i].position.x,mesh[i].position.y,mesh[i].position.z);
+				if(meshId[i]!=null){
+				var d = dist3d(	camera.position.x,camera.position.y,camera.position.z,
+						(meshId[i].x*16*60),(meshId[i].y*16*60),(meshId[i].z*16*60));
+				
+				//if(runOnce==false)console.log(d);
+				//if(Math.random()<.01)console.log(d);
+				if(d<5000.0){
+					//console.log(d);
+					mesh[i].visible=true;
+				    //scene.remove(mesh[i]);					
+			 	 	//mesh[i].geometry.dispose();
+					//mesh[i].material.dispose();
+					//mesh[i] = null;
+					//meshId[i]=null;
+				}
+			}}
+			//runOnce=true;
+		}
+		// Return distance 3d (x,y,z)
+		function dist3d(x1,y1,z1,x2,y2,z2) {
+ 		   	//var a = x2 - x1;
+    		//var b = y2 - y1;
+    		//var c = z2 - z1;
+
+   		 	//return Math.hypot(a, b, c);
+ 		   	var dx = x2 - x1;
+		    var dy = y2 - y1;
+		    var dz = z2 - z1;
+    
+		    var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2) + Math.pow(dz, 2));
+    
+		    return dist;
+
+		}
+		// Draw some cubes in front of the camera
+		// where the touch screen has effects. (UI)
+		//	
+		function setUi(){				
+				var pointer = new THREE.Vector2();
+				pointer.x = ( (window.innerWidth*.3) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
+				var raycaster = new THREE.Raycaster()
+			    raycaster.setFromCamera(pointer, camera);
+				var bulld = new THREE.Vector3();
+				bulld = raycaster.ray.direction;
+				var bull = new THREE.Vector3();
+				bull.x = camera.position.x;
+				bull.y = camera.position.y;
+				bull.z = camera.position.z;
+				bull.x += bulld.x*10;
+				bull.y += bulld.y*10;
+				bull.z += bulld.z*10;
+				meshf.position.set(bull.x,bull.y,bull.z);
+				meshf.lookAt(camera.position);
+				
+				var pointer = new THREE.Vector2();
+				pointer.x = ( (window.innerWidth*.2) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
+				var raycaster = new THREE.Raycaster()
+			    raycaster.setFromCamera(pointer, camera);
+				var bulld = new THREE.Vector3();
+				bulld = raycaster.ray.direction;
+				var bull = new THREE.Vector3();
+				bull.x = camera.position.x;
+				bull.y = camera.position.y;
+				bull.z = camera.position.z;
+				bull.x += bulld.x*10;
+				bull.y += bulld.y*10;
+				bull.z += bulld.z*10;
+				meshb.position.set(bull.x,bull.y,bull.z);
+				meshb.lookAt(camera.position);				
+
+				// dig icon
+				var pointer = new THREE.Vector2();
+				pointer.x = ( (window.innerWidth*.78) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
+				var raycaster = new THREE.Raycaster()
+			    raycaster.setFromCamera(pointer, camera);
+				var bulld = new THREE.Vector3();
+				bulld = raycaster.ray.direction;
+				var bull = new THREE.Vector3();
+				bull.x = camera.position.x;
+				bull.y = camera.position.y;
+				bull.z = camera.position.z;
+				bull.x += bulld.x*10;
+				bull.y += bulld.y*10;
+				bull.z += bulld.z*10;
+				meshDig.position.set(bull.x,bull.y,bull.z);
+				meshDig.lookAt(camera.position);				
+				// place block icon
+				// dig icon
+				var pointer = new THREE.Vector2();
+				pointer.x = ( (window.innerWidth*.92) / window.innerWidth ) * 2 -1;
+				pointer.y = -( (window.innerHeight*.68) / window.innerHeight ) * 2 +1;
+				var raycaster = new THREE.Raycaster()
+			    raycaster.setFromCamera(pointer, camera);
+				var bulld = new THREE.Vector3();
+				bulld = raycaster.ray.direction;
+				var bull = new THREE.Vector3();
+				bull.x = camera.position.x;
+				bull.y = camera.position.y;
+				bull.z = camera.position.z;
+				bull.x += bulld.x*10;
+				bull.y += bulld.y*10;
+				bull.z += bulld.z*10;
+				meshPlace.position.set(bull.x,bull.y,bull.z);
+				meshPlace.lookAt(camera.position);					
+		}			
+	
+			
+		
+			function moveBackward(){
+				if(collideBackward(backwardlastx,backwardlasty)){					
+					turnCountDown=40;
+					var dir = new THREE.Vector3();
+					camera.getWorldDirection( dir );
+					dir.y=0; // stay on the ground
+					// see if our direction ahead collides
+					if(collideCameraMap(camera.position,dir.multiplyScalar(-10))==false){
+						var dir = new THREE.Vector3();
+						camera.getWorldDirection( dir );
+						dir.y=0;
+						camera.position.add(dir.multiplyScalar(-10) )
+					}															
+				}
+			}
+			function collideBackward(x,y){
+				var w=window.innerWidth/6;
+				var h=window.innerHeight/5;
+					
+				if (x>(w) && x<w+window.innerWidth/14 && y>(window.innerHeight/1.45) && y<window.innerHeight-h){
+					return true;
+				}
+				return false;
+			}
+			
+			function moveForward(){	
+				if(collideForward(forwardlastx,forwardlasty)){
+					turnCountDown=40;
+
+					var dir = new THREE.Vector3();
+					camera.getWorldDirection( dir );
+					dir.y=0; // stay on the ground
+					// see if our direction ahead collides
+					if(collideCameraMap(camera.position,dir.multiplyScalar(10))==false){
+						var dir = new THREE.Vector3();
+						camera.getWorldDirection( dir );
+						dir.y=0;
+						camera.position.add(dir.multiplyScalar(10) )
+					}
+					
+					
+					var dir = new THREE.Vector3();
+					camera.getWorldDirection( dir );
+					dir.y=0; // stay on the ground
+					if(collideCameraMap(camera.position,dir.multiplyScalar(10))==true){						
+						//check ahead above us and then movce up on step
+						//var dir = new THREE.Vector3();							
+						//camera.getWorldDirection( dir );
+						//dir.y=0;
+						var p1 = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
+						var p2 = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
+						
+						//var d1 = dir.multiplyScalar(30);
+						//p1.x+=dir.x*30;
+						//p1.z+=dir.y*30;
+						//p1.y+=60;//35
+						var dir = new THREE.Vector3();
+						camera.getWorldDirection( dir );
+						dir.y=.6;
+						
+						p1.add(dir.multiplyScalar(5));
+						p1.y+=30;
+						//p1.y+=120;
+						//dir.y=0; // stay on the ground
+						if(	collideCameraMap(p1,dir.multiplyScalar(5))==false ){
+							p1.y+=30;//65
+							//camera.position.y+=10;
+							if(	collideCameraMap(p1,dir.multiplyScalar(5))==false ){
+							//var dir = new THREE.Vector3();
+							//camera.getWorldDirection( dir );
+							//dir.y=0;
+							camera.position.y+=30;
+							//var dir = new THREE.Vector3();
+							//camera.getWorldDirection( dir );
+							gravdelay=true;
+							//camera.position.add(dir.multiplyScalar(10) )
+							}
+						}												
+						
+					}	
+					
+				}
+			}
+			function collideForward(x,y){
+				var w=window.innerWidth/4;
+				var h=window.innerHeight/5;
+					
+				if (x>(w) && x<w+window.innerWidth/14 && y>(window.innerHeight/1.45) && y<window.innerHeight-h){
+					return true;
+				}
+				return false;				
+			}
+	
+			function collideCameraMap(position,pos){
+				
+				var x=position.x+pos.x+40;
+				var y=position.y+pos.y;
+				var z=position.z+pos.z+40;
+				x/=60;
+				y/=60;
+				z/=60;
+				x=Math.floor(x);
+				y=Math.floor(y);
+				z=Math.floor(z);
+				//fif(world[x][y][z]>0)return true;
+				for(var bz=-1;bz<2;bz++){
+				for(var bx=-1;bx<2;bx++){
+				for(var by=-1;by<2;by++){
+				if(world[x+bx][y+by][z+bz]>0 && world[x+bx][y+by][z+bz]<128){
+					var ax=(x+bx)*60;
+					var ay=(y+by)*60;
+					var az=(z+bz)*60;
+					
+					if(sphereboxcollision(
+						position.x+pos.x+40,
+						position.y+pos.y,
+						position.z+pos.z+40,
+						30,//40
+						ax,
+						ay,
+						az,
+						60,60,60
+						
+					)){
+						return true;
+					}
+					/*
+					if(boxcollision(
+						position.x+pos.x+30,
+						position.y+pos.y,
+						position.z+pos.z+30,
+						30,30,30,
+						ax,
+						ay,
+						az,
+						60,60,60
+						
+					)){
+						return true;
+					}
+					*/
+					
+					
+				}}}}
+				return false;
+			}
+	
+			function sphereboxcollision(     x1,  y1,  z1,  radius,
+                             x2,  y2,  z2,  w,  h,  d) {
+  // get box closest point to sphere center by clamping
+  var x = Math.max(x2, Math.min(x1, x2+w));
+  var y = Math.max(y2, Math.min(y1, y2+h));
+  var z = Math.max(z2, Math.min(z1, z2+d));
+
+  // this is the same as isPointInsideSphere
+  var distance =      Math.sqrt(   (x - x1) * (x - x1) +
+                                (y - y1) * (y - y1) +
+                                (z - z1) * (z - z1));
+  
+  return distance < radius;
+};
+			
+			function boxcollision( x1,y1, z1,w1,h1, d1, 
+                     x2,  y2,  z2, w2, h2, d2){
+    return  (x1 <= x2+w2 && x1+w1 >= x2) &&
+            (y1 <= y2+h2 && y1+h1 >= y2) &&
+            (z1 <= z2+d2 && z1+d1 >= z2);
+		}
+			
+		
+
+		
+	function placeBlock(){
+		// exit if moving backwards
+			var w=window.innerWidth/7;
+				var h=window.innerHeight/5;
+					
+				if (startx>(w) && startx<w+window.innerWidth/6 && starty>(window.innerHeight/1.5) && starty<window.innerHeight-h)return;
+				
+			
+			//if(turnCountDown>0)return;	
+			var pointer = new THREE.Vector2();
+			//pointer.x = ( startx / window.innerWidth ) * 2 - 1;
+			//pointer.y = -( starty / window.innerHeight ) * 2 + 1;
+			pointer.x = ( (startx) / window.innerWidth ) * 2 -1;
+			pointer.y = -( (starty-(window.innerHeight/20)) / window.innerHeight ) * 2 +1;
+			//pointer.y+=.25;
+			//pointer.x-=.03;
+			
+			//pointer.x = startx;
+			//pointer.y = starty;
+	// update the picking ray with the camera and pointer position
+	    	
+			const raycaster = new THREE.Raycaster()
+
+			//raycaster.params.Line.threshold = 60;
+			//var vec = new THREE.Vector3();
+			//camera.getWorldPosition(vec);
+			//var dir = new THREE.Vector3();
+			//camera.getWorldDirection(dir);
+			
+			//const ray = new THREE.ray(vec,camera.getWorldDirection());
+			//raycaster.params.Points.threshold = 60;
+		    raycaster.setFromCamera(pointer, camera);
+			var bulld = new THREE.Vector3();
+			bulld = raycaster.ray.direction;
+			//bulld.y+=.25;
+			//bulld.x+=.45;
+			var oldBull = new THREE.Vector3();
+			var bull = new THREE.Vector3();
+			bull.x = camera.position.x+30;
+			bull.y = camera.position.y+30;
+			bull.z = camera.position.z+60;
+			bull.x += bulld.x*30;
+			bull.y += bulld.y*30;
+			bull.z += bulld.z*30;
+	   		const coords=new THREE.Vector3();
+
+	  //raycaster.at(50,coords);
+		 	var eloop=false;
+			var x3,y3,z3,Id;
+			var px,py,pz;
+	  		for(var q=0;q<500;q++){
+				oldBull.x = bull.x;
+				oldBull.y = bull.y;
+				oldBull.z = bull.z;
+				bull.x += bulld.x;
+				bull.y += bulld.y;
+				bull.z += bulld.z;
+				var x=Math.floor(bull.x/60);
+				var y=Math.floor(bull.y/60);
+				var z=Math.floor(bull.z/60);
+				
+	  			//raycaster.ray.at(q,coords);
+				//raycaster.ray.at(q,coords);
+				//var x=Math.floor(coords.x/60);
+				//var y=Math.floor(coords.y/60);
+				//var z=Math.floor(coords.z/60);
+				if(x>=-worldWidth && y>=-worldHeight && z>=-worldDepth && x<worldWidth && y<worldHeight && z<worldHeight){
+				if(world[x][y][z]>0){
+					meshSelect.position.set(x*60,y*60,z*60-30);
+					for(var xq=-1;xq<2;xq++){
+					for(var yq=-1;yq<1;yq++){
+					for(var zq=-1;zq<2;zq++){	
+					if(world[x+xq][y+yq][z+zq]==undefined)world[x+xq][y+yq][z+zq]=1;
+				}}}
+				//world[x][y][z]=0;
+					// rebuild chunks
+					var x2=Math.floor(x/chunkSize);
+					var y2=Math.floor(y/chunkSize);
+					var z2=Math.floor(z/chunkSize);
+					for(var i=0;i<meshId.length;i++){
+						if(x2===meshId[i].x && y2===meshId[i].y && z2===meshId[i].z){
+							eloop=true;
+							Id = i;
+							px=Math.floor(oldBull.x/60);
+							py=Math.floor(oldBull.y/60);
+							pz=Math.floor(oldBull.z/60);
+							world[px][py][pz]=1;
+				
+							//px = x;
+							//py = y;
+							//pz = z;
+							x3=x2;
+							y3=y2;
+							z3=z2;
+							q=1200;
+							break;
+						}
+				}			
+				}
+			}
+			if(eloop==true){
+				//
+				// If we are to edge of chunks remake chunk nexto to it(testing)
+				//
+				var ax = Math.floor((px/16));
+				var ay = Math.floor((py/16));
+				var az = Math.floor((pz/16));
+				ax=Math.abs(ax*16-px);		
+				ay=Math.abs(ay*16-py);		
+				az=Math.abs(az*16-pz);		
+				//console.log(ax+","+ay+","+az);
+				if(ax==0)rm(x3-1,y3,z3);
+				if(ax==15)rm(x3+1,y3,z3);
+				//if(ay==0)rm(x3,y3-1,z3);//fixed
+				//if(ay==15)rm(x3,y3+1,z3);//fixed
+				if(ay==0)rm(x3,y3-1,z3);//fixed
+				if(ay==15)rm(x3,y3+1,z3);//fixed
+				
+				if(az==0)rm(x3,y3,z3-1);//fixed
+				if(az==15)rm(x3,y3,z3+1);//fixed
+				rm(x3,y3,z3);
+			}
+			function rm(x4,y4,z4){
+				for(var i=0;i<meshId.length;i++){
+					if(meshId[i].x===x4 && meshId[i].y===y4 && meshId[i].z===z4){
+						scene.remove(mesh[i]);
+						mesh.splice(i,1);
+						meshId.splice(i,1);
+						mesh.push(makechunk(x4*16,y4*16,z4*16));
+						meshId.push({x:x4,y:y4,z:z4});
+						scene.add(mesh[mesh.length-1]);
+				
+					}
+				}
+			}
+		}	
+		}
+	
+	function dig(){
+		// exit if moving backwards
+			var w=window.innerWidth/7;
+				var h=window.innerHeight/5;
+					
+				if (startx>(w) && startx<w+window.innerWidth/6 && starty>(window.innerHeight/1.5) && starty<window.innerHeight-h)return;
+
+			
+			//if(turnCountDown>0)return;
+	
+			var pointer = new THREE.Vector2();
+			//pointer.x = ( startx / window.innerWidth ) * 2 - 1;
+			//pointer.y = -( starty / window.innerHeight ) * 2 + 1;
+			pointer.x = ( (startx) / window.innerWidth ) * 2 -1;
+			pointer.y = -( (starty-(window.innerHeight/20)) / window.innerHeight ) * 2 +1;
+			//pointer.y+=.25;
+			//pointer.x-=.03;
+			
+			//pointer.x = startx;
+			//pointer.y = starty;
+	// update the picking ray with the camera and pointer position
+	    	
+			const raycaster = new THREE.Raycaster()
+
+			//raycaster.params.Line.threshold = 60;
+			//var vec = new THREE.Vector3();
+			//camera.getWorldPosition(vec);
+			//var dir = new THREE.Vector3();
+			//camera.getWorldDirection(dir);
+			
+			//const ray = new THREE.ray(vec,camera.getWorldDirection());
+			//raycaster.params.Points.threshold = 60;
+		    raycaster.setFromCamera(pointer, camera);
+			var bulld = new THREE.Vector3();
+			bulld = raycaster.ray.direction;
+			//bulld.y+=.25;
+			//bulld.x+=.45;
+			var bull = new THREE.Vector3();
+			bull.x = camera.position.x+30;
+			bull.y = camera.position.y+30;
+			bull.z = camera.position.z+60;
+			bull.x += bulld.x*30;
+			bull.y += bulld.y*30;
+			bull.z += bulld.z*30;
+	   		const coords=new THREE.Vector3();
+
+	  //raycaster.at(50,coords);
+		 	var eloop=false;
+			var x3,y3,z3,Id;
+			var px,py,pz;
+	  		for(var q=0;q<500;q++){
+				bull.x += bulld.x;
+				bull.y += bulld.y;
+				bull.z += bulld.z;
+				var x=Math.floor(bull.x/60);
+				var y=Math.floor(bull.y/60);
+				var z=Math.floor(bull.z/60);
+				
+	  			//raycaster.ray.at(q,coords);
+				//raycaster.ray.at(q,coords);
+				//var x=Math.floor(coords.x/60);
+				//var y=Math.floor(coords.y/60);
+				//var z=Math.floor(coords.z/60);
+				if(x>=-worldWidth && y>=-worldHeight && z>=-worldDepth && x<worldWidth && y<worldHeight && z<worldHeight){
+				if(world[x][y][z]>0){
+					meshSelect.position.set(x*60,y*60,z*60-30);
+					for(var xq=-1;xq<2;xq++){
+					for(var yq=-1;yq<1;yq++){
+					for(var zq=-1;zq<2;zq++){	
+					if(world[x+xq][y+yq][z+zq]==undefined)world[x+xq][y+yq][z+zq]=1;
+				}}}
+				world[x][y][z]=0;
+					// rebuild chunks
+					var x2=Math.floor(x/chunkSize);
+					var y2=Math.floor(y/chunkSize);
+					var z2=Math.floor(z/chunkSize);
+					for(var i=0;i<meshId.length;i++){
+						if(x2===meshId[i].x && y2===meshId[i].y && z2===meshId[i].z){
+							eloop=true;
+							Id = i;
+							px = x;
+							py = y;
+							pz = z;
+							x3=x2;
+							y3=y2;
+							z3=z2;
+							q=1200;
+							break;
+						}
+				}			
+				}
+			}
+			if(eloop==true){
+				//
+				// If we are to edge of chunks remake chunk nexto to it(testing)
+				//
+				var ax = Math.floor((px/16));
+				var ay = Math.floor((py/16));
+				var az = Math.floor((pz/16));
+				ax=Math.abs(ax*16-px);		
+				ay=Math.abs(ay*16-py);		
+				az=Math.abs(az*16-pz);		
+				//console.log(ax+","+ay+","+az);
+				if(ax==0)rm(x3-1,y3,z3);
+				if(ax==15)rm(x3+1,y3,z3);
+				//if(ay==0)rm(x3,y3-1,z3);//fixed
+				//if(ay==15)rm(x3,y3+1,z3);//fixed
+				if(ay==0)rm(x3,y3-1,z3);//fixed
+				if(ay==15)rm(x3,y3+1,z3);//fixed
+				
+				if(az==0)rm(x3,y3,z3-1);//fixed
+				if(az==15)rm(x3,y3,z3+1);//fixed
+				rm(x3,y3,z3);
+			}
+			function rm(x4,y4,z4){
+				for(var i=0;i<meshId.length;i++){
+					if(meshId[i].x===x4 && meshId[i].y===y4 && meshId[i].z===z4){
+						scene.remove(mesh[i]);
+						mesh.splice(i,1);
+						meshId.splice(i,1);
+						//chunkQueue.push({x:x4*16,y:y4*16,z:z4*16});
+						mesh.push(makechunk(x4*16,y4*16,z4*16));
+						meshId.push({x:x4,y:y4,z:z4});
+						scene.add(mesh[mesh.length-1]);
+				
+					}
+				}
+				for(var i=0;i<watermeshId.length;i++){
+					if(watermeshId[i].x===x4 && watermeshId[i].y===y4 && watermeshId[i].z===z4){
+						scene.remove(watermesh[i]);
+						watermesh.splice(i,1);
+						watermeshId.splice(i,1);
+						
+						waterChunkQueue.push({x:x4,y:y4,z:z4});
+						//watermesh.push(makechunk(x4*16,y4*16,z4*16,true));
+						//watermeshId.push({x:x4,y:y4,z:z4});
+						//scene.add(watermesh[watermesh.length-1]);
+				
+					}
+				}
+				
+			}
+		}	
+	}
+	
+      function moveCamera( evt ) {
+      
+		  //dir.applyQuaternion( mesh.quaternion );
+			var dir = new THREE.Vector3();
+			camera.getWorldDirection( dir );
+			
+      	switch( evt.key ) {
+        
+        	case 'w':
+			
+					  							an+=.1;
+
+				
+            break;
+           
+          case 's':
+				an-=.1;		  
+
+            break;
+            
+          case 'a':
+
+			an2-=0.1;									
+            break;
+            
+          case 'd':
+			an2+=0.1;		  			
+									break;
+			case 'q':
+			if(collideCameraMap(dir.multiplyScalar(100))==false){
+				var dir = new THREE.Vector3();
+				camera.getWorldDirection( dir );
+				camera.position.add(dir.multiplyScalar(45) )
+			}
+		break;        	
+			case 'e':
+			if(collideCameraMap(dir.multiplyScalar(-100))==false){
+				var dir = new THREE.Vector3();
+				camera.getWorldDirection( dir );				
+				camera.position.add(dir.multiplyScalar(-45) )
+			}
+		break;        	
+		
+	}
+      
+	}
+	
+	function foilage(val){
+		if(val>=128 && val <=130)return true;
+		return false;
+	}
+			function solidBlock(val){
+				if(val==0)return false;
+				if(val==32)return false;
+				if(foilage(val))return false;
+				return true;
+			}			
+			function faceLogic(val1,val2,water){
+
+				
+				//if(val1===1	&& val2===1)return true;				
+				//if(val1===11 && val2===11)return true;				
+				//if(val1===1	&& val2===11)return true;				
+				//if(val1===11 && val2===1)return true;				
+				if(water){
+				if(val1==32 && val2==0)return false;
+				if(val1==32 && val2==32)return true;
+				if(val1==32 && foilage(val2))return false;
+				
+				if(val1==32 && val2==1)return true;
+				if(val1==32 && val2==11)return true;
+				}
+				if(solidBlock(val1) && val2==0)return false;
+				if(solidBlock(val1) && val2==32)return false;	
+				if(solidBlock(val1) && foilage(val2))return false;	
+				
+				if(solidBlock(val1) && solidBlock(val2))return true;			
+				//if(val1==1 && val2==0)return false;
+				//if(val1==11 && val2==0)return false;
+				//if(val1==1 && val2==32)return false;
+				//if(val1==11 && val2==32)return false;
+
+				//if(val1==64 && val2==0)return false;
+				//if(val1==64 && val2==32)return false;
+				//if(val1==64 && val2==64)return false;
+
+				
+				//if(solidBlock(val1)==true && solidBlock(val2)==false)return false;
+				return true;
+			}
+			// get from world[][][];
+			//
+			// Create faces the surfaces - no neighbour is a face.
+			//
+			function getfaces(x,y,z,water=false){
+				var face = [];
+				
+				//top
+				//if(world[x][y+1][z] == 1){
+				if(faceLogic(world[x][y][z],world[x][y+1][z],water)){
+					face.push(false);
+					}else{
+					face.push(true);
+					}
+				//front
+				//if(world[x][y][z+1] == 1){
+				if(faceLogic(world[x][y][z],world[x][y][z+1],water)){
+					face.push(false);
+					}else{
+					face.push(true);
+					}
+					
+				//right
+				//if(world[x+1][y][z] == 1){
+				if(faceLogic(world[x][y][z],world[x+1][y][z],water)){
+					face.push(false);
+
+					}else{
+						face.push(true);
+					}
+				//left
+				//if(world[x-1][y][z] == 1){
+				if(faceLogic(world[x][y][z],world[x-1][y][z],water)){
+					face.push(false);
+
+					}else{
+						face.push(true);
+					}
+				//back
+				//if(world[x][y][z-1] == 1){
+				if(faceLogic(world[x][y][z],world[x][y][z-1],water)){
+					face.push(false)
+
+					}else{
+						face.push(true);
+					}
+				//bottom
+				//if(world[x][y-1][z] == 1){
+				if(faceLogic(world[x][y][z],world[x][y-1][z],water)){
+					face.push(false);
+					}else{
+					face.push(true);
+					}
+
+				return face;
+			}
+			
+			function addquadindices(num){
+				q = [0+4*num, 2+4*num, 1+4*num, 0+4*num, 3+4*num, 2+4*num,
+				];
+				
+				return q;
+			}
+			
+			function addquaduvs(x,y){
+				var x1=x,y1=y;
+				var x2=x1+1.0;
+				var y2=y1+1.0;
+				
+				// here we set the uv's with the atlas texture
+				var q = [
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+				];
+				
+				
+				return q;
+			}
+			
+			function addquadverticesface(x,y,z,top=false,front=false,right=false,left=false,back=false,bottom=false){
+				var q = [];
+				if(top==true){
+					// top box
+					q.push(
+					-30.0+x,  30.0+y, -60.0+z, //left top
+					30.0+x, 30.0+y, -60.0+z, //right top
+					30.0+x, 30.0+y, 0.0+z,//right bottom
+					-30.0+x, 30.0+y, 0.0+z,//left bottom
+					);
+				}
+				if(front==true){
+					// front box
+					q.push(
+					-30.0+x,  30.0+y, 0.0+z, //left top
+					30.0+x,  30.0+y, 0.0+z, //right top
+					30.0+x, -30.0+y, 0.0+z,//right bottom
+					-30.0+x, -30.0+y, 0.0+z,//left bottom
+					);
+				}
+				if(right==true){
+					// right side  box
+					q.push(
+					30.0+x,  30.0+y, 0.0+z, //left top
+					30.0+x,  30.0+y, -60.0+z, //right top
+					30.0+x, -30.0+y, -60.0+z,//right bottom
+					30.0+x, -30.0+y, 0.0+z,//left bottom
+					);
+				}	
+				if(left==true){
+					// left side  box
+					q.push(
+					-30.0+x,  30.0+y, -60.0+z, //left top
+					-30.0+x,  30.0+y, 0.0+z, //right top
+					-30.0+x, -30.0+y, 0.0+z,//right bottom
+					-30.0+x, -30.0+y, -60.0+z,//left bottom
+					);
+				}	
+				if(back==true){
+					// Back box
+					q.push(
+					30.0+x,  30.0+y, -60.0+z, //right top
+					-30.0+x,  30.0+y,-60.0+z, //left top
+					-30.0+x, -30.0+y, -60.0+z,//left bottom
+					30.0+x, -30.0+y, -60.0+z,//right bottom
+					);
+				}	
+				if(bottom==true){
+					// bottom box
+					q.push(
+					30.0+x, -30.0+y, -60.0+z, //right top
+					-30.0+x,  -30.0+y, -60.0+z, //left top
+					-30.0+x, -30.0+y, 0.0+z,//left bottom
+					30.0+x, -30.0+y, 0.0+z,//right bottom
+					);
+				}
+			
+				return q;
+
+
+
+				
+			}
+			
+			function addflowerquadverticesface(x,y,z,front=true,right=true,left=true,back=true){
+				var q = [];				
+				if(front){
+					// front box
+					q.push(
+					30.0+x, -30.0+y, -30.0+z,//right bottom
+					-30.0+x, -30.0+y, -30.0+z,//left bottom
+					
+					-30.0+x,  0.0+y, -30.0+z, //left top
+					30.0+x,  0.0+y, -30.0+z, //right top
+					);
+				}
+				if(right){
+					// right side  box
+					q.push(
+					0.0+x, -30.0+y, -60.0+z,//right bottom
+					0.0+x, -30.0+y, -0.0+z,//left bottom
+					
+					0.0+x,  0.0+y, 0.0+z, //left top
+					0.0+x,  0.0+y, -60.0+z, //right top
+					);
+				}	
+				if(left){
+					// left side  box
+					q.push(
+					0.0+x, -30.0+y, -0.0+z,//right bottom
+					0.0+x, -30.0+y, -60.0+z,//left bottom
+					
+					0.0+x,  0.0+y, -60.0+z, //left top
+					0.0+x,  0.0+y, -0.0+z, //right top
+					);
+				}	
+				if(back){
+					// Back box
+					q.push(
+					-30.0+x, -30.0+y, -30.0+z,//left bottom
+					30.0+x, -30.0+y, -30.0+z,//right bottom
+					
+					30.0+x,  0.0+y, -30.0+z, //right top
+					-30.0+x,  0.0+y,-30.0+z, //left top
+					);
+				}				
+				return q;
+				
+
+				
+			}
+			
+			function addquadverticesColorface(top,front,right,left,back,bottom,val,lm=null){
+				var q = [];
+
+				if(top){// top box
+					if(lm!=null)val=lm[0];					
+					pushQ(val);
+				}
+				if(front){// front box
+					if(lm!=null)val=lm[1];										
+					pushQ(val);
+				}
+				if(right){// right side  box
+					if(lm!=null)val=lm[2];										
+					pushQ(val);
+				}	
+				if(left){// left side  box
+					if(lm!=null)val=lm[3];										
+					pushQ(val);
+				}	
+				if(back){// Back box
+					if(lm!=null)val=lm[4];										
+					pushQ(val);
+				}	
+				if(bottom){// bottom box
+					if(lm!=null)val=lm[5];										
+					pushQ(val);
+				}
+			
+				return q;
+				// Add to the q array the color
+				// intensity values r,g,b
+				function pushQ(val){
+					q.push(
+					val,val,val,
+					val,val,val,
+					val,val,val,
+					val,val,val,
+					);
+					
+				}
+
+				
+			}			
+
+			function addflowerquadverticesColorface(front=true,right=true,left=true,back=true,val=1.0){
+				var q = [];				
+				if(front){
+					// front box
+					pushQ(val);
+				}
+				if(right){
+					// right side  box
+					pushQ(val);
+				}	
+				if(left){
+					// left side  box
+					pushQ(val);
+				}	
+				if(back){
+					// Back box
+					pushQ(val);
+				}				
+				return q;
+				
+				function pushQ(val){
+					q.push(
+					val,val,val,
+					val,val,val,
+					val,val,val,
+					val,val,val,
+					);
+					
+				}				
+				
+			}
+			// Set the color of a index in a mesh.
+			function setChunkColor(mmesh,r,g,b){
+				//const positions = mesh.children[zz].geometry.attributes.position.array;
+				var col = mmesh.geometry.attributes.color.array;
+
+
+			 	//for ( var i = index; i<index+8; i+=8 ) {
+				// change the uv's inside the geometry based
+				// on atlas tile position.
+				for(var i=0;i<col.length;i+=3){
+				col[i]=r;
+				col[i+1]=g;
+				col[i+2]=b;
+				}
+				
+				// needded after changing the uv's.
+				mmesh.geometry.attributes.color.needsUpdate = true
+									
+				//}
+			}						
+			// Set the color of a index in a mesh.
+			function setColor(mmesh,index,r,g,b){
+				//const positions = mesh.children[zz].geometry.attributes.position.array;
+				var col = mmesh.geometry.attributes.color.array;
+
+				var i=index;
+			 	//for ( var i = index; i<index+8; i+=8 ) {
+				// change the uv's inside the geometry based
+				// on atlas tile position.
+				col[i]=r;
+				col[i+1]=g;
+				col[i+2]=b;
+				col[i+3]=r;
+				col[i+4]=g;
+				col[i+5]=b;
+				col[i+6]=r;
+				col[i+7]=g;
+				col[i+8]=b;
+				col[i+9]=r;
+				col[i+10]=g;
+				col[i+11]=b;
+				
+				// needded after changing the uv's.
+				mmesh.geometry.attributes.color.needsUpdate = true
+									
+				//}
+			}						
+		</script>
+	</body>
+	</html>
+	
+	
