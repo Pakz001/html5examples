@@ -672,6 +672,9 @@ material.flatShading=true;
 	var chunkGenDistTime = 60;
 	var chunkGenDistCount = 0;
 	var chunkGenDistMax = 5;
+	var id=0;
+	var colval = 1.0;
+	var coldir=-1;
 	
 	//spotLight.lookAt(meshz);
 			var runOnce=false;
@@ -680,8 +683,49 @@ material.flatShading=true;
 			var dir=10;
 			//var d = Math.hypot(y2-y1,x2-x1);
 			
+			// Stackoverflow - Turn float into hex (for fog!)
+			function rgbToHex(r,g,b) {
+		         r = parseInt(r);
+	    	     g = parseInt(g);
+        		 b = parseInt(b);
+         		return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+			 }
+
 			function animate() {
 				requestAnimationFrame( animate );
+
+
+			//function setColor(mmesh,index,r,g,b){
+				for(var j=0;j<mesh.length/10;j++){
+				if(mesh[id]!=null){
+				setChunkColor(mesh[id],colval,colval,colval)
+				//if(Math.random()<.1)console.log(coldir);
+				}
+				id++;
+				}
+
+				if(id>mesh.length){
+					scene.background = new THREE.Color( 0,colval/2,colval );	
+					
+					scene.fog = new THREE.FogExp2(rgbToHex(0,colval/2,colval),0.0003);
+			
+					id=0;
+					if(coldir==-1){
+						colval-=.1;
+					}
+					if(coldir==1){
+						colval+=.1;
+					}
+					if(colval>1.0){
+						colval=0.9;
+						coldir=-1;
+					}
+					if(colval<0){
+						colval=0.1;
+						coldir=1;
+					}
+					
+				}
 				
 				// When starting out we generate the new chunks
 				// first close to the player and further away
@@ -2201,7 +2245,54 @@ chunkDone=true;
 					
 				}				
 				
-			}					
+			}
+			// Set the color of a index in a mesh.
+			function setChunkColor(mmesh,r,g,b){
+				//const positions = mesh.children[zz].geometry.attributes.position.array;
+				var col = mmesh.geometry.attributes.color.array;
+
+
+			 	//for ( var i = index; i<index+8; i+=8 ) {
+				// change the uv's inside the geometry based
+				// on atlas tile position.
+				for(var i=0;i<col.length;i+=3){
+				col[i]=r;
+				col[i+1]=g;
+				col[i+2]=b;
+				}
+				
+				// needded after changing the uv's.
+				mmesh.geometry.attributes.color.needsUpdate = true
+									
+				//}
+			}						
+			// Set the color of a index in a mesh.
+			function setColor(mmesh,index,r,g,b){
+				//const positions = mesh.children[zz].geometry.attributes.position.array;
+				var col = mmesh.geometry.attributes.color.array;
+
+				var i=index;
+			 	//for ( var i = index; i<index+8; i+=8 ) {
+				// change the uv's inside the geometry based
+				// on atlas tile position.
+				col[i]=r;
+				col[i+1]=g;
+				col[i+2]=b;
+				col[i+3]=r;
+				col[i+4]=g;
+				col[i+5]=b;
+				col[i+6]=r;
+				col[i+7]=g;
+				col[i+8]=b;
+				col[i+9]=r;
+				col[i+10]=g;
+				col[i+11]=b;
+				
+				// needded after changing the uv's.
+				mmesh.geometry.attributes.color.needsUpdate = true
+									
+				//}
+			}						
 		</script>
 	</body>
 	</html>
