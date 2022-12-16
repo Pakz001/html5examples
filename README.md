@@ -20,6 +20,7 @@ update:checked every file and removed references to a unused css file. gfx now i
 
 
 Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
+(three.js requires more work. media and .js includes and later worker threading files (3d))
 
 
 <br>From the procgen folder:(100% programmed graphics - random maps)<br>
