@@ -16,7 +16,7 @@ update:checked every file and removed references to a unused css file. gfx now i
 
 <br><br>From the 3d / threetest / test - folder.<br>
 (tablet / phone Browser Touch voxel engine)(book files chapter 1..x - this -> book42.html)<br>
-<img src="3D/threeTest/Test/Media/18275FB6-D620-46A5-998D-570E7E56141C.png" width="60%"><br><br>
+<img src="3D/threeTest/Test/Media/4ACEC619-2702-465D-912C-B3C9FCB2B23E.png" width="60%"><br><br>
 
 
 Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
