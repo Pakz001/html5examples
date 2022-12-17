@@ -843,8 +843,8 @@ chunkDone=true;
 						//dig();
 						//placeBlock();
 						if(playerTouchMode==1){
-							//dig();
-							placeTorch();
+							dig();
+							//placeTorch();
 						}else{
 							placeBlock();
 						}
@@ -2416,26 +2416,26 @@ chunkDone=true;
 			
 			function addquadverticesColorface2(x,y,z,top,front,right,left,back,bottom,val,lm=null){
 				var q = [];
-				//var low = val/5;
+				var low = val/5;
 				if(top){// top box
 					if(lm!=null)val=lm[0];
 					if(solidBlock(world[x+1][y+1][z])){
-						pushQ([val,val,val,.1,.1,.1,.1,.1,.1,.1,val,val]);	
+						pushQ([val,val,val,low,low,low,low,low,low,low,val,val]);	
 					}else if(solidBlock(world[x-1][y+1][z])){
-						pushQ([.1,.1,.1,val,val,val,val,val,val,.1,.1,.1]);							
+						pushQ([low,low,low,val,val,val,val,val,val,low,low,low]);							
 					}else if(solidBlock(world[x][y+1][z-1])){
-						pushQ([.1,.1,.1,.1,.1,.1,val,val,val,val,val,val]);													
+						pushQ([low,low,low,low,low,low,val,val,val,val,val,val]);													
 					}else if(solidBlock(world[x][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);													
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);													
 					//	
 					}else if(solidBlock(world[x+1][y+1][z-1])){
-						pushQ([val,val,val,.1,.1,.1,val,val,val,val,val,val]);										
+						pushQ([val,val,val,low,low,low,val,val,val,val,val,val]);										
 					}else if(solidBlock(world[x+1][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,val,val,val]);																		
+						pushQ([val,val,val,val,val,val,low,low,low,val,val,val]);																		
 					}else if(solidBlock(world[x-1][y+1][z-1])){
-						pushQ([.1,.1,.1,val,val,val,val,val,val,val,val,val]);												
+						pushQ([low,low,low,val,val,val,val,val,val,val,val,val]);												
 					}else if(solidBlock(world[x-1][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,val,val,val,.1,.1,.1]);												
+						pushQ([val,val,val,val,val,val,val,val,val,low,low,low]);												
 						
 					}else{					
 					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
@@ -2444,7 +2444,7 @@ chunkDone=true;
 				if(front){// front box
 					if(lm!=null)val=lm[1];					
 					if(solidBlock(world[x][y-1][z+1])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
 					}else{
 						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}
@@ -2452,7 +2452,7 @@ chunkDone=true;
 				if(right){// right side  box
 					if(lm!=null)val=lm[2];					
 					if(solidBlock(world[x+1][y-1][z])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
 					}else{
 						
 					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
@@ -2462,7 +2462,7 @@ chunkDone=true;
 					if(lm!=null)val=lm[3];
 					
 					if(solidBlock(world[x-1][y-1][z])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
 						
 					}else{
 						
@@ -2473,7 +2473,7 @@ chunkDone=true;
 					if(lm!=null)val=lm[4];
 					
 					if(solidBlock(world[x][y-1][z-1])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
 					}else{
 						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}
