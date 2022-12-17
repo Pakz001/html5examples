@@ -77,6 +77,7 @@ book47 - main - grow map from center player, larger every x. Fix water created w
 book48 - main - Vextex Colors added. Setting here at .25/1.00 of light(halve night)<br>
 book49 - Test - Set color of voxel on creation time. = Lighting.<br>
 book50 - main - torch light test. Face-dependent lighting effects <br>
+book52 - test - Ambient Occlusion<br>
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=IDWdGPViRdM" target="_blank">
  <img src="http://img.youtube.com/vi/IDWdGPViRdM/mqdefault.jpg" alt="Watch the video" width="460" height="260" border="2" />
