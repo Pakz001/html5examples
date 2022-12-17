@@ -7,7 +7,7 @@
 		<style>
 			body { margin: 0; }
 
-body {
+body { 
 	touch-action: none;
 -webkit-touch-callout:none;
 -webkit-user-select:none;
@@ -2416,6 +2416,7 @@ chunkDone=true;
 			
 			function addquadverticesColorface2(x,y,z,top,front,right,left,back,bottom,val,lm=null){
 				var q = [];
+				//var low = val/5;
 				if(top){// top box
 					if(lm!=null)val=lm[0];
 					if(solidBlock(world[x+1][y+1][z])){
@@ -2460,8 +2461,9 @@ chunkDone=true;
 				if(left){// left side  box
 					if(lm!=null)val=lm[3];
 					
-					if(solidBlock(world[x-11][y-1][z])){
+					if(solidBlock(world[x-1][y-1][z])){
 						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						
 					}else{
 						
 					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
