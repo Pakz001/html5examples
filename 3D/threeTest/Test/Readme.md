@@ -1,5 +1,5 @@
 <br><br>
-<img src="Media/4ACEC619-2702-465D-912C-B3C9FCB2B23E.png" width="60%"><br>
+<img src="Media/8DE96B62-92E8-43FB-A314-EEC7B0C467F9.png" width="60%"><br>
 (book23.html version / touch control / first person camera / voxels / Minecraft / camera vs map collision / gravity / walking)
 <br><br>
 Current controls touch : touch center = move forward, touch left bottom = move backwards, double tap center bottom = jump,
