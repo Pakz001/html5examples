@@ -2413,56 +2413,93 @@ chunkDone=true;
 
 				
 			}
-			
 			function addquadverticesColorface2(x,y,z,top,front,right,left,back,bottom,val,lm=null){
 				var q = [];
+				var ver1=ver2=ver3=ver4=val;
 				var low = val/5;
 				if(top){// top box
-					if(lm!=null)val=lm[0];
-					if(solidBlock(world[x+1][y+1][z])){
-						pushQ([val,val,val,low,low,low,low,low,low,low,val,val]);	
-					}else if(solidBlock(world[x-1][y+1][z])){
-						pushQ([low,low,low,val,val,val,val,val,val,low,low,low]);							
-					}else if(solidBlock(world[x][y+1][z-1])){
-						pushQ([low,low,low,low,low,low,val,val,val,val,val,val]);													
-					}else if(solidBlock(world[x][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);													
-					//	
-					}else if(solidBlock(world[x+1][y+1][z-1])){
-						pushQ([val,val,val,low,low,low,val,val,val,val,val,val]);										
-					}else if(solidBlock(world[x+1][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,low,low,low,val,val,val]);																		
-					}else if(solidBlock(world[x-1][y+1][z-1])){
-						pushQ([low,low,low,val,val,val,val,val,val,val,val,val]);												
-					}else if(solidBlock(world[x-1][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,val,val,val,low,low,low]);												
-						
+					if(lm!=null){val=lm[0];low=val/5};
+					if(solidBlock(world[x-1][y+1][z-1]))ver1=low;//left back
+					if(solidBlock(world[x+1][y+1][z-1]))ver2=low;//right back
+					if(solidBlock(world[x+1][y+1][z+1]))ver3=low;//right front
+					if(solidBlock(world[x-1][y+1][z+1]))ver4=low;//left front					
+					if(solidBlock(world[x-1][y+1][z])){ver1=low;ver4=low;}//block to the left
+					if(solidBlock(world[x+1][y+1][z])){ver2=low;ver3=low;}//block to the right
+					if(solidBlock(world[x][y+1][z+1])){ver3=low;ver4=low;}//block to the back
+					if(solidBlock(world[x][y+1][z-1])){ver2=low;ver1=low;}//block to the front					
+					
+					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
+						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
 					}else{					
-					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
+						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}
 				}
 				if(front){// front box
-					if(lm!=null)val=lm[1];					
-					if(solidBlock(world[x][y-1][z+1])){
-						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
+					if(lm!=null){val=lm[1];low=val/5};					
+					ver1=ver2=ver3=ver4=val;
+					if(solidBlock(world[x-1][y+1][z+1]))ver1=low;//left back
+					if(solidBlock(world[x+1][y+1][z+1]))ver2=low;//right back
+					if(solidBlock(world[x+1][y-1][z+1]))ver3=low;//right front
+					if(solidBlock(world[x+1][y-1][z+1]))ver4=low;//left front					
+					if(solidBlock(world[x-1][y][z+1])){ver1=low;ver4=low;}//block to the left
+					if(solidBlock(world[x+1][y][z+1])){ver2=low;ver3=low;}//block to the right
+					if(solidBlock(world[x][y+1][z+1])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x][y-1][z+1])){ver3=low;ver4=low;}//block to the front					
+					
+					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
+						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
+						
+					//if(solidBlock(world[x][y-1][z+1])){
+					//	pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						//pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}else{
 						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}
 				}
 				if(right){// right side  box
-					if(lm!=null)val=lm[2];					
-					if(solidBlock(world[x+1][y-1][z])){
-						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
+					if(lm!=null){val=lm[2];low=val/5};					
+					ver1=ver2=ver3=ver4=val;
+					if(solidBlock(world[x+1][y+1][z+1]))ver1=low;//left back
+					if(solidBlock(world[x+1][y+1][z-1]))ver2=low;//right back
+					if(solidBlock(world[x+1][y-1][z-1]))ver3=low;//right front
+					if(solidBlock(world[x+1][y-1][z+1]))ver4=low;//left front					
+					
+					if(solidBlock(world[x+1][y][z+1])){ver1=low;ver4=low;}//block to the left					
+					if(solidBlock(world[x+1][y][z-1])){ver2=low;ver3=low;}//block to the right
+					
+					if(solidBlock(world[x+1][y+1][z])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x+1][y-1][z])){ver3=low;ver4=low;}//block to the front					
+					
+					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
+						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
+						
+					//if(solidBlock(world[x+1][y-1][z])){
+						//pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						//pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}else{
 						
 					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}
 				}	
 				if(left){// left side  box
-					if(lm!=null)val=lm[3];
+					if(lm!=null){val=lm[3];low=val/5};					
+					ver1=ver2=ver3=ver4=val;
+					if(solidBlock(world[x-1][y+1][z-1]))ver1=low;//left back
+					if(solidBlock(world[x-1][y+1][z+1]))ver2=low;//right back
+					if(solidBlock(world[x-1][y-1][z+1]))ver3=low;//right front
+					if(solidBlock(world[x-1][y-1][z-1]))ver4=low;//left front					
 					
-					if(solidBlock(world[x-1][y-1][z])){
-						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
+					if(solidBlock(world[x-1][y][z-1])){ver1=low;ver4=low;}//block to the left					
+					if(solidBlock(world[x-1][y][z+1])){ver2=low;ver3=low;}//block to the right
+					
+					if(solidBlock(world[x-1][y+1][z])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x-1][y-1][z])){ver3=low;ver4=low;}//block to the front					
+					
+					//if(solidBlock(world[x-11][y-1][z])){
+					//	pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						//pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
+					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
+						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
 						
 					}else{
 						
@@ -2470,18 +2507,50 @@ chunkDone=true;
 					}
 				}	
 				if(back){// Back box
-					if(lm!=null)val=lm[4];
+					if(lm!=null){val=lm[4];low=val/5};					
+					ver1=ver2=ver3=ver4=val;
+					if(solidBlock(world[x+1][y+1][z-1]))ver1=low;//left back
+					if(solidBlock(world[x-1][y+1][z-1]))ver2=low;//right back
+					if(solidBlock(world[x-1][y-1][z-1]))ver3=low;//right front
+					if(solidBlock(world[x+1][y-1][z-1]))ver4=low;//left front										
+					if(solidBlock(world[x+1][y][z-1])){ver1=low;ver4=low;}//block to the left					
+					if(solidBlock(world[x-1][y][z-1])){ver2=low;ver3=low;}//block to the right					
+					if(solidBlock(world[x][y+1][z-1])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x][y-1][z-1])){ver3=low;ver4=low;}//block to the front					
 					
-					if(solidBlock(world[x][y-1][z-1])){
-						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
+					//if(solidBlock(world[x][y-1][z-1])){
+						
+						//pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						//pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
+					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
+						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
+						
+						
 					}else{
 						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}
 				}	
 				if(bottom){// bottom box
-					if(lm!=null)val=lm[5];
+					if(lm!=null){val=lm[5];low=val/5};					
+					ver1=ver2=ver3=ver4=val;
+					if(solidBlock(world[x+1][y-1][z-1]))ver1=low;//left back
+					if(solidBlock(world[x-1][y-1][z-1]))ver2=low;//right back
+					if(solidBlock(world[x-1][y-1][z+1]))ver3=low;//right front
+					if(solidBlock(world[x+1][y-1][z+1]))ver4=low;//left front										
 					
-					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
+					if(solidBlock(world[x+1][y-1][z])){ver1=low;ver4=low;}//block to the left					
+					if(solidBlock(world[x-1][y-1][z])){ver2=low;ver3=low;}//block to the right					
+					if(solidBlock(world[x][y-1][z-1])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x][y-1][z+1])){ver3=low;ver4=low;}//block to the front					
+					
+					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
+						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
+						
+						
+					}else{
+						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
+					}					
+					//					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 				}
 			
 				return q;
@@ -2502,7 +2571,9 @@ chunkDone=true;
 				}
 
 				
-			}		
+				}					
+				
+				
 			
 			function addquadverticesColorface(top,front,right,left,back,bottom,val,lm=null){
 				var q = [];
