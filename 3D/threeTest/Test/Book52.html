@@ -29,7 +29,7 @@
 			
 			
 			
-
+/*
 					var spotLight = new THREE.SpotLight(0xffffff);
 					spotLight.position.set(-100,100,100);
 					spotLight.castShadow = true;
@@ -38,7 +38,7 @@
 					spotLight.shadow.camera.far = 130;
 					spotLight.shadow.camera.near = 140;
 					scene.add(spotLight);
-
+*/
 					
 
 //quad_vertices = addquadverticesface(0,0,0,true,true,true,true,true,true);
@@ -49,9 +49,9 @@
   const tileTextureWidth = 256.0;
   const tileTextureHeight = 128.0;
 
-  var worldWidth = 10;
+  var worldWidth = 16;
   var worldHeight = 6;
-  var worldDepth = 10;
+  var worldDepth = 16;
   var world = [];
   	for(var i=-worldWidth;i<worldWidth;i++){
 		world[i] = new Array();
@@ -68,16 +68,26 @@
 		}
 		
 	}	
-	world[7][3][4]=1;
-	//world[8][4][3]=1;
-	//world[6][4][3]=1;
-	//world[6][2][3]=1;
-	//world[8][2][3]=1;	
+	for(var i=0;i<250;i++){
+		var x=Math.floor(Math.random()*14);
+		var y=Math.floor(Math.random()*4)
+		var z=Math.floor(Math.random()*14)
+		world[x][y][z]=1;	
+	}
+//	world[4][2][4]=1;
+//	world[3][1][5]=1;//lt
+//	world[5][1][5]=1;//rt
+//	world[3][1][3]=1;//lb
+//	world[5][1][3]=1;//rb
 	
-	//world[7][4][3]=1;
-	//world[8][3][3]=1;
+
+//	world[4][1][5]=1;//tp	
+//	world[4][1][3]=1;//bt
+//	world[3][1][4]=1;//lft
+//	world[5][1][4]=1;//rgt
+	
 	//world[6][3][3]=1;
-	world[7][2][3]=1;
+	//world[7][2][3]=1;
 	
 	//world[4][2][5]=1;
 //	world[5][3][5]=1;
@@ -198,9 +208,11 @@ scene.add( ambient );
 
 			//camera.position.z = 5;
 			
-			camera.lookAt(mesh.position);
-			camera.position.set( -520,150, 150);
-			mesh.rotation.y+=3;			
+			
+			camera.position.set( -360,650,420);
+			//camera.lookAt(mesh.position);
+			camera.lookAt(0,0,220);
+			//mesh.rotation.y+=3;			
 			
 			function setColor(index,r,g,b){
 				//const positions = mesh.children[zz].geometry.attributes.position.array;
@@ -521,24 +533,25 @@ scene.add( ambient );
 			
 			function addquadverticesColorface4(x,y,z,top,front,right,left,back,bottom,val){
 				var q = [];
+				var low=val/10;
 				if(top){// top box
 					if(solidBlock(world[x+1][y+1][z])){
-						pushQ([val,val,val,.1,.1,.1,.1,.1,.1,.1,val,val]);	
+						pushQ([val,val,val,low,low,low,low,low,low,low,val,val]);	
 					}else if(solidBlock(world[x-1][y+1][z])){
-						pushQ([.1,.1,.1,val,val,val,val,val,val,.1,.1,.1]);							
+						pushQ([low,low,low,val,val,val,val,val,val,low,low,low]);							
 					}else if(solidBlock(world[x][y+1][z-1])){
-						pushQ([.1,.1,.1,.1,.1,.1,val,val,val,val,val,val]);													
+						pushQ([low,low,low,low,low,low,val,val,val,val,val,val]);													
 					}else if(solidBlock(world[x][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);													
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);													
 					//	
 					}else if(solidBlock(world[x+1][y+1][z-1])){
-						pushQ([val,val,val,.1,.1,.1,val,val,val,val,val,val]);										
+						pushQ([val,val,val,low,low,low,val,val,val,val,val,val]);										
 					}else if(solidBlock(world[x+1][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,val,val,val]);																		
+						pushQ([val,val,val,val,val,val,low,low,low,val,val,val]);																		
 					}else if(solidBlock(world[x-1][y+1][z-1])){
-						pushQ([.1,.1,.1,val,val,val,val,val,val,val,val,val]);												
+						pushQ([low,low,low,val,val,val,val,val,val,val,val,val]);												
 					}else if(solidBlock(world[x-1][y+1][z+1])){
-						pushQ([val,val,val,val,val,val,val,val,val,.1,.1,.1]);												
+						pushQ([val,val,val,val,val,val,val,val,val,low,low,low]);												
 						
 					}else{					
 					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
@@ -546,14 +559,14 @@ scene.add( ambient );
 				}
 				if(front){// front box
 					if(solidBlock(world[x][y-1][z+1])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
 					}else{
 						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}
 				}
 				if(right){// right side  box
 					if(solidBlock(world[x+1][y-1][z])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
 					}else{
 						
 					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
@@ -561,7 +574,7 @@ scene.add( ambient );
 				}	
 				if(left){// left side  box
 					if(solidBlock(world[x-11][y-1][z])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
 					}else{
 						
 					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
@@ -569,7 +582,7 @@ scene.add( ambient );
 				}	
 				if(back){// Back box
 					if(solidBlock(world[x][y-1][z-1])){
-						pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
+						pushQ([val,val,val,val,val,val,low,low,low,low,low,low]);
 					}else{
 						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 					}
@@ -601,16 +614,17 @@ scene.add( ambient );
 			function addquadverticesColorface2(x,y,z,top,front,right,left,back,bottom,val){
 				var q = [];
 				var ver1=ver2=ver3=ver4=val;
+				var low = val/10;
 				if(top){// top box
 					
-					if(solidBlock(world[x-1][y+1][z-1]))ver1=.1;//left back
-					if(solidBlock(world[x+1][y+1][z-1]))ver2=.1;//right back
-					if(solidBlock(world[x+1][y+1][z+1]))ver3=.1;//right front
-					if(solidBlock(world[x-1][y+1][z+1]))ver4=.1;//left front					
-					if(solidBlock(world[x-1][y+1][z])){ver1=0.1;ver4=0.1;}//block to the left
-					if(solidBlock(world[x+1][y+1][z])){ver2=0.1;ver3=0.1;}//block to the right
-					if(solidBlock(world[x][y+1][z+1])){ver3=0.1;ver4=0.1;}//block to the back
-					if(solidBlock(world[x][y+1][z-1])){ver2=0.1;ver1=0.1;}//block to the front					
+					if(solidBlock(world[x-1][y+1][z-1]))ver1=low;//left back
+					if(solidBlock(world[x+1][y+1][z-1]))ver2=low;//right back
+					if(solidBlock(world[x+1][y+1][z+1]))ver3=low;//right front
+					if(solidBlock(world[x-1][y+1][z+1]))ver4=low;//left front					
+					if(solidBlock(world[x-1][y+1][z])){ver1=low;ver4=low;}//block to the left
+					if(solidBlock(world[x+1][y+1][z])){ver2=low;ver3=low;}//block to the right
+					if(solidBlock(world[x][y+1][z+1])){ver3=low;ver4=low;}//block to the back
+					if(solidBlock(world[x][y+1][z-1])){ver2=low;ver1=low;}//block to the front					
 					
 					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
 						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
@@ -620,14 +634,14 @@ scene.add( ambient );
 				}
 				if(front){// front box
 					ver1=ver2=ver3=ver4=val;
-					if(solidBlock(world[x-1][y+1][z+1]))ver1=.1;//left back
-					if(solidBlock(world[x+1][y+1][z+1]))ver2=.1;//right back
-					if(solidBlock(world[x+1][y-1][z+1]))ver3=.1;//right front
-					if(solidBlock(world[x+1][y-1][z+1]))ver4=.1;//left front					
-					if(solidBlock(world[x-1][y][z+1])){ver1=0.1;ver4=0.1;}//block to the left
-					if(solidBlock(world[x+1][y][z+1])){ver2=0.1;ver3=0.1;}//block to the right
-					if(solidBlock(world[x][y+1][z+1])){ver2=0.1;ver1=0.1;}//block to the back
-					if(solidBlock(world[x][y-1][z+1])){ver3=0.1;ver4=0.1;}//block to the front					
+					if(solidBlock(world[x-1][y+1][z+1]))ver1=low;//left back
+					if(solidBlock(world[x+1][y+1][z+1]))ver2=low;//right back
+					if(solidBlock(world[x+1][y-1][z+1]))ver3=low;//right front
+					if(solidBlock(world[x+1][y-1][z+1]))ver4=low;//left front					
+					if(solidBlock(world[x-1][y][z+1])){ver1=low;ver4=low;}//block to the left
+					if(solidBlock(world[x+1][y][z+1])){ver2=low;ver3=low;}//block to the right
+					if(solidBlock(world[x][y+1][z+1])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x][y-1][z+1])){ver3=low;ver4=low;}//block to the front					
 					
 					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
 						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
@@ -641,16 +655,16 @@ scene.add( ambient );
 				}
 				if(right){// right side  box
 					ver1=ver2=ver3=ver4=val;
-					if(solidBlock(world[x+1][y+1][z+1]))ver1=.1;//left back
-					if(solidBlock(world[x+1][y+1][z-1]))ver2=.1;//right back
-					if(solidBlock(world[x+1][y-1][z-1]))ver3=.1;//right front
-					if(solidBlock(world[x+1][y-1][z+1]))ver4=.1;//left front					
+					if(solidBlock(world[x+1][y+1][z+1]))ver1=low;//left back
+					if(solidBlock(world[x+1][y+1][z-1]))ver2=low;//right back
+					if(solidBlock(world[x+1][y-1][z-1]))ver3=low;//right front
+					if(solidBlock(world[x+1][y-1][z+1]))ver4=low;//left front					
 					
-					if(solidBlock(world[x+1][y][z+1])){ver1=0.1;ver4=0.1;}//block to the left					
-					if(solidBlock(world[x+1][y][z-1])){ver2=0.1;ver3=0.1;}//block to the right
+					if(solidBlock(world[x+1][y][z+1])){ver1=low;ver4=low;}//block to the left					
+					if(solidBlock(world[x+1][y][z-1])){ver2=low;ver3=low;}//block to the right
 					
-					if(solidBlock(world[x+1][y+1][z])){ver2=0.1;ver1=0.1;}//block to the back
-					if(solidBlock(world[x+1][y-1][z])){ver3=0.1;ver4=0.1;}//block to the front					
+					if(solidBlock(world[x+1][y+1][z])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x+1][y-1][z])){ver3=low;ver4=low;}//block to the front					
 					
 					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
 						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
@@ -665,16 +679,16 @@ scene.add( ambient );
 				}	
 				if(left){// left side  box
 					ver1=ver2=ver3=ver4=val;
-					if(solidBlock(world[x-1][y+1][z-1]))ver1=.1;//left back
-					if(solidBlock(world[x-1][y+1][z+1]))ver2=.1;//right back
-					if(solidBlock(world[x-1][y-1][z+1]))ver3=.1;//right front
-					if(solidBlock(world[x-1][y-1][z-1]))ver4=.1;//left front					
+					if(solidBlock(world[x-1][y+1][z-1]))ver1=low;//left back
+					if(solidBlock(world[x-1][y+1][z+1]))ver2=low;//right back
+					if(solidBlock(world[x-1][y-1][z+1]))ver3=low;//right front
+					if(solidBlock(world[x-1][y-1][z-1]))ver4=low;//left front					
 					
-					if(solidBlock(world[x-1][y][z-1])){ver1=0.1;ver4=0.1;}//block to the left					
-					if(solidBlock(world[x-1][y][z+1])){ver2=0.1;ver3=0.1;}//block to the right
+					if(solidBlock(world[x-1][y][z-1])){ver1=low;ver4=low;}//block to the left					
+					if(solidBlock(world[x-1][y][z+1])){ver2=low;ver3=low;}//block to the right
 					
-					if(solidBlock(world[x-1][y+1][z])){ver2=0.1;ver1=0.1;}//block to the back
-					if(solidBlock(world[x-1][y-1][z])){ver3=0.1;ver4=0.1;}//block to the front					
+					if(solidBlock(world[x-1][y+1][z])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x-1][y-1][z])){ver3=low;ver4=low;}//block to the front					
 					
 					//if(solidBlock(world[x-11][y-1][z])){
 					//	pushQ([val,val,val,val,val,val,.1,.1,.1,.1,.1,.1]);
@@ -689,14 +703,14 @@ scene.add( ambient );
 				}	
 				if(back){// Back box
 					ver1=ver2=ver3=ver4=val;
-					if(solidBlock(world[x+1][y+1][z-1]))ver1=.1;//left back
-					if(solidBlock(world[x-1][y+1][z-1]))ver2=.1;//right back
-					if(solidBlock(world[x-1][y-1][z-1]))ver3=.1;//right front
-					if(solidBlock(world[x+1][y-1][z-1]))ver4=.1;//left front										
-					if(solidBlock(world[x+1][y][z-1])){ver1=0.1;ver4=0.1;}//block to the left					
-					if(solidBlock(world[x-1][y][z-1])){ver2=0.1;ver3=0.1;}//block to the right					
-					if(solidBlock(world[x][y+1][z-1])){ver2=0.1;ver1=0.1;}//block to the back
-					if(solidBlock(world[x][y-1][z-1])){ver3=0.1;ver4=0.1;}//block to the front					
+					if(solidBlock(world[x+1][y+1][z-1]))ver1=low;//left back
+					if(solidBlock(world[x-1][y+1][z-1]))ver2=low;//right back
+					if(solidBlock(world[x-1][y-1][z-1]))ver3=low;//right front
+					if(solidBlock(world[x+1][y-1][z-1]))ver4=low;//left front										
+					if(solidBlock(world[x+1][y][z-1])){ver1=low;ver4=low;}//block to the left					
+					if(solidBlock(world[x-1][y][z-1])){ver2=low;ver3=low;}//block to the right					
+					if(solidBlock(world[x][y+1][z-1])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x][y-1][z-1])){ver3=low;ver4=low;}//block to the front					
 					
 					//if(solidBlock(world[x][y-1][z-1])){
 						
@@ -711,7 +725,25 @@ scene.add( ambient );
 					}
 				}	
 				if(bottom){// bottom box
-					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
+					ver1=ver2=ver3=ver4=val;
+					if(solidBlock(world[x+1][y-1][z-1]))ver1=low;//left back
+					if(solidBlock(world[x-1][y-1][z-1]))ver2=low;//right back
+					if(solidBlock(world[x-1][y-1][z+1]))ver3=low;//right front
+					if(solidBlock(world[x+1][y-1][z+1]))ver4=low;//left front										
+					
+					if(solidBlock(world[x+1][y-1][z])){ver1=low;ver4=low;}//block to the left					
+					if(solidBlock(world[x-1][y-1][z])){ver2=low;ver3=low;}//block to the right					
+					if(solidBlock(world[x][y-1][z-1])){ver2=low;ver1=low;}//block to the back
+					if(solidBlock(world[x][y-1][z+1])){ver3=low;ver4=low;}//block to the front					
+					
+					if(ver1!=val || ver2 !=val || ver3!=val || ver4!=val){						
+						pushQ([ver1,ver1,ver1,ver2,ver2,ver2,ver3,ver3,ver3,ver4,ver4,ver4]);	
+						
+						
+					}else{
+						pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
+					}					
+					//					pushQ([val,val,val,val,val,val,val,val,val,val,val,val]);
 				}
 			
 				return q;
