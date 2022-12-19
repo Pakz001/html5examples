@@ -142,6 +142,7 @@ user-select:none;
 			// draw white background
 			ui_RightBottomContext.fillStyle = '#FF0000';
 			ui_RightBottomContext.fillRect( 0, 0, 128, 128 );
+			ui_RightBottomContext.font = "48px serif";				
 			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
 			UImaterialx.map = new THREE.CanvasTexture( ui_RightBottomCanvas );
 			
@@ -156,7 +157,7 @@ user-select:none;
 			// text
 			ui_BottomContext.fillStyle = '#000000';	
 			ui_BottomContext.font = "48px serif";			
-			ui_BottomContext.fillText("hello",10,50);
+			//ui_BottomContext.fillText("hello",10,50);
 			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
 			//				material.map.needsUpdate = true;
 			UImaterial2.map = new THREE.CanvasTexture( ui_BottomCanvas );
@@ -335,23 +336,88 @@ var rotlegright=0.025;
 				
 				
 				
-				
-				ui_RightBottomContext.canvas.style.top=""+window.innerHeight-200+"px";
-				ui_RightBottomContext.canvas.style.left=""+window.innerWidth-128+"px";		
-				ui_RightBottomContext.canvas.width=148;
-				ui_RightBottomContext.canvas.height=96;
+				//
+				// Right bottom UI
+				//
+				ui_RightBottomContext.canvas.style.top=""+window.innerHeight*.7+"px";
+				ui_RightBottomContext.canvas.style.left=""+window.innerWidth*.85+"px";		
+				ui_RightBottomContext.canvas.width=window.innerWidth*.098;
+				ui_RightBottomContext.canvas.height=window.innerHeight*.134;
 				ui_RightBottomContext.fillStyle="#FFFFFF";
+				ui_RightBottomContext.font = "32px serif";								
 				ui_RightBottomContext.fillRect(0,0,200,200);
 				
+				// bright inside
+				ui_RightBottomContext.fillStyle="#777777";
+				ui_RightBottomContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
+				
+				var left = 0;
+				var top = 0;
+				var w = window.innerWidth*.15/3.3;
+				var h = window.innerHeight*.20/3.3;
+				for(var y1=0;y1<2;y1++){
+				for(var x1=0;x1<2;x1++){
+				left = x1*(w+8);
+				top = y1*(h+8);
+				// dark edge bottom and right
+				ui_RightBottomContext.fillStyle="#222222";
+				ui_RightBottomContext.fillRect(left+w-4,top+4,4,h-8);
+				ui_RightBottomContext.fillRect(left,top+h-4,w,4);				
+				// light edge top and left
+				ui_RightBottomContext.fillStyle="#999999";
+				ui_RightBottomContext.fillRect(left,top,w-4,4);
+				ui_RightBottomContext.fillRect(left,top,4,h-4);		
+				ui_RightBottomContext.fillStyle="#DDDDDD";
+				var s="Jp";
+				if(x1==1 && y1==0){s="Dk"};
+				if(y1==1){s=".."};
+				
+				ui_RightBottomContext.fillText(s,left+8,top+32);
+			}}
+
+
+				
+				
+				//
+				// Right Top UI
+				//
 				
 				ui_RightTopContext.canvas.style.top="16px";
-				ui_RightTopContext.canvas.style.left=""+window.innerWidth-128+"px";				
-				ui_RightTopContext.canvas.width=100;
+				ui_RightTopContext.canvas.style.left=""+window.innerWidth*.85+"px";				
+				ui_RightTopContext.canvas.width=window.innerWidth*.1;
 				ui_RightTopContext.canvas.height=48;
 				ui_RightTopContext.fillStyle="#0000FF";
 				ui_RightTopContext.fillRect(0,0,200,200);
+				// bright inside
+				ui_RightTopContext.fillStyle="#777777";
+				ui_RightTopContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
+				ui_RightTopContext.font = "32px serif";				
+				var left = 0;
+				var top = 0;
+				var w = window.innerWidth*.15/3.3;
+				var h = window.innerHeight*.20/3.3;
+				for(var y1=0;y1<2;y1++){
+				for(var x1=0;x1<2;x1++){
+				left = x1*(w+8);
+				top = y1*(h+8);
+				// dark edge bottom and right
+				ui_RightTopContext.fillStyle="#222222";
+				ui_RightTopContext.fillRect(left+w-4,top+4,4,h-8);
+				ui_RightTopContext.fillRect(left,top+h-4,w,4);				
+				// light edge top and left
+				ui_RightTopContext.fillStyle="#999999";
+				ui_RightTopContext.fillRect(left,top,w-4,4);
+				ui_RightTopContext.fillRect(left,top,4,h-4);				
+				ui_RightTopContext.fillStyle="#DDDDDD";
+				var s="M";
+				if(x1==1){s="In"};
+				ui_RightTopContext.fillText(s,left+12,top-20);
+				}}				
 				
 				
+				// Bottom UI
+				//
+				//
 				ui_BottomContext.canvas.width=window.innerWidth*.50;				
 				ui_BottomContext.canvas.style.top=""+window.innerHeight-132+"px";
 				ui_BottomContext.canvas.style.left=""+window.innerWidth*.25+"px";				
