@@ -269,13 +269,35 @@ var rotlegright=0.025;
 				//ui_RightTopContext.canvas.style.left=""+256+"px";
 				
 				// Here we setup and draw the gui's
+				
+				
+				//
+				// Power armor bar
+				//
 				ui_LeftTopContext.canvas.style.top="16px";
 				ui_LeftTopContext.canvas.style.left="50px";				
-				ui_LeftTopContext.canvas.width=100;
-				ui_LeftTopContext.canvas.height=48;
-				ui_LeftTopContext.fillStyle="#FFFFFF";
-				ui_LeftTopContext.fillRect(0,0,200,200);
+				ui_LeftTopContext.canvas.width=window.innerWidth*.198;
+				ui_LeftTopContext.canvas.height=window.innerHeight*.052;
+				ui_LeftTopContext.fillStyle="#000000";
+				ui_LeftTopContext.fillRect(0,0,window.innerWidth*.198,window.innerHeight*.052);
 				
+
+				var left = right = 0;
+				for(var x1=0;x1<10;x1++){
+				left=x1*window.innerWidth*.20/10;
+				top=2;
+				ui_LeftTopContext.fillStyle="#FF0000";
+				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/12,window.innerHeight*.05/2.5);
+				ui_LeftTopContext.fillStyle="#DDDDDD";
+				ui_LeftTopContext.fillRect(left+2,top+=2,window.innerWidth*.20/40,window.innerHeight*.05/9.5);
+
+				top+=window.innerHeight*.05/2;
+				ui_LeftTopContext.fillStyle="#666666";
+				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/12,window.innerHeight*.05/2.5);				
+				ui_LeftTopContext.fillStyle="#DDDDDD";
+				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/12,window.innerHeight*.05/22.5);				
+				
+				}
 				
 				
 				//
