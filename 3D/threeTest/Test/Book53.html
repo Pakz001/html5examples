@@ -108,6 +108,9 @@ user-select:none;
 			
 			const loader = new THREE.ObjectLoader();
 
+
+			const blockImages = new Image(); // Create new img element
+			blockImages.src = "resources/flourish-cc-by-nc-sa3.png"; // Set source path
 			
 			//
 			// Here we set up a canvas that we draw ontop of the 3d view.
@@ -227,7 +230,7 @@ loader.load(
 
 	// onProgress callback
 	function ( xhr ) {
-		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+		//console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
 	},
 
 	// onError callback
@@ -300,31 +303,109 @@ var rotlegright=0.025;
 				ui_BottomContext.canvas.style.top=""+window.innerHeight-132+"px";
 				ui_BottomContext.canvas.style.left=""+window.innerWidth*.25+"px";				
 				ui_BottomContext.canvas.height=80;
-				ui_BottomContext.fillStyle="#FF0000";
-				ui_BottomContext.fillRect(0,0,window.innerWidth*.5,100);
+
+				// bright inside
+				ui_BottomContext.fillStyle="#AAAAAA";
+				ui_BottomContext.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
 				
+				// dark inside
+				ui_BottomContext.fillStyle="#444444";
+				ui_BottomContext.fillRect(8,8,window.innerWidth*.5-16,80-16);
+
+				// dark edge bottom and right
+				ui_BottomContext.fillStyle="#222222";
+				ui_BottomContext.fillRect(window.innerWidth*.50-4,4,4,80-8);
+				ui_BottomContext.fillRect(0,80-4,window.innerWidth*.5,4);				
+				// light edge top and left
+				ui_BottomContext.fillStyle="#EEEEEE";
+				ui_BottomContext.fillRect(0,0,window.innerWidth*.50-4,4);
+				ui_BottomContext.fillRect(0,0,4,80-4);				
 				
+				var x2=y2=0;
+				for(var y=0;y<1;y++){
+				for(var x=0;x<11;x++){
+					var left = x*52+14;
+					var top = y*52+16;
+					ui_BottomContext.fillStyle="#AAAAAA";
+					ui_BottomContext.fillRect(left,top,48,48);
+					left-=1;top-=1;
+					ui_BottomContext.fillStyle="#333333";
+					ui_BottomContext.fillRect(left,top,48,48);
+					left-=1;top-=1;
+					ui_BottomContext.fillStyle="#888888";
+					ui_BottomContext.fillRect(left,top,48,48);
+					left+=8;top+=8;
+					
+					
+					ui_BottomContext.drawImage(blockImages,x2*16,y2*16,16,16,left,top,32,32);
+					x2+=1;
+					if(x2>15){x2=0;y2+=1};
+				}
+			}
+			
+				//
+				// Center GUI
+				//
 				ui_CenterContext.canvas.style.top=""+48+"px";
 				ui_CenterContext.canvas.style.left=""+window.innerWidth*.25+"px";								
 				ui_CenterContext.canvas.width=window.innerWidth*.50;				
 				ui_CenterContext.canvas.height=window.innerHeight*.7;
-				ui_CenterContext.fillStyle="#444444";
+				
+				// bright inside
+				ui_CenterContext.fillStyle="#AAAAAA";
 				ui_CenterContext.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
+
+				// dark inside				
+				ui_CenterContext.fillStyle="#444444";
+				ui_CenterContext.fillRect(32,16,window.innerWidth*.5-64,window.innerHeight*.7-32);
+
+				
+				
+				// dark edge bottom and right
+				ui_CenterContext.fillStyle="#222222";
+				ui_CenterContext.fillRect(window.innerWidth*.50-4,4,4,window.innerHeight*.7-4);
+				ui_CenterContext.fillRect(0,window.innerHeight*.7-4,window.innerWidth*.5-4,4);				
+				// light edge top and left
+				ui_CenterContext.fillStyle="#EEEEEE";
+				ui_CenterContext.fillRect(0,0,window.innerWidth*.50-4,4);
+				ui_CenterContext.fillRect(0,0,4,window.innerHeight*.7-4);				
+
+				var x2=y2=0;
+				for(var y=0;y<9;y++){
+				for(var x=0;x<10;x++){
+					var left = x*52+40;
+					var top = y*52+32;
+					ui_CenterContext.fillStyle="#AAAAAA";
+					ui_CenterContext.fillRect(left,top,48,48);
+					left-=1;top-=1;
+					ui_CenterContext.fillStyle="#333333";
+					ui_CenterContext.fillRect(left,top,48,48);
+					left-=1;top-=1;
+					ui_CenterContext.fillStyle="#888888";
+					ui_CenterContext.fillRect(left,top,48,48);
+					left+=8;top+=8;
+					
+					
+					ui_CenterContext.drawImage(blockImages,x2*16,y2*16,16,16,left,top,32,32);
+					x2+=1;
+					if(x2>15){x2=0;y2+=1};
+				}
+				}
 
 				//if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
 				//if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}
-				if(Math.random()<.01){ui_RightTopCanvas.setAttribute("hidden","hidden");}
-				if(Math.random()<.01){ui_RightTopCanvas.removeAttribute("hidden");}				
-				if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
-				if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}	
-				if(Math.random()<.01){ui_RightBottomCanvas.setAttribute("hidden","hidden");}
-				if(Math.random()<.01){ui_RightBottomCanvas.removeAttribute("hidden");}				
-				if(Math.random()<.01){ui_LeftBottomCanvas.setAttribute("hidden","hidden");}
-				if(Math.random()<.01){ui_LeftBottomCanvas.removeAttribute("hidden");}	
-				if(Math.random()<.01){ui_CenterCanvas.setAttribute("hidden","hidden");}
-				if(Math.random()<.01){ui_CenterCanvas.removeAttribute("hidden");}	
-				if(Math.random()<.01){ui_BottomCanvas.setAttribute("hidden","hidden");}
-				if(Math.random()<.01){ui_BottomCanvas.removeAttribute("hidden");}					
+				//if(Math.random()<.01){ui_RightTopCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_RightTopCanvas.removeAttribute("hidden");}				
+				//if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}	
+				//if(Math.random()<.01){ui_RightBottomCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_RightBottomCanvas.removeAttribute("hidden");}				
+				//if(Math.random()<.01){ui_LeftBottomCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_LeftBottomCanvas.removeAttribute("hidden");}	
+				//if(Math.random()<.01){ui_CenterCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_CenterCanvas.removeAttribute("hidden");}	
+				//if(Math.random()<.01){ui_BottomCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_BottomCanvas.removeAttribute("hidden");}					
 				requestAnimationFrame( animate );
 				
 		
