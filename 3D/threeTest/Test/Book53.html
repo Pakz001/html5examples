@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+body {
+	touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+	-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}			
+			#drawing-canvas {
+				position: absolute;
+				background-color: #000000;
+				top: 70%;
+				left: 10%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#drawing-canvas2 {
+				position: absolute;
+				background-color: #000000;
+				top: 70%;
+				right: 10%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#drawing-canvas3 {
+				position: absolute;
+				background-color: #000000;
+				top:70%;
+				left:40%;
+				width:300;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#drawing-canvas4 {
+				position: absolute;
+				background-color: #000000;
+				top:70%;
+				left:40%;
+				width:300;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			
+		</style>
+	</head>
+	<body>
+		<canvas id="drawing-canvas" height="128" width="128"></canvas>		
+		<canvas id="drawing-canvas2" height="128" width="128"></canvas>		
+		<canvas id="drawing-canvas3" width="100" height="96"></canvas>		
+		<canvas id="drawing-canvas4" width="100" height="96"></canvas>		
+		
+		
+		<script src="js/three.js"></script>
+	
+		<script>
+			
+			//
+			// rotate mesh inside mesh. this for animating
+			// items and character. these made inside
+			// the three.js model editor(browser) saved
+			// as scene json.
+			//
+			//
+			
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.shadowMap.Enabled=true;
+			document.body.appendChild( renderer.domElement );
+			
+			const loader = new THREE.ObjectLoader();
+
+			
+			//
+			// Here we set up a canvas that we draw ontop of the 3d view.
+			// it is partly initiated in the html style part
+			// and needs to be initiated below the body part to.
+			UImaterial = new THREE.MeshBasicMaterial();			
+			const drawingCanvas = document.getElementById( 'drawing-canvas' );
+			const drawingContext = drawingCanvas.getContext( '2d' );	
+			// draw white background
+			drawingContext.fillStyle = '#FFFFFF';
+			drawingContext.fillRect( 0, 0, 128, 128 );
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			UImaterial.map = new THREE.CanvasTexture( drawingCanvas );
+
+			UImaterial2 = new THREE.MeshBasicMaterial();			
+			const drawingCanvas2 = document.getElementById( 'drawing-canvas2' );
+			const drawingContext2 = drawingCanvas2.getContext( '2d' );
+//			drawingCanvas2.style.left = 0;			
+			// draw white background
+			drawingContext2.fillStyle = '#FFFFFF';
+			drawingContext2.fillRect( 0, 0, 128, 128 );
+			// text
+			drawingContext2.fillStyle = '#000000';	
+			drawingContext2.font = "48px serif";			
+			drawingContext2.fillText("hello",10,50);
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			//				material.map.needsUpdate = true;
+			UImaterial2.map = new THREE.CanvasTexture( drawingCanvas2 );
+			
+			
+			UImaterial3 = new THREE.MeshBasicMaterial();			
+			const drawingCanvas3 = document.getElementById( 'drawing-canvas3' );
+			const drawingContext3 = drawingCanvas3.getContext( '2d' );
+			// draw white background
+			drawingContext3.fillStyle = '#FFFFFF';
+			drawingContext3.fillRect( 0, 0, 300, 96 );
+			// text
+			drawingContext3.fillStyle = '#000000';	
+			drawingContext3.font = "48px serif";			
+			drawingContext3.fillText("hello",10,50);
+			UImaterial3.map = new THREE.CanvasTexture( drawingCanvas3 );			
+			
+			
+			UImaterial4 = new THREE.MeshBasicMaterial();									
+			const drawingCanvas4 = document.getElementById( 'drawing-canvas4' );
+			const drawingContext4 = drawingCanvas4.getContext( '2d' );
+			
+			drawingContext4.fillStyle = '#FF00FF';
+			drawingContext4.fillRect( 0, 0, 300, 96 );
+			UImaterial4.map = new THREE.CanvasTexture( drawingCanvas4 );			
+			
+			
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			//				material.map.needsUpdate = true;
+
+			
+			
+			var spotLight = new THREE.SpotLight(0xffffff);
+			spotLight.position.set(-100,100,100);
+			spotLight.castShadow = true;
+					
+			spotLight.shadow.mapSize = new THREE.Vector2(1024,1024);
+			spotLight.shadow.camera.far = 130;
+			spotLight.shadow.camera.near = 40;
+			scene.add(spotLight);
+
+
+			const geometry = new THREE.PlaneGeometry( 160,120);
+			const material = new THREE.MeshLambertMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+			const plane = new THREE.Mesh( geometry, material );
+			scene.add( plane );
+
+			const cubeGeometry = new THREE.BoxGeometry(4,20,4);
+			const cubeMaterial = new THREE.MeshLambertMaterial({
+				color: 0xff0000,
+				wireframe: false
+			});
+			const cube = new THREE.Mesh(cubeGeometry,cubeMaterial);
+			cube.position.set(-4,3,5);
+			scene.add(cube);				
+		var mesh;
+//var loader = new THREE.ObjectLoader();
+loader.load(
+	// resource URL
+	"models/steve.json",
+
+	// onLoad callback
+	// Here the loaded data is assumed to be an object
+	function ( obj  ) {
+		// Add the loaded object to the scene
+		mesh = obj;
+		obj.scale.set(10, 10, 10);
+		obj.position.set(-4,3,15)
+		scene.add( obj );
+	},
+
+	// onProgress callback
+	function ( xhr ) {
+		console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+	},
+
+	// onError callback
+	function ( err ) {
+		console.error( 'An error happened' );
+	}
+	);
+
+			
+	
+			
+			
+			//camera.position.z = 5;
+			camera.position.set( 12, 5, 100);
+
+			camera.lookAt(scene.position);
+var an=2;
+var rotarmleft=-0.02;
+var rotarmright=0.02;
+var rotlegleft=-0.025;
+var rotlegright=0.025;
+
+			/*
+			// hide and show canvas
+			drawingCanvas.setAttribute("hidden","hidden");
+			drawingCanvas.removeAttribute("hidden");
+
+
+			// Draw somethingf in context 2
+			drawingContext2.fillStyle='#FF0000';
+			drawingContext2.fillRect(0,0,220,10);
+			*/
+			function animate() {
+				// Set the canvas context to position left to 10..
+				//drawingContext2.canvas.style.left=""+10+"px";
+				//drawingContext3.canvas.style.left=""+256+"px";
+				
+				// Here we setup and draw the gui's
+				drawingContext.canvas.style.top="16px";
+				drawingContext.canvas.style.left="50px";				
+				drawingContext.canvas.width=100;
+				drawingContext.canvas.height=48;
+				drawingContext.fillStyle="#00FF00";
+				drawingContext.fillRect(0,0,200,200);
+
+				drawingContext2.canvas.style.top="16px";
+				drawingContext2.canvas.style.left=""+window.innerWidth-128+"px";				
+				drawingContext2.canvas.width=100;
+				drawingContext2.canvas.height=48;
+				drawingContext2.fillStyle="#0000FF";
+				drawingContext2.fillRect(0,0,200,200);
+				
+				
+				drawingContext3.canvas.width=window.innerWidth*.50;				
+				drawingContext3.canvas.style.top=""+window.innerHeight-132+"px";
+				drawingContext3.canvas.style.left=""+window.innerWidth*.25+"px";				
+				drawingContext3.canvas.height=80;
+				drawingContext3.fillStyle="#FF0000";
+				drawingContext3.fillRect(0,0,window.innerWidth*.5,100);
+				
+				
+				drawingContext4.canvas.style.top=""+48+"px";
+				drawingContext4.canvas.style.left=""+window.innerWidth*.25+"px";								
+				drawingContext4.canvas.width=window.innerWidth*.50;				
+				drawingContext4.canvas.height=window.innerHeight*.7;
+				drawingContext4.fillStyle="#444444";
+				drawingContext4.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
+				
+				requestAnimationFrame( animate );
+		
+		//	an+=0.1
+			    if(mesh!=null){
+					mesh.children[5].material.color.setHex( 0xff0000 );
+					
+					// set the cubes made with the three modeler
+					// so the centers of the limbs are at the top.
+					// this makes them rotate from the top parts(origin)
+					// this is done by modifying the vertices in the geometry
+					// at y moving a but up(+) except the head and body.
+					if(an==2){
+						an=-1;
+						mesh.children[4].rotation.x = Math.PI*1.3;
+						mesh.children[1].rotation.x = Math.PI*.7;
+						mesh.children[3].rotation.x = Math.PI*.7;
+						mesh.children[2].rotation.x = Math.PI*1.3;			
+						for(var zz=0;zz<mesh.children.length;zz++){
+							const positions = mesh.children[zz].geometry.attributes.position.array;
+				
+							let x, y, z, index;
+							x = y = z = index = 0;
+				
+							for ( let i = 0, l = positions.length; i < l; i ++ ) {
+								index++;
+								if(zz==0 || zz==5 ){
+									positions[index++]-=.5;
+								}else{
+								positions[index++]+=.5;
+								}
+								index++
+							}
+						}
+					}
+					// animate our steve character
+					mesh.children[4].rotation.x+=rotarmleft;
+					if (mesh.children[4].rotation.x > Math.PI*1.3 || mesh.children[4].rotation.x <Math.PI*.7) rotarmleft = -rotarmleft;
+					mesh.children[1].rotation.x+=rotarmright;
+					if (mesh.children[1].rotation.x > Math.PI*1.3 || mesh.children[1].rotation.x <Math.PI*.7) rotarmright = -rotarmright;				
+					mesh.children[3].rotation.x+=rotlegleft;
+					if (mesh.children[3].rotation.x > Math.PI*1.3 || mesh.children[3].rotation.x < Math.PI*.7) rotlegleft *= -1;
+					mesh.children[2].rotation.x+=rotlegright;
+					if (mesh.children[2].rotation.x > Math.PI*1.3 || mesh.children[2].rotation.x < Math.PI*.7) rotlegright *= -1;
+					}		
+				renderer.render( scene, camera );
+			};
+
+			animate();
+			
+			
+			
+			
+		</script>
+	</body>
+	</html>
