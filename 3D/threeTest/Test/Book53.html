@@ -15,7 +15,7 @@ body {
 user-select:none;
 -webkit-tap-highlight-color:rgba(0,0,0,0);
 }			
-			#drawing-canvas {
+			#ui-lefttop {
 				position: absolute;
 				background-color: #000000;
 				top: 70%;
@@ -24,7 +24,28 @@ user-select:none;
 				cursor: crosshair;
 				touch-action: none;
 			}			
-			#drawing-canvas2 {
+			#ui-leftbottom {
+				position: absolute;
+				background-color: #000000;
+				top: 70%;
+				left: 10%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+
+			#ui-rightbottom {
+				position: absolute;
+				background-color: #000000;
+				top: 70%;
+				left: 10%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			
+			
+			#ui-bottom {
 				position: absolute;
 				background-color: #000000;
 				top: 70%;
@@ -33,7 +54,7 @@ user-select:none;
 				cursor: crosshair;
 				touch-action: none;
 			}			
-			#drawing-canvas3 {
+			#ui-righttop {
 				position: absolute;
 				background-color: #000000;
 				top:70%;
@@ -43,7 +64,7 @@ user-select:none;
 				cursor: crosshair;
 				touch-action: none;
 			}			
-			#drawing-canvas4 {
+			#ui-center {
 				position: absolute;
 				background-color: #000000;
 				top:70%;
@@ -57,10 +78,12 @@ user-select:none;
 		</style>
 	</head>
 	<body>
-		<canvas id="drawing-canvas" height="128" width="128"></canvas>		
-		<canvas id="drawing-canvas2" height="128" width="128"></canvas>		
-		<canvas id="drawing-canvas3" width="100" height="96"></canvas>		
-		<canvas id="drawing-canvas4" width="100" height="96"></canvas>		
+		<canvas id="ui-lefttop" height="128" width="128"></canvas>		
+		<canvas id="ui-leftbottom" height="128" width="128"></canvas>
+		<canvas id="ui-rightbottom" height="128" width="128"></canvas>		
+		<canvas id="ui-bottom" height="128" width="128"></canvas>		
+		<canvas id="ui-righttop" width="100" height="96"></canvas>		
+		<canvas id="ui-center" width="100" height="96"></canvas>		
 		
 		
 		<script src="js/three.js"></script>
@@ -91,50 +114,71 @@ user-select:none;
 			// it is partly initiated in the html style part
 			// and needs to be initiated below the body part to.
 			UImaterial = new THREE.MeshBasicMaterial();			
-			const drawingCanvas = document.getElementById( 'drawing-canvas' );
-			const drawingContext = drawingCanvas.getContext( '2d' );	
+			const ui_LeftTopCanvas = document.getElementById( 'ui-lefttop' );
+			const ui_LeftTopContext = ui_LeftTopCanvas.getContext( '2d' );	
 			// draw white background
-			drawingContext.fillStyle = '#FFFFFF';
-			drawingContext.fillRect( 0, 0, 128, 128 );
+			ui_LeftTopContext.fillStyle = '#FF0000';
+			ui_LeftTopContext.fillRect( 0, 0, 128, 128 );
 			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
-			UImaterial.map = new THREE.CanvasTexture( drawingCanvas );
+			UImaterial.map = new THREE.CanvasTexture( ui_LeftTopCanvas );
 
+
+			UImaterialz = new THREE.MeshBasicMaterial();			
+			const ui_LeftBottomCanvas = document.getElementById( 'ui-leftbottom' );
+			const ui_LeftBottomContext = ui_LeftBottomCanvas.getContext( '2d' );	
+			// draw white background
+			ui_LeftBottomContext.fillStyle = '#FF0000';
+			ui_LeftBottomContext.fillRect( 0, 0, 128, 128 );
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			UImaterialz.map = new THREE.CanvasTexture( ui_LeftBottomCanvas );
+			
+
+			UImaterialx = new THREE.MeshBasicMaterial();			
+			const ui_RightBottomCanvas = document.getElementById( 'ui-rightbottom' );
+			const ui_RightBottomContext = ui_RightBottomCanvas.getContext( '2d' );	
+			// draw white background
+			ui_RightBottomContext.fillStyle = '#FF0000';
+			ui_RightBottomContext.fillRect( 0, 0, 128, 128 );
+			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
+			UImaterialx.map = new THREE.CanvasTexture( ui_RightBottomCanvas );
+			
+			
 			UImaterial2 = new THREE.MeshBasicMaterial();			
-			const drawingCanvas2 = document.getElementById( 'drawing-canvas2' );
-			const drawingContext2 = drawingCanvas2.getContext( '2d' );
+			const ui_BottomCanvas = document.getElementById( 'ui-bottom' );
+			const ui_BottomContext = ui_BottomCanvas.getContext( '2d' );
 //			drawingCanvas2.style.left = 0;			
 			// draw white background
-			drawingContext2.fillStyle = '#FFFFFF';
-			drawingContext2.fillRect( 0, 0, 128, 128 );
+			ui_BottomContext.fillStyle = '#FFFFFF';
+			ui_BottomContext.fillRect( 0, 0, 128, 128 );
 			// text
-			drawingContext2.fillStyle = '#000000';	
-			drawingContext2.font = "48px serif";			
-			drawingContext2.fillText("hello",10,50);
+			ui_BottomContext.fillStyle = '#000000';	
+			ui_BottomContext.font = "48px serif";			
+			ui_BottomContext.fillText("hello",10,50);
 			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
 			//				material.map.needsUpdate = true;
-			UImaterial2.map = new THREE.CanvasTexture( drawingCanvas2 );
+			UImaterial2.map = new THREE.CanvasTexture( ui_BottomCanvas );
 			
 			
 			UImaterial3 = new THREE.MeshBasicMaterial();			
-			const drawingCanvas3 = document.getElementById( 'drawing-canvas3' );
-			const drawingContext3 = drawingCanvas3.getContext( '2d' );
+			const ui_RightTopCanvas = document.getElementById( 'ui-righttop' );
+			const ui_RightTopContext = ui_RightTopCanvas.getContext( '2d' );
 			// draw white background
-			drawingContext3.fillStyle = '#FFFFFF';
-			drawingContext3.fillRect( 0, 0, 300, 96 );
+			ui_RightTopContext.fillStyle = '#FFFF00';
+			ui_RightTopContext.fillRect( 0, 0, 300, 96 );
 			// text
-			drawingContext3.fillStyle = '#000000';	
-			drawingContext3.font = "48px serif";			
-			drawingContext3.fillText("hello",10,50);
-			UImaterial3.map = new THREE.CanvasTexture( drawingCanvas3 );			
+			ui_RightTopContext.fillStyle = '#000000';	
+			ui_RightTopContext.font = "48px serif";			
+			ui_RightTopContext.fillText("hello",10,50);
+			UImaterial3.map = new THREE.CanvasTexture( ui_RightTopCanvas );			
 			
 			
 			UImaterial4 = new THREE.MeshBasicMaterial();									
-			const drawingCanvas4 = document.getElementById( 'drawing-canvas4' );
-			const drawingContext4 = drawingCanvas4.getContext( '2d' );
+			const ui_CenterCanvas = document.getElementById( 'ui-center' );
+			const ui_CenterContext = ui_CenterCanvas.getContext( '2d' );
 			
-			drawingContext4.fillStyle = '#FF00FF';
-			drawingContext4.fillRect( 0, 0, 300, 96 );
-			UImaterial4.map = new THREE.CanvasTexture( drawingCanvas4 );			
+			ui_CenterContext.fillStyle = '#FF00FF';
+			ui_CenterContext.fillRect( 0, 0, 300, 96 );
+			UImaterial4.map = new THREE.CanvasTexture( ui_CenterCanvas );			
 			
 			
 			// set canvas as material.map (this could be done to any map, bump, displacement etc.)
@@ -213,44 +257,59 @@ var rotlegright=0.025;
 
 
 			// Draw somethingf in context 2
-			drawingContext2.fillStyle='#FF0000';
-			drawingContext2.fillRect(0,0,220,10);
+			ui_BottomContext.fillStyle='#FF0000';
+			ui_BottomContext.fillRect(0,0,220,10);
 			*/
 			function animate() {
 				// Set the canvas context to position left to 10..
-				//drawingContext2.canvas.style.left=""+10+"px";
-				//drawingContext3.canvas.style.left=""+256+"px";
+				//ui_BottomContext.canvas.style.left=""+10+"px";
+				//ui_RightTopContext.canvas.style.left=""+256+"px";
 				
 				// Here we setup and draw the gui's
-				drawingContext.canvas.style.top="16px";
-				drawingContext.canvas.style.left="50px";				
-				drawingContext.canvas.width=100;
-				drawingContext.canvas.height=48;
-				drawingContext.fillStyle="#00FF00";
-				drawingContext.fillRect(0,0,200,200);
+				ui_LeftTopContext.canvas.style.top="16px";
+				ui_LeftTopContext.canvas.style.left="50px";				
+				ui_LeftTopContext.canvas.width=100;
+				ui_LeftTopContext.canvas.height=48;
+				ui_LeftTopContext.fillStyle="#FFFFFF";
+				ui_LeftTopContext.fillRect(0,0,200,200);
 
-				drawingContext2.canvas.style.top="16px";
-				drawingContext2.canvas.style.left=""+window.innerWidth-128+"px";				
-				drawingContext2.canvas.width=100;
-				drawingContext2.canvas.height=48;
-				drawingContext2.fillStyle="#0000FF";
-				drawingContext2.fillRect(0,0,200,200);
+				ui_LeftBottomContext.canvas.style.top=""+window.innerHeight-200+"px";
+				ui_LeftBottomContext.canvas.style.left="96px";				
+				ui_LeftBottomContext.canvas.width=148;
+				ui_LeftBottomContext.canvas.height=96;
+				ui_LeftBottomContext.fillStyle="#FFFFFF";
+				ui_LeftBottomContext.fillRect(0,0,200,200);
+				
+				ui_RightBottomContext.canvas.style.top=""+window.innerHeight-200+"px";
+				ui_RightBottomContext.canvas.style.left=""+window.innerWidth-128+"px";		
+				ui_RightBottomContext.canvas.width=148;
+				ui_RightBottomContext.canvas.height=96;
+				ui_RightBottomContext.fillStyle="#FFFFFF";
+				ui_RightBottomContext.fillRect(0,0,200,200);
 				
 				
-				drawingContext3.canvas.width=window.innerWidth*.50;				
-				drawingContext3.canvas.style.top=""+window.innerHeight-132+"px";
-				drawingContext3.canvas.style.left=""+window.innerWidth*.25+"px";				
-				drawingContext3.canvas.height=80;
-				drawingContext3.fillStyle="#FF0000";
-				drawingContext3.fillRect(0,0,window.innerWidth*.5,100);
+				ui_BottomContext.canvas.style.top="16px";
+				ui_BottomContext.canvas.style.left=""+window.innerWidth-128+"px";				
+				ui_BottomContext.canvas.width=100;
+				ui_BottomContext.canvas.height=48;
+				ui_BottomContext.fillStyle="#0000FF";
+				ui_BottomContext.fillRect(0,0,200,200);
 				
 				
-				drawingContext4.canvas.style.top=""+48+"px";
-				drawingContext4.canvas.style.left=""+window.innerWidth*.25+"px";								
-				drawingContext4.canvas.width=window.innerWidth*.50;				
-				drawingContext4.canvas.height=window.innerHeight*.7;
-				drawingContext4.fillStyle="#444444";
-				drawingContext4.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
+				ui_RightTopContext.canvas.width=window.innerWidth*.50;				
+				ui_RightTopContext.canvas.style.top=""+window.innerHeight-132+"px";
+				ui_RightTopContext.canvas.style.left=""+window.innerWidth*.25+"px";				
+				ui_RightTopContext.canvas.height=80;
+				ui_RightTopContext.fillStyle="#FF0000";
+				ui_RightTopContext.fillRect(0,0,window.innerWidth*.5,100);
+				
+				
+				ui_CenterContext.canvas.style.top=""+48+"px";
+				ui_CenterContext.canvas.style.left=""+window.innerWidth*.25+"px";								
+				ui_CenterContext.canvas.width=window.innerWidth*.50;				
+				ui_CenterContext.canvas.height=window.innerHeight*.7;
+				ui_CenterContext.fillStyle="#444444";
+				ui_CenterContext.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
 				
 				requestAnimationFrame( animate );
 		
