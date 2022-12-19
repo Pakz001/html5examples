@@ -79,6 +79,7 @@ book49 - Test - Set color of voxel on creation time. = Lighting.<br>
 book50 - main - torch light test. Face-dependent lighting effects <br>
 book51 - main - ambient occlusion ( dirty edges)<br>
 book52 - test - Ambient Occlusion<br>
+book53 - test - User Interface and Hud's.<br>
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=IDWdGPViRdM" target="_blank">
  <img src="http://img.youtube.com/vi/IDWdGPViRdM/mqdefault.jpg" alt="Watch the video" width="460" height="260" border="2" />
