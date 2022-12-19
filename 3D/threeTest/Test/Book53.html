@@ -275,13 +275,44 @@ var rotlegright=0.025;
 				ui_LeftTopContext.canvas.height=48;
 				ui_LeftTopContext.fillStyle="#FFFFFF";
 				ui_LeftTopContext.fillRect(0,0,200,200);
-
-				ui_LeftBottomContext.canvas.style.top=""+window.innerHeight-200+"px";
+				
+				
+				
+				//
+				// Player joystick
+				//
+				ui_LeftBottomContext.canvas.style.top=""+window.innerHeight-window.innerHeight*.30+"px";
 				ui_LeftBottomContext.canvas.style.left="96px";				
-				ui_LeftBottomContext.canvas.width=148;
-				ui_LeftBottomContext.canvas.height=96;
+				ui_LeftBottomContext.canvas.width=window.innerWidth*.15;
+				ui_LeftBottomContext.canvas.height=window.innerHeight*.20;
 				ui_LeftBottomContext.fillStyle="#FFFFFF";
 				ui_LeftBottomContext.fillRect(0,0,200,200);
+				
+				// bright inside
+				ui_LeftBottomContext.fillStyle="#777777";
+				ui_LeftBottomContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
+				
+				var left = 0;
+				var top = 0;
+				var w = window.innerWidth*.15/3.3;
+				var h = window.innerHeight*.20/3.3;
+				for(var y1=0;y1<3;y1++){
+				for(var x1=0;x1<3;x1++){
+				left = x1*(w+8);
+				top = y1*(h+8);
+				// dark edge bottom and right
+				ui_LeftBottomContext.fillStyle="#222222";
+				ui_LeftBottomContext.fillRect(left+w-4,top+4,4,h-8);
+				ui_LeftBottomContext.fillRect(left,top+h-4,w,4);				
+				// light edge top and left
+				ui_LeftBottomContext.fillStyle="#999999";
+				ui_LeftBottomContext.fillRect(left,top,w-4,4);
+				ui_LeftBottomContext.fillRect(left,top,4,h-4);				
+				}}
+				
+				
+				
+				
 				
 				ui_RightBottomContext.canvas.style.top=""+window.innerHeight-200+"px";
 				ui_RightBottomContext.canvas.style.left=""+window.innerWidth-128+"px";		
