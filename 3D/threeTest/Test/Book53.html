@@ -288,20 +288,20 @@ var rotlegright=0.025;
 				ui_RightBottomContext.fillRect(0,0,200,200);
 				
 				
-				ui_BottomContext.canvas.style.top="16px";
-				ui_BottomContext.canvas.style.left=""+window.innerWidth-128+"px";				
-				ui_BottomContext.canvas.width=100;
-				ui_BottomContext.canvas.height=48;
-				ui_BottomContext.fillStyle="#0000FF";
-				ui_BottomContext.fillRect(0,0,200,200);
+				ui_RightTopContext.canvas.style.top="16px";
+				ui_RightTopContext.canvas.style.left=""+window.innerWidth-128+"px";				
+				ui_RightTopContext.canvas.width=100;
+				ui_RightTopContext.canvas.height=48;
+				ui_RightTopContext.fillStyle="#0000FF";
+				ui_RightTopContext.fillRect(0,0,200,200);
 				
 				
-				ui_RightTopContext.canvas.width=window.innerWidth*.50;				
-				ui_RightTopContext.canvas.style.top=""+window.innerHeight-132+"px";
-				ui_RightTopContext.canvas.style.left=""+window.innerWidth*.25+"px";				
-				ui_RightTopContext.canvas.height=80;
-				ui_RightTopContext.fillStyle="#FF0000";
-				ui_RightTopContext.fillRect(0,0,window.innerWidth*.5,100);
+				ui_BottomContext.canvas.width=window.innerWidth*.50;				
+				ui_BottomContext.canvas.style.top=""+window.innerHeight-132+"px";
+				ui_BottomContext.canvas.style.left=""+window.innerWidth*.25+"px";				
+				ui_BottomContext.canvas.height=80;
+				ui_BottomContext.fillStyle="#FF0000";
+				ui_BottomContext.fillRect(0,0,window.innerWidth*.5,100);
 				
 				
 				ui_CenterContext.canvas.style.top=""+48+"px";
@@ -310,8 +310,23 @@ var rotlegright=0.025;
 				ui_CenterContext.canvas.height=window.innerHeight*.7;
 				ui_CenterContext.fillStyle="#444444";
 				ui_CenterContext.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
-				
+
+				//if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}
+				if(Math.random()<.01){ui_RightTopCanvas.setAttribute("hidden","hidden");}
+				if(Math.random()<.01){ui_RightTopCanvas.removeAttribute("hidden");}				
+				if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
+				if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}	
+				if(Math.random()<.01){ui_RightBottomCanvas.setAttribute("hidden","hidden");}
+				if(Math.random()<.01){ui_RightBottomCanvas.removeAttribute("hidden");}				
+				if(Math.random()<.01){ui_LeftBottomCanvas.setAttribute("hidden","hidden");}
+				if(Math.random()<.01){ui_LeftBottomCanvas.removeAttribute("hidden");}	
+				if(Math.random()<.01){ui_CenterCanvas.setAttribute("hidden","hidden");}
+				if(Math.random()<.01){ui_CenterCanvas.removeAttribute("hidden");}	
+				if(Math.random()<.01){ui_BottomCanvas.setAttribute("hidden","hidden");}
+				if(Math.random()<.01){ui_BottomCanvas.removeAttribute("hidden");}					
 				requestAnimationFrame( animate );
+				
 		
 		//	an+=0.1
 			    if(mesh!=null){
