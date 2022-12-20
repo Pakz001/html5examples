@@ -511,6 +511,11 @@ var rotlegright=0.025;
 				}
 				}
 
+				// Javascript html5 does not have a scissor feature as far as I am aware.
+				// To be able to scroll a part of a canvas I here copy a part of the canvas
+				// on a lower part(scrollign. down) and draw this higher. This for smooth
+				// scrolling....	ui_CenterContext.drawImage(ui_CenterCanvas,40,50,window.innerWidth*.5-40,100,40,32,window.innerWidth*.5-40,100);
+				
 				//if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
 				//if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}
 				//if(Math.random()<.01){ui_RightTopCanvas.setAttribute("hidden","hidden");}
