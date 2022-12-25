@@ -277,7 +277,7 @@ var rotlegright=0.025;
 				//
 				ui_LeftTopContext.canvas.style.top="16px";
 				ui_LeftTopContext.canvas.style.left="50px";				
-				ui_LeftTopContext.canvas.width=window.innerWidth*.198;
+				ui_LeftTopContext.canvas.width=window.innerWidth*.170;
 				ui_LeftTopContext.canvas.height=window.innerHeight*.052;
 				ui_LeftTopContext.fillStyle="#000000";
 				ui_LeftTopContext.fillRect(0,0,window.innerWidth*.198,window.innerHeight*.052);
@@ -285,18 +285,18 @@ var rotlegright=0.025;
 
 				var left = right = 0;
 				for(var x1=0;x1<10;x1++){
-				left=x1*window.innerWidth*.20/10;
+				left=x1*window.innerWidth*.20/12;
 				top=2;
 				ui_LeftTopContext.fillStyle="#FF0000";
-				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/12,window.innerHeight*.05/2.5);
+				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/2.5);
 				ui_LeftTopContext.fillStyle="#DDDDDD";
 				ui_LeftTopContext.fillRect(left+2,top+=2,window.innerWidth*.20/40,window.innerHeight*.05/9.5);
 
 				top+=window.innerHeight*.05/2;
 				ui_LeftTopContext.fillStyle="#666666";
-				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/12,window.innerHeight*.05/2.5);				
+				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/2.5);				
 				ui_LeftTopContext.fillStyle="#DDDDDD";
-				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/12,window.innerHeight*.05/22.5);				
+				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/22.5);				
 				
 				}
 				
@@ -305,7 +305,7 @@ var rotlegright=0.025;
 				// Player joystick
 				//
 				ui_LeftBottomContext.canvas.style.top=""+window.innerHeight-window.innerHeight*.30+"px";
-				ui_LeftBottomContext.canvas.style.left="96px";				
+				ui_LeftBottomContext.canvas.style.left="32px";				
 				ui_LeftBottomContext.canvas.width=window.innerWidth*.15;
 				ui_LeftBottomContext.canvas.height=window.innerHeight*.20;
 				ui_LeftBottomContext.fillStyle="#FFFFFF";
@@ -321,7 +321,7 @@ var rotlegright=0.025;
 				var h = window.innerHeight*.20/3.3;
 				for(var y1=0;y1<3;y1++){
 				for(var x1=0;x1<3;x1++){
-				left = x1*(w+8);
+				left = x1*(w+6);
 				top = y1*(h+8);
 				// dark edge bottom and right
 				ui_LeftBottomContext.fillStyle="#222222";
@@ -344,7 +344,7 @@ var rotlegright=0.025;
 				ui_RightBottomContext.canvas.width=window.innerWidth*.098;
 				ui_RightBottomContext.canvas.height=window.innerHeight*.134;
 				ui_RightBottomContext.fillStyle="#FFFFFF";
-				ui_RightBottomContext.font = "32px serif";								
+				ui_RightBottomContext.font = "22px serif";								
 				ui_RightBottomContext.fillRect(0,0,200,200);
 				
 				// bright inside
@@ -391,7 +391,9 @@ var rotlegright=0.025;
 				// bright inside
 				ui_RightTopContext.fillStyle="#777777";
 				ui_RightTopContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
-				ui_RightTopContext.font = "32px serif";				
+				//ui_RightTopContext.font = "32px serif";				
+				ui_RightTopContext.font = "26px serif";				
+				//if(Math.random()<.01)console.log(""+Math.floor(window.innerHeight/25)+"px serif");				
 				var left = 0;
 				var top = 0;
 				var w = window.innerWidth*.15/3.3;
@@ -411,7 +413,7 @@ var rotlegright=0.025;
 				ui_RightTopContext.fillStyle="#DDDDDD";
 				var s="M";
 				if(x1==1){s="In"};
-				ui_RightTopContext.fillText(s,left+12,top-20);
+				ui_RightTopContext.fillText(s,left+(w/5),top-(h/1.9));
 				}}				
 				
 				
@@ -440,23 +442,31 @@ var rotlegright=0.025;
 				ui_BottomContext.fillRect(0,0,window.innerWidth*.50-4,4);
 				ui_BottomContext.fillRect(0,0,4,80-4);				
 				
+				var bWidth2 = (window.innerWidth*.50-16)/12;
+				var bHeight2 = 50;
+				var bWidth=bWidth2*.8;
+				var bHeight=bHeight2*.8;
+				
 				var x2=y2=0;
 				for(var y=0;y<1;y++){
 				for(var x=0;x<11;x++){
-					var left = x*52+14;
-					var top = y*52+16;
+//					var left = x*52+14;
+//					var top = y*52+16;
+					var left = x*(bWidth2+2)+16;
+					var top = y*(bHeight2+2)+16;
+					
 					ui_BottomContext.fillStyle="#AAAAAA";
-					ui_BottomContext.fillRect(left,top,48,48);
+					ui_BottomContext.fillRect(left,top,bWidth2,bHeight2);
 					left-=1;top-=1;
 					ui_BottomContext.fillStyle="#333333";
-					ui_BottomContext.fillRect(left,top,48,48);
+					ui_BottomContext.fillRect(left,top,bWidth2,bHeight2);
 					left-=1;top-=1;
 					ui_BottomContext.fillStyle="#888888";
-					ui_BottomContext.fillRect(left,top,48,48);
+					ui_BottomContext.fillRect(left,top,bWidth2,bHeight2);
 					left+=8;top+=8;
 					
 					
-					ui_BottomContext.drawImage(blockImages,x2*16,y2*16,16,16,left,top,32,32);
+					ui_BottomContext.drawImage(blockImages,x2*16,y2*16,16,16,left-3,top-3,bWidth,bHeight);
 					x2+=1;
 					if(x2>15){x2=0;y2+=1};
 				}
@@ -489,23 +499,37 @@ var rotlegright=0.025;
 				ui_CenterContext.fillRect(0,0,window.innerWidth*.50-4,4);
 				ui_CenterContext.fillRect(0,0,4,window.innerHeight*.7-4);				
 
+				var horCount = 10;
+				//if(window.innerHeight>window.innerWidth){
+				//	horCount=(((window.innerWidth*.5)-64)/48)-2;
+				//	//if(Math.random()<.1)console.log(horCount);
+				//}
+				var bWidth2 = (window.innerWidth*.50-64)/(horCount+1);
+				var bHeight2 = 48;
+				var bWidth=bWidth2*.7;
+				var bHeight=bHeight2*.7;
+				
+				/*
+				var bWidth = Math.floor(((window.innerWidth*.5)-64)/((horCount*2)));
+				var bHeight = Math.floor(((window.innerHeight*.7)-32)/((horCount*2)+6));
+				var bWidth2 = Math.floor(bWidth*1.7);
+				var bHeight2 = Math.floor(bHeight*1.7);
+				*/
 				var x2=y2=0;
 				for(var y=0;y<9;y++){
-				for(var x=0;x<10;x++){
-					var left = x*52+40;
-					var top = y*52+32;
-					ui_CenterContext.fillStyle="#AAAAAA";
-					ui_CenterContext.fillRect(left,top,48,48);
-					left-=1;top-=1;
+				for(var x=0;x<horCount;x++){
+					var left = x*(bWidth2+2)+32;
+					var top = y*(bHeight2+2)+32;
+					ui_CenterContext.fillStyle="#EEEEEE";
+					ui_CenterContext.fillRect(left+2,top+2,bWidth2,bHeight2);
 					ui_CenterContext.fillStyle="#333333";
-					ui_CenterContext.fillRect(left,top,48,48);
-					left-=1;top-=1;
+					ui_CenterContext.fillRect(left,top,bWidth2-2,bHeight2-2);
 					ui_CenterContext.fillStyle="#888888";
-					ui_CenterContext.fillRect(left,top,48,48);
+					ui_CenterContext.fillRect(left+2,top+2,bWidth2-3,bHeight2-3);
 					left+=8;top+=8;
 					
 					
-					ui_CenterContext.drawImage(blockImages,x2*16,y2*16,16,16,left,top,32,32);
+					ui_CenterContext.drawImage(blockImages,x2*16,y2*16,16,16,left-2,top-2,bWidth,bHeight);
 					x2+=1;
 					if(x2>15){x2=0;y2+=1};
 				}
