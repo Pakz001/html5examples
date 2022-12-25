@@ -259,12 +259,22 @@ var rotlegright=0.025;
 			drawingCanvas.setAttribute("hidden","hidden");
 			drawingCanvas.removeAttribute("hidden");
 
-
+			
 			// Draw somethingf in context 2
 			ui_BottomContext.fillStyle='#FF0000';
 			ui_BottomContext.fillRect(0,0,220,10);
 			*/
+			var mainSelX=mainSelY=0;
+			var barSelX=0;
 			function animate() {
+				
+				if(Math.random()<.01){
+					mainSelX = Math.floor(Math.random()*11);
+					mainSelY = Math.floor(Math.random()*7);					
+				}
+				if(Math.random()<.01){					
+					barSelX = Math.floor(Math.random()*11);					
+				}
 				// Set the canvas context to position left to 10..
 				//ui_BottomContext.canvas.style.left=""+10+"px";
 				//ui_RightTopContext.canvas.style.left=""+256+"px";
@@ -444,7 +454,7 @@ var rotlegright=0.025;
 				
 				var bWidth2 = (window.innerWidth*.50-16)/12;
 				var bHeight2 = 50;
-				var bWidth=bWidth2*.8;
+				var bWidth=bWidth2*.75;
 				var bHeight=bHeight2*.8;
 				
 				var x2=y2=0;
@@ -455,18 +465,27 @@ var rotlegright=0.025;
 					var left = x*(bWidth2+2)+16;
 					var top = y*(bHeight2+2)+16;
 					
-					ui_BottomContext.fillStyle="#AAAAAA";
+					ui_BottomContext.fillStyle="#EEEEEE";
 					ui_BottomContext.fillRect(left,top,bWidth2,bHeight2);
-					left-=1;top-=1;
+					left-=2;top-=2;
+					if(barSelX!=x){
 					ui_BottomContext.fillStyle="#333333";
-					ui_BottomContext.fillRect(left,top,bWidth2,bHeight2);
-					left-=1;top-=1;
-					ui_BottomContext.fillStyle="#888888";
-					ui_BottomContext.fillRect(left,top,bWidth2,bHeight2);
+					}else{
+					ui_BottomContext.fillStyle="#EEEEEE";
+					}
+					ui_BottomContext.fillRect(left,top,bWidth2-1,bHeight2-1);
+					left+=2;top+=2;
+					if(barSelX!=x){
+						ui_BottomContext.fillStyle="#888888";						
+					}else{
+
+						ui_BottomContext.fillStyle="#66EE66";
+					}
+					ui_BottomContext.fillRect(left,top,bWidth2-3,bHeight2-3);
 					left+=8;top+=8;
 					
 					
-					ui_BottomContext.drawImage(blockImages,x2*16,y2*16,16,16,left-3,top-3,bWidth,bHeight);
+					ui_BottomContext.drawImage(blockImages,x2*16,y2*16,16,16,left-4,top-4,bWidth,bHeight);
 					x2+=1;
 					if(x2>15){x2=0;y2+=1};
 				}
@@ -515,16 +534,26 @@ var rotlegright=0.025;
 				var bWidth2 = Math.floor(bWidth*1.7);
 				var bHeight2 = Math.floor(bHeight*1.7);
 				*/
+				
 				var x2=y2=0;
 				for(var y=0;y<9;y++){
 				for(var x=0;x<horCount;x++){
-					var left = x*(bWidth2+2)+32;
-					var top = y*(bHeight2+2)+32;
+					var left = x*(bWidth2+2)+34;
+					var top = y*(bHeight2+2)+34;
 					ui_CenterContext.fillStyle="#EEEEEE";
 					ui_CenterContext.fillRect(left+2,top+2,bWidth2,bHeight2);
-					ui_CenterContext.fillStyle="#333333";
+					if(mainSelX==x && mainSelY==y){
+						ui_CenterContext.fillStyle="#EEEEEE";
+					}else{
+						ui_CenterContext.fillStyle="#333333";
+					}
+
 					ui_CenterContext.fillRect(left,top,bWidth2-2,bHeight2-2);
-					ui_CenterContext.fillStyle="#888888";
+					if(mainSelX==x && mainSelY==y){						
+						ui_CenterContext.fillStyle="#88EE88";						
+					}else{
+						ui_CenterContext.fillStyle="#888888";
+					}
 					ui_CenterContext.fillRect(left+2,top+2,bWidth2-3,bHeight2-3);
 					left+=8;top+=8;
 					
