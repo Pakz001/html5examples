@@ -86,4 +86,4 @@ book53 - test - User Interface and Hud's.<br>
 </a>
 
 <br><br>
-note: the engine uses square blocks right now. I started a different version where there would be more types of blocks such as ramps. Adding more geometry can be done making it a more rounded engine. Not sure when that folder with code gets created and added.<br>
+note: the engine uses square blocks right now. I started a different version where there would be more types of blocks(tiles) such as ramps. This would use auto-tiling to convert the world data into the right (mesh)tiles. Adding more geometry can be done making it a more rounded engine. Not sure when that folder with code gets created and added.<br>
