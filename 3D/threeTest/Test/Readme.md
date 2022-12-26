@@ -84,3 +84,6 @@ book53 - test - User Interface and Hud's.<br>
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=IDWdGPViRdM" target="_blank">
  <img src="http://img.youtube.com/vi/IDWdGPViRdM/mqdefault.jpg" alt="Watch the video" width="460" height="260" border="2" />
 </a>
+
+<br><br>
+note: the engine uses square blocks right now. I started a different version where there would be more types of blocks such as ramps. Adding more geometry can be done making it a more rounded engine. Not sure when that folder with code gets created and added.<br>
