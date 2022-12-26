@@ -108,6 +108,7 @@ user-select:none;
 			
 			const loader = new THREE.ObjectLoader();
 
+			window.addEventListener("touchend", touchHandler,false);			
 
 			const blockImages = new Image(); // Create new img element
 			blockImages.src = "resources/flourish-cc-by-nc-sa3.png"; // Set source path
@@ -272,12 +273,19 @@ user-select:none;
 			// The selection variables. grid x and y of selected
 			// grids. Placeable blocks by these.
 			// center ui
-			var mainSelX=mainSelY=0;
+			var mainSelX=mainSelY=-1;
 			// bottom bar ui.
-			var barSelX=0;
+			var barSelX=-1;
 			// texture grid coordinates. (!)
 			var barSel = [];
-			
+
+			// Quick hack to get grid index of user interface canvas
+			// touch last pressed x and y location.
+			uiTouchLastX = -1;
+			uiTouchLastY = -1;
+			uiTouchEnd = false; // true when user interface is pressed.
+				
+			// The first few cycles we draw the user interfaces.			
 			var firstRun = 5;
 			
 			
@@ -290,16 +298,7 @@ user-select:none;
 					firstRun-=1;
 				};
 				
-				
-				//
-				// Demo - change the grid selection variables.
-				if(Math.random()<.01){
-					mainSelX = Math.floor(Math.random()*11);
-					mainSelY = Math.floor(Math.random()*7);	
-					updateUI();// Every change we update the user interface.				
-				}
-				if(Math.random()<.01){					
-					barSelX = Math.floor(Math.random()*11);					
+				if(uiTouchEnd){
 					updateUI();
 				}
 				
@@ -537,7 +536,30 @@ user-select:none;
 				var bHeight2 = 50;
 				var bWidth=bWidth2*.75;
 				var bHeight=bHeight2*.8;
-				
+
+				//
+				// Get the touch screen bottom grid
+				//				
+				if(uiTouchEnd){
+				for(var y=0;y<1;y++){
+				for(var x=0;x<11;x++){
+					var left = x*(bWidth2+2)+16;
+					var top = y*(bHeight2+2)+16;
+					// Get touch press
+					var touchX = uiTouchLastX-(window.innerWidth*.25);
+					var touchY = uiTouchLastY-(window.innerHeight-132);
+					// user interface is pressed.
+					if(uiTouchEnd===true){
+						if(touchX>left && touchY>top && touchX<left+bWidth2 && touchY<top+bHeight2){
+							uiTouchEnd=false;							
+							barSelX = x;
+						}
+					}					
+				}}}		
+
+				//
+				// Draw the bottom grid ui
+				//
 				var x2=y2=0;
 				for(var y=0;y<1;y++){
 				for(var x=0;x<11;x++){
@@ -573,6 +595,8 @@ user-select:none;
 				//
 				// Center GUI
 				//
+
+				
 				ui_CenterContext.canvas.style.top=""+48+"px";
 				ui_CenterContext.canvas.style.left=""+window.innerWidth*.25+"px";								
 				ui_CenterContext.canvas.width=window.innerWidth*.50;				
@@ -597,19 +621,45 @@ user-select:none;
 				ui_CenterContext.fillRect(0,0,window.innerWidth*.50-4,4);
 				ui_CenterContext.fillRect(0,0,4,window.innerHeight*.7-4);				
 
+				
 				var horCount = 10;
 				var bWidth2 = (window.innerWidth*.50-64)/(horCount+1);
 				var bHeight2 = 48;
 				var bWidth=bWidth2*.7;
 				var bHeight=bHeight2*.7;
+
+				//
+				// Get the touch screen grid
+				//				
+				if(uiTouchEnd){
+				for(var y=0;y<9;y++){
+				for(var x=0;x<horCount;x++){
+					var left = x*(bWidth2+2)+34;
+					var top = y*(bHeight2+2)+34;
+					// Get touch press
+					var touchX = uiTouchLastX-window.innerWidth*.25;
+					var touchY = uiTouchLastY-48;
+					// user interface is pressed.
+					if(uiTouchEnd===true){
+						if(touchX>left && touchY>top && touchX<left+bWidth2 && touchY<top+bHeight2){
+							uiTouchEnd=false;							
+							mainSelX = x;
+							mainSelY = y;
+						}
+					}					
+				}}}				
 				
 				//
 				// Draw the Center grid(No scrolling/swipe)
+				//
 				var x2=y2=0;
 				for(var y=0;y<9;y++){
 				for(var x=0;x<horCount;x++){
 					var left = x*(bWidth2+2)+34;
 					var top = y*(bHeight2+2)+34;
+					
+					
+					// Draw cell
 					ui_CenterContext.fillStyle="#EEEEEE";
 					ui_CenterContext.fillRect(left+2,top+2,bWidth2,bHeight2);
 					// Selection variable is current grid
@@ -656,7 +706,30 @@ user-select:none;
 				//if(Math.random()<.01){ui_BottomCanvas.removeAttribute("hidden");}	
 			}				
 			
-			
+	function touchHandler(e){
+		
+		
+		if(e.type=="touchend" && e.touches) {
+				for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;
+				
+				// Quick hack to get grid index of user interface canvas
+				// touch last pressed x and y location.
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+				uiTouchEnd = true;
+				
+		}
+
+
+				
+				
+		//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+	    e.preventDefault();
+		}
+	
+	}								
 			
 		</script>
 	</body>
