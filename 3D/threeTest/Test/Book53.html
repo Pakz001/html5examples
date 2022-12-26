@@ -108,7 +108,8 @@ user-select:none;
 			
 			const loader = new THREE.ObjectLoader();
 
-			window.addEventListener("touchend", touchHandler,false);			
+			window.addEventListener("touchend", touchHandler,false);	
+			window.addEventListener("resize",  touchHandler,false);
 
 			const blockImages = new Image(); // Create new img element
 			blockImages.src = "resources/flourish-cc-by-nc-sa3.png"; // Set source path
@@ -708,6 +709,7 @@ user-select:none;
 			
 	function touchHandler(e){
 		
+		if(e.type=="resize")updateUI();
 		
 		if(e.type=="touchend" && e.touches) {
 				for(var i=0;i<e.changedTouches.length;i++){	
