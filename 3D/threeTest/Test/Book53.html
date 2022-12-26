@@ -214,31 +214,35 @@ user-select:none;
 			cube.position.set(-4,3,5);
 			scene.add(cube);				
 		var mesh;
-//var loader = new THREE.ObjectLoader();
-loader.load(
-	// resource URL
-	"models/steve.json",
-
-	// onLoad callback
-	// Here the loaded data is assumed to be an object
-	function ( obj  ) {
-		// Add the loaded object to the scene
-		mesh = obj;
-		obj.scale.set(10, 10, 10);
-		obj.position.set(-4,3,15)
-		scene.add( obj );
-	},
-
-	// onProgress callback
-	function ( xhr ) {
-		//console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
-	},
-
-	// onError callback
-	function ( err ) {
-		console.error( 'An error happened' );
-	}
-	);
+		//var loader = new THREE.ObjectLoader();
+		//
+		// Load a 3d model from the internet web
+		// three.js editor. exported as a scene.
+		//
+		loader.load(
+			// resource URL
+			"models/steve.json",
+		
+			// onLoad callback
+			// Here the loaded data is assumed to be an object
+			function ( obj  ) {
+				// Add the loaded object to the scene
+				mesh = obj;
+				obj.scale.set(10, 10, 10);
+				obj.position.set(-4,3,15)
+				scene.add( obj );
+			},
+		
+			// onProgress callback
+			function ( xhr ) {
+				//console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+		
+			// onError callback
+			function ( err ) {
+				console.error( 'An error happened' );
+			}
+			);
 
 			
 	
@@ -248,11 +252,11 @@ loader.load(
 			camera.position.set( 12, 5, 100);
 
 			camera.lookAt(scene.position);
-var an=2;
-var rotarmleft=-0.02;
-var rotarmright=0.02;
-var rotlegleft=-0.025;
-var rotlegright=0.025;
+			var an=2;
+			var rotarmleft=-0.02;
+			var rotarmright=0.02;
+			var rotlegleft=-0.025;
+			var rotlegright=0.025;
 
 			/*
 			// hide and show canvas
@@ -264,329 +268,48 @@ var rotlegright=0.025;
 			ui_BottomContext.fillStyle='#FF0000';
 			ui_BottomContext.fillRect(0,0,220,10);
 			*/
+			
+			// The selection variables. grid x and y of selected
+			// grids. Placeable blocks by these.
+			// center ui
 			var mainSelX=mainSelY=0;
+			// bottom bar ui.
 			var barSelX=0;
+			// texture grid coordinates. (!)
+			var barSel = [];
+			
+			var firstRun = 5;
+			
+			
 			function animate() {
+
+				// The first few loop cycles we draw the user interface.
+				// further study into (load?)
+				if(firstRun>0){
+					updateUI();
+					firstRun-=1;
+				};
 				
+				
+				//
+				// Demo - change the grid selection variables.
 				if(Math.random()<.01){
 					mainSelX = Math.floor(Math.random()*11);
-					mainSelY = Math.floor(Math.random()*7);					
+					mainSelY = Math.floor(Math.random()*7);	
+					updateUI();// Every change we update the user interface.				
 				}
 				if(Math.random()<.01){					
 					barSelX = Math.floor(Math.random()*11);					
+					updateUI();
 				}
-				// Set the canvas context to position left to 10..
-				//ui_BottomContext.canvas.style.left=""+10+"px";
-				//ui_RightTopContext.canvas.style.left=""+256+"px";
 				
 				// Here we setup and draw the gui's
-				
-				
-				//
-				// Power armor bar
-				//
-				ui_LeftTopContext.canvas.style.top="16px";
-				ui_LeftTopContext.canvas.style.left="50px";				
-				ui_LeftTopContext.canvas.width=window.innerWidth*.170;
-				ui_LeftTopContext.canvas.height=window.innerHeight*.052;
-				ui_LeftTopContext.fillStyle="#000000";
-				ui_LeftTopContext.fillRect(0,0,window.innerWidth*.198,window.innerHeight*.052);
-				
+				//				
 
-				var left = right = 0;
-				for(var x1=0;x1<10;x1++){
-				left=x1*window.innerWidth*.20/12;
-				top=2;
-				ui_LeftTopContext.fillStyle="#FF0000";
-				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/2.5);
-				ui_LeftTopContext.fillStyle="#DDDDDD";
-				ui_LeftTopContext.fillRect(left+2,top+=2,window.innerWidth*.20/40,window.innerHeight*.05/9.5);
-
-				top+=window.innerHeight*.05/2;
-				ui_LeftTopContext.fillStyle="#666666";
-				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/2.5);				
-				ui_LeftTopContext.fillStyle="#DDDDDD";
-				ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/22.5);				
-				
-				}
-				
-				
-				//
-				// Player joystick
-				//
-				ui_LeftBottomContext.canvas.style.top=""+window.innerHeight-window.innerHeight*.30+"px";
-				ui_LeftBottomContext.canvas.style.left="32px";				
-				ui_LeftBottomContext.canvas.width=window.innerWidth*.15;
-				ui_LeftBottomContext.canvas.height=window.innerHeight*.20;
-				ui_LeftBottomContext.fillStyle="#FFFFFF";
-				ui_LeftBottomContext.fillRect(0,0,200,200);
-				
-				// bright inside
-				ui_LeftBottomContext.fillStyle="#777777";
-				ui_LeftBottomContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
-				
-				var left = 0;
-				var top = 0;
-				var w = window.innerWidth*.15/3.3;
-				var h = window.innerHeight*.20/3.3;
-				for(var y1=0;y1<3;y1++){
-				for(var x1=0;x1<3;x1++){
-				left = x1*(w+6);
-				top = y1*(h+8);
-				// dark edge bottom and right
-				ui_LeftBottomContext.fillStyle="#222222";
-				ui_LeftBottomContext.fillRect(left+w-4,top+4,4,h-8);
-				ui_LeftBottomContext.fillRect(left,top+h-4,w,4);				
-				// light edge top and left
-				ui_LeftBottomContext.fillStyle="#999999";
-				ui_LeftBottomContext.fillRect(left,top,w-4,4);
-				ui_LeftBottomContext.fillRect(left,top,4,h-4);				
-				}}
-				
-				
-				
-				
-				//
-				// Right bottom UI
-				//
-				ui_RightBottomContext.canvas.style.top=""+window.innerHeight*.7+"px";
-				ui_RightBottomContext.canvas.style.left=""+window.innerWidth*.85+"px";		
-				ui_RightBottomContext.canvas.width=window.innerWidth*.098;
-				ui_RightBottomContext.canvas.height=window.innerHeight*.134;
-				ui_RightBottomContext.fillStyle="#FFFFFF";
-				ui_RightBottomContext.font = "22px serif";								
-				ui_RightBottomContext.fillRect(0,0,200,200);
-				
-				// bright inside
-				ui_RightBottomContext.fillStyle="#777777";
-				ui_RightBottomContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
-				
-				var left = 0;
-				var top = 0;
-				var w = window.innerWidth*.15/3.3;
-				var h = window.innerHeight*.20/3.3;
-				for(var y1=0;y1<2;y1++){
-				for(var x1=0;x1<2;x1++){
-				left = x1*(w+8);
-				top = y1*(h+8);
-				// dark edge bottom and right
-				ui_RightBottomContext.fillStyle="#222222";
-				ui_RightBottomContext.fillRect(left+w-4,top+4,4,h-8);
-				ui_RightBottomContext.fillRect(left,top+h-4,w,4);				
-				// light edge top and left
-				ui_RightBottomContext.fillStyle="#999999";
-				ui_RightBottomContext.fillRect(left,top,w-4,4);
-				ui_RightBottomContext.fillRect(left,top,4,h-4);		
-				ui_RightBottomContext.fillStyle="#DDDDDD";
-				var s="Jp";
-				if(x1==1 && y1==0){s="Dk"};
-				if(y1==1){s=".."};
-				
-				ui_RightBottomContext.fillText(s,left+8,top+32);
-			}}
-
-
-				
-				
-				//
-				// Right Top UI
-				//
-				
-				ui_RightTopContext.canvas.style.top="16px";
-				ui_RightTopContext.canvas.style.left=""+window.innerWidth*.85+"px";				
-				ui_RightTopContext.canvas.width=window.innerWidth*.1;
-				ui_RightTopContext.canvas.height=48;
-				ui_RightTopContext.fillStyle="#0000FF";
-				ui_RightTopContext.fillRect(0,0,200,200);
-				// bright inside
-				ui_RightTopContext.fillStyle="#777777";
-				ui_RightTopContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
-				//ui_RightTopContext.font = "32px serif";				
-				ui_RightTopContext.font = "26px serif";				
-				//if(Math.random()<.01)console.log(""+Math.floor(window.innerHeight/25)+"px serif");				
-				var left = 0;
-				var top = 0;
-				var w = window.innerWidth*.15/3.3;
-				var h = window.innerHeight*.20/3.3;
-				for(var y1=0;y1<2;y1++){
-				for(var x1=0;x1<2;x1++){
-				left = x1*(w+8);
-				top = y1*(h+8);
-				// dark edge bottom and right
-				ui_RightTopContext.fillStyle="#222222";
-				ui_RightTopContext.fillRect(left+w-4,top+4,4,h-8);
-				ui_RightTopContext.fillRect(left,top+h-4,w,4);				
-				// light edge top and left
-				ui_RightTopContext.fillStyle="#999999";
-				ui_RightTopContext.fillRect(left,top,w-4,4);
-				ui_RightTopContext.fillRect(left,top,4,h-4);				
-				ui_RightTopContext.fillStyle="#DDDDDD";
-				var s="M";
-				if(x1==1){s="In"};
-				ui_RightTopContext.fillText(s,left+(w/5),top-(h/1.9));
-				}}				
-				
-				
-				// Bottom UI
-				//
-				//
-				ui_BottomContext.canvas.width=window.innerWidth*.50;				
-				ui_BottomContext.canvas.style.top=""+window.innerHeight-132+"px";
-				ui_BottomContext.canvas.style.left=""+window.innerWidth*.25+"px";				
-				ui_BottomContext.canvas.height=80;
-
-				// bright inside
-				ui_BottomContext.fillStyle="#AAAAAA";
-				ui_BottomContext.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
-				
-				// dark inside
-				ui_BottomContext.fillStyle="#444444";
-				ui_BottomContext.fillRect(8,8,window.innerWidth*.5-16,80-16);
-
-				// dark edge bottom and right
-				ui_BottomContext.fillStyle="#222222";
-				ui_BottomContext.fillRect(window.innerWidth*.50-4,4,4,80-8);
-				ui_BottomContext.fillRect(0,80-4,window.innerWidth*.5,4);				
-				// light edge top and left
-				ui_BottomContext.fillStyle="#EEEEEE";
-				ui_BottomContext.fillRect(0,0,window.innerWidth*.50-4,4);
-				ui_BottomContext.fillRect(0,0,4,80-4);				
-				
-				var bWidth2 = (window.innerWidth*.50-16)/12;
-				var bHeight2 = 50;
-				var bWidth=bWidth2*.75;
-				var bHeight=bHeight2*.8;
-				
-				var x2=y2=0;
-				for(var y=0;y<1;y++){
-				for(var x=0;x<11;x++){
-//					var left = x*52+14;
-//					var top = y*52+16;
-					var left = x*(bWidth2+2)+16;
-					var top = y*(bHeight2+2)+16;
-					
-					ui_BottomContext.fillStyle="#EEEEEE";
-					ui_BottomContext.fillRect(left,top,bWidth2,bHeight2);
-					left-=2;top-=2;
-					if(barSelX!=x){
-					ui_BottomContext.fillStyle="#333333";
-					}else{
-					ui_BottomContext.fillStyle="#EEEEEE";
-					}
-					ui_BottomContext.fillRect(left,top,bWidth2-1,bHeight2-1);
-					left+=2;top+=2;
-					if(barSelX!=x){
-						ui_BottomContext.fillStyle="#888888";						
-					}else{
-
-						ui_BottomContext.fillStyle="#66EE66";
-					}
-					ui_BottomContext.fillRect(left,top,bWidth2-3,bHeight2-3);
-					left+=8;top+=8;
-					
-					
-					ui_BottomContext.drawImage(blockImages,x2*16,y2*16,16,16,left-4,top-4,bWidth,bHeight);
-					x2+=1;
-					if(x2>15){x2=0;y2+=1};
-				}
-			}
-			
-				//
-				// Center GUI
-				//
-				ui_CenterContext.canvas.style.top=""+48+"px";
-				ui_CenterContext.canvas.style.left=""+window.innerWidth*.25+"px";								
-				ui_CenterContext.canvas.width=window.innerWidth*.50;				
-				ui_CenterContext.canvas.height=window.innerHeight*.7;
-				
-				// bright inside
-				ui_CenterContext.fillStyle="#AAAAAA";
-				ui_CenterContext.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
-
-				// dark inside				
-				ui_CenterContext.fillStyle="#444444";
-				ui_CenterContext.fillRect(32,16,window.innerWidth*.5-64,window.innerHeight*.7-32);
-
-				
-				
-				// dark edge bottom and right
-				ui_CenterContext.fillStyle="#222222";
-				ui_CenterContext.fillRect(window.innerWidth*.50-4,4,4,window.innerHeight*.7-4);
-				ui_CenterContext.fillRect(0,window.innerHeight*.7-4,window.innerWidth*.5-4,4);				
-				// light edge top and left
-				ui_CenterContext.fillStyle="#EEEEEE";
-				ui_CenterContext.fillRect(0,0,window.innerWidth*.50-4,4);
-				ui_CenterContext.fillRect(0,0,4,window.innerHeight*.7-4);				
-
-				var horCount = 10;
-				//if(window.innerHeight>window.innerWidth){
-				//	horCount=(((window.innerWidth*.5)-64)/48)-2;
-				//	//if(Math.random()<.1)console.log(horCount);
-				//}
-				var bWidth2 = (window.innerWidth*.50-64)/(horCount+1);
-				var bHeight2 = 48;
-				var bWidth=bWidth2*.7;
-				var bHeight=bHeight2*.7;
-				
-				/*
-				var bWidth = Math.floor(((window.innerWidth*.5)-64)/((horCount*2)));
-				var bHeight = Math.floor(((window.innerHeight*.7)-32)/((horCount*2)+6));
-				var bWidth2 = Math.floor(bWidth*1.7);
-				var bHeight2 = Math.floor(bHeight*1.7);
-				*/
-				
-				var x2=y2=0;
-				for(var y=0;y<9;y++){
-				for(var x=0;x<horCount;x++){
-					var left = x*(bWidth2+2)+34;
-					var top = y*(bHeight2+2)+34;
-					ui_CenterContext.fillStyle="#EEEEEE";
-					ui_CenterContext.fillRect(left+2,top+2,bWidth2,bHeight2);
-					if(mainSelX==x && mainSelY==y){
-						ui_CenterContext.fillStyle="#EEEEEE";
-					}else{
-						ui_CenterContext.fillStyle="#333333";
-					}
-
-					ui_CenterContext.fillRect(left,top,bWidth2-2,bHeight2-2);
-					if(mainSelX==x && mainSelY==y){						
-						ui_CenterContext.fillStyle="#88EE88";						
-					}else{
-						ui_CenterContext.fillStyle="#888888";
-					}
-					ui_CenterContext.fillRect(left+2,top+2,bWidth2-3,bHeight2-3);
-					left+=8;top+=8;
-					
-					
-					ui_CenterContext.drawImage(blockImages,x2*16,y2*16,16,16,left-2,top-2,bWidth,bHeight);
-					x2+=1;
-					if(x2>15){x2=0;y2+=1};
-				}
-				}
-
-				// Javascript html5 does not have a scissor feature as far as I am aware.
-				// To be able to scroll a part of a canvas I here copy a part of the canvas
-				// on a lower part(scrollign. down) and draw this higher. This for smooth
-				// scrolling....	ui_CenterContext.drawImage(ui_CenterCanvas,40,50,window.innerWidth*.5-40,100,40,32,window.innerWidth*.5-40,100);
-				
-				//if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
-				//if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}
-				//if(Math.random()<.01){ui_RightTopCanvas.setAttribute("hidden","hidden");}
-				//if(Math.random()<.01){ui_RightTopCanvas.removeAttribute("hidden");}				
-				//if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
-				//if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}	
-				//if(Math.random()<.01){ui_RightBottomCanvas.setAttribute("hidden","hidden");}
-				//if(Math.random()<.01){ui_RightBottomCanvas.removeAttribute("hidden");}				
-				//if(Math.random()<.01){ui_LeftBottomCanvas.setAttribute("hidden","hidden");}
-				//if(Math.random()<.01){ui_LeftBottomCanvas.removeAttribute("hidden");}	
-				//if(Math.random()<.01){ui_CenterCanvas.setAttribute("hidden","hidden");}
-				//if(Math.random()<.01){ui_CenterCanvas.removeAttribute("hidden");}	
-				//if(Math.random()<.01){ui_BottomCanvas.setAttribute("hidden","hidden");}
-				//if(Math.random()<.01){ui_BottomCanvas.removeAttribute("hidden");}					
 				requestAnimationFrame( animate );
 				
 		
-		//	an+=0.1
+				//	an+=0.1
 			    if(mesh!=null){
 					mesh.children[5].material.color.setHex( 0xff0000 );
 					
@@ -629,10 +352,309 @@ var rotlegright=0.025;
 					if (mesh.children[2].rotation.x > Math.PI*1.3 || mesh.children[2].rotation.x < Math.PI*.7) rotlegright *= -1;
 					}		
 				renderer.render( scene, camera );
+				
 			};
 
 			animate();
 			
+
+			//
+			// The user interface. Updates every ui canvas. Needs to be linked
+			// with touch/mouse/keyboard/joysticks.
+			// Update with - swipe scrolling and further (game) designs.
+			//	
+			function updateUI(){	
+				//
+				// Power armor bar
+				//
+				ui_LeftTopContext.canvas.style.top="16px";
+				ui_LeftTopContext.canvas.style.left="50px";				
+				ui_LeftTopContext.canvas.width=window.innerWidth*.170;
+				ui_LeftTopContext.canvas.height=window.innerHeight*.052;
+				ui_LeftTopContext.fillStyle="#000000";
+				ui_LeftTopContext.fillRect(0,0,window.innerWidth*.198,window.innerHeight*.052);
+				
+
+				var left = right = 0;
+				for(var x1=0;x1<10;x1++){
+					left=x1*window.innerWidth*.20/12;
+					top=2;
+					ui_LeftTopContext.fillStyle="#FF0000";
+					ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/2.5);
+					ui_LeftTopContext.fillStyle="#DDDDDD";
+					ui_LeftTopContext.fillRect(left+2,top+=2,window.innerWidth*.20/40,window.innerHeight*.05/9.5);
+	
+					top+=window.innerHeight*.05/2;
+					ui_LeftTopContext.fillStyle="#666666";
+					ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/2.5);				
+					ui_LeftTopContext.fillStyle="#DDDDDD";
+					ui_LeftTopContext.fillRect(left,top,window.innerWidth*.20/13,window.innerHeight*.05/22.5);			
+				}
+				
+				
+				//
+				// Player joystick
+				//
+				ui_LeftBottomContext.canvas.style.top=""+window.innerHeight-window.innerHeight*.30+"px";
+				ui_LeftBottomContext.canvas.style.left="32px";				
+				ui_LeftBottomContext.canvas.width=window.innerWidth*.15;
+				ui_LeftBottomContext.canvas.height=window.innerHeight*.20;
+				ui_LeftBottomContext.fillStyle="#FFFFFF";
+				ui_LeftBottomContext.fillRect(0,0,200,200);
+				
+				// bright inside
+				ui_LeftBottomContext.fillStyle="#777777";
+				ui_LeftBottomContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
+				
+				var left = 0;
+				var top = 0;
+				var w = window.innerWidth*.15/3.3;
+				var h = window.innerHeight*.20/3.3;
+				for(var y1=0;y1<3;y1++){
+				for(var x1=0;x1<3;x1++){
+					left = x1*(w+6);
+					top = y1*(h+8);
+					// dark edge bottom and right
+					ui_LeftBottomContext.fillStyle="#222222";
+					ui_LeftBottomContext.fillRect(left+w-4,top+4,4,h-8);
+					ui_LeftBottomContext.fillRect(left,top+h-4,w,4);				
+					// light edge top and left
+					ui_LeftBottomContext.fillStyle="#999999";
+					ui_LeftBottomContext.fillRect(left,top,w-4,4);
+					ui_LeftBottomContext.fillRect(left,top,4,h-4);				
+				}}
+				
+				
+				
+				
+				//
+				// Right bottom UI
+				//
+				ui_RightBottomContext.canvas.style.top=""+window.innerHeight*.7+"px";
+				ui_RightBottomContext.canvas.style.left=""+window.innerWidth*.85+"px";		
+				ui_RightBottomContext.canvas.width=window.innerWidth*.098;
+				ui_RightBottomContext.canvas.height=window.innerHeight*.134;
+				ui_RightBottomContext.fillStyle="#FFFFFF";
+				ui_RightBottomContext.font = "22px serif";								
+				ui_RightBottomContext.fillRect(0,0,200,200);
+				
+				// bright inside
+				ui_RightBottomContext.fillStyle="#777777";
+				ui_RightBottomContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
+				
+				var left = 0;
+				var top = 0;
+				var w = window.innerWidth*.15/3.3;
+				var h = window.innerHeight*.20/3.3;
+				for(var y1=0;y1<2;y1++){
+				for(var x1=0;x1<2;x1++){
+					left = x1*(w+8);
+					top = y1*(h+8);
+					// dark edge bottom and right
+					ui_RightBottomContext.fillStyle="#222222";
+					ui_RightBottomContext.fillRect(left+w-4,top+4,4,h-8);
+					ui_RightBottomContext.fillRect(left,top+h-4,w,4);				
+					// light edge top and left
+					ui_RightBottomContext.fillStyle="#999999";
+					ui_RightBottomContext.fillRect(left,top,w-4,4);
+					ui_RightBottomContext.fillRect(left,top,4,h-4);		
+					ui_RightBottomContext.fillStyle="#DDDDDD";
+					var s="Jp";
+					if(x1==1 && y1==0){s="Dk"};
+					if(y1==1){s=".."};
+					
+					ui_RightBottomContext.fillText(s,left+8,top+32);
+				}}
+
+
+				
+				
+				//
+				// Right Top UI
+				//
+				
+				ui_RightTopContext.canvas.style.top="16px";
+				ui_RightTopContext.canvas.style.left=""+window.innerWidth*.85+"px";				
+				ui_RightTopContext.canvas.width=window.innerWidth*.1;
+				ui_RightTopContext.canvas.height=48;
+				ui_RightTopContext.fillStyle="#0000FF";
+				ui_RightTopContext.fillRect(0,0,200,200);
+				// bright inside
+				ui_RightTopContext.fillStyle="#777777";
+				ui_RightTopContext.fillRect(0,0,window.innerWidth*.15,window.innerHeight*.20);
+				//ui_RightTopContext.font = "32px serif";				
+				ui_RightTopContext.font = "26px serif";				
+				//if(Math.random()<.01)console.log(""+Math.floor(window.innerHeight/25)+"px serif");				
+				var left = 0;
+				var top = 0;
+				var w = window.innerWidth*.15/3.3;
+				var h = window.innerHeight*.20/3.3;
+				for(var y1=0;y1<2;y1++){
+				for(var x1=0;x1<2;x1++){
+					left = x1*(w+8);
+					top = y1*(h+8);
+					// dark edge bottom and right
+					ui_RightTopContext.fillStyle="#222222";
+					ui_RightTopContext.fillRect(left+w-4,top+4,4,h-8);
+					ui_RightTopContext.fillRect(left,top+h-4,w,4);				
+					// light edge top and left
+					ui_RightTopContext.fillStyle="#999999";
+					ui_RightTopContext.fillRect(left,top,w-4,4);
+					ui_RightTopContext.fillRect(left,top,4,h-4);				
+					ui_RightTopContext.fillStyle="#DDDDDD";
+					var s="M";
+					if(x1==1){s="In"};
+					ui_RightTopContext.fillText(s,left+(w/5),top-(h/1.9));
+				}}				
+				
+				
+				// Bottom UI
+				//
+				//
+				ui_BottomContext.canvas.width=window.innerWidth*.50;				
+				ui_BottomContext.canvas.style.top=""+window.innerHeight-132+"px";
+				ui_BottomContext.canvas.style.left=""+window.innerWidth*.25+"px";				
+				ui_BottomContext.canvas.height=80;
+
+				// bright inside
+				ui_BottomContext.fillStyle="#AAAAAA";
+				ui_BottomContext.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
+				
+				// dark inside
+				ui_BottomContext.fillStyle="#444444";
+				ui_BottomContext.fillRect(8,8,window.innerWidth*.5-16,80-16);
+
+				// dark edge bottom and right
+				ui_BottomContext.fillStyle="#222222";
+				ui_BottomContext.fillRect(window.innerWidth*.50-4,4,4,80-8);
+				ui_BottomContext.fillRect(0,80-4,window.innerWidth*.5,4);				
+				// light edge top and left
+				ui_BottomContext.fillStyle="#EEEEEE";
+				ui_BottomContext.fillRect(0,0,window.innerWidth*.50-4,4);
+				ui_BottomContext.fillRect(0,0,4,80-4);				
+				
+				var bWidth2 = (window.innerWidth*.50-16)/12;
+				var bHeight2 = 50;
+				var bWidth=bWidth2*.75;
+				var bHeight=bHeight2*.8;
+				
+				var x2=y2=0;
+				for(var y=0;y<1;y++){
+				for(var x=0;x<11;x++){
+					var left = x*(bWidth2+2)+16;
+					var top = y*(bHeight2+2)+16;
+					
+					ui_BottomContext.fillStyle="#EEEEEE";
+					ui_BottomContext.fillRect(left,top,bWidth2,bHeight2);
+					left-=2;top-=2;
+					// If selection is current
+					if(barSelX!=x){
+						ui_BottomContext.fillStyle="#333333";
+					}else{
+						ui_BottomContext.fillStyle="#EEEEEE";
+					}
+					ui_BottomContext.fillRect(left,top,bWidth2-1,bHeight2-1);
+					left+=2;top+=2;
+					// If selection is current
+					if(barSelX!=x){
+						ui_BottomContext.fillStyle="#888888";						
+					}else{
+						ui_BottomContext.fillStyle="#66EE66";
+					}
+					ui_BottomContext.fillRect(left,top,bWidth2-3,bHeight2-3);
+					left+=8;top+=8;
+					// Draw the	texture image
+					ui_BottomContext.drawImage(blockImages,x2*16,y2*16,16,16,left-4,top-4,bWidth,bHeight);
+					x2+=1;
+					if(x2>15){x2=0;y2+=1};
+				}
+				}
+			
+				//
+				// Center GUI
+				//
+				ui_CenterContext.canvas.style.top=""+48+"px";
+				ui_CenterContext.canvas.style.left=""+window.innerWidth*.25+"px";								
+				ui_CenterContext.canvas.width=window.innerWidth*.50;				
+				ui_CenterContext.canvas.height=window.innerHeight*.7;
+				
+				// bright inside
+				ui_CenterContext.fillStyle="#AAAAAA";
+				ui_CenterContext.fillRect(0,0,window.innerWidth*.5,window.innerHeight*.7);
+
+				// dark inside				
+				ui_CenterContext.fillStyle="#444444";
+				ui_CenterContext.fillRect(32,16,window.innerWidth*.5-64,window.innerHeight*.7-32);
+
+				
+				
+				// dark edge bottom and right
+				ui_CenterContext.fillStyle="#222222";
+				ui_CenterContext.fillRect(window.innerWidth*.50-4,4,4,window.innerHeight*.7-4);
+				ui_CenterContext.fillRect(0,window.innerHeight*.7-4,window.innerWidth*.5-4,4);				
+				// light edge top and left
+				ui_CenterContext.fillStyle="#EEEEEE";
+				ui_CenterContext.fillRect(0,0,window.innerWidth*.50-4,4);
+				ui_CenterContext.fillRect(0,0,4,window.innerHeight*.7-4);				
+
+				var horCount = 10;
+				var bWidth2 = (window.innerWidth*.50-64)/(horCount+1);
+				var bHeight2 = 48;
+				var bWidth=bWidth2*.7;
+				var bHeight=bHeight2*.7;
+				
+				//
+				// Draw the Center grid(No scrolling/swipe)
+				var x2=y2=0;
+				for(var y=0;y<9;y++){
+				for(var x=0;x<horCount;x++){
+					var left = x*(bWidth2+2)+34;
+					var top = y*(bHeight2+2)+34;
+					ui_CenterContext.fillStyle="#EEEEEE";
+					ui_CenterContext.fillRect(left+2,top+2,bWidth2,bHeight2);
+					// Selection variable is current grid
+					if(mainSelX==x && mainSelY==y){
+						ui_CenterContext.fillStyle="#EEEEEE";//selection color
+					}else{
+						ui_CenterContext.fillStyle="#333333";
+					}
+
+					ui_CenterContext.fillRect(left,top,bWidth2-2,bHeight2-2);
+					// Selection variables are current
+					if(mainSelX==x && mainSelY==y){						
+						ui_CenterContext.fillStyle="#88EE88";//selection color						
+					}else{
+						ui_CenterContext.fillStyle="#888888";
+					}
+					ui_CenterContext.fillRect(left+2,top+2,bWidth2-3,bHeight2-3);
+					left+=8;top+=8;
+					// Draw the texture image
+					ui_CenterContext.drawImage(blockImages,x2*16,y2*16,16,16,left-2,top-2,bWidth,bHeight);
+					x2+=1;
+					if(x2>15){x2=0;y2+=1};
+				}
+				}
+
+				// Javascript html5 does not have a scissor feature as far as I am aware.
+				// To be able to scroll a part of a canvas I here copy a part of the canvas
+				// on a lower part(scrollign. down) and draw this higher. This for smooth
+				// scrolling....	ui_CenterContext.drawImage(ui_CenterCanvas,40,50,window.innerWidth*.5-40,100,40,32,window.innerWidth*.5-40,100);
+				
+				//if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}
+				//if(Math.random()<.01){ui_RightTopCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_RightTopCanvas.removeAttribute("hidden");}				
+				//if(Math.random()<.01){ui_LeftTopCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_LeftTopCanvas.removeAttribute("hidden");}	
+				//if(Math.random()<.01){ui_RightBottomCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_RightBottomCanvas.removeAttribute("hidden");}				
+				//if(Math.random()<.01){ui_LeftBottomCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_LeftBottomCanvas.removeAttribute("hidden");}	
+				//if(Math.random()<.01){ui_CenterCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_CenterCanvas.removeAttribute("hidden");}	
+				//if(Math.random()<.01){ui_BottomCanvas.setAttribute("hidden","hidden");}
+				//if(Math.random()<.01){ui_BottomCanvas.removeAttribute("hidden");}	
+			}				
 			
 			
 			
