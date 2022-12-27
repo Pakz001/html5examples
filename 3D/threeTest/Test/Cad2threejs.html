@@ -14,6 +14,10 @@
 			user-select:none;
 			-webkit-tap-highlight-color:rgba(0,0,0,0);
 			}
+			.center {
+				margin-left: auto;
+				margin-right: auto;
+			}			
 			#ui-page1 {
 				position: absolute;
 				background-color: #000000;
@@ -29,7 +33,7 @@
 				position: absolute;
 				background-color: #000000;
 				top: 60%;
-				height: 29%;
+				height: 25%;
 				width:49%;
 				left: 0%;
 				z-index: 3000;
@@ -51,7 +55,7 @@
 				position: absolute;
 				background-color: #000000;
 				top: 60%;
-				height: 29%;
+				height: 25%;
 				width:49%;
 				left: 50%;
 				z-index: 3000;
@@ -66,7 +70,8 @@
 		<canvas id="ui-page2" height="128" width="128"></canvas>			
 		<canvas id="ui-page3" height="128" width="128"></canvas>			
 		<canvas id="ui-page4" height="128" width="128"></canvas>			
-		<table>
+
+		<table class="center">
 		    <tr>
         		<td id="some_id"></td>
 				<td>
@@ -75,7 +80,8 @@
 		
 				</td>
  		   </tr>
-	   </table>		
+	   	</table>	
+
 	   
 		<script src="js/three.js"></script>
 		<script>
