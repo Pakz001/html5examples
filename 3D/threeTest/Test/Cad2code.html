@@ -89,6 +89,9 @@
         		<td id="some_id"></td>
 				<td>
 					<textarea id="output" name="output" rows="14" cols="50">Valid theejs html/javascript code wil be placed here based on the cad data in the below editing windows. Copy and paste into html file or html editor. requires three.js include for complete examples. Code wil also be generated with only the model. (Todo:design/test)
+						Controls :
+						Touch/press to activate window. Then :
+						W/S/A/D to move vertice. Z to tab through vertices.
 					</textarea>
 		
 				</td>
@@ -115,7 +118,7 @@
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth/4, window.innerHeight/4 );
 			renderer.shadowMap.Enabled=true;
-
+			scene.background = new THREE.Color( 0x001133);
 			
 			
 			camera.position.z = 60;
@@ -130,15 +133,17 @@
 			window.addEventListener('keyup', control, false);		
 			//var cube = new THREE.Mesh(geometry, material);
 			
-				var quad_vertices =
-				[
-				-30.0,  30.0, 0.0,
-				30.0,  30.0, 0.0,
-				30.0, -30.0, 0.0,
-				-30.0, -30.0, 0.0
-				];
+			// Our scene's vertices array - used to build and rebuild and
+			// edit the scene through the editor.
+			var quad_vertices =
+			[
+			-30.0,  30.0, 0.0,
+			30.0,  30.0, 0.0,
+			30.0, -30.0, 0.0,
+			-30.0, -30.0, 0.0
+			];
 				
-			
+			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
 			
 			
 			
@@ -149,7 +154,7 @@
 			var cube = makeMesh01();
 			//add the object to scene
 			scene.add(cube);
-			var ambient = new THREE.AmbientLight( 0xffffff, 4 );
+			var ambient = new THREE.AmbientLight( 0xffffff, 2 );
 			
 			scene.add( ambient );
 
@@ -169,6 +174,9 @@
 			drawRight(ui_Page3Context);
 
 			
+			// 
+			// Method to add text to text area
+			//
 			//<textarea id="myTextArea" rows="10" cols="20" name="work">
 			var a="";
 
@@ -176,7 +184,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 
 			a+="hello";
 
-			document.getElementById("output").value=a;
+			//document.getElementById("output").value=a;
 			
 			function animate() {
 				requestAnimationFrame(animate);				
@@ -190,7 +198,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				renderer.render( scene, camera );
 			}	
 			animate();	
-			// draw top cad view..
+			// draw top cad view.. note opengl style coordinates - up=down(stranger things)
 			function drawTop(c){
 				c.clearRect(0,0,c.canvas.width,c.canvas.height);
 				c.font = "12px serif";
@@ -205,6 +213,18 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				for(var y=0;y<c.canvas.height;y+=2){
 					c.fillRect(c.canvas.width/2,y,1,1);
 				}
+				var vx = [];
+				var vy = [];
+				vx.push(quad_vertices[0]+c.canvas.width/2);
+				vy.push(quad_vertices[2]+c.canvas.height/2);
+				vx.push(quad_vertices[3]+c.canvas.width/2);
+				vy.push(quad_vertices[5]+c.canvas.height/2);
+				vx.push(quad_vertices[6]+c.canvas.width/2);
+				vy.push(quad_vertices[8]+c.canvas.height/2);
+				vx.push(quad_vertices[9]+c.canvas.width/2);
+				vy.push(quad_vertices[11]+c.canvas.height/2);
+				
+				/*
 				x1 = quad_vertices[0]+c.canvas.width/2;
 				y1 = quad_vertices[2]+c.canvas.height/2;
 				x2 = quad_vertices[3]+c.canvas.width/2;
@@ -213,14 +233,28 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				y3 = quad_vertices[8]+c.canvas.height/2;
 				x4 = quad_vertices[9]+c.canvas.width/2;
 				y4 = quad_vertices[11]+c.canvas.height/2;
+				*/
 				
-				c.fillStyle="#FFFFFF";
+				// Draw the points in the cad canvas
+				//c.fillStyle="#FFFFFF";
+				for(var i=0;i<vx.length;i++){
+					if(i==activeVertice){
+						c.fillStyle="#AAAA00";
+						c.fillRect(vx[i]-3,vy[i]-3,6,6);						
+						c.fillStyle="#FFFF00";
+					}else{
+						c.fillStyle="#FFFFFF";
+					}					
+					c.fillRect(vx[i]-2,vy[i]-2,4,4);
+				}
+				/*
 				c.fillRect(x1,y1,5,5);
 				c.fillRect(x2,y2,5,5);
 				c.fillRect(x3,y3,5,5);
 				c.fillRect(x4,y4,5,5);
-				
+				*/
 			}
+			// draw front side cad view - note opengl coordinates			
 			function drawFront(c){
 				c.clearRect(0,0,c.canvas.width,c.canvas.height);				
 				c.font = "12px serif";
@@ -236,6 +270,18 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 					c.fillRect(c.canvas.width/2,y,1,1);
 				}
 
+				var vx = [];
+				var vy = [];
+				vx.push(quad_vertices[0]+c.canvas.width/2);
+				vy.push(quad_vertices[1]+c.canvas.height/2);
+				vx.push(quad_vertices[3]+c.canvas.width/2);
+				vy.push(quad_vertices[4]+c.canvas.height/2);
+				vx.push(quad_vertices[6]+c.canvas.width/2);
+				vy.push(quad_vertices[7]+c.canvas.height/2);
+				vx.push(quad_vertices[9]+c.canvas.width/2);
+				vy.push(quad_vertices[10]+c.canvas.height/2);
+				
+				/*
 				x1 = quad_vertices[0]+c.canvas.width/2;
 				y1 = quad_vertices[1]+c.canvas.height/2;
 				x2 = quad_vertices[3]+c.canvas.width/2;
@@ -244,17 +290,29 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				y3 = quad_vertices[7]+c.canvas.height/2;
 				x4 = quad_vertices[9]+c.canvas.width/2;
 				y4 = quad_vertices[10]+c.canvas.height/2;
+				*/
 				
-				
-				
-				c.fillStyle="#FFFFFF";
+				// Draw the points in the cad canvas
+				//c.fillStyle="#FFFFFF";
+				for(var i=0;i<vx.length;i++){
+					if(i==activeVertice){
+						c.fillStyle="#AAAA00";
+						c.fillRect(vx[i]-3,vy[i]-3,6,6);						
+						c.fillStyle="#FFFF00";
+					}else{
+						c.fillStyle="#FFFFFF";
+					}					
+					c.fillRect(vx[i]-2,vy[i]-2,4,4);									
+				}
+				/*
 				c.fillRect(x1,y1,5,5);
 				c.fillRect(x2,y2,5,5);
 				c.fillRect(x3,y3,5,5);
 				c.fillRect(x4,y4,5,5);
-				
+				*/
 				
 			}
+			// draw right side cad view - note opengl coordinates
 			function drawRight(c){
 				c.clearRect(0,0,c.canvas.width,c.canvas.height);				
 				c.font = "12px serif";
@@ -269,6 +327,18 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				for(var y=0;y<c.canvas.height;y+=2){
 					c.fillRect(c.canvas.width/2,y,1,1);
 				}
+				var vx = [];
+				var vy = [];
+				vx.push(quad_vertices[2]+c.canvas.width/2);
+				vy.push(quad_vertices[1]+c.canvas.height/2);
+				vx.push(quad_vertices[5]+c.canvas.width/2);
+				vy.push(quad_vertices[4]+c.canvas.height/2);
+				vx.push(quad_vertices[8]+c.canvas.width/2);
+				vy.push(quad_vertices[7]+c.canvas.height/2);
+				vx.push(quad_vertices[11]+c.canvas.width/2);
+				vy.push(quad_vertices[10]+c.canvas.height/2);
+				
+				/*
 				x1 = quad_vertices[2]+c.canvas.width/2;
 				y1 = quad_vertices[1]+c.canvas.height/2;
 				x2 = quad_vertices[5]+c.canvas.width/2;
@@ -277,13 +347,25 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				y3 = quad_vertices[7]+c.canvas.height/2;
 				x4 = quad_vertices[11]+c.canvas.width/2;
 				y4 = quad_vertices[10]+c.canvas.height/2;
+				*/
+				// Draw the points in the cad canvas
 				
-				c.fillStyle="#FFFFFF";
+				for(var i=0;i<vx.length;i++){
+					if(i==activeVertice){
+						c.fillStyle="#AAAA00";
+						c.fillRect(vx[i]-3,vy[i]-3,6,6);						
+						c.fillStyle="#FFFF00";
+					}else{
+						c.fillStyle="#FFFFFF";
+					}
+					c.fillRect(vx[i]-2,vy[i]-2,4,4);
+				}
+				/*
 				c.fillRect(x1,y1,5,5);
 				c.fillRect(x2,y2,5,5);
 				c.fillRect(x3,y3,5,5);
 				c.fillRect(x4,y4,5,5);
-				
+				*/
 			}
 			
 			function makeMesh01(){
@@ -311,7 +393,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				1.0, 1.0,
 				0.0, 1.0
 				];
-				quad_uvs = addquaduvs(2,3);
+				quad_uvs = addquaduvs(9,3);
 				
 				var quad_indices =
 				[
@@ -335,7 +417,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
 				
-				let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-saLight.png');
+				let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa3.png');
 				//sprite.minFilter = THREE.NearestFilter;
 				sprite.minFilter = THREE.NearestFilter;
 				sprite.magFilter = THREE.NearestFilter;
@@ -361,7 +443,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 			function addquaduvs(x,y){
  				const tileSize = 16.0;
  				const tileTextureWidth = 256.0;
- 	 			const tileTextureHeight = 128.0;
+ 	 			const tileTextureHeight = 64.0;
   
 				var x1=x,y1=y;
 				var x2=x1+1;
@@ -388,25 +470,51 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 			function control(e){
 
 				if(e.type=="keyup"){
-			
-					//console.log(e.code);
 					
+					// Disable line below to see key code pressed
+					//console.log(e.code);
+					// if pressed w key then move vertice up on screen. down on canvas.
+					var av = Math.floor(activeVertice*3);
 					if(e.code==="KeyW"){
 						//console.log("a");	
-						quad_vertices[1]+=10;
-						scene.remove(cube);
-						cube = makeMesh01();
-						scene.add(cube);
-						drawTop(ui_Page1Context);			
-						drawFront(ui_Page2Context);			
-						drawRight(ui_Page3Context);			
-			
+						quad_vertices[av+1]+=10;
+						
 					}
-			
+					if(e.code==="KeyS"){
+						//console.log("a");	
+						quad_vertices[av+1]-=10;
+						
+					}
+					if(e.code==="KeyA"){
+						//console.log("a");	
+						quad_vertices[av]+=10;
+						
+					}
+					if(e.code==="KeyD"){
+						//console.log("a");	
+						quad_vertices[av]-=10;
+						
+					}					
+					if(e.code==="KeyZ"){
+						//console.log("a");	
+						activeVertice++;
+						if(activeVertice>=Math.floor(quad_vertices.length/3))activeVertice=0;
+						
+					}
+					
+					
+					// update mesh
+					scene.remove(cube);
+					cube = makeMesh01();
+					scene.add(cube);
+					drawTop(ui_Page1Context);			
+					drawFront(ui_Page2Context);			
+					drawRight(ui_Page3Context);			
+						
 					e.preventDefault();
 			}				
 		}
 			
 		</script>
 	</body>
-</html>			
+	</html>			
