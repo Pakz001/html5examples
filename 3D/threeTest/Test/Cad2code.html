@@ -2,9 +2,10 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>My first three.js app</title>
+		<title>Cad2Code</title>
 		<style>
 		body {
+			background-color: #112277;			
 			touch-action: none;
 			-webkit-touch-callout:none;
 			-webkit-user-select:none;
@@ -19,8 +20,11 @@
 				margin-right: auto;
 			}			
 			#ui-page1 {
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;
 				position: absolute;
-				background-color: #000000;
+				background-color: #4455AA;
 				top: 30%;
 				height: 29%;
 				width:49%;
@@ -30,8 +34,11 @@
 				touch-action: none;
 			}			
 			#ui-page2 {
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;
 				position: absolute;
-				background-color: #000000;
+				background-color: #4455AA;
 				top: 60%;
 				height: 25%;
 				width:49%;
@@ -41,8 +48,11 @@
 				touch-action: none;
 			}			
 			#ui-page3 {
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;				
 				position: absolute;
-				background-color: #000000;
+				background-color: #4455AA;
 				top: 30%;
 				height: 29%;
 				width:49%;
@@ -52,8 +62,11 @@
 				touch-action: none;
 			}			
 			#ui-page4 {
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;				
 				position: absolute;
-				background-color: #000000;
+				background-color: #4455AA;
 				top: 60%;
 				height: 25%;
 				width:49%;
@@ -75,7 +88,7 @@
 		    <tr>
         		<td id="some_id"></td>
 				<td>
-					<textarea id="w3review" name="w3review" rows="14" cols="50">Valid theejs html/javascript code wil be placed here based on the cad data in the below editing windows. Copy and paste into html file or html editor. requires three.js include for complete examples. Code wil also be generated with only the model. (Todo:design/test)
+					<textarea id="output" name="output" rows="14" cols="50">Valid theejs html/javascript code wil be placed here based on the cad data in the below editing windows. Copy and paste into html file or html editor. requires three.js include for complete examples. Code wil also be generated with only the model. (Todo:design/test)
 					</textarea>
 		
 				</td>
@@ -85,24 +98,219 @@
 	   
 		<script src="js/three.js"></script>
 		<script>
+			//
+			// Cad 2 Code - work in progress..
+			//
+			// requires three.js and a texture include
+			//
+			//
 			const scene = new THREE.Scene();
 			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 			const renderer = new THREE.WebGLRenderer();
 			renderer.setSize( window.innerWidth/4, window.innerHeight/4 );
 			renderer.shadowMap.Enabled=true;
-			//document.body.appendChild( renderer.domElement );
-var container = document.getElementById( 'some_id' );
 
-container.appendChild( renderer.domElement );			
 			
 			
+			camera.position.z = 5;
+			
+			//create an object
+			const geometry = new THREE.BoxGeometry(1, 1, 1);
+			var material = new THREE.MeshBasicMaterial({
+			  color: 0xfffff,
+			  wireframe: false,
+			});
+			//var cube = new THREE.Mesh(geometry, material);
+			var cube = makeMesh01();
+			//add the object to scene
+			scene.add(cube);
+			var ambient = new THREE.AmbientLight( 0xffffff, .5 );
+			
+			scene.add( ambient );
+
+
+			//document.body.appendChild( renderer.domElement );
+			var container = document.getElementById( 'some_id' );
+
+			container.appendChild( renderer.domElement );			
+			const ui_Page1Canvas = document.getElementById( 'ui-page1' );
+			const ui_Page1Context = ui_Page1Canvas.getContext( '2d' );	
+			drawTop(ui_Page1Context);
+			const ui_Page2Canvas = document.getElementById( 'ui-page2' );
+			const ui_Page2Context = ui_Page2Canvas.getContext( '2d' );	
+			drawFront(ui_Page2Context);
+			const ui_Page3Canvas = document.getElementById( 'ui-page3' );
+			const ui_Page3Context = ui_Page3Canvas.getContext( '2d' );	
+			drawRight(ui_Page3Context);
+			
+			//<textarea id="myTextArea" rows="10" cols="20" name="work">
+			var a="";
+
+a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.0, -30.0, 0.0];"
+
+			a+="hello";
+
+			document.getElementById("output").value=a;
 			
 			function animate() {
+				requestAnimationFrame(animate);				
+				//camera.position.x=Math.random()*150-77;
+				//camera.position.y=Math.random()*150-77;
+				//camera.position.z=Math.random()*150-77;
 				
+				cube.rotation.x+=.07;
+				cube.rotation.z+=.07;				
+				cube.rotation.y+=.07;								
 				renderer.render( scene, camera );
 			}	
 			animate();	
+			// draw top cad view..
+			function drawTop(c){
+				c.font = "12px serif";
+				c.fillStyle = "#AAAAAA";
+				c.fillText('top',0,12);	
+				c.fillStyle = "#FF9999";
+				// horizontal center line
+				for(var x=0;x<c.canvas.width;x+=2){
+					c.fillRect(x,c.canvas.height/2,1,1);
+				}
+				// vertical center line
+				for(var y=0;y<c.canvas.height;y+=2){
+					c.fillRect(c.canvas.width/2,y,1,1);
+				}
+				
+			}
+			function drawFront(c){
+				c.font = "12px serif";
+				c.fillStyle = "#AAAAAA";
+				c.fillText('front',0,12);	
+				c.fillStyle = "#FF9999";
+				// horizontal center line
+				for(var x=0;x<c.canvas.width;x+=2){
+					c.fillRect(x,c.canvas.height/2,1,1);
+				}
+				// vertical center line
+				for(var y=0;y<c.canvas.height;y+=2){
+					c.fillRect(c.canvas.width/2,y,1,1);
+				}
+				
+			}
+			function drawRight(c){
+				c.font = "12px serif";
+				c.fillStyle = "#AAAAAA";
+				c.fillText('right',0,12);	
+				c.fillStyle = "#FF9999";
+				// horizontal center line
+				for(var x=0;x<c.canvas.width;x+=2){
+					c.fillRect(x,c.canvas.height/2,1,1);
+				}
+				// vertical center line
+				for(var y=0;y<c.canvas.height;y+=2){
+					c.fillRect(c.canvas.width/2,y,1,1);
+				}
+				
+			}
+			
+			function makeMesh01(){
+				
+				var quad_vertices =
+				[
+				-30.0,  30.0, 0.0,
+				30.0,  30.0, 0.0,
+				30.0, -30.0, 0.0,
+				-30.0, -30.0, 0.0
+				];
+
+				var quad_verticesColor =
+				[
+				1.0,1.0,1.0,
+				1.0,1.0,1.0,
+				1.0,1.0,1.0,
+				1.0,1.0,1.0
+				];
+				
+				var quad_uvs =
+				[
+				0.0, 0.0,
+				1.0, 0.0,
+				1.0, 1.0,
+				0.0, 1.0
+				];
+				//quad_uvs = addquaduvs(10,4);
+				
+				var quad_indices =
+				[
+				0, 2, 1, 0, 3, 2
+				];
+				//quad_indices = addquadindices(0);				
+				
+				var geometry = new THREE.BufferGeometry();
+				
+				var vertices = new Float32Array( quad_vertices );
+				var verticesColor = new Float32Array( quad_verticesColor );
+				// Each vertex has one uv coordinate for texture mapping
+				var uvs = new Float32Array( quad_uvs);
+				// Use the four vertices to draw the two triangles that make up the square.
+				var indices = new Uint32Array( quad_indices )
+				
+				geometry.setAttribute(
+				      'color',
+				      new THREE.BufferAttribute(verticesColor, 3));
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+				
+				let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-saLight.png');
+				//sprite.minFilter = THREE.NearestFilter;
+				sprite.minFilter = THREE.NearestFilter;
+				sprite.magFilter = THREE.NearestFilter;
+
+				var material2 = new THREE.MeshLambertMaterial( {	map: sprite,
+												transparent: true,
+												alphaTest:0.5,
+												color:0xFFFFFF,// note darkness for torches
+												vertexColors:true,												
+											});
+
+				material2.flatShading=true;
+
+
+				var mesh = new THREE.Mesh( geometry, material2 );
+				
+				//mesh.receiveShadow=true;
+				//mesh.castShadow=true;
+				//mesh.position.z = -100;
+				//mesh.receiveShadow=true;
+				return mesh;				
+			}
+			function addquaduvs(x,y){
+ 				const tileSize = 16.0;
+ 				const tileTextureWidth = 256.0;
+ 	 			const tileTextureHeight = 128.0;
+  
+				var x1=x,y1=y;
+				var x2=x1+1;
+				var y2=y1+1;
+				
+				// here we set the uv's with the atlas texture
+				var q = [
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+				];
+				
+				
+				return q;
+			}
+			function addquadindices(num){
+				q = [0+4*num, 2+4*num, 1+4*num, 0+4*num, 3+4*num, 2+4*num,
+				];
+				
+				return q;
+			}
+			
 		</script>
 	</body>
 </html>			
