@@ -122,6 +122,23 @@
 			  wireframe: false,
 			});
 			//var cube = new THREE.Mesh(geometry, material);
+			
+				var quad_vertices =
+				[
+				-30.0,  30.0, 0.0,
+				30.0,  30.0, 0.0,
+				30.0, -30.0, 0.0,
+				-30.0, -30.0, 0.0
+				];
+				
+			
+			
+			
+			
+			
+			
+			
+			
 			var cube = makeMesh01();
 			//add the object to scene
 			scene.add(cube);
@@ -179,6 +196,20 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				for(var y=0;y<c.canvas.height;y+=2){
 					c.fillRect(c.canvas.width/2,y,1,1);
 				}
+				x1 = quad_vertices[0]+c.canvas.width/2;
+				y1 = quad_vertices[2]+c.canvas.height/2;
+				x2 = quad_vertices[3]+c.canvas.width/2;
+				y2 = quad_vertices[5]+c.canvas.height/2;
+				x3 = quad_vertices[6]+c.canvas.width/2;
+				y3 = quad_vertices[8]+c.canvas.height/2;
+				x4 = quad_vertices[9]+c.canvas.width/2;
+				y4 = quad_vertices[11]+c.canvas.height/2;
+				
+				c.fillStyle="#FFFFFF";
+				c.fillRect(x1,y1,5,5);
+				c.fillRect(x2,y2,5,5);
+				c.fillRect(x3,y3,5,5);
+				c.fillRect(x4,y4,5,5);
 				
 			}
 			function drawFront(c){
@@ -194,6 +225,22 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				for(var y=0;y<c.canvas.height;y+=2){
 					c.fillRect(c.canvas.width/2,y,1,1);
 				}
+
+				x1 = quad_vertices[0]+c.canvas.width/2;
+				y1 = quad_vertices[1]+c.canvas.height/2;
+				x2 = quad_vertices[3]+c.canvas.width/2;
+				y2 = quad_vertices[4]+c.canvas.height/2;
+				x3 = quad_vertices[6]+c.canvas.width/2;
+				y3 = quad_vertices[7]+c.canvas.height/2;
+				x4 = quad_vertices[9]+c.canvas.width/2;
+				y4 = quad_vertices[10]+c.canvas.height/2;
+				
+				c.fillStyle="#FFFFFF";
+				c.fillRect(x1,y1,5,5);
+				c.fillRect(x2,y2,5,5);
+				c.fillRect(x3,y3,5,5);
+				c.fillRect(x4,y4,5,5);
+				
 				
 			}
 			function drawRight(c){
@@ -213,7 +260,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 			}
 			
 			function makeMesh01(){
-				
+				/*			
 				var quad_vertices =
 				[
 				-30.0,  30.0, 0.0,
@@ -221,7 +268,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				30.0, -30.0, 0.0,
 				-30.0, -30.0, 0.0
 				];
-
+				*/
 				var quad_verticesColor =
 				[
 				1.0,1.0,1.0,
