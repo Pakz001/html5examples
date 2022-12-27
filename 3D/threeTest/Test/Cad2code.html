@@ -88,10 +88,7 @@
 		    <tr>
         		<td id="some_id"></td>
 				<td>
-					<textarea id="output" name="output" rows="14" cols="50">Valid theejs html/javascript code wil be placed here based on the cad data in the below editing windows. Copy and paste into html file or html editor. requires three.js include for complete examples. Code wil also be generated with only the model. (Todo:design/test)
-						Controls :
-						Touch/press to activate window. Then :
-						W/S/A/D to move vertice. Z to tab through vertices.
+					<textarea id="output" name="output" rows="14" cols="50">
 					</textarea>
 		
 				</td>
@@ -144,8 +141,10 @@
 			];
 				
 			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
-			
-			
+			var frontCanvas = 2;
+			var topCanvas = 1;
+			var rightCanvas = 3;
+			var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
 			
 			
 			
@@ -178,13 +177,13 @@
 			// Method to add text to text area
 			//
 			//<textarea id="myTextArea" rows="10" cols="20" name="work">
-			var a="";
+			var a="Valid theejs html/javascript code wil be placed here based on the cad data in the below editing windows. Copy and paste into html file or html editor. requires three.js include for complete examples. Code wil also be generated with only the model. (Todo:design/test) \n\nControls : Touch/press to activate window. Then : \nW/S/A/D to move vertice. \nZ to tab through vertices. \nX to tab between canvasses.";
 
-a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.0, -30.0, 0.0];"
+			//a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.0, -30.0, 0.0];"
 
-			a+="hello";
+			//a+="hello";
 
-			//document.getElementById("output").value=a;
+			document.getElementById("output").value=a;
 			
 			function animate() {
 				requestAnimationFrame(animate);				
@@ -253,6 +252,16 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				c.fillRect(x3,y3,5,5);
 				c.fillRect(x4,y4,5,5);
 				*/
+				// If the active last touched or pressed or tabbed canvas is this
+				// then draw a outline.
+				if(activeCanvas==topCanvas){
+					c.fillStyle="#FF1188";					
+					c.fillRect(0,0,c.canvas.width,1);
+					c.fillRect(0,c.canvas.height-1,c.canvas.width,1);
+					c.fillRect(0,0,1,c.canvas.height);
+					c.fillRect(c.canvas.width-1,0,1,c.canvas.height);
+				}
+				
 			}
 			// draw front side cad view - note opengl coordinates			
 			function drawFront(c){
@@ -310,7 +319,15 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				c.fillRect(x3,y3,5,5);
 				c.fillRect(x4,y4,5,5);
 				*/
-				
+				// If the active last touched or pressed or tabbed canvas is this
+				// then draw a outline.
+				if(activeCanvas==frontCanvas){
+					c.fillStyle="#FF1188";					
+					c.fillRect(0,0,c.canvas.width,1);
+					c.fillRect(0,c.canvas.height-1,c.canvas.width,1);
+					c.fillRect(0,0,1,c.canvas.height);
+					c.fillRect(c.canvas.width-1,0,1,c.canvas.height);
+				}
 			}
 			// draw right side cad view - note opengl coordinates
 			function drawRight(c){
@@ -366,6 +383,16 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				c.fillRect(x3,y3,5,5);
 				c.fillRect(x4,y4,5,5);
 				*/
+				// If the active last touched or pressed or tabbed canvas is this
+				// then draw a outline.
+				if(activeCanvas==rightCanvas){
+					c.fillStyle="#FF1188";					
+					c.fillRect(0,0,c.canvas.width,1);
+					c.fillRect(0,c.canvas.height-1,c.canvas.width,1);
+					c.fillRect(0,0,1,c.canvas.height);
+					c.fillRect(c.canvas.width-1,0,1,c.canvas.height);
+				}
+				
 			}
 			
 			function makeMesh01(){
@@ -478,28 +505,28 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 					if(e.code==="KeyW"){
 						//console.log("a");	
 						quad_vertices[av+1]+=10;
-						
 					}
 					if(e.code==="KeyS"){
 						//console.log("a");	
 						quad_vertices[av+1]-=10;
-						
 					}
 					if(e.code==="KeyA"){
 						//console.log("a");	
 						quad_vertices[av]+=10;
-						
 					}
 					if(e.code==="KeyD"){
 						//console.log("a");	
 						quad_vertices[av]-=10;
-						
 					}					
-					if(e.code==="KeyZ"){
+					if(e.code==="KeyZ"){ // tab points/vertices
 						//console.log("a");	
 						activeVertice++;
 						if(activeVertice>=Math.floor(quad_vertices.length/3))activeVertice=0;
-						
+					}
+					if(e.code==="KeyX"){ // tab canvasses
+						//console.log("a");	
+						activeCanvas++;
+						if(activeCanvas>=4)activeCanvas=1;
 					}
 					
 					
