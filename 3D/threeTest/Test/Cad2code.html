@@ -177,7 +177,7 @@
 			// Method to add text to text area
 			//
 			//<textarea id="myTextArea" rows="10" cols="20" name="work">
-			var a="Valid theejs html/javascript code wil be placed here based on the cad data in the below editing windows. Copy and paste into html file or html editor. requires three.js include for complete examples. Code wil also be generated with only the model. (Todo:design/test) \n\nControls : Touch/press to activate window. Then : \nW/S/A/D to move vertice. \nZ to tab through vertices. \nX to tab between canvasses.";
+			var a="Valid theejs html/javascript code wil be placed here based on the cad data in the below editing windows. Copy and paste into html file or html editor. requires three.js include for complete examples. Code wil also be generated with only the model. (Todo:design/test) \n\nControls : Touch/press to activate window. Then : \nW/S/A/D to move vertice. \nZ to tab through vertices. \nX to tab between canvasses.\nI/J/K/L turn mesh in 3d view.\nO/P zoom camera in and out in camera view.";
 
 			//a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.0, -30.0, 0.0];"
 
@@ -503,32 +503,59 @@
 					// if pressed w key then move vertice up on screen. down on canvas.
 					var av = Math.floor(activeVertice*3);
 					if(e.code==="KeyW"){
-						//console.log("a");	
-						quad_vertices[av+1]+=10;
+						if(activeCanvas==frontCanvas)quad_vertices[av+1]+=10;
+						if(activeCanvas==rightCanvas)quad_vertices[av+1]+=10;						
+						if(activeCanvas==topCanvas)quad_vertices[av+2]+=10;
 					}
 					if(e.code==="KeyS"){
-						//console.log("a");	
-						quad_vertices[av+1]-=10;
+						if(activeCanvas==frontCanvas)quad_vertices[av+1]-=10;
+						if(activeCanvas==rightCanvas)quad_vertices[av+1]-=10;												
+						if(activeCanvas==topCanvas)quad_vertices[av+2]-=10;
 					}
 					if(e.code==="KeyA"){
-						//console.log("a");	
-						quad_vertices[av]+=10;
+						if(activeCanvas==frontCanvas)quad_vertices[av]+=10;
+						if(activeCanvas==rightCanvas)quad_vertices[av+2]+=10;						
+						if(activeCanvas==topCanvas)quad_vertices[av]+=10;						
 					}
 					if(e.code==="KeyD"){
-						//console.log("a");	
-						quad_vertices[av]-=10;
+						if(activeCanvas==frontCanvas)quad_vertices[av]-=10;
+						if(activeCanvas==rightCanvas)quad_vertices[av+2]-=10;						
+						if(activeCanvas==topCanvas)quad_vertices[av]-=10;
 					}					
 					if(e.code==="KeyZ"){ // tab points/vertices
-						//console.log("a");	
 						activeVertice++;
 						if(activeVertice>=Math.floor(quad_vertices.length/3))activeVertice=0;
 					}
 					if(e.code==="KeyX"){ // tab canvasses
-						//console.log("a");	
 						activeCanvas++;
 						if(activeCanvas>=4)activeCanvas=1;
 					}
-					
+					//
+					// 3d View controls
+					//
+					if(e.code=="KeyJ"){//turn mesh left
+						cube.rotation.y-=.25;
+					}
+					if(e.code=="KeyL"){//turn mesh right
+						cube.rotation.y+=.25;
+					}
+					if(e.code=="KeyI"){//turn mesh up
+						cube.rotation.x-=.25;
+					}
+					if(e.code=="KeyK"){//turn mesh down
+						cube.rotation.x+=.25;
+					}
+					if(e.code=="KeyO"){//zoom camera out
+						camera.position.z-=10;
+					}
+					if(e.code=="KeyP"){//zoom camera in
+						camera.position.z+=10;
+					}
+					// Store 3d view variables
+					var oldrx = cube.rotation.x;
+					var oldry = cube.rotation.y;
+					var oldrz = cube.rotation.z;
+					var oldcpz = camera.position.z;
 					
 					// update mesh
 					scene.remove(cube);
@@ -536,8 +563,14 @@
 					scene.add(cube);
 					drawTop(ui_Page1Context);			
 					drawFront(ui_Page2Context);			
-					drawRight(ui_Page3Context);			
-						
+					drawRight(ui_Page3Context);	
+					
+					// restore 3d view variables
+					cube.rotation.x = oldrx;
+					cube.rotation.y = oldry;
+					cube.rotation.z = oldrz;
+					camera.position.z = oldcpz;	
+					
 					e.preventDefault();
 			}				
 		}
