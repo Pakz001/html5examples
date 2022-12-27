@@ -95,6 +95,11 @@
  		   </tr>
 	   	</table>	
 
+		
+							
+							
+							
+
 	   
 		<script src="js/three.js"></script>
 		<script>
@@ -113,7 +118,7 @@
 
 			
 			
-			camera.position.z = 5;
+			camera.position.z = 60;
 			
 			//create an object
 			const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -121,6 +126,8 @@
 			  color: 0xfffff,
 			  wireframe: false,
 			});
+			
+			window.addEventListener('keyup', control, false);		
 			//var cube = new THREE.Mesh(geometry, material);
 			
 				var quad_vertices =
@@ -142,7 +149,7 @@
 			var cube = makeMesh01();
 			//add the object to scene
 			scene.add(cube);
-			var ambient = new THREE.AmbientLight( 0xffffff, .5 );
+			var ambient = new THREE.AmbientLight( 0xffffff, 4 );
 			
 			scene.add( ambient );
 
@@ -160,6 +167,7 @@
 			const ui_Page3Canvas = document.getElementById( 'ui-page3' );
 			const ui_Page3Context = ui_Page3Canvas.getContext( '2d' );	
 			drawRight(ui_Page3Context);
+
 			
 			//<textarea id="myTextArea" rows="10" cols="20" name="work">
 			var a="";
@@ -176,14 +184,15 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				//camera.position.y=Math.random()*150-77;
 				//camera.position.z=Math.random()*150-77;
 				
-				cube.rotation.x+=.07;
-				cube.rotation.z+=.07;				
-				cube.rotation.y+=.07;								
+				//cube.rotation.x+=.07;
+				//cube.rotation.z+=.07;				
+				//cube.rotation.y+=.07;								
 				renderer.render( scene, camera );
 			}	
 			animate();	
 			// draw top cad view..
 			function drawTop(c){
+				c.clearRect(0,0,c.canvas.width,c.canvas.height);
 				c.font = "12px serif";
 				c.fillStyle = "#AAAAAA";
 				c.fillText('top',0,12);	
@@ -213,6 +222,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				
 			}
 			function drawFront(c){
+				c.clearRect(0,0,c.canvas.width,c.canvas.height);				
 				c.font = "12px serif";
 				c.fillStyle = "#AAAAAA";
 				c.fillText('front',0,12);	
@@ -235,6 +245,8 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				x4 = quad_vertices[9]+c.canvas.width/2;
 				y4 = quad_vertices[10]+c.canvas.height/2;
 				
+				
+				
 				c.fillStyle="#FFFFFF";
 				c.fillRect(x1,y1,5,5);
 				c.fillRect(x2,y2,5,5);
@@ -244,6 +256,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				
 			}
 			function drawRight(c){
+				c.clearRect(0,0,c.canvas.width,c.canvas.height);				
 				c.font = "12px serif";
 				c.fillStyle = "#AAAAAA";
 				c.fillText('right',0,12);	
@@ -256,6 +269,20 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				for(var y=0;y<c.canvas.height;y+=2){
 					c.fillRect(c.canvas.width/2,y,1,1);
 				}
+				x1 = quad_vertices[2]+c.canvas.width/2;
+				y1 = quad_vertices[1]+c.canvas.height/2;
+				x2 = quad_vertices[5]+c.canvas.width/2;
+				y2 = quad_vertices[4]+c.canvas.height/2;
+				x3 = quad_vertices[8]+c.canvas.width/2;
+				y3 = quad_vertices[7]+c.canvas.height/2;
+				x4 = quad_vertices[11]+c.canvas.width/2;
+				y4 = quad_vertices[10]+c.canvas.height/2;
+				
+				c.fillStyle="#FFFFFF";
+				c.fillRect(x1,y1,5,5);
+				c.fillRect(x2,y2,5,5);
+				c.fillRect(x3,y3,5,5);
+				c.fillRect(x4,y4,5,5);
 				
 			}
 			
@@ -284,7 +311,7 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				1.0, 1.0,
 				0.0, 1.0
 				];
-				//quad_uvs = addquaduvs(10,4);
+				quad_uvs = addquaduvs(2,3);
 				
 				var quad_indices =
 				[
@@ -357,6 +384,28 @@ a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.
 				
 				return q;
 			}
+			
+			function control(e){
+
+				if(e.type=="keyup"){
+			
+					//console.log(e.code);
+					
+					if(e.code==="KeyW"){
+						//console.log("a");	
+						quad_vertices[1]+=10;
+						scene.remove(cube);
+						cube = makeMesh01();
+						scene.add(cube);
+						drawTop(ui_Page1Context);			
+						drawFront(ui_Page2Context);			
+						drawRight(ui_Page3Context);			
+			
+					}
+			
+					e.preventDefault();
+			}				
+		}
 			
 		</script>
 	</body>
