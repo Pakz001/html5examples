@@ -372,18 +372,43 @@
 				}
 
 				// Draw the indices numbers
+				// Store locations in here in case of doublers
+				var dx = [];
+				var dy = [];
 				if(showVertexNumbers){
 					c.font = "12px arial";				
 					for(var i=0;i<vx.length;i++){
-						var x = vx[i]-26+Math.random()*26;
-						var y = vy[i]-26+Math.random()*26;
-						c.fillStyle="#000000";
-						c.fillRect(x,y-16,8,20);
-						c.fillStyle="#FFFFFF";
-						c.fillText(""+i,x,y);					
+						var x = vx[i]-12;//-26+Math.random()*26;
+						var y = vy[i]-12;//-26+Math.random()*26;
+						dx.push(x);
+						dy.push(y);
 					}
 				}
-				
+				// Check if there are double points on the canvas
+				// and then add space between.
+				var doub=true;
+				while(doub){
+					doub=false;
+					for(var i=0;i<dx.length;i++){
+						for(var j=0;j<dx.length;j++){
+							if(j==i)continue;
+							if(dx[i]==dx[j] && dy[i]==dy[j]){
+								dx[j]+=12;
+								//dy[j]+=24;
+								doub=true;
+							}
+						}
+					}
+				}
+				// draw the points on the canvas
+				for(var i=0;i<dx.length;i++){
+					var x = dx[i];
+					var y = dy[i];
+					c.fillStyle="#000000";
+					c.fillRect(x,y-16,8,20);
+					c.fillStyle="#FFFFFF";
+					c.fillText(""+i,x,y);										
+				}
 				
 				
 				// If the active last touched or pressed or tabbed canvas is this
@@ -500,18 +525,42 @@
 					}
 				}
 				// Draw the indices numbers
+				var dx = [];
+				var dy = [];
 				if(showVertexNumbers){
 					c.font = "12px arial";				
 					for(var i=0;i<vx.length;i++){
-						var x = vx[i]-26+Math.random()*26;
-						var y = vy[i]-26+Math.random()*26;
-						c.fillStyle="#000000";
-						c.fillRect(x,y-16,8,20);
-						c.fillStyle="#FFFFFF";
-						c.fillText(""+i,x,y);					
+						var x = vx[i]-12;
+						var y = vy[i]-12;
+						dx.push(x);
+						dy.push(y);
 					}
 				}
-				
+				// Check if there are double points on the canvas
+				// and then add space between.
+				var doub=true;
+				while(doub){
+					doub=false;
+					for(var i=0;i<dx.length;i++){
+						for(var j=0;j<dx.length;j++){
+							if(j==i)continue;
+							if(dx[i]==dx[j] && dy[i]==dy[j]){
+								dx[j]+=12;
+								//dy[j]+=24;
+								doub=true;
+							}
+						}
+					}
+				}
+				// draw the points on the canvas
+				for(var i=0;i<dx.length;i++){
+					var x = dx[i];
+					var y = dy[i];
+					c.fillStyle="#000000";
+					c.fillRect(x,y-16,8,20);
+					c.fillStyle="#FFFFFF";
+					c.fillText(""+i,x,y);										
+				}				
 				
 				/*
 				c.fillRect(x1,y1,5,5);
@@ -629,17 +678,42 @@
 					}
 				}
 				// Draw the indices numbers
+				var dx = [];
+				var dy = [];
 				if(showVertexNumbers){
 					c.font = "12px arial";				
 					for(var i=0;i<vx.length;i++){
-						var x = vx[i]-26+Math.random()*26;
-						var y = vy[i]-26+Math.random()*26;
-						c.fillStyle="#000000";
-						c.fillRect(x,y-16,8,20);
-						c.fillStyle="#FFFFFF";
-						c.fillText(""+i,x,y);					
+						var x = vx[i]-12;
+						var y = vy[i]-12;
+						dx.push(x);
+						dy.push(y);
 					}
 				}
+				// Check if there are double points on the canvas
+				// and then add space between.
+				var doub=true;
+				while(doub){
+					doub=false;
+					for(var i=0;i<dx.length;i++){
+						for(var j=0;j<dx.length;j++){
+							if(j==i)continue;
+							if(dx[i]==dx[j] && dy[i]==dy[j]){
+								dx[j]+=12;
+								//dy[j]+=24;
+								doub=true;
+							}
+						}
+					}
+				}
+				// draw the points on the canvas
+				for(var i=0;i<dx.length;i++){
+					var x = dx[i];
+					var y = dy[i];
+					c.fillStyle="#000000";
+					c.fillRect(x,y-16,8,20);
+					c.fillStyle="#FFFFFF";
+					c.fillText(""+i,x,y);										
+				}				
 				
 				
 				
