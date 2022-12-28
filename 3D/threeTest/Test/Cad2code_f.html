@@ -201,6 +201,8 @@
 			var trackEditWindow = 0; // The current prop edit screen
 			var trackEditVertex = 0; // track edit screen 
 			var trackEdituv = 1; // ,,
+			var oldEditCursorX = 0;
+			var oldEditCursorY = 0;
 			
 			var cube = makeMesh01();
 			//add the object to scene
@@ -858,6 +860,13 @@
 					
 					//if pressed 'e' then switch edit track screen.
 					if(e.code==="KeyE"){
+						// Get previous prop window cursor positio
+						var tx = propCursorX;
+						var ty = propCursorY;
+						propCursorX = oldEditCursorX;
+						propCursorY = oldEditCursorY;
+						oldEditCursorX = tx;
+						oldEditCursorY = ty;
 						trackEditWindow++;
 						if(trackEditWindow>1){
 							trackEditWindow=0;
@@ -956,11 +965,16 @@
 							if(trackEditWindow==trackEdituv){
 								if(propCursorY>=Math.floor(quad_uvs.length/2))propCursorY=Math.floor(quad_uvs.length/2);
 							}
+							if(trackEditWindow==trackEditVertex && propCursorY == quad_indices.length/3 && propCursorX==0)propCursorX++;
+							if(trackEditWindow==trackEdituv && propCursorY == quad_uvs.length/2 && propCursorX==2)propCursorX--;
+							if(trackEditWindow==trackEditVertex && propCursorY == quad_indices.length/3 && propCursorX==3)propCursorX--;
+							
 							
 						}
 						if(e.code=="KeyA"){//move cursor left in indices field
 							propCursorX-=1;
 							if(propCursorX<0)propCursorX=0;
+							if(trackEditWindow==trackEditVertex && propCursorY == quad_indices.length/3 && propCursorX==0)propCursorX++;
 						}
 						if(e.code=="KeyD"){//move cursor right in indices field
 							var r = 3;
@@ -968,9 +982,10 @@
 							propCursorX++;
 							if(propCursorX>r)propCursorX=r;
 							// If in the add remove indice section.
-							if(propCursorY==quad_indices.length/r){
+							if(propCursorY==quad_indices.length/r+1){
 								if(propCursorX==r)propCursorX=r-1;								
 							}
+							if(trackEditWindow==trackEdituv && propCursorY > quad_uvs.length/2 && propCursorX==2)propCursorX--;
 							
 						}
 					}
@@ -1097,6 +1112,7 @@
 			
 			// Handle the Return and dice (random indices based on values already present..)
 			if(lastChar=="Enter" && trackEditWindow==trackEditVertex){
+				lastChar="";
 				if(propCursorX>2)randomIndice();
 				if(propCursorX==1 && propCursorY==quad_indices.length/3){
 					//remove_indices
@@ -1218,6 +1234,47 @@
 				updateScene();
 			}			
 			
+			// Handle the Return and uvs.
+			if(lastChar=="Enter" && trackEditWindow==trackEdituv){
+				if(propCursorX>1)randomuv();
+				if(propCursorX==0 && propCursorY==quad_uvs.length/2){
+					//remove_indices
+					lastChar="";
+					if(quad_uvs.length>0)quad_uvs.pop()
+					if(quad_uvs.length>0)quad_uvs.pop()
+					if(propCursorY>0)propCursorY-=1;
+				}
+				//console.log("a");				
+				if(propCursorX==1 && propCursorY==quad_uvs.length/2){
+					//add_indices
+					lastChar="";
+					quad_uvs.push(0);
+					quad_uvs.push(0);
+					propCursorY++;
+
+				}
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);				
+				updateScene();								
+			}
+			function randomuv(){
+				lastChar="";
+				var i=0;
+				for(var y=0;y<quad_uvs.length/2;y++){
+					if(propCursorX==2 && propCursorY==y){						
+						for(j=0;j<2;j++){				
+							var s = Math.floor(Math.random()*2);							
+							quad_uvs[i+j]=s;
+						}
+					}	
+					for(var x=0;x<2;x++){
+						i++;
+					}				
+				}
+			}
+			
 			
 			
 			
@@ -1235,9 +1292,9 @@
 		
 		function trackEdit(c,arr,collumns,blink){
 			//draw indices
-			c.fillStyle="#FFFFFF";
-			c.font="20px serif";
-			c.fillText("Indices",20,60);
+			//c.fillStyle="#FFFFFF";
+			//c.font="20px serif";
+			//c.fillText("Indices",20,60);
 			var i=propCursorY*collumns-(5*collumns);
 			if(i<0)i=0;
 			//var st=0;
@@ -1251,7 +1308,8 @@
 			//draw indices
 			c.fillStyle="#FFFFFF";
 			c.font="20px serif";
-			c.fillText("Indices",20,60);
+			if(collumns==3)c.fillText("Indices",20,60);
+			if(collumns==2)c.fillText("Uvs",20,60);			
 			var i=0;
 			if(propCursorY>5){
 				//yOff -= 20;
@@ -1305,7 +1363,9 @@
 
 				// Draw the add and remove buttons..
 				if(y>=arr.length/collumns){
-						if(x>0 && x<collumns){	
+						var z=1;
+						if(collumns==2)z=0;
+						if(x>=z && x<collumns){	
 							if(propCursorX==x && propCursorY==y && blink==true){
 								c.fillStyle="#AA0000";
 								c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
