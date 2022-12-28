@@ -950,42 +950,89 @@
 			c.fillStyle="#FFFFFF";
 			c.font="20px serif";
 			c.fillText("Indices",20,60);
+			var i=propCursorY*3-(5*3);
+			if(i<0)i=0;
+			var st=0;
+			var lt=0;
+			var x = 0;
+			var y = 0;
+			var xOff = 0;
+			var yOff = 0;
+			var lasty = 0;
+			//potential memory leak or ?? when y1 is used here in y2 (bug??)
+			//draw indices
+			c.fillStyle="#FFFFFF";
+			c.font="20px serif";
+			c.fillText("Indices",20,60);
 			var i=0;
-			for(var y=0;y<(quad_indices.length/3)+1;y++){
-			for(var x=0;x<4;x++){
+			if(propCursorY>5){
+				//yOff -= 20;
+			}
+			var x=y=0;
+			var bana=false;
+			for(y=0;y<(quad_indices.length/3)+1;y++){				
+			for(x=0;x<4;x++){
+				//20+x*30
+
+				if(80+y*20>200 && bana==false){
+					yOff=80+y*20-200;
+					yOff=-yOff;
+				}
+				if(y==propCursorY){
+					bana=true;
+					if((60+y*20+20)<=60){
+					//console.log(60+y*20);
+						//yOff=60+y*20;
+					yOff=60+y*20+20;
+					yOff=-yOff;
+					//console.log("a");
+					
+					
+					}
+					
+				}
+			}}	
+			for(y=0;y<(quad_indices.length/3)+1;y++){				
+
+			for(x=0;x<4;x++){
 				// Draw the indice values
 				if(x<3 && y<quad_indices.length/3){//Draw the indices
+					if(80+y*20+yOff>=70){
 					if(propCursorX==x && propCursorY==y && blink==true){
 						c.fillStyle="#AA0000";
-						c.fillRect(20+x*30	,60+y*20+20,16,4);
+						c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
 						c.fillStyle="#FFFFFF";
 					}
-					c.fillText(quad_indices[i],20+x*30	,80+y*20);
+					c.fillText(quad_indices[i],20+x*30	,80+y*20+yOff);
+					}
 					i++;
 				}
 				// Draw the dices
-				if(x==3 && y<quad_indices.length/3){//Draw the dice icon(s)
+				if(80+y*20+yOff>=70 && x==3 && y<quad_indices.length/3){//Draw the dice icon(s)
 					var a=false;
 					if(propCursorX==x && propCursorY==y && blink==true)a=true;
 					//if(propCursorX==x && propCursorY==y && blink==true)a=false;					
-					drawDice(20+x*30	,60+y*30+4, 20, 18,a);					
+					drawDice(20+x*30	,60+y*20+4+yOff, 20, 18,a);					
 				}
+
 				// Draw the add and remove buttons..
 				if(y>=quad_indices.length/3){
-					if(x>0 && x<3){	
-						if(propCursorX==x && propCursorY==y && blink==true){
-							c.fillStyle="#AA0000";
-							c.fillRect(20+x*30	,60+y*20+20,16,4);
-							c.fillStyle="#FFFFFF";
-						}
-
-						var a="-";
-						if(x==2)a="+";
-						c.fillText(a,20+x*30	,80+y*20);
-					}		
-				}
-			}}
+						if(x>0 && x<3){	
+							if(propCursorX==x && propCursorY==y && blink==true){
+								c.fillStyle="#AA0000";
+								c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
+								c.fillStyle="#FFFFFF";
+							}
+	
+							var a="-";
+							if(x==2)a="+";
+							c.fillText(a,20+x*30	,80+y*20+yOff);
+						}		
+				}	
 			
+			}			
+			}	
+
 			// handle key input (0..9)
 			for(var i=0;i<10;i++){
 				if(lastChar==i.toString())setIndice(i);
