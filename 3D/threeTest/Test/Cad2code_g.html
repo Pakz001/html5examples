@@ -399,7 +399,8 @@
 			// draw top cad view.. note opengl style coordinates - up=down(stranger things)
 			function drawTop(c){
 				c.imageSmoothingEnabled = false;				
-				c.clearRect(0,0,c.canvas.width,c.canvas.height);
+				c.fillStyle="#001166"				
+				c.fillRect(0,0,c.canvas.width,c.canvas.height);				
 				c.font = "24px serif";
 				c.fillStyle = "#AAAAAA";
 				c.fillText('top',6,24);	
@@ -578,7 +579,8 @@
 
 				
 				c.imageSmoothingEnabled = false;								
-				c.clearRect(0,0,c.canvas.width,c.canvas.height);				
+				c.fillStyle="#001166"				
+				c.fillRect(0,0,c.canvas.width,c.canvas.height);				
 				c.font = "24px serif";
 				c.fillStyle = "#AAAAAA";
 				c.fillText('front',6,24);	
@@ -757,8 +759,9 @@
 			
 			// draw right side cad view - note opengl coordinates
 			function drawRight(c){
-				c.imageSmoothingEnabled = false;								
-				c.clearRect(0,0,c.canvas.width,c.canvas.height);				
+				c.imageSmoothingEnabled = false;	
+				c.fillStyle="#001166"				
+				c.fillRect(0,0,c.canvas.width,c.canvas.height);				
 				c.font = "24px serif";
 				c.fillStyle = "#AAAAAA";
 				c.fillText('right',6,24);	
