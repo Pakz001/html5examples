@@ -236,6 +236,9 @@
 			var uiSelectionStart = false;
 			var uiSelectionEnd = false;	
 			var uiPinchStartDist = 0;
+			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
+			var uiPointY = [];
+			var uiPointVertice = [];
 			
 			var cube = makeMesh01();
 			//add the object to scene
@@ -504,6 +507,9 @@
 
 				// Draw the indices numbers
 				// Store locations in here in case of doublers
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];				
 				var dx = [];
 				var dy = [];
 				if(showVertexNumbers){
@@ -513,6 +519,10 @@
 						var y = vy[i]-12;//-26+Math.random()*26;
 						dx.push(x);
 						dy.push(y);
+						uiPointX.push(x);
+						uiPointY.push(y);
+						uiPointVertice.push(i*3)
+						
 					}
 				}
 				// Check if there are double points on the canvas
@@ -668,6 +678,12 @@
 					}
 				}
 				// Draw the indices numbers
+	//			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
+	//			var uiPointY = [];
+	//			var uiPointVertice = [];
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];
 				var dx = [];
 				var dy = [];
 				if(showVertexNumbers){
@@ -677,6 +693,10 @@
 						var y = vy[i]-12;
 						dx.push(x);
 						dy.push(y);
+						uiPointX.push(x);
+						uiPointY.push(y);
+						uiPointVertice.push(i*3)
+
 					}
 				}
 				// Check if there are double points on the canvas
@@ -695,6 +715,7 @@
 						}
 					}
 				}
+				
 				// draw the points on the canvas
 				for(var i=0;i<dx.length;i++){
 					var x = dx[i];
@@ -829,6 +850,9 @@
 					}
 				}
 				// Draw the indices numbers
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];				
 				var dx = [];
 				var dy = [];
 				if(showVertexNumbers){
@@ -838,6 +862,9 @@
 						var y = vy[i]-12;
 						dx.push(x);
 						dy.push(y);
+						uiPointX.push(x);
+						uiPointY.push(y);
+						uiPointVertice.push(i*3)						
 					}
 				}
 				// Check if there are double points on the canvas
@@ -1909,8 +1936,59 @@
 				uiTouchStart = false;
 				uiTouchEnd = true;				
 			}
+			if(uiSelectionStart){
+
+				var a=b=0;
+				var c;
+				if(activeCanvas == frontCanvas){
+					drawFront(ui_Page2Context);
+					c=ui_Page2Context;
+				}
+				if(activeCanvas == rightCanvas){
+					drawRight(ui_Page3Context);
+					c=ui_Page3Context;
+				}
+				if(activeCanvas == topCanvas){
+					drawTop(ui_Page1Context);
+					c=ui_Page1Context;					
+				}
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
+				
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				var x2=uiTouchLastX/a;
+				var y2=uiTouchLastY/b;
+				// Selection in all directions.
+				if(x1>x2){
+					[x1,x2] = [x2,x1];
+				}
+				if(y1>y2){
+					[y1,y2] = [y2,y1];
+				}
+				var w=Math.abs(x1-x2);
+				var h=Math.abs(y1-y2);
+
+				for(var i=0;i<uiPointVertice.length;i++){			
+					if(uiPointX[i]>x1 && uiPointX[i]<x2 && uiPointY[i]>y1 && uiPointY[i]<y2){
+						activeVertice = uiPointVertice[i]/3;
+						//console.log(uiPointVertice[i]+","+activeVertice);
+						
+					}
+					//ui_Page1Context.fillStyle="#FF0000";
+					//ui_Page1Context.fillRect(uiPointX[i],uiPointY[i],12,12);
+				}
+				//console.log("a");
+			}
 			uiSelectionStart = false;
 			uiSelectionEnd = true;
+//			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
+			
+//			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
+//			var uiPointY = [];
+//			var uiPointVertice = [];
+			
 			// update the screen.
 			drawTop(ui_Page1Context);			
 			drawFront(ui_Page2Context);			
