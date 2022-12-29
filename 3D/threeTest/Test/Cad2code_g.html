@@ -231,7 +231,8 @@
 			var uiTouchStart = false;			
 			var uiTouchEnd = false;
 			var uiTouchDrag = false;
-				
+			var uiSelectionStart = false;
+			var uiSelectionEnd = false;	
 			
 			var cube = makeMesh01();
 			//add the object to scene
@@ -1625,6 +1626,9 @@
 			// top is ui_Page1Context
 			// right is ui_Page3Context
 			// props is ui_Page4Context
+//			var uiSelectionStart = false;
+//			var uiSelectionEnd = false;	
+			
 			
 		var rect1 = ui_Page1Canvas.getBoundingClientRect();
 		var rect2 = ui_Page2Canvas.getBoundingClientRect();
@@ -1674,6 +1678,16 @@
 			uiTouchLastY = uiTouchLastY - my;
 			uiTouchStartX = uiTouchStartX - mx;
 			uiTouchStartY = uiTouchStartY - my;
+
+
+			
+			// Selection of points/objects with touch screen
+			// 
+			if(e.changedTouches.length==1 && uiSelectionEnd==true){
+				uiSelectionStart = true;
+
+				uiSelectionEnd = false;
+			}
 			
 			// update the screen.
 			drawTop(ui_Page1Context);			
@@ -1681,7 +1695,16 @@
 			drawRight(ui_Page3Context);					
 			drawPropScreen(ui_Page4Context);				
 			updateScene();								
-				
+			//ui_Page2Context.fillStyle="#FF0000";
+			//var x1=uiTouchStartX/2;
+			//var y1=uiTouchStartY/2;
+			//var x2=uiTouchLastX/2;
+			//var y2=uiTouchLastY/2;
+			//ui_Page2Context.fillRect(x1,y1,20,20);
+			//console.log(ui_Page2Context.canvas.width+","+ui_Page2Context.canvas.clientWidth);
+			//var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;
+			//console.log(a);
+			
 			//console.log("touch start :"+uiTouchLastX+","+uiTouchLastY);
 			//ui_Page1Context.fillStyle="#FFFFFF";
 			//ui_Page1Context.fillRect(uiTouchLastX,uiTouchLastX,50,50);
@@ -1700,28 +1723,49 @@
 			// get the canvas client coordinates
 			var mx=my=0;
 			if(x>=rect1.left && y>=rect1.top && x<rect1.right && y<rect1.bottom){
-				activeCanvas = topCanvas;
+				if(uiSelectionStart && activeCanvas!=topCanvas){
+					uiSelectionStart=false;
+					uiSelectionEnd=true;
+					
+				}
+				//activeCanvas = topCanvas;
 				mx=rect1.left;
 				my=rect1.top;				
 			}
 			if(x>=rect2.left && y>=rect2.top && x<rect2.right && y<rect2.bottom){
-				activeCanvas = frontCanvas;				
+				if(uiSelectionStart && activeCanvas!=frontCanvas){
+					uiSelectionStart=false;
+					uiSelectionEnd=true;
+				}
+				
+				//activeCanvas = frontCanvas;				
 				mx=rect2.left;
 				my=rect2.top;				
 			}
 			if(x>=rect3.left && y>=rect3.top && x<rect3.right && y<rect3.bottom){
-				activeCanvas = rightCanvas;	
+				if(uiSelectionStart && activeCanvas!=rightCanvas){
+					uiSelectionStart=false;
+					uiSelectionEnd=true;
+				}
+				
+				//activeCanvas = rightCanvas;	
 				mx=rect3.left;
 				my=rect3.top;					
 			}
 			if(x>=rect4.left && y>=rect4.top && x<rect4.right && y<rect4.bottom){
-				activeCanvas = propsCanvas;				
+				if(uiSelectionStart && activeCanvas!=propsCanvas){
+					uiSelectionStart=false;
+					uiSelectionEnd=true;
+				}
+				
+				//activeCanvas = propsCanvas;				
 				mx=rect4.left;
 				my=rect4.top;								
 			}
 			// Bring back the coordinates to the ccurrent canvas coordinates..
 			uiTouchLastX = uiTouchLastX - mx;
 			uiTouchLastY = uiTouchLastY - my;
+
 			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);		
 			//if(Math.random()<.01)console.log(e.changedTouches.length);	
 			
@@ -1747,13 +1791,63 @@
 					topCanvasOffsetY+=dy;
 				}
 				
+				
+				
 				// update the screen.
 				drawTop(ui_Page1Context);			
 				drawFront(ui_Page2Context);			
 				drawRight(ui_Page3Context);					
 				drawPropScreen(ui_Page4Context);				
 				updateScene();					
-		}			
+			}
+			// If we are dragging the selection rectangle.
+			if(uiSelectionStart){
+				//console.log("a");
+				// Get the scale of the canvas..
+				var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
+				var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				var x2=uiTouchLastX/a;
+				var y2=uiTouchLastY/b;
+				// Selection in all directions.
+				if(x1>x2){
+					[x1,x2] = [x2,x1];
+				}
+				if(y1>y2){
+					[y1,y2] = [y2,y1];
+				}
+				var w=Math.abs(x1-x2);
+				var h=Math.abs(y1-y2);
+				// update the screen.
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				// draw the selection rectangle.
+				var c;
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				
+				
+				if(activeCanvas==topCanvas)c=ui_Page1Context;
+				if(activeCanvas==frontCanvas)c=ui_Page2Context;
+				if(activeCanvas==rightCanvas)c=ui_Page3Context;				
+				if(activeCanvas>-1 && activeCanvas<4){
+				c.strokeStyle = 'yellow';;
+				c.rect(x1,y1,w,h);
+				c.stroke();
+				}
+				// update the screen.
+//				drawTop(ui_Page1Context);			
+//				drawFront(ui_Page2Context);			
+//				drawRight(ui_Page3Context);					
+//				drawPropScreen(ui_Page4Context);				
+//				updateScene();					
+				
+			}
+			
 
 			e.preventDefault();
 		}		
@@ -1772,7 +1866,15 @@
 				uiTouchStart = false;
 				uiTouchEnd = true;				
 			}
-			
+			uiSelectionStart = false;
+			uiSelectionEnd = true;
+			// update the screen.
+			drawTop(ui_Page1Context);			
+			drawFront(ui_Page2Context);			
+			drawRight(ui_Page3Context);					
+			drawPropScreen(ui_Page4Context);				
+			updateScene();					
+
 			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);					
 			//e.preventDefault();
 		}
