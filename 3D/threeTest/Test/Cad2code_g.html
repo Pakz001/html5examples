@@ -239,6 +239,7 @@
 			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
 			var uiPointY = [];
 			var uiPointVertice = [];
+			var uiSelectionVertice = []; // holds the selected points/vertices id's
 			
 			var cube = makeMesh01();
 			//add the object to scene
@@ -469,7 +470,11 @@
 				//c.font = "16px arial";				
 				
 				for(var i=0;i<vx.length;i++){
-					if(i==activeVertice){
+					var bloke=false;
+					for(var j=0;j<uiSelectionVertice.length;j++){
+						if(i==uiSelectionVertice[j])bloke=true;
+					}
+					if(i==activeVertice || bloke==true){						
 						c.fillStyle="#AA0000";
 						c.fillRect(vx[i]-6,vy[i]-6,12,12);						
 						c.fillStyle="#FFFF00";
@@ -643,7 +648,11 @@
 				//c.fillStyle="#FFFFFF";
 				//c.font = "16px arial";				
 				for(var i=0;i<vx.length;i++){
-					if(i==activeVertice){
+					var bloke=false;
+					for(var j=0;j<uiSelectionVertice.length;j++){
+						if(i==uiSelectionVertice[j])bloke=true;
+					}
+					if(i==activeVertice || bloke==true){
 						c.fillStyle="#AA0000";
 						c.fillRect(vx[i]-6,vy[i]-6,12,12);						
 						c.fillStyle="#FFFF00";
@@ -814,7 +823,12 @@
 				// Draw the points in the cad canvas
 				//c.font = "16px arial";				
 				for(var i=0;i<vx.length;i++){
-					if(i==activeVertice){
+					// Multiple selection
+					var bloke=false;
+					for(var j=0;j<uiSelectionVertice.length;j++){
+						if(i==uiSelectionVertice[j])bloke=true;
+					}
+					if(i==activeVertice || bloke==true){
 						c.fillStyle="#AA0000";
 						c.fillRect(vx[i]-6,vy[i]-6,12,12);						
 						c.fillStyle="#FFFF00";
@@ -1060,9 +1074,28 @@
 					var av = Math.floor(activeVertice*3);
 					if(e.code==="KeyW"){
 						if(ctrlKeyDown==false){
-							if(activeCanvas==frontCanvas)quad_vertices[av+1]+=10;
-							if(activeCanvas==rightCanvas)quad_vertices[av+1]+=10;						
-							if(activeCanvas==topCanvas)quad_vertices[av+2]+=10;
+							if(uiSelectionVertice.length>0){
+								if(activeCanvas==frontCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+1]+=10;
+									}
+								}	
+								if(activeCanvas==rightCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+1]+=10;
+									}
+								}	
+								if(activeCanvas==topCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+2]+=10;
+									}
+								}	
+								
+							}else{
+								if(activeCanvas==frontCanvas)quad_vertices[av+1]+=10;
+								if(activeCanvas==rightCanvas)quad_vertices[av+1]+=10;						
+								if(activeCanvas==topCanvas)quad_vertices[av+2]+=10;
+							}
 						}
 						if(ctrlKeyDown==true){
 							if(activeCanvas==frontCanvas)frontCanvasOffsetY+=10;	
@@ -1070,11 +1103,30 @@
 							if(activeCanvas==topCanvas)topCanvasOffsetY+=10;	
 						}
 					}
+					// If pressed Key S on canvas then move vertice(s)
 					if(e.code==="KeyS"){
 						if(ctrlKeyDown==false){
-							if(activeCanvas==frontCanvas)quad_vertices[av+1]-=10;
-							if(activeCanvas==rightCanvas)quad_vertices[av+1]-=10;											
-							if(activeCanvas==topCanvas)quad_vertices[av+2]-=10;
+							if(uiSelectionVertice.length>0){
+								if(activeCanvas==frontCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+1]-=10;
+									}
+								}	
+								if(activeCanvas==rightCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+1]-=10;
+									}
+								}	
+								if(activeCanvas==topCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+2]-=10;
+									}
+								}									
+							}else{							
+								if(activeCanvas==frontCanvas)quad_vertices[av+1]-=10;
+								if(activeCanvas==rightCanvas)quad_vertices[av+1]-=10;						
+								if(activeCanvas==topCanvas)quad_vertices[av+2]-=10;
+							}
 						}
 						if(ctrlKeyDown==true){
 							if(activeCanvas==frontCanvas)frontCanvasOffsetY-=10;	
@@ -1083,11 +1135,30 @@
 						}
 						
 					}
+					//If pressed key A on canvas then move vertice(s)
 					if(e.code==="KeyA"){
 						if(ctrlKeyDown==false){
-							if(activeCanvas==frontCanvas)quad_vertices[av]+=10;
-							if(activeCanvas==rightCanvas)quad_vertices[av+2]+=10;						
-							if(activeCanvas==topCanvas)quad_vertices[av]+=10;	
+							if(uiSelectionVertice.length>0){
+								if(activeCanvas==frontCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3]+=10;
+									}
+								}	
+								if(activeCanvas==rightCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+2]+=10;
+									}
+								}	
+								if(activeCanvas==topCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3]+=10;
+									}
+								}									
+							}else{							
+								if(activeCanvas==frontCanvas)quad_vertices[av]+=10;
+								if(activeCanvas==rightCanvas)quad_vertices[av+2]+=10;						
+								if(activeCanvas==topCanvas)quad_vertices[av]+=10;	
+							}
 						}	
 						if(ctrlKeyDown==true){
 							if(activeCanvas==frontCanvas)frontCanvasOffsetX+=10;	
@@ -1097,11 +1168,30 @@
 						}
 						
 					}
+					// if pressed key D on canvas then move vertice(s)
 					if(e.code==="KeyD"){
 						if(ctrlKeyDown==false){
-							if(activeCanvas==frontCanvas)quad_vertices[av]-=10;
-							if(activeCanvas==rightCanvas)quad_vertices[av+2]-=10;						
-							if(activeCanvas==topCanvas)quad_vertices[av]-=10;
+							if(uiSelectionVertice.length>0){
+								if(activeCanvas==frontCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3]-=10;
+									}
+								}	
+								if(activeCanvas==rightCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+2]-=10;
+									}
+								}	
+								if(activeCanvas==topCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3]-=10;
+									}
+								}									
+							}else{							
+								if(activeCanvas==frontCanvas)quad_vertices[av]-=10;
+								if(activeCanvas==rightCanvas)quad_vertices[av+2]-=10;						
+								if(activeCanvas==topCanvas)quad_vertices[av]-=10;
+							}
 						}
 						if(ctrlKeyDown==true){
 							if(activeCanvas==frontCanvas)frontCanvasOffsetX-=10;	
@@ -1970,9 +2060,12 @@
 				var w=Math.abs(x1-x2);
 				var h=Math.abs(y1-y2);
 				var points = [];
+				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+				uiSelectionVertice = [];
 				for(var i=0;i<uiPointVertice.length;i++){			
 					if(uiPointX[i]>x1 && uiPointX[i]<x2 && uiPointY[i]>y1 && uiPointY[i]<y2){
 						points.push(uiPointVertice[i]/3);
+						uiSelectionVertice.push(uiPointVertice[i]/3);
 						//console.log(uiPointVertice[i]+","+activeVertice);
 						
 					}
@@ -1982,6 +2075,7 @@
 				// No selection buffer right now...
 				// If we have multiple points below the selection ontop of
 				// each other then select either one of two.
+
 				if(points.length==1)activeVertice = points[0];
 				if(points.length==2){
 					if(points[0]==activeVertice){
