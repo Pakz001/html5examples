@@ -230,6 +230,7 @@
 			var uiTouchLastY = 0;
 			var uiTouchStart = false;			
 			var uiTouchEnd = false;
+			var uiTouchDrag = false;
 				
 			
 			var cube = makeMesh01();
@@ -1639,10 +1640,13 @@
 				var y = e.changedTouches[i].clientY;				
 				// Quick hack to get grid index of user interface canvas
 				// touch last pressed x and y location.
+				uiTouchStartX = x;
+				uiTouchStartY = y;				
 				uiTouchLastX = x;
 				uiTouchLastY = y;
 				uiTouchStart = true;
 			}
+
 			// get the canvas client coordinates
 			var mx=my=0;
 			if(x>=rect1.left && y>=rect1.top && x<rect1.right && y<rect1.bottom){
@@ -1693,7 +1697,64 @@
 				uiTouchLastX = x;
 				uiTouchLastY = y;
 			}
-			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);					
+			// get the canvas client coordinates
+			var mx=my=0;
+			if(x>=rect1.left && y>=rect1.top && x<rect1.right && y<rect1.bottom){
+				activeCanvas = topCanvas;
+				mx=rect1.left;
+				my=rect1.top;				
+			}
+			if(x>=rect2.left && y>=rect2.top && x<rect2.right && y<rect2.bottom){
+				activeCanvas = frontCanvas;				
+				mx=rect2.left;
+				my=rect2.top;				
+			}
+			if(x>=rect3.left && y>=rect3.top && x<rect3.right && y<rect3.bottom){
+				activeCanvas = rightCanvas;	
+				mx=rect3.left;
+				my=rect3.top;					
+			}
+			if(x>=rect4.left && y>=rect4.top && x<rect4.right && y<rect4.bottom){
+				activeCanvas = propsCanvas;				
+				mx=rect4.left;
+				my=rect4.top;								
+			}
+			// Bring back the coordinates to the ccurrent canvas coordinates..
+			uiTouchLastX = uiTouchLastX - mx;
+			uiTouchLastY = uiTouchLastY - my;
+			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);		
+			//if(Math.random()<.01)console.log(e.changedTouches.length);	
+			
+			// if we touch with 2 fingers then drag mode for canvas itself.
+			if(e.changedTouches.length==2)uiTouchDrag=true;
+			if(uiTouchDrag){
+				uiTouchDrag=false;
+				var dx=uiTouchStartX-uiTouchLastX;
+				var dy=uiTouchStartY-uiTouchLastY;
+				//if(Math.random()<.1)console.log(""+uiTouchStartX+","+uiTouchLastX);
+				dx/=90;
+				dy/=45;
+				if(activeCanvas == frontCanvas){
+					frontCanvasOffsetX+=dx;
+					frontCanvasOffsetY+=dy;
+				}
+				if(activeCanvas == rightCanvas){
+					rightCanvasOffsetX+=dx;
+					rightCanvasOffsetY+=dy;
+				}
+				if(activeCanvas == topCanvas){
+					topCanvasOffsetX+=dx;
+					topCanvasOffsetY+=dy;
+				}
+				
+				// update the screen.
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);				
+				updateScene();					
+		}			
+
 			e.preventDefault();
 		}		
 		
@@ -1706,11 +1767,12 @@
 				var y = e.changedTouches[i].clientY;				
 				// Quick hack to get grid index of user interface canvas
 				// touch last pressed x and y location.
-				uiTouchLastX = x;
-				uiTouchLastY = y;
+				//uiTouchLastX = x;
+				//uiTouchLastY = y;
 				uiTouchStart = false;
 				uiTouchEnd = true;				
 			}
+			
 			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);					
 			//e.preventDefault();
 		}
