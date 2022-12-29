@@ -1969,15 +1969,30 @@
 				}
 				var w=Math.abs(x1-x2);
 				var h=Math.abs(y1-y2);
-
+				var points = [];
 				for(var i=0;i<uiPointVertice.length;i++){			
 					if(uiPointX[i]>x1 && uiPointX[i]<x2 && uiPointY[i]>y1 && uiPointY[i]<y2){
-						activeVertice = uiPointVertice[i]/3;
+						points.push(uiPointVertice[i]/3);
 						//console.log(uiPointVertice[i]+","+activeVertice);
 						
 					}
 					//ui_Page1Context.fillStyle="#FF0000";
 					//ui_Page1Context.fillRect(uiPointX[i],uiPointY[i],12,12);
+				}
+				// No selection buffer right now...
+				// If we have multiple points below the selection ontop of
+				// each other then select either one of two.
+				if(points.length==1)activeVertice = points[0];
+				if(points.length==2){
+					if(points[0]==activeVertice){
+						activeVertice=points[1];
+
+					}else{
+						activeVertice=points[0];
+					}
+					
+				}else if(points.length>2){
+					activeVertice = points[Math.floor(Math.random()*points.length)];
 				}
 				//console.log("a");
 			}
