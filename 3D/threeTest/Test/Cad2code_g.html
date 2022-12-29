@@ -149,7 +149,10 @@
 			  color: 0xfffff,
 			  wireframe: false,
 			});
-			
+
+			window.addEventListener("touchstart", touchHandler,false);
+			window.addEventListener("touchmove", touchHandler,false);
+			window.addEventListener("touchend", touchHandler,false);			
 			window.addEventListener('keyup', control, false);		
 			window.addEventListener('keydown', control, false);
 			//var cube = new THREE.Mesh(geometry, material);
@@ -220,6 +223,14 @@
 			var frontCanvasOffsetY = 0;
 			var topCanvasOffsetX = 0;
 			var topCanvasOffsetY = 0;
+			// touch controls
+			var uiTouchStartX = 0;
+			var uiTouchStartY = 0;
+			var uiTouchLastX = 0;
+			var uiTouchLastY = 0;
+			var uiTouchStart = false;			
+			var uiTouchEnd = false;
+				
 			
 			var cube = makeMesh01();
 			//add the object to scene
@@ -235,6 +246,16 @@
 			container.appendChild( renderer.domElement );			
 			const ui_Page1Canvas = document.getElementById( 'ui-page1' );
 
+
+			//var frontCanvas = 2;
+			//var topCanvas = 1;
+			//var rightCanvas = 3;
+			//var propsCanvas = 4;
+			//var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
+			// front is ui_Page2Context
+			// top is ui_Page1Context
+			// right is ui_Page3Context
+			// props is ui_Page4Context
 			const ui_Page1Context = ui_Page1Canvas.getContext( '2d' );	
 			drawTop(ui_Page1Context);
 			const ui_Page2Canvas = document.getElementById( 'ui-page2' );
@@ -249,7 +270,34 @@
 			ui_Page1Canvas.id="ab1";
 			ui_Page2Canvas.id="ab2";
 			ui_Page3Canvas.id="ab3";
-			ui_Page4Canvas.id="ab4";			
+			ui_Page4Canvas.id="ab4";
+			//canvas.addEventListener ('click', event => {
+			//  console.log(`x: ${event.screenX}, y: ${event.screenY}`)
+			//})			
+
+			//			ui_Page1Canvas.addEventListener ('click', event => {
+//				touchStartX = event.screenX;
+//				//console.log(touchStartX);
+//			})
+			//ui_Page1Canvas.addEventListener ('touchstart',touchHandler);
+			//ui_Page2Canvas.addEventListener ('touchstart',touchHandler);
+			//ui_Page3Canvas.addEventListener ('touchstart',touchHandler);
+			
+			/*
+			ui_Page1Canvas.addEventListener ('touchstart', event => {
+				uiTouchLastX = event.screenX;
+				console.log(event.screenX);
+			})
+			ui_Page2Canvas.addEventListener ('touchmove', event => {
+				uiTouchLastX = event.screenX;
+				console.log(uiTouchLastX);
+			})
+			ui_Page3Canvas.addEventListener ('touchmove', event => {
+				uiTouchLastX = event.screenX;
+				console.log(uiTouchLastX);
+			})
+			*/
+			
 			//var container2 = document.getElementById( 'some_id2' );
 			//var container3 = document.getElementById( 'some_id3' );
 			//container2.appendChild( ab1.domElement );				
@@ -281,6 +329,7 @@
 				//ui_Page2Context.canvas.style.top=window.innerHeight/1.5+"px";
 				//ui_Page3Context.canvas.style.top=window.innerHeight/3+"px";
 				//ui_Page4Context.canvas.style.top=window.innerHeight/1.5+"px";
+
 				ui_Page1Context.canvas.style.width=window.innerWidth/2-16+"px";
 				ui_Page1Context.canvas.style.height=window.innerHeight/3+"px";				
 				ui_Page2Context.canvas.style.width=window.innerWidth/2-16+"px";
@@ -289,7 +338,7 @@
 				ui_Page3Context.canvas.style.height=window.innerHeight/3+"px";				
 				ui_Page4Context.canvas.style.width=window.innerWidth/2-16+"px";
 				ui_Page4Context.canvas.style.height=window.innerHeight/3+"px";				
-				}
+			}
 				
 				//cube.rotation.x+=.07;
 				//cube.rotation.z+=.07;				
@@ -313,7 +362,30 @@
 			}	
 			animate();	
 			
-			
+			function canvasSelection(){
+
+				//var uiTouchStartX = 0;
+				//var uiTouchStartY = 0;
+				//var uiTouchLastX = 0;
+				//var uiTouchLastY = 0;
+				//var uiTouchStart = true;			
+				//var uiTouchEnd = true;
+				//var frontCanvas = 2;
+				//var topCanvas = 1;
+				//var rightCanvas = 3;
+				//var propsCanvas = 4;
+				//var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
+				if(uiTouchEnd==true){
+					var x1=y1=x2=y2=0;
+					//console.log(ui_Page1Context.canvas.style.top);
+					if(uiTouchStartX>x1 && uiTouchStartY>y1 && uiTouchStartX<x2 && uiTouchStartY<y2){
+						activeCanvas = topCanvas;
+					}
+				}
+				if(uiTouchStart==false)return;
+				
+				
+			}
 			
 			// draw top cad view.. note opengl style coordinates - up=down(stranger things)
 			function drawTop(c){
@@ -331,6 +403,8 @@
 				for(var y=0;y<c.canvas.height;y+=2){
 					c.fillRect(c.canvas.width/2,y,1,1);
 				}
+				
+				canvasSelection(c);
 				
 				c.translate(topCanvasOffsetX,topCanvasOffsetY);
 				
@@ -1526,6 +1600,123 @@
 
 			}			
 		}		
+		
+		
+	// Touch controls function	
+	//
+	// Currently working on adding selection of points (note scaling!! zoom)
+	//
+	function touchHandler(e){
+
+//			function getTouchPos(canvasDom, touchEvent) {
+//	  var rect = canvasDom.getBoundingClientRect();
+//	  return {
+//	    x: touchEvent.touches[0].clientX - rect.left,
+//	    y: touchEvent.touches[0].clientY - rect.top
+//	  };
+//	}	
+			//var frontCanvas = 2;
+			//var topCanvas = 1;
+			//var rightCanvas = 3;
+			//var propsCanvas = 4;
+			//var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
+			// front is ui_Page2Context
+			// top is ui_Page1Context
+			// right is ui_Page3Context
+			// props is ui_Page4Context
+			
+		var rect1 = ui_Page1Canvas.getBoundingClientRect();
+		var rect2 = ui_Page2Canvas.getBoundingClientRect();
+		var rect3 = ui_Page3Canvas.getBoundingClientRect();
+		var rect4 = ui_Page4Canvas.getBoundingClientRect();		
+
+		//
+		// touch start
+		if(e.type=="touchstart" && e.touches) {
+			// get the last touch coordinates
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				// Quick hack to get grid index of user interface canvas
+				// touch last pressed x and y location.
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+				uiTouchStart = true;
+			}
+			// get the canvas client coordinates
+			var mx=my=0;
+			if(x>=rect1.left && y>=rect1.top && x<rect1.right && y<rect1.bottom){
+				activeCanvas = topCanvas;
+				mx=rect1.left;
+				my=rect1.top;				
+			}
+			if(x>=rect2.left && y>=rect2.top && x<rect2.right && y<rect2.bottom){
+				activeCanvas = frontCanvas;				
+				mx=rect2.left;
+				my=rect2.top;				
+			}
+			if(x>=rect3.left && y>=rect3.top && x<rect3.right && y<rect3.bottom){
+				activeCanvas = rightCanvas;	
+				mx=rect3.left;
+				my=rect3.top;					
+			}
+			if(x>=rect4.left && y>=rect4.top && x<rect4.right && y<rect4.bottom){
+				activeCanvas = propsCanvas;				
+				mx=rect4.left;
+				my=rect4.top;								
+			}
+			// Bring back the coordinates to the ccurrent canvas coordinates..
+			uiTouchLastX = uiTouchLastX - mx;
+			uiTouchLastY = uiTouchLastY - my;
+			uiTouchStartX = uiTouchStartX - mx;
+			uiTouchStartY = uiTouchStartY - my;
+			
+			// update the screen.
+			drawTop(ui_Page1Context);			
+			drawFront(ui_Page2Context);			
+			drawRight(ui_Page3Context);					
+			drawPropScreen(ui_Page4Context);				
+			updateScene();								
+				
+			//console.log("touch start :"+uiTouchLastX+","+uiTouchLastY);
+			//ui_Page1Context.fillStyle="#FFFFFF";
+			//ui_Page1Context.fillRect(uiTouchLastX,uiTouchLastX,50,50);
+			e.preventDefault();
+		}
+
+		if(e.type=="touchmove" && e.touches) {
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				// Quick hack to get grid index of user interface canvas
+				// touch last pressed x and y location.
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+			}
+			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);					
+			e.preventDefault();
+		}		
+		
+		
+		// touch end
+		if(e.type=="touchend" && e.touches) {
+
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				// Quick hack to get grid index of user interface canvas
+				// touch last pressed x and y location.
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+				uiTouchStart = false;
+				uiTouchEnd = true;				
+			}
+			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);					
+			//e.preventDefault();
+		}
+	
+	}			
 	</script>
 	</body>
 	</html>			
+	
