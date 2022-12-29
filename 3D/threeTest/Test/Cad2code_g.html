@@ -150,6 +150,8 @@
 			  wireframe: false,
 			});
 
+			window.addEventListener("pointerdown", touchHandler,false);
+			window.addEventListener("pointerup", touchHandler,false);
 			window.addEventListener("touchstart", touchHandler,false);
 			window.addEventListener("touchmove", touchHandler,false);
 			window.addEventListener("touchend", touchHandler,false);			
@@ -233,6 +235,7 @@
 			var uiTouchDrag = false;
 			var uiSelectionStart = false;
 			var uiSelectionEnd = false;	
+			var uiPinchStartDist = 0;
 			
 			var cube = makeMesh01();
 			//add the object to scene
@@ -1628,12 +1631,14 @@
 			// props is ui_Page4Context
 //			var uiSelectionStart = false;
 //			var uiSelectionEnd = false;	
+//			var uiPinchStartDist = 0;
 			
 			
 		var rect1 = ui_Page1Canvas.getBoundingClientRect();
 		var rect2 = ui_Page2Canvas.getBoundingClientRect();
 		var rect3 = ui_Page3Canvas.getBoundingClientRect();
 		var rect4 = ui_Page4Canvas.getBoundingClientRect();		
+
 
 		//
 		// touch start
@@ -1770,7 +1775,45 @@
 			//if(Math.random()<.01)console.log(e.changedTouches.length);	
 			
 			// if we touch with 2 fingers then drag mode for canvas itself.
-			if(e.changedTouches.length==2)uiTouchDrag=true;
+			if(e.changedTouches.length==2){
+				uiTouchDrag=true;
+				uiSelectionStart=false;
+				uiSelectionEnd=false;
+/*				
+				// scale zoom canvas..
+				var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
+				var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
+				
+				var d1=e.changedTouches[0].clientX/a;
+				var d2=e.changedTouches[1].clientX/b;
+				if(Math.random()<.05){
+					uiPinchStartDist = Math.hypot(d1-d2);
+				}
+				if(Math.random()<.1){
+					//console.log(Math.abs(Math.hypot(uiPinchStartDist-Math.hypot(d1-d2))));					
+				}
+				uiPinchStartDist+=Math.abs(Math.hypot(d1-d2));
+				if(uiPinchStartDist>20){
+					uiPinchStartDist=0;
+					if(Math.hypot(d1-d2)>0){
+					canvasScale+=10;
+					}else{
+					canvasScale-=10;
+					}
+					uiTouchDrag=false;
+//				}else{
+//					canvasScale-=10;
+//					uiTouchDrag=false;
+				}
+				//console.log(Math.hypot(d1-d2));
+				//if(Math.hypot(d1-d2)<200){
+				//	uiTouchDrag=false;
+				//	}
+				*/
+				//canvasScale = Math.hypot(d1-d2);
+				
+				
+			}
 			if(uiTouchDrag){
 				uiTouchDrag=false;
 				var dx=uiTouchStartX-uiTouchLastX;
