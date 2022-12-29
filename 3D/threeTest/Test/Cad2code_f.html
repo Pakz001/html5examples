@@ -93,11 +93,20 @@
 		    <tr>
         		<td id="some_id"></td>
 				<td>
-					<textarea id="output" name="output" rows="14" cols="50">
+					<textarea id="output" name="output" rows="10" cols="50">
 					</textarea>
 		
 				</td>
  		   </tr>
+		   	<tr>
+        		<td id="some_id2"></td>				
+        		<td id="some_id3"></td>								
+			</tr>
+		   	<tr>
+        		<td id="some_id4"></td>				
+        		<td id="some_id5"></td>								
+			</tr>
+			
 	   	</table>	
 
 		
@@ -217,6 +226,7 @@
 
 			container.appendChild( renderer.domElement );			
 			const ui_Page1Canvas = document.getElementById( 'ui-page1' );
+
 			const ui_Page1Context = ui_Page1Canvas.getContext( '2d' );	
 			drawTop(ui_Page1Context);
 			const ui_Page2Canvas = document.getElementById( 'ui-page2' );
@@ -228,7 +238,18 @@
 			const ui_Page4Canvas = document.getElementById( 'ui-page4' );
 			const ui_Page4Context = ui_Page4Canvas.getContext( '2d' );	
 			drawPropScreen(ui_Page4Context);
-			
+			ui_Page1Canvas.id="ab1";
+			ui_Page2Canvas.id="ab2";
+			ui_Page3Canvas.id="ab3";
+			ui_Page4Canvas.id="ab4";			
+			//var container2 = document.getElementById( 'some_id2' );
+			//var container3 = document.getElementById( 'some_id3' );
+			//container2.appendChild( ab1.domElement );				
+			//container3.appendChild( ui_Page2Context.domElement );				
+			document.getElementById('some_id2').appendChild(ui_Page1Canvas);
+			document.getElementById('some_id3').appendChild(ui_Page3Canvas);			
+			document.getElementById('some_id4').appendChild(ui_Page2Canvas);
+			document.getElementById('some_id5').appendChild(ui_Page4Canvas);			
 			
 			// 
 			// Method to add text to text area
@@ -247,6 +268,20 @@
 				//camera.position.x=Math.random()*150-77;
 				//camera.position.y=Math.random()*150-77;
 				//camera.position.z=Math.random()*150-77;
+				if(Math.random()<.1){
+				//ui_Page1Context.canvas.style.top=window.innerHeight/3+"px";
+				//ui_Page2Context.canvas.style.top=window.innerHeight/1.5+"px";
+				//ui_Page3Context.canvas.style.top=window.innerHeight/3+"px";
+				//ui_Page4Context.canvas.style.top=window.innerHeight/1.5+"px";
+				ui_Page1Context.canvas.style.width=window.innerWidth/2-16+"px";
+				ui_Page1Context.canvas.style.height=window.innerHeight/3+"px";				
+				ui_Page2Context.canvas.style.width=window.innerWidth/2-16+"px";
+				ui_Page2Context.canvas.style.height=window.innerHeight/3+"px";				
+				ui_Page3Context.canvas.style.width=window.innerWidth/2-16+"px";
+				ui_Page3Context.canvas.style.height=window.innerHeight/3+"px";				
+				ui_Page4Context.canvas.style.width=window.innerWidth/2-16+"px";
+				ui_Page4Context.canvas.style.height=window.innerHeight/3+"px";				
+				}
 				
 				//cube.rotation.x+=.07;
 				//cube.rotation.z+=.07;				
