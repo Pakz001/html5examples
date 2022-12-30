@@ -711,6 +711,7 @@
 				uiPointVertice = [];
 				var dx = [];
 				var dy = [];
+
 				if(showVertexNumbers){
 					c.font = "12px arial";				
 					for(var i=0;i<vx.length;i++){
@@ -2164,6 +2165,8 @@
 				quad_vertices[uiSelectionVertice[i]*3+1]=b;  
 				quad_vertices[uiSelectionVertice[i]*3+2]=c;  
 			}				
+			
+			// selection
 			if(uiSelectionStart && activeCanvas!=propsCanvas && uiTouchPress==false){
 
 				var a=b=0;
@@ -2199,11 +2202,26 @@
 				var h=Math.abs(y1-y2);
 				var points = [];
 				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
-
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
+				}
+				
 				if(w>1 && h>1){
 				uiSelectionVertice = [];
 				for(var i=0;i<uiPointVertice.length;i++){			
-					if(uiPointX[i]>x1 && uiPointX[i]<x2 && uiPointY[i]>y1 && uiPointY[i]<y2){
+					if(uiPointX[i]+offx>x1 && uiPointX[i]+offx<x2 && uiPointY[i]+offy>y1 && uiPointY[i]+offy<y2){
 						points.push(uiPointVertice[i]/3);
 						uiSelectionVertice.push(uiPointVertice[i]/3);
 						//console.log(uiPointVertice[i]+","+activeVertice);
