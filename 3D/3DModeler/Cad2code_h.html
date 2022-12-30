@@ -240,12 +240,17 @@
 			var uiPointY = [];
 			var uiPointVertice = [];
 			var uiSelectionVertice = []; // holds the selected points/vertices id's
-			var uiPinchStart = false;
-			var uiPinchStartDistX = 0; // pinch zoom variables
-			var uiPinchStartDistY = 0;
-			var uiPinchStartX = 0;
+//			var uiPinchStart = false;
+//			var uiPinchStartDistX = 0; // pinch zoom variables
+//			var uiPinchStartDistY = 0;
+			var uiPinchStartX = 0; // pinch zoom in/out
 			var uiPinchStartY = 0;
 			var uiPinchStartDist = 0;
+			var uiTouchPress = false; // for hold down touch 1 finger (popup menu)
+			var uiTouchPressX = 0;
+			var uiTouchPressY = 0;
+			var uiTouchPressTime = 0;
+			var uiTouchPressTimeMax = 30;
 			
 			var cube = makeMesh01();
 			//add the object to scene
@@ -353,7 +358,10 @@
 				ui_Page3Context.canvas.style.height=window.innerHeight/3+"px";				
 				ui_Page4Context.canvas.style.width=window.innerWidth/2-16+"px";
 				ui_Page4Context.canvas.style.height=window.innerHeight/3+"px";				
-			}
+				}
+				
+				// increase touch press timer.(move points)
+				uiTouchPressTime+=1;
 				
 				//cube.rotation.x+=.07;
 				//cube.rotation.z+=.07;				
@@ -1811,15 +1819,25 @@
 			uiTouchStartX = uiTouchStartX - mx;
 			uiTouchStartY = uiTouchStartY - my;
 
-
+			//var uiTouchPress = false; // for hold down touch 1 finger
+			//var uiTouchPressX = 0;
+			//var uiTouchPressY = 0;
+			//var uiTouchPressTime = 0;
+			//var uiTouchPressTimeMax = 30;
+			
 
 			
 			// Selection of points/objects with touch screen
 			// 
 			if(e.changedTouches.length==1 && uiSelectionEnd==true && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
 				uiSelectionStart = true;
-
 				uiSelectionEnd = false;
+				// Touch move point.
+				uiTouchPress = true;
+				uiTouchPressX = uiTouchStartX;
+				uiTouchPressY = uiTouchStartY;
+				uiTouchPressTime = 0;
+
 			}
 			if(e.changedTouches.length==2 && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
 				var x3 = e.changedTouches[0].clientX;
@@ -1911,6 +1929,92 @@
 
 			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);		
 			//if(Math.random()<.01)console.log(e.changedTouches.length);	
+
+			if(uiTouchPressX!=uiTouchLastX || uiTouchPressY!=uiTouchLastY){
+				if(uiTouchPressTime<uiTouchPressTimeMax && uiTouchPress==true){
+					uiTouchPress=false;
+
+				}
+			}
+			if(e.changedTouches.length==1 && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
+				//
+
+				if(uiTouchPress==true){
+
+
+					var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
+					var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
+				
+					var x1=uiTouchStartX/a;
+					var y1=uiTouchStartY/b;
+					var x2=uiTouchLastX/a;
+					var y2=uiTouchLastY/b;
+					// Selection in all directions.
+					if(x1>x2){
+						[x1,x2] = [x2,x1];
+					}
+					if(y1>y2){
+						[y1,y2] = [y2,y1];
+					}
+					
+					bb = uiTouchLastX-uiTouchPressX;
+					aa = uiTouchLastY-uiTouchPressY;
+					uiTouchPressX = uiTouchLastX;
+					uiTouchPressY = uiTouchLastY;
+					// move little bit slower
+					bb/=3;
+					aa/=3;
+					//move vertical
+					if(uiSelectionVertice.length>0){
+						if(activeCanvas==frontCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3+1]+=aa;
+							}
+						}	
+						if(activeCanvas==rightCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3+1]+=aa;
+							}
+						}	
+						if(activeCanvas==topCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3+2]+=aa;
+							}
+						}						
+					}
+					//move horizontal
+					if(uiSelectionVertice.length>0){
+						if(activeCanvas==frontCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3]+=bb;
+							}
+						}	
+						if(activeCanvas==rightCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3+2]+=bb;
+							}
+						}	
+						if(activeCanvas==topCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3]+=bb;
+							}
+						}		
+					}					
+			
+					
+					
+				}
+			//var uiTouchPress = false; // for hold down touch 1 finger (popup menu)
+			//var uiTouchPressX = 0;
+			//var uiTouchPressY = 0;
+			//var uiTouchPressTime = 0;
+			//var uiTouchPressTimeMax = 30;
+			//uiTouchPressX = uiTouchStartX;
+				//uiTouchPressY = uiTouchStartY;
+				//uiTouchPressTime = 0;
+				
+
+			}
 			
 			// if we touch with 2 fingers then drag mode for canvas itself.
 			if(e.changedTouches.length==2  && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
@@ -2044,6 +2148,18 @@
 				uiTouchStart = false;
 				uiTouchEnd = true;				
 			}
+			// Round vertices to 10..
+			for(var i=0;i<uiSelectionVertice.length;i++){					
+				var a = quad_vertices[uiSelectionVertice[i]*3]; 					
+				var b = quad_vertices[uiSelectionVertice[i]*3+1];  
+				var c = quad_vertices[uiSelectionVertice[i]*3+2];  
+				a = Math.round(a/10)*10;
+				b = Math.round(b/10)*10;
+				c = Math.round(c/10)*10;
+				quad_vertices[uiSelectionVertice[i]*3]=a; 					
+				quad_vertices[uiSelectionVertice[i]*3+1]=b;  
+				quad_vertices[uiSelectionVertice[i]*3+2]=c;  
+			}				
 			if(uiSelectionStart && activeCanvas!=propsCanvas){
 
 				var a=b=0;
@@ -2110,6 +2226,10 @@
 			}
 			uiSelectionStart = false;
 			uiSelectionEnd = true;
+			
+			
+			
+			
 //			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
 			
 //			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
