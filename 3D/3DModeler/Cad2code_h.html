@@ -1830,6 +1830,7 @@
 			// Selection of points/objects with touch screen
 			// 
 			if(e.changedTouches.length==1 && uiSelectionEnd==true && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
+
 				uiSelectionStart = true;
 				uiSelectionEnd = false;
 				// Touch move point.
@@ -1937,6 +1938,8 @@
 				}
 			}
 			if(e.changedTouches.length==1 && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
+				uiSelectionstart=false;
+
 				//
 
 				if(uiTouchPress==true){
@@ -1966,6 +1969,7 @@
 					aa/=3;
 					//move vertical
 					if(uiSelectionVertice.length>0){
+
 						if(activeCanvas==frontCanvas){
 							for(var i=0;i<uiSelectionVertice.length;i++){
 								quad_vertices[uiSelectionVertice[i]*3+1]+=aa;
@@ -2018,7 +2022,7 @@
 			
 			// if we touch with 2 fingers then drag mode for canvas itself.
 			if(e.changedTouches.length==2  && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
-				
+
 				uiTouchDrag=true;
 				
 				var x3 = e.changedTouches[0].clientX;
@@ -2046,7 +2050,7 @@
 				
 
 				uiSelectionStart=false;
-				uiSelectionEnd=false;
+				uiSelectionEnd=true;
 
 				
 				drawTop(ui_Page1Context);			
@@ -2160,7 +2164,7 @@
 				quad_vertices[uiSelectionVertice[i]*3+1]=b;  
 				quad_vertices[uiSelectionVertice[i]*3+2]=c;  
 			}				
-			if(uiSelectionStart && activeCanvas!=propsCanvas){
+			if(uiSelectionStart && activeCanvas!=propsCanvas && uiTouchPress==false){
 
 				var a=b=0;
 				var c;
@@ -2195,6 +2199,8 @@
 				var h=Math.abs(y1-y2);
 				var points = [];
 				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+
+				if(w>1 && h>1){
 				uiSelectionVertice = [];
 				for(var i=0;i<uiPointVertice.length;i++){			
 					if(uiPointX[i]>x1 && uiPointX[i]<x2 && uiPointY[i]>y1 && uiPointY[i]<y2){
@@ -2205,7 +2211,8 @@
 					}
 					//ui_Page1Context.fillStyle="#FF0000";
 					//ui_Page1Context.fillRect(uiPointX[i],uiPointY[i],12,12);
-				}
+				}}
+
 				// No selection buffer right now...
 				// If we have multiple points below the selection ontop of
 				// each other then select either one of two.
@@ -2226,6 +2233,7 @@
 			}
 			uiSelectionStart = false;
 			uiSelectionEnd = true;
+			uiTouchPress = false;
 			
 			
 			
