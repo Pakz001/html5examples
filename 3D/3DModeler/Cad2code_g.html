@@ -240,6 +240,12 @@
 			var uiPointY = [];
 			var uiPointVertice = [];
 			var uiSelectionVertice = []; // holds the selected points/vertices id's
+			var uiPinchStart = false;
+			var uiPinchStartDistX = 0; // pinch zoom variables
+			var uiPinchStartDistY = 0;
+			var uiPinchStartX = 0;
+			var uiPinchStartY = 0;
+			var uiPinchStartDist = 0;
 			
 			var cube = makeMesh01();
 			//add the object to scene
@@ -1813,6 +1819,16 @@
 
 				uiSelectionEnd = false;
 			}
+			if(e.changedTouches.length==2){
+				var x3 = e.changedTouches[0].clientX;
+				var y3 = e.changedTouches[0].clientY;
+				var x4 = e.changedTouches[1].clientX;
+				var y4 = e.changedTouches[1].clientY;
+				
+				uiPinchStartDist = Math.floor(Math.abs(Math.hypot(x3-x4,y3-y4)))
+				uiPinchStart = true;
+				
+			}
 			
 			// update the screen.
 			drawTop(ui_Page1Context);			
@@ -1896,41 +1912,42 @@
 			
 			// if we touch with 2 fingers then drag mode for canvas itself.
 			if(e.changedTouches.length==2){
+				
 				uiTouchDrag=true;
+				
+				var x3 = e.changedTouches[0].clientX;
+				var y3 = e.changedTouches[0].clientY;
+				var x4 = e.changedTouches[1].clientX;
+				var y4 = e.changedTouches[1].clientY;
+				
+				var d = Math.floor(Math.abs(Math.hypot(x3-x4,y3-y4)))
+				if(Math.abs(Math.hypot(d-uiPinchStartDist))>20){
+					canvasScale=-50+d;
+					uiTouchDrag=false;
+				}
+				/*
+				if(d>50 && d>uiPinchStartDist){
+					uiTouchDrag=false
+					canvasScale+=10;
+					
+				}
+				if(d<uiPinchStartDist){
+					uiTouchDrag=false
+					canvasScale-=10;
+					
+				}
+				*/
+				
+
 				uiSelectionStart=false;
 				uiSelectionEnd=false;
-/*				
-				// scale zoom canvas..
-				var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
-				var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
+
 				
-				var d1=e.changedTouches[0].clientX/a;
-				var d2=e.changedTouches[1].clientX/b;
-				if(Math.random()<.05){
-					uiPinchStartDist = Math.hypot(d1-d2);
-				}
-				if(Math.random()<.1){
-					//console.log(Math.abs(Math.hypot(uiPinchStartDist-Math.hypot(d1-d2))));					
-				}
-				uiPinchStartDist+=Math.abs(Math.hypot(d1-d2));
-				if(uiPinchStartDist>20){
-					uiPinchStartDist=0;
-					if(Math.hypot(d1-d2)>0){
-					canvasScale+=10;
-					}else{
-					canvasScale-=10;
-					}
-					uiTouchDrag=false;
-//				}else{
-//					canvasScale-=10;
-//					uiTouchDrag=false;
-				}
-				//console.log(Math.hypot(d1-d2));
-				//if(Math.hypot(d1-d2)<200){
-				//	uiTouchDrag=false;
-				//	}
-				*/
-				//canvasScale = Math.hypot(d1-d2);
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);				
+				updateScene();					
 				
 				
 			}
