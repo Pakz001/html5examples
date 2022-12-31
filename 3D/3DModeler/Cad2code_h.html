@@ -204,6 +204,7 @@
 			var rightCanvas = 3;
 			var propsCanvas = 4;
 			var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
+			var previousCanvas = frontCanvas;
 			var showVertexNumbers = true; // show the number of the vertex at the point in canvas.
 			var showIndicesLines = true; // show the lines between the vertices (indices)
 			var canvasScale = 200; // scale zoom in out on canvasses
@@ -1772,10 +1773,10 @@
 //			var uiPinchStartDist = 0;
 			
 			
-		var rect1 = ui_Page1Canvas.getBoundingClientRect();
-		var rect2 = ui_Page2Canvas.getBoundingClientRect();
-		var rect3 = ui_Page3Canvas.getBoundingClientRect();
-		var rect4 = ui_Page4Canvas.getBoundingClientRect();		
+		var rect1 = ui_Page1Canvas.getBoundingClientRect();//(top)
+		var rect2 = ui_Page2Canvas.getBoundingClientRect();//(front)
+		var rect3 = ui_Page3Canvas.getBoundingClientRect();//(right)
+		var rect4 = ui_Page4Canvas.getBoundingClientRect();//(props)	
 
 
 		//
@@ -1902,42 +1903,52 @@
 				uiTouchLastX = x;
 				uiTouchLastY = y;
 			}
+			//var rect1 = ui_Page1Canvas.getBoundingClientRect();//(top)
+			//var rect2 = ui_Page2Canvas.getBoundingClientRect();//(front)
+			//var rect3 = ui_Page3Canvas.getBoundingClientRect();//(right)
+			//var rect4 = ui_Page4Canvas.getBoundingClientRect();//(props)			
 			// get the canvas client coordinates
+			var layout = [0,0];
 			var mx=my=0;
-			if(x>=rect1.left && y>=rect1.top && x<rect1.right && y<rect1.bottom){
+			if(x>=rect1.left && y>=rect1.top && x<rect1.right && y<rect1.bottom){//top
 				if(uiSelectionStart && activeCanvas!=topCanvas){
 					uiSelectionStart=false;
 					uiSelectionEnd=true;
-					
 				}
+				
 				//activeCanvas = topCanvas;
 				mx=rect1.left;
 				my=rect1.top;				
 			}
-			if(x>=rect2.left && y>=rect2.top && x<rect2.right && y<rect2.bottom){
+			if(x>=rect2.left && y>=rect2.top && x<rect2.right && y<rect2.bottom){//front
 				if(uiSelectionStart && activeCanvas!=frontCanvas){
 					uiSelectionStart=false;
-					uiSelectionEnd=true;
+					uiSelectionEnd=true;				
 				}
 				
 				//activeCanvas = frontCanvas;				
 				mx=rect2.left;
-				my=rect2.top;				
+				my=rect2.top;
+			}else{
+				// If touch moving then adjust coordinates..
+				if(activeCanvas==frontCanvas && uiTouchPress==true){
+					uiTouchPress=false;
+				}
 			}
-			if(x>=rect3.left && y>=rect3.top && x<rect3.right && y<rect3.bottom){
+			if(x>=rect3.left && y>=rect3.top && x<rect3.right && y<rect3.bottom){//right
 				if(uiSelectionStart && activeCanvas!=rightCanvas){
 					uiSelectionStart=false;
-					uiSelectionEnd=true;
+					uiSelectionEnd=true;				
 				}
-				
+
 				//activeCanvas = rightCanvas;	
 				mx=rect3.left;
 				my=rect3.top;					
 			}
-			if(x>=rect4.left && y>=rect4.top && x<rect4.right && y<rect4.bottom){
+			if(x>=rect4.left && y>=rect4.top && x<rect4.right && y<rect4.bottom){//props
 				if(uiSelectionStart && activeCanvas!=propsCanvas){
 					uiSelectionStart=false;
-					uiSelectionEnd=true;
+					uiSelectionEnd=true;			
 				}
 				
 				//activeCanvas = propsCanvas;				
@@ -1957,7 +1968,7 @@
 
 				}
 			}
-			var banana=1;
+
 			//
 			// move vertex or point selection
 			if(e.changedTouches.length==1 && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
@@ -1966,10 +1977,10 @@
 				//. Move the selection
 				//
 				if(uiTouchPress==true){
-
+					//if(Math.random()<.05)console.log("banana");
 					uiSelectionStart=false;
 					uiSelectionEnd=true;
-				
+					/*				
 					var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
 					var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
 				
@@ -1992,6 +2003,38 @@
 					// move little bit slower
 					bb/=3;
 					aa/=3;
+					*/
+									
+					var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
+					var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
+				
+					var x1=(uiTouchStartX+mx)/a;
+					var y1=(uiTouchStartY+my)/b;
+					var x2=(uiTouchLastX+mx)/a;
+					var y2=(uiTouchLastY+my)/b;
+					// Selection in all directions.
+					if(x1>x2){
+						[x1,x2] = [x2,x1];
+					}
+					if(y1>y2){
+						[y1,y2] = [y2,y1];
+					}
+
+					
+					//bb = (uiTouchLastX+mx)-(uiTouchPressX+my+layout[0]);
+					//aa = (uiTouchLastY+my)-(uiTouchPressY+my+layout[1]);
+					bb = (uiTouchLastX)-(uiTouchPressX);
+					aa = (uiTouchLastY)-(uiTouchPressY);
+					//Quick fix to not let the point movement jump a larger part(!)
+					if(aa>10 || aa<-10)aa=0;
+					if(bb>10 || bb<-10)bb=0;
+					uiTouchPressX = uiTouchLastX;
+					uiTouchPressY = uiTouchLastY;
+					// move little bit slower
+					bb/=3;
+					aa/=3;
+					//if(Math.random()<.05)console.log('moving:'+aa+','+bb+","+activeCanvas+","+uiSelectionVertice.length);
+									
 					//move vertical
 					if(uiSelectionVertice.length>0){
 
@@ -2275,17 +2318,27 @@
 				}
 				
 				if(w>1 && h>1){
-				uiSelectionVertice = [];
+				var uiSelectionVertice2 = [];
 				for(var i=0;i<uiPointVertice.length;i++){			
 					if(uiPointX[i]+offx>x1 && uiPointX[i]+offx<x2 && uiPointY[i]+offy>y1 && uiPointY[i]+offy<y2){
 						points.push(uiPointVertice[i]/3);
-						uiSelectionVertice.push(uiPointVertice[i]/3);
+						uiSelectionVertice2.push(uiPointVertice[i]/3);
 						//console.log(uiPointVertice[i]+","+activeVertice);
 						
 					}
 					//ui_Page1Context.fillStyle="#FF0000";
 					//ui_Page1Context.fillRect(uiPointX[i],uiPointY[i],12,12);
-				}}
+				}
+				// If there was something in the selection area then move this
+				// in the selection array.
+				if(uiSelectionVertice2.length>0){
+					uiSelectionVertice = [];
+					for(var i=0;i<uiSelectionVertice2.length;i++){
+						uiSelectionVertice.push(uiSelectionVertice2[i]);
+					}
+				}
+				}
+				
 
 				// No selection buffer right now...
 				// If we have multiple points below the selection ontop of
