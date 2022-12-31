@@ -2263,7 +2263,11 @@
 				quad_vertices[uiSelectionVertice[i]*3]=a; 					
 				quad_vertices[uiSelectionVertice[i]*3+1]=b;  
 				quad_vertices[uiSelectionVertice[i]*3+2]=c;  
-			}				
+			}			
+
+			// remove selections
+			uiSelectionVertice = [];
+			activeVertice = -1;
 			
 			// selection
 			if(uiSelectionStart && activeCanvas!=propsCanvas && uiTouchPress==false){
@@ -2318,25 +2322,25 @@
 				}
 				
 				if(w>1 && h>1){
-				var uiSelectionVertice2 = [];
-				for(var i=0;i<uiPointVertice.length;i++){			
-					if(uiPointX[i]+offx>x1 && uiPointX[i]+offx<x2 && uiPointY[i]+offy>y1 && uiPointY[i]+offy<y2){
-						points.push(uiPointVertice[i]/3);
-						uiSelectionVertice2.push(uiPointVertice[i]/3);
-						//console.log(uiPointVertice[i]+","+activeVertice);
-						
+					var uiSelectionVertice2 = [];
+					for(var i=0;i<uiPointVertice.length;i++){			
+						if(uiPointX[i]+offx>x1 && uiPointX[i]+offx<x2 && uiPointY[i]+offy>y1 && uiPointY[i]+offy<y2){
+							points.push(uiPointVertice[i]/3);
+							uiSelectionVertice2.push(uiPointVertice[i]/3);
+							//console.log(uiPointVertice[i]+","+activeVertice);
+							
+						}
+						//ui_Page1Context.fillStyle="#FF0000";
+						//ui_Page1Context.fillRect(uiPointX[i],uiPointY[i],12,12);
 					}
-					//ui_Page1Context.fillStyle="#FF0000";
-					//ui_Page1Context.fillRect(uiPointX[i],uiPointY[i],12,12);
-				}
-				// If there was something in the selection area then move this
-				// in the selection array.
-				if(uiSelectionVertice2.length>0){
-					uiSelectionVertice = [];
-					for(var i=0;i<uiSelectionVertice2.length;i++){
-						uiSelectionVertice.push(uiSelectionVertice2[i]);
+						// If there was something in the selection area then move this
+						// in the selection array.
+					if(uiSelectionVertice2.length>0){
+						uiSelectionVertice = [];
+						for(var i=0;i<uiSelectionVertice2.length;i++){
+							uiSelectionVertice.push(uiSelectionVertice2[i]);
+						}
 					}
-				}
 				}
 				
 
@@ -2376,7 +2380,8 @@
 			drawFront(ui_Page2Context);			
 			drawRight(ui_Page3Context);					
 			drawPropScreen(ui_Page4Context);				
-			updateScene();					
+			updateScene();		
+	
 
 			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);					
 			//e.preventDefault();
