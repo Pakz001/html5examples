@@ -1964,11 +1964,6 @@
 				//activeCanvas = frontCanvas;				
 				mx=rect2.left;
 				my=rect2.top;
-			}else{
-				// If touch moving then adjust coordinates..
-				if(activeCanvas==frontCanvas && uiTouchPress==true){
-					uiTouchPress=false;
-				}
 			}
 			if(x>=rect3.left && y>=rect3.top && x<rect3.right && y<rect3.bottom){//right
 				if(uiSelectionStart && activeCanvas!=rightCanvas){
@@ -2011,6 +2006,7 @@
 				//
 				//. Move the selection
 				//
+
 				if(uiTouchPress==true){
 					//if(Math.random()<.05)console.log("banana");
 					uiSelectionStart=false;
@@ -2066,8 +2062,8 @@
 					uiTouchPressX = uiTouchLastX;
 					uiTouchPressY = uiTouchLastY;
 					// move little bit slower
-					bb/=3;
-					aa/=3;
+					bb/=3;//x
+					aa/=2;//y
 					//if(Math.random()<.05)console.log('moving:'+aa+','+bb+","+activeCanvas+","+uiSelectionVertice.length);
 									
 					//move vertical
@@ -2400,6 +2396,7 @@
 			uiSelectionStart = false;
 			uiSelectionEnd = true;
 			uiTouchPress = false;
+
 			
 			// select individual vertice point
 			if(activeCanvas==frontCanvas || activeCanvas==rightCanvas || activeCanvas==topCanvas){
