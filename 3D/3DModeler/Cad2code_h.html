@@ -2402,53 +2402,54 @@
 			uiTouchPress = false;
 			
 			// select individual vertice point
-			var a=b=0;
-			var c;
-			if(activeCanvas == frontCanvas){
-				drawFront(ui_Page2Context);
-				c=ui_Page2Context;
-			}
-			if(activeCanvas == rightCanvas){
-				drawRight(ui_Page3Context);
-				c=ui_Page3Context;
-			}
-			if(activeCanvas == topCanvas){
-				drawTop(ui_Page1Context);
-				c=ui_Page1Context;					
-			}
-			a = c.canvas.clientWidth / c.canvas.width;				
-			b = c.canvas.clientHeight / c.canvas.height;		
-			
-			
-			var x1=uiTouchStartX/a;
-			var y1=uiTouchStartY/b;
-			//var uiSelectionVertice = []; // holds the selected points/vertices id's				
-			var offx = 0;
-			var offy = 0;
-			// take into account the canvas offset
-			if(activeCanvas==frontCanvas){
-				offx = frontCanvasOffsetX;
-				offy = frontCanvasOffsetY;
-			}
-			if(activeCanvas==rightCanvas){
-				offx = rightCanvasOffsetX;
-				offy = rightCanvasOffsetY;
-			}
-			if(activeCanvas==topCanvas){
-				offx = topCanvasOffsetX;
-				offy = topCanvasOffsetY;
-			}			
-			//console.log("num :"+uiPointNumX.length);
-			var ax = x1;
-			var ay = y1;
-			for(var i=0;i<uiPointNumX.length;i++){
+			if(activeCanvas==frontCanvas || activeCanvas==rightCanvas || activeCanvas==topCanvas){
+				var a=b=0;
+				var c;
+				if(activeCanvas == frontCanvas){
+					drawFront(ui_Page2Context);
+					c=ui_Page2Context;
+				}
+				if(activeCanvas == rightCanvas){
+					drawRight(ui_Page3Context);
+					c=ui_Page3Context;
+				}
+				if(activeCanvas == topCanvas){
+					drawTop(ui_Page1Context);
+					c=ui_Page1Context;					
+				}
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
 				
-				if(x1>uiPointNumX[i]+offx && x1<uiPointNumX[i]+16+offx && y1>uiPointNumY[i]+offy && y1<uiPointNumY[i]+offy+16){
-					uiSelectionVertice = [];
-					uiSelectionVertice.push(uiPointNumVertice[i]/3);
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
 				}			
+				//console.log("num :"+uiPointNumX.length);
+				var ax = x1;
+				var ay = y1;
+				for(var i=0;i<uiPointNumX.length;i++){
+					
+					if(x1>uiPointNumX[i]+offx && x1<uiPointNumX[i]+16+offx && y1>uiPointNumY[i]+offy && y1<uiPointNumY[i]+offy+16){
+						uiSelectionVertice = [];
+						uiSelectionVertice.push(uiPointNumVertice[i]/3);
+					}			
 			}
-			
+			}
 			
 //			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
 			
