@@ -239,6 +239,9 @@
 			var uiSelectionStart = false;
 			var uiSelectionEnd = false;	
 			var uiPinchStartDist = 0;
+			var uiPointNumX = []; // holds the coordinates of the labels on the points (ids) selection
+			var uiPointNumY = [];
+			var uiPointNumVertice = [];
 			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
 			var uiPointY = [];
 			var uiPointVertice = [];
@@ -487,6 +490,10 @@
 				//c.fillStyle="#FFFFFF";
 				// Show number of the vertex on the point.
 				//c.font = "16px arial";				
+				// Store locations in here in case of doublers
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];				
 				
 				for(var i=0;i<vx.length;i++){
 					var bloke=false;
@@ -501,6 +508,10 @@
 						c.fillStyle="#AAAAAA";
 					}					
 					c.fillRect(vx[i]-4,vy[i]-4,8,8);
+					uiPointX.push(vx[i]-4);
+					uiPointY.push(vy[i]-4);
+					uiPointVertice.push(i*3)
+						
 					//if(showVertexNumbers)c.fillText(""+i,vx[i]-12+Math.random()*20,vy[i]-12+Math.random()*20);
 				}
 				/*
@@ -530,10 +541,6 @@
 				}
 
 				// Draw the indices numbers
-				// Store locations in here in case of doublers
-				uiPointX = [];
-				uiPointY = [];
-				uiPointVertice = [];				
 				var dx = [];
 				var dy = [];
 				if(showVertexNumbers){
@@ -543,9 +550,6 @@
 						var y = vy[i]-12;//-26+Math.random()*26;
 						dx.push(x);
 						dy.push(y);
-						uiPointX.push(x+12);
-						uiPointY.push(y+12);
-						uiPointVertice.push(i*3)
 						
 					}
 				}
@@ -565,12 +569,23 @@
 						}
 					}
 				}
+				
+//			var uiPointNumX = []; // holds the coordinates of the labels on the points (ids) selection
+//			var uiPointNumY = [];
+//			var uiPointNumVertice = [];
+				uiPointNumX = [];
+				uiPointNumY = [];
+				uiPointNumVertice = [];				
+				
 				// draw the points on the canvas
 				for(var i=0;i<dx.length;i++){
 					var x = dx[i];
 					var y = dy[i];
 					c.fillStyle="#000000";
 					c.fillRect(x,y-16,8,20);
+					uiPointNumX.push(x);
+					uiPointNumY.push(y-16);
+					uiPointNumVertice.push(i*3);
 					c.fillStyle="#FFFFFF";
 					c.fillText(""+i,x,y);										
 				}
@@ -666,7 +681,11 @@
 				
 				// Draw the points in the cad canvas
 				//c.fillStyle="#FFFFFF";
-				//c.font = "16px arial";				
+				//c.font = "16px arial";
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];				
+				
 				for(var i=0;i<vx.length;i++){
 					var bloke=false;
 					for(var j=0;j<uiSelectionVertice.length;j++){
@@ -680,6 +699,10 @@
 						c.fillStyle="#AAAAAA";
 					}					
 					c.fillRect(vx[i]-4,vy[i]-4,8,8);									
+					uiPointX.push(vx[i]-4);
+					uiPointY.push(vy[i]-4);
+					uiPointVertice.push(i*3)
+					
 					//if(showVertexNumbers)c.fillText(""+i,vx[i]-12+Math.random()*20,vy[i]-12+Math.random()*20);					
 				}
 				
@@ -710,9 +733,6 @@
 	//			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
 	//			var uiPointY = [];
 	//			var uiPointVertice = [];
-				uiPointX = [];
-				uiPointY = [];
-				uiPointVertice = [];
 				var dx = [];
 				var dy = [];
 
@@ -723,10 +743,6 @@
 						var y = vy[i]-12;
 						dx.push(x);
 						dy.push(y);
-						uiPointX.push(x+12);
-						uiPointY.push(y+12);
-						uiPointVertice.push(i*3)
-
 					}
 				}
 				// Check if there are double points on the canvas
@@ -747,11 +763,19 @@
 				}
 				
 				// draw the points on the canvas
+				uiPointNumX = [];
+				uiPointNumY = [];
+				uiPointNumVertice = [];				
+				
 				for(var i=0;i<dx.length;i++){
 					var x = dx[i];
 					var y = dy[i];
 					c.fillStyle="#000000";
 					c.fillRect(x,y-16,8,20);
+					uiPointNumX.push(x);
+					uiPointNumY.push(y-16);
+					uiPointNumVertice.push(i*3);
+					
 					c.fillStyle="#FFFFFF";
 					c.fillText(""+i,x,y);										
 				}				
@@ -843,7 +867,11 @@
 				y4 = quad_vertices[10]+c.canvas.height/2;
 				*/
 				// Draw the points in the cad canvas
-				//c.font = "16px arial";				
+				//c.font = "16px arial";			
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];				
+				
 				for(var i=0;i<vx.length;i++){
 					// Multiple selection
 					var bloke=false;
@@ -858,6 +886,10 @@
 						c.fillStyle="#AAAAAA";
 					}
 					c.fillRect(vx[i]-4,vy[i]-4,8,8);
+					uiPointX.push(vx[i]-4);
+					uiPointY.push(vy[i]-4);
+					uiPointVertice.push(i*3)
+					
 					//if(showVertexNumbers)c.fillText(""+i,vx[i]-12+Math.random()*20,vy[i]-12+Math.random()*20);					
 				}
 				/*
@@ -886,9 +918,7 @@
 					}
 				}
 				// Draw the indices numbers
-				uiPointX = [];
-				uiPointY = [];
-				uiPointVertice = [];				
+				
 				var dx = [];
 				var dy = [];
 				if(showVertexNumbers){
@@ -898,9 +928,6 @@
 						var y = vy[i]-12;
 						dx.push(x);
 						dy.push(y);
-						uiPointX.push(x+12);
-						uiPointY.push(y+12);
-						uiPointVertice.push(i*3)						
 					}
 				}
 				// Check if there are double points on the canvas
@@ -920,11 +947,19 @@
 					}
 				}
 				// draw the points on the canvas
+				uiPointNumX = [];
+				uiPointNumY = [];
+				uiPointNumVertice = [];				
+				
 				for(var i=0;i<dx.length;i++){
 					var x = dx[i];
 					var y = dy[i];
 					c.fillStyle="#000000";
 					c.fillRect(x,y-16,8,20);
+					uiPointNumX.push(x);
+					uiPointNumY.push(y-16);
+					uiPointNumVertice.push(i*3);
+					
 					c.fillStyle="#FFFFFF";
 					c.fillText(""+i,x,y);										
 				}				
@@ -2366,7 +2401,53 @@
 			uiSelectionEnd = true;
 			uiTouchPress = false;
 			
+			// select individual vertice point
+			var a=b=0;
+			var c;
+			if(activeCanvas == frontCanvas){
+				drawFront(ui_Page2Context);
+				c=ui_Page2Context;
+			}
+			if(activeCanvas == rightCanvas){
+				drawRight(ui_Page3Context);
+				c=ui_Page3Context;
+			}
+			if(activeCanvas == topCanvas){
+				drawTop(ui_Page1Context);
+				c=ui_Page1Context;					
+			}
+			a = c.canvas.clientWidth / c.canvas.width;				
+			b = c.canvas.clientHeight / c.canvas.height;		
 			
+			
+			var x1=uiTouchStartX/a;
+			var y1=uiTouchStartY/b;
+			//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+			var offx = 0;
+			var offy = 0;
+			// take into account the canvas offset
+			if(activeCanvas==frontCanvas){
+				offx = frontCanvasOffsetX;
+				offy = frontCanvasOffsetY;
+			}
+			if(activeCanvas==rightCanvas){
+				offx = rightCanvasOffsetX;
+				offy = rightCanvasOffsetY;
+			}
+			if(activeCanvas==topCanvas){
+				offx = topCanvasOffsetX;
+				offy = topCanvasOffsetY;
+			}			
+			//console.log("num :"+uiPointNumX.length);
+			var ax = x1;
+			var ay = y1;
+			for(var i=0;i<uiPointNumX.length;i++){
+				
+				if(x1>uiPointNumX[i]+offx && x1<uiPointNumX[i]+16+offx && y1>uiPointNumY[i]+offy && y1<uiPointNumY[i]+offy+16){
+					uiSelectionVertice = [];
+					uiSelectionVertice.push(uiPointNumVertice[i]/3);
+				}			
+			}
 			
 			
 //			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
@@ -2381,7 +2462,9 @@
 			drawRight(ui_Page3Context);					
 			drawPropScreen(ui_Page4Context);				
 			updateScene();		
-	
+			//ui_Page1Context.fillStyle="#FFFFFF";
+			//ui_Page1Context.fillRect(ax,ay,20,20);
+			//ui_Page1Context.fillRect(uiPointNumX[0],uiPointNumY[0],30,30);
 
 			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);					
 			//e.preventDefault();
