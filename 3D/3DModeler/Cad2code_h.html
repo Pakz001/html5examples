@@ -1845,21 +1845,29 @@
 				uiTouchPressTime = 0;
 
 			}
+		
+			// We almost never detect 2 finger start
+			// so our drag position for two fingers start from finger
+			// position 1.	
+			uiTouchDragX = e.changedTouches[0].clientX;
+			uiTouchDragY = e.changedTouches[0].clientY;
+				
 			if(e.changedTouches.length==2 && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
 				var x3 = e.changedTouches[0].clientX;
 				var y3 = e.changedTouches[0].clientY;
 				var x4 = e.changedTouches[1].clientX;
 				var y4 = e.changedTouches[1].clientY;
-				
+				// if we caught 2 fingers start then pinch and drag start variables here
 				uiPinchStartDist = Math.floor(Math.abs(Math.hypot(x3-x4,y3-y4)))
 				uiTouchDragX = (x3+x4)/2;
 				uiTouchDragY = (y3+y4)/2;
 				
 				
 			}
-				uiPinchStart = true;
-				uiPinchStartScale = canvasScale;
-				uiTouchDrag = true;
+			// We Might started pinching or dragging - start variables
+			uiPinchStart = true;
+			uiPinchStartScale = canvasScale;
+			uiTouchDrag = true;
 				
 			// update the screen.
 			drawTop(ui_Page1Context);			
@@ -1947,6 +1955,8 @@
 
 				}
 			}
+			//
+			// move vertex or point selection
 			if(e.changedTouches.length==1 && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
 				uiSelectionstart=false;
 
