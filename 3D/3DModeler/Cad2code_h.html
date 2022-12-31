@@ -213,6 +213,11 @@
 			var propBlinkTime = 0;
 			var propBlinkTimeMax = 30;
 			var propCursorVisible = true;
+			var propCollisionX = []; // collision coordinates for props canvas
+			var propCollisionY = [];
+			var propCollisionCursorX = []; //contains the selected cursor position.
+			var propCollisionCursorY = [];
+
 			var lastChar = ""; // Last character pressed by keyup.
 			var trackEditWindow = 0; // The current prop edit screen
 			var trackEditVertex = 0; // track edit screen 
@@ -1653,6 +1658,11 @@
 		}
 		
 		function trackEdit(c,arr,collumns,blink){
+			propCollisionX = [];
+			propCollisionY = [];
+			propCollisionCursorX = [];
+			propCollisionCursorY = [];
+			
 			//draw indices
 			//c.fillStyle="#FFFFFF";
 			//c.font="20px serif";
@@ -1700,6 +1710,11 @@
 					
 				}
 			}}	
+			//var propsCollisionX = []; // collision coordinates for props canvas
+			//var propsCollisionY = [];
+			//var propsCollisionCursorX = []; //contains the selected cursor position.
+			//var propsCollisionCursorY = [];
+			// draw the numbers for the tracker edit
 			for(y=0;y<(arr.length/collumns)+1;y++){				
 
 			for(x=0;x<collumns+1;x++){
@@ -1712,6 +1727,13 @@
 						c.fillStyle="#FFFFFF";
 					}
 					c.fillText(arr[i],20+x*30	,80+y*20+yOff);
+					// Create a collision map
+					propCollisionX.push(20+x*30);
+					propCollisionY.push(80+y*20+yOff);
+					propCollisionCursorX.push(x);
+					propCollisionCursorY.push(y);
+					
+
 					}
 					i++;
 				}
@@ -1720,7 +1742,13 @@
 					var a=false;
 					if(propCursorX==x && propCursorY==y && blink==true)a=true;
 					//if(propCursorX==x && propCursorY==y && blink==true)a=false;					
-					drawDice(20+x*30	,60+y*20+4+yOff, 20, 18,a);					
+					drawDice(20+x*30	,60+y*20+4+yOff, 20, 18,a);
+					// create a collision map
+					propCollisionX.push(20+x*30);
+					propCollisionY.push(60+y*20+4+yOff);
+					propCollisionCursorX.push(x);
+					propCollisionCursorY.push(y);
+						
 				}
 
 				// Draw the add and remove buttons..
@@ -1731,12 +1759,19 @@
 							if(propCursorX==x && propCursorY==y && blink==true){
 								c.fillStyle="#AA0000";
 								c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
+								// create a collision map					
 								c.fillStyle="#FFFFFF";
 							}
 	
 							var a="-";
 							if(x==collumns-1)a="+";
 							c.fillText(a,20+x*30	,80+y*20+yOff);
+							// add to the collision map(touch)
+							propCollisionX.push(20+x*30);
+							propCollisionY.push(80+y*20+yOff);
+							propCollisionCursorX.push(x);
+							propCollisionCursorY.push(y);
+								
 						}		
 				}	
 			
@@ -1777,7 +1812,7 @@
 					i++;
 				}}
 
-			}			
+			}		
 		}		
 		
 		
@@ -2445,7 +2480,51 @@
 						uiSelectionVertice = [];
 						uiSelectionVertice.push(uiPointNumVertice[i]/3);
 					}			
+				}
 			}
+
+
+			// props canvas interaction
+			if(activeCanvas==propsCanvas){
+				var a=b=0;
+				var c;
+				if(activeCanvas == propsCanvas){
+					drawFront(ui_Page4Context);
+					c=ui_Page4Context;
+				}
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
+				
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
+				}			
+				//console.log("num :"+uiPointNumX.length);
+				//propCursorX - propsCollisionX
+				var ax = x1;
+				var ay = y1;
+				for(var i=0;i<propCollisionX.length;i++){
+					
+					if(x1>propCollisionX[i]+offx && x1<propCollisionX[i]+32+offx && y1>propCollisionY[i]+offy && y1<propCollisionY[i]+offy+32){
+						propCursorX = propCollisionCursorX[i];
+						propCursorY = propCollisionCursorY[i];
+					}			
+				}
 			}
 			
 //			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
