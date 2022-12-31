@@ -1893,6 +1893,7 @@
 		}
 
 		if(e.type=="touchmove" && e.touches) {
+			
 			for(var i=0;i<e.changedTouches.length;i++){	
 				var x = e.changedTouches[i].clientX;
 				var y = e.changedTouches[i].clientY;				
@@ -2030,9 +2031,9 @@
 						}		
 					}		
 
-					drawTop(ui_Page1Context);			
-					drawFront(ui_Page2Context);			
-					drawRight(ui_Page3Context);					
+					//drawTop(ui_Page1Context);			
+					//drawFront(ui_Page2Context);			
+					//drawRight(ui_Page3Context);					
 				
 				}
 				
@@ -2072,11 +2073,11 @@
 				uiSelectionEnd=true;
 
 				
-				drawTop(ui_Page1Context);			
-				drawFront(ui_Page2Context);			
-				drawRight(ui_Page3Context);					
-				drawPropScreen(ui_Page4Context);				
-				updateScene();					
+				//drawTop(ui_Page1Context);			
+				//drawFront(ui_Page2Context);			
+				//drawRight(ui_Page3Context);					
+				//drawPropScreen(ui_Page4Context);				
+				//updateScene();					
 				
 				
 			}
@@ -2112,11 +2113,11 @@
 				
 				
 				// update the screen.
-				drawTop(ui_Page1Context);			
-				drawFront(ui_Page2Context);			
-				drawRight(ui_Page3Context);					
-				drawPropScreen(ui_Page4Context);				
-				updateScene();					
+				//drawTop(ui_Page1Context);			
+				//drawFront(ui_Page2Context);			
+				//drawRight(ui_Page3Context);					
+				//drawPropScreen(ui_Page4Context);				
+				//updateScene();					
 			}
 			
 			
@@ -2124,7 +2125,9 @@
 			
 			
 			// If we are dragging the selection rectangle.
-
+			var drawRect = false;
+			var drawRectX=drawRectY=drawRectW=drawRectH=0;
+			
 			if(uiSelectionStart==true){
 
 				//console.log("a");
@@ -2146,9 +2149,9 @@
 				var w=Math.abs(x1-x2);
 				var h=Math.abs(y1-y2);
 				// update the screen.
-				drawTop(ui_Page1Context);			
-				drawFront(ui_Page2Context);			
-				drawRight(ui_Page3Context);					
+				//drawTop(ui_Page1Context);			
+				//drawFront(ui_Page2Context);			
+				//drawRight(ui_Page3Context);					
 				// draw the selection rectangle.
 				var c;
 
@@ -2163,14 +2166,30 @@
 				if(activeCanvas==frontCanvas)c=ui_Page2Context;
 				if(activeCanvas==rightCanvas)c=ui_Page3Context;				
 				if(activeCanvas>-1 && activeCanvas<4){
-					c.strokeStyle = 'yellow';;
-					c.rect(x1,y1,w,h);
-					c.stroke();
+					drawRect=true;
+					drawRectX = x1;
+					drawRectY = y1;
+					drawRectW = w;
+					drawRectH = h;
+					//c.strokeStyle = 'yellow';;
+					//c.rect(x1,y1,w,h);
+					//c.stroke();
 				}
 				
 			}
 			
-
+			drawTop(ui_Page1Context);			
+			drawFront(ui_Page2Context);			
+			drawRight(ui_Page3Context);					
+			drawPropScreen(ui_Page4Context);				
+			updateScene();					
+			if(drawRect){
+				c.beginPath(); // Add a begin path when having glitches like smudge
+				c.strokeStyle = 'yellow';
+				c.rect(x1,y1,w,h);
+				c.stroke();				
+			}
+			
 			e.preventDefault();
 		}		
 		
