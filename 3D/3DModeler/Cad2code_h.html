@@ -233,6 +233,8 @@
 			var uiTouchStart = false;			
 			var uiTouchEnd = false;
 			var uiTouchDrag = false;
+			var uiTouchDragX = 0;
+			var uiTouchDragY = 0;
 			var uiSelectionStart = false;
 			var uiSelectionEnd = false;	
 			var uiPinchStartDist = 0;
@@ -246,6 +248,7 @@
 			var uiPinchStartX = 0; // pinch zoom in/out
 			var uiPinchStartY = 0;
 			var uiPinchStartDist = 0;
+			var uiPinchStartScale = 0;
 			var uiTouchPress = false; // for hold down touch 1 finger (popup menu)
 			var uiTouchPressX = 0;
 			var uiTouchPressY = 0;
@@ -1778,6 +1781,7 @@
 		//
 		// touch start
 		if(e.type=="touchstart" && e.touches) {
+
 			// get the last touch coordinates
 			for(var i=0;i<e.changedTouches.length;i++){	
 				var x = e.changedTouches[i].clientX;
@@ -1848,10 +1852,15 @@
 				var y4 = e.changedTouches[1].clientY;
 				
 				uiPinchStartDist = Math.floor(Math.abs(Math.hypot(x3-x4,y3-y4)))
-				uiPinchStart = true;
+				uiTouchDragX = (x3+x4)/2;
+				uiTouchDragY = (y3+y4)/2;
+				
 				
 			}
-			
+				uiPinchStart = true;
+				uiPinchStartScale = canvasScale;
+				uiTouchDrag = true;
+				
 			// update the screen.
 			drawTop(ui_Page1Context);			
 			drawFront(ui_Page2Context);			
@@ -2024,6 +2033,12 @@
 			// if we touch with 2 fingers then drag mode for canvas itself.
 			if(e.changedTouches.length==2  && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
 
+				//var uiPinchStartX = 0; // pinch zoom in/out
+				//var uiPinchStartY = 0;
+				//var uiPinchStartDist = 0;
+				//var uiPinchStartScale = 0;
+			
+
 				uiTouchDrag=true;
 				
 				var x3 = e.changedTouches[0].clientX;
@@ -2031,9 +2046,12 @@
 				var x4 = e.changedTouches[1].clientX;
 				var y4 = e.changedTouches[1].clientY;
 				
-				var d = Math.floor(Math.abs(Math.hypot(x3-x4,y3-y4)))
-				if(Math.abs(Math.hypot(d-uiPinchStartDist))>20){
-					canvasScale=-50+d;
+				var d = Math.floor(Math.hypot(x3-x4,y3-y4));
+				if(Math.abs(Math.hypot(d-uiPinchStartDist))>2){
+					
+					canvasScale=uiPinchStartScale+(d-uiPinchStartDist);
+					if(canvasScale<50)canvasScale=50;
+					if(canvasScale>500)canvasScale=500;
 					uiTouchDrag=false;
 				}
 				/*
@@ -2062,10 +2080,16 @@
 				
 				
 			}
-			if(uiTouchDrag){
+			if(uiTouchDrag && e.changedTouches.length==2){
 				uiTouchDrag=false;
-				var dx=uiTouchStartX-uiTouchLastX;
-				var dy=uiTouchStartY-uiTouchLastY;
+				//var dx=uiTouchStartX-uiTouchLastX;
+				//var dy=uiTouchStartY-uiTouchLastY;
+				var x3 = (e.changedTouches[0].clientX+e.changedTouches[1].clientX)/2;
+				var y3 = (e.changedTouches[0].clientY+e.changedTouches[1].clientY)/2;
+
+				var dx=uiTouchDragX-x3;
+				var dy=uiTouchDragY-y3;
+				
 				//if(Math.random()<.1)console.log(""+uiTouchStartX+","+uiTouchLastX);
 				dx/=90;
 				dy/=45;
