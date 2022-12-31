@@ -2058,6 +2058,8 @@
 				var y4 = e.changedTouches[1].clientY;
 				
 				var d = Math.floor(Math.hypot(x3-x4,y3-y4));
+				if(uiPinchStartDist==0)uiPinchStartDist=d;
+				//console.log(d+","+uiPinchStartDist+","+Math.abs(Math.hypot(d-uiPinchStartDist)));
 				if(Math.abs(Math.hypot(d-uiPinchStartDist))>2){
 					
 					canvasScale=uiPinchStartScale+(d-uiPinchStartDist);
