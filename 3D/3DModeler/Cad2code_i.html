@@ -1826,7 +1826,29 @@
 					propCollisionCursorY.push(y);
 						
 				}
-
+				// Draw the switch tracker section
+				if(80+y*20+yOff>=70 && x==collumns && y==arr.length/collumns){//Draw the dice icon(s)
+					var a=false;
+					if(propCursorX==x && propCursorY==y && blink==true)a=true;
+					//if(propCursorX==x && propCursorY==y && blink==true)a=false;		
+					if(propCursorX==x && propCursorY==y && blink==true){
+						c.fillStyle="#AA0000";
+						c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
+						// create a collision map					
+						c.fillStyle="#FFFFFF";
+					}
+					
+					var a=">";
+					if(trackEditWindow==1)a="<";					
+					c.fillText(a,20+x*30	,80+y*20+yOff);
+							
+					// create a collision map
+					propCollisionX.push(20+x*30);
+					propCollisionY.push(60+y*20+4+yOff);
+					propCollisionCursorX.push(x);
+					propCollisionCursorY.push(y);
+						
+				}
 				// Draw the add and remove buttons..
 				if(y>=arr.length/collumns){
 						var z=1;
@@ -1846,12 +1868,12 @@
 							propCollisionX.push(20+x*30);
 							propCollisionY.push(80+y*20+yOff);
 							propCollisionCursorX.push(x);
-							propCollisionCursorY.push(y);
-								
-						}		
-				}	
+							propCollisionCursorY.push(y);								
+																
+						}	
+					}	
 			
-			}			
+				}			
 			}	
 			//draw a dice icon
 			function drawDice(x,y,w,h,sel=false){
@@ -2696,7 +2718,18 @@
 								quad_indices.push(0);					
 								propCursorY++;
 							}							
-
+							//
+							// Next window
+							//
+							//console.log("a");				
+							if(trackEditWindow==0 && propCursorX==3 && propCursorY==quad_indices.length/3){
+								trackEditWindow=1;
+							}		
+							
+							if(trackEditWindow==1 && propCursorX==2 && propCursorY==quad_uvs.length/2){
+								trackEditWindow=0;
+							}							
+							
 							
 						}
 					}			
@@ -2758,16 +2791,18 @@
 						var w = 64;
 						var h = 64;
 						if(x1>x+offx && x1<x+32+offx && y1>y+offy && y1<y+offy+32){		
-
-							var j=0;
-							for(var y=0;y<quad_indices.length/3;y++){
-							for(var x=0;x<3;x++){
-								if(propCursorX==x && propCursorY==y){					
-									quad_indices[j]=propVertexSelect[i].vertice/3;
-
-								}	
-								j++;					
-							}}
+							if(trackEditWindow==0){
+								var j=0;
+								for(var y=0;y<quad_indices.length/3;y++){
+								for(var x=0;x<3;x++){
+									if(propCursorX==x && propCursorY==y){					
+										quad_indices[j]=propVertexSelect[i].vertice/3;
+	
+									}	
+									j++;					
+								}}
+							}
+							
 						}
 					//}
 				}
