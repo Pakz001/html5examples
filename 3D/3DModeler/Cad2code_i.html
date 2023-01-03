@@ -2862,6 +2862,8 @@
 		a+="const renderer = new THREE.WebGLRenderer();\n";
 		a+="renderer.setSize( window.innerWidth, window.innerHeight );\n";
 		a+="document.body.appendChild( renderer.domElement );\n";
+		a+="camera.position.z = 60;\n";
+		a+="\n";
 		a+="var quad_vertices =\n";
 		a+="[\n";
 		for(var i=0;i<quad_vertices.length;i+=3){
@@ -2924,6 +2926,7 @@
 		a+="\t\t\t\t\t\t\t\t});\n";
 		a+="material2.flatShading=true;\n";
 		a+="var mesh = new THREE.Mesh( geometry, material2 );\n";
+		a+="scene.add(mesh);\n";
 		a+="\n\n";
 		
 		a+="var ambient = new THREE.AmbientLight( 0xffffff, 2 );\n";
@@ -2931,6 +2934,9 @@
 		a+="function animate() {\n";
 		a+="\trequestAnimationFrame(animate);\n";
 		// rotate here
+		a+="\tmesh.rotation.x += .25;\n";
+		a+="\tmesh.rotation.y += .25;\n";
+		a+="\tmesh.rotation.z += .25;\n";		
 		a+="\trenderer.render( scene, camera );\n";
 		a+="}\n";	
 		a+="animate();\n";
