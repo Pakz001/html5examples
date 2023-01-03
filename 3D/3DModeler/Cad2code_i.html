@@ -2901,8 +2901,9 @@
 		// work in progress
 		
 		var a="";
-		a+="<html>\n\t<head>\n\t\t<title>3d</title>\n\t</head>\n<body>\n<script>\n";
-		a+="<script src=\"js/three.js\"><\/script>";
+		a+="<html>\n\t<head>\n\t\t<title>3d</title>\n\t</head>\n<body>\n";
+		a+="<script src=\"js/three.js\"><\/script>\n";
+		a+="<script>\n";
 		a+="const scene = new THREE.Scene();\n";
 		a+="const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );\n";
 		a+="const renderer = new THREE.WebGLRenderer();\n";
@@ -2980,9 +2981,9 @@
 		a+="function animate() {\n";
 		a+="\trequestAnimationFrame(animate);\n";
 		// rotate here
-		a+="\tmesh.rotation.x += .25;\n";
-		a+="\tmesh.rotation.y += .25;\n";
-		a+="\tmesh.rotation.z += .25;\n";		
+		a+="\tmesh.rotation.x += .025;\n";
+		a+="\tmesh.rotation.y += .025;\n";
+		a+="\tmesh.rotation.z += .025;\n";		
 		a+="\trenderer.render( scene, camera );\n";
 		a+="}\n";	
 		a+="animate();\n";
