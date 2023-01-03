@@ -1400,6 +1400,7 @@
 						if(e.code=="Enter")lastChar="Enter";
 						if(e.code=="KeyW"){//Move cursor up in indices field
 							propCursorY-=1;
+
 							if(propCursorY<0)propCursorY=0;
 							// If in the add remove indice section.
 							if(propCursorY==quad_indices.length/3){
@@ -1426,7 +1427,7 @@
 							if(trackEditWindow==trackEditVertex && propCursorY == quad_indices.length/3 && propCursorX==0)propCursorX++;
 						}
 						if(e.code=="KeyD"){//move cursor right in indices field
-							var r = 3;
+							var r = 4;
 							if(trackEditWindow==trackEdituv)r=2;
 							propCursorX++;
 							if(propCursorX>r)propCursorX=r;
@@ -1563,6 +1564,12 @@
 			if(lastChar=="Enter" && trackEditWindow==trackEditVertex){
 				lastChar="";
 				if(propCursorX>2)randomIndice();
+				if(propCursorX==4 && propCursorY==quad_indices.length/3){
+					//create htgmlk template
+					lastChar="";
+					makeHtmlTemplate();
+				}
+				
 				if(propCursorX==1 && propCursorY==quad_indices.length/3){
 					//remove_indices
 					lastChar="";
@@ -1686,6 +1693,12 @@
 			// Handle the Return and uvs.
 			if(lastChar=="Enter" && trackEditWindow==trackEdituv){
 				if(propCursorX>1)randomuv();
+				if(propCursorX==3 && propCursorY==quad_uvs.length/2){
+					//Generate html template
+					lastChar="";
+					makeHtmlTemplate();
+				}
+				
 				if(propCursorX==0 && propCursorY==quad_uvs.length/2){
 					//remove_indices
 					lastChar="";
@@ -1799,7 +1812,7 @@
 			// draw the numbers for the tracker edit
 			for(y=0;y<(arr.length/collumns)+1;y++){				
 
-			for(x=0;x<collumns+1;x++){
+			for(x=0;x<collumns+2;x++){
 				// Draw the indice values
 				if(x<collumns && y<arr.length/collumns){//Draw the indices
 					if(80+y*20+yOff>=70){
@@ -1855,6 +1868,29 @@
 					propCollisionCursorY.push(y);
 						
 				}
+				// Draw the Generate html template
+				if(80+y*20+yOff>=70 && x==collumns+1 && y==arr.length/collumns){//Draw the dice icon(s)
+					var a=false;
+					if(propCursorX==x && propCursorY==y && blink==true)a=true;
+					//if(propCursorX==x && propCursorY==y && blink==true)a=false;		
+					if(propCursorX==x && propCursorY==y && blink==true){
+						c.fillStyle="#AA0000";
+						c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
+						// create a collision map					
+						c.fillStyle="#FFFFFF";
+					}
+					
+					var a="Generate";					
+					c.fillText(a,20+x*30	,80+y*20+yOff);
+							
+					// create a collision map
+					propCollisionX.push(20+x*30);
+					propCollisionY.push(60+y*20+4+yOff);
+					propCollisionCursorX.push(x);
+					propCollisionCursorY.push(y);
+						
+				}
+				
 				// Draw the add and remove buttons..
 				if(y>=arr.length/collumns){
 						var z=1;
@@ -2702,6 +2738,8 @@
 								}												
 							}
 							//
+							
+							//
 							// Minus 
 							//
 							if(trackEditWindow==0 && propCursorX==1 && propCursorY==quad_indices.length/3){
@@ -2709,7 +2747,7 @@
 								lastChar="";
 								if(quad_indices.length>0)quad_indices.pop()
 								if(quad_indices.length>0)quad_indices.pop()
-								if(quad_indices.length>0)quad_indices.pop()					
+								if(quad_indices.length>0)quad_indices.pop()													
 								if(propCursorY>0)propCursorY-=1;
 							}
 							//
@@ -2734,6 +2772,14 @@
 							
 							if(trackEditWindow==1 && propCursorX==2 && propCursorY==quad_uvs.length/2){
 								trackEditWindow=0;
+							}			
+							// generate html template				
+							if(trackEditWindow==0 && propCursorX==4 && propCursorY==quad_indices.length/3){
+								makeHtmlTemplate();
+							}		
+							
+							if(trackEditWindow==1 && propCursorX==3 && propCursorY==quad_uvs.length/2){
+								makeHtmlTemplate();
 							}							
 							
 							
