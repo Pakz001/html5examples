@@ -2864,23 +2864,77 @@
 		a+="document.body.appendChild( renderer.domElement );\n";
 		a+="var quad_vertices =\n";
 		a+="[\n";
+		for(var i=0;i<quad_vertices.length;i+=3){
+			a+=""+quad_vertices[i]+",";
+			a+=""+quad_vertices[i+1]+",";
+			a+=""+quad_vertices[i+2]+",\n";			
+		}
 		a+="];\n";
 		a+="\n\n";
 		a+="var quad_verticesColor =\n";
 		a+="[\n";
+		for(var i=0;i<quad_verticesColor.length;i+=3){
+			a+=""+quad_verticesColor[i]+",";
+			a+=""+quad_verticesColor[i+1]+",";
+			a+=""+quad_verticesColor[i+2]+",\n";			
+		}
 		a+="];\n";
 		a+="\n\n";
 		a+="var quad_uvs =\n";
 		a+="[\n";
+		for(var i=0;i<quad_uvs.length;i+=2){
+			a+=""+quad_uvs[i]+",";
+			a+=""+quad_uvs[i+1]+",\n";
+		}		
 		a+="];\n";
 		a+="\n\n";
 		a+="var quad_indices =\n";
 		a+="[\n";
+		for(var i=0;i<quad_indices.length;i+=3){
+			a+=""+quad_indices[i]+",";
+			a+=""+quad_indices[i+1]+",";
+			a+=""+quad_indices[i+2]+",\n";			
+		}		
 		a+="];\n";
 		a+="\n\n";
+
+		a+="var geometry = new THREE.BufferGeometry();\n";
+				
+		a+="var vertices = new Float32Array( quad_vertices );\n";
+		a+="var verticesColor = new Float32Array( quad_verticesColor );\n";
+		a+="var uvs = new Float32Array( quad_uvs);\n";
+		a+="var indices = new Uint32Array( quad_indices );\n";
+				
+		a+="geometry.setAttribute(\n";
+		a+="\t\t'color',\n";
+		a+="\t\tnew THREE.BufferAttribute(verticesColor, 3));\n";
+		a+="geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );\n";
+		a+="geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );\n";
+		a+="geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );\n";				
+		a+="let sprite = new THREE.TextureLoader().load('resources/star.png');\n";
+		a+="sprite.minFilter = THREE.NearestFilter;\n";
+		a+="sprite.magFilter = THREE.NearestFilter;\n";
+
+		a+="var material2 = new THREE.MeshLambertMaterial( {\n";
+		a+="\t\t\t\t\t\t\t\tmap:sprite,\n";
+		a+="\t\t\t\t\t\t\t\ttransparent: true,\n";
+		a+="\t\t\t\t\t\t\t\talphaTest:0.5,\n";
+		a+="\t\t\t\t\t\t\t\tcolor:0x446600,\n";
+		a+="\t\t\t\t\t\t\t\tvertexColors:true,\n";
+		a+="\t\t\t\t\t\t\t\t});\n";
+		a+="material2.flatShading=true;\n";
+		a+="var mesh = new THREE.Mesh( geometry, material2 );\n";
+		a+="\n\n";
+		
 		a+="var ambient = new THREE.AmbientLight( 0xffffff, 2 );\n";
 		a+="scene.add( ambient );\n";
-		
+		a+="function animate() {\n";
+		a+="\trequestAnimationFrame(animate);\n";
+		// rotate here
+		a+="\trenderer.render( scene, camera );\n";
+		a+="}\n";	
+		a+="animate();\n";
+		a+="\n\n";
 
 		
 		a+="<\/script>\n</body>\n</html>";
