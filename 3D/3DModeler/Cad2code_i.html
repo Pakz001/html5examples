@@ -347,7 +347,7 @@
 			// Method to add text to text area
 			//
 			//<textarea id="myTextArea" rows="10" cols="20" name="work">
-			var a="Controls : Touch/press to activate window. Then : W/S/A/D to move vertice or cursor(props). wsad with Ctrl = move canvas\nZ to tab through vertices. X to tab between canvasses.\nI/J/K/L turn mesh in 3d view.\nO/P zoom camera in and out in camera view.\nEqual/Minus zoom on canvas. Leftshift is toggle indice numbers.\nRightShift is Hide or show uv/indices lines. V = add point\nProps:\nW/S/A/D num 0..9/Backspace/Return\n e key is tab though edit windows.";
+			var a="Controls : Touch/press to activate window. Then : W/S/A/D to move vertice or cursor(props). wsad with Ctrl = move canvas\nZ to tab through vertices. X to tab between canvasses.\nI/J/K/L turn mesh in 3d view.\nO/P zoom camera in and out in camera view.\nEqual/Minus zoom on canvas. Leftshift is toggle indice numbers.\nRightShift is Hide or show uv/indices lines. V = add point\nProps:\nW/S/A/D num 0..9/Backspace/Return\n e key is tab though edit windows.\nM key is create webpage in text window(copy paste)";
 
 			//a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.0, -30.0, 0.0];"
 
@@ -1351,6 +1351,12 @@
 					if(e.code==="Equal"){
 						canvasScale+=25;
 					}
+					// canvas zoom in and out scale
+					if(e.code==="KeyM"){
+						//document.getElementById("output").value=a;
+						makeHtmlTemplate();
+					}
+					
 					if(e.code==="Minus"){
 						canvasScale-=25;
 						if(canvasScale<25)canvasScale=25;
@@ -2840,6 +2846,45 @@
 		
 	
 		
+	}
+	
+	//
+	// Create a html text file with the 3d data from the app.
+	function makeHtmlTemplate(){
+		
+		// work in progress
+		
+		var a="";
+		a+="<html>\n\t<head>\n\t\t<title>3d</title>\n\t</head>\n<body>\n<script>\n";
+		a+="<script src=\"js/three.js\"><\/script>";
+		a+="const scene = new THREE.Scene();\n";
+		a+="const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );\n";
+		a+="const renderer = new THREE.WebGLRenderer();\n";
+		a+="renderer.setSize( window.innerWidth, window.innerHeight );\n";
+		a+="document.body.appendChild( renderer.domElement );\n";
+		a+="var quad_vertices =\n";
+		a+="[\n";
+		a+="];\n";
+		a+="\n\n";
+		a+="var quad_verticesColor =\n";
+		a+="[\n";
+		a+="];\n";
+		a+="\n\n";
+		a+="var quad_uvs =\n";
+		a+="[\n";
+		a+="];\n";
+		a+="\n\n";
+		a+="var quad_indices =\n";
+		a+="[\n";
+		a+="];\n";
+		a+="\n\n";
+		a+="var ambient = new THREE.AmbientLight( 0xffffff, 2 );\n";
+		a+="scene.add( ambient );\n";
+		
+
+		
+		a+="<\/script>\n</body>\n</html>";
+		document.getElementById("output").value=a;
 	}
 	</script>
 	</body>
