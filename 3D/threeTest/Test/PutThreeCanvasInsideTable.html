@@ -94,6 +94,12 @@
 
 			function animate() {
 				requestAnimationFrame(animate);				
+				// Get the canvas position
+				if(Math.random()<.01){
+					var rect1 = canvas.getBoundingClientRect();//(top)
+					console.log(rect1.left+","+rect1.top+","+rect1.width+","+rect1.height);
+					
+				}
 				
 				
 				
