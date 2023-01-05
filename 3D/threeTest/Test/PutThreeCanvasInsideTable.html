@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>three canvas inside table</title>
+		
+		<style>
+		body {
+
+  
+
+			background-color: #112277;			
+			touch-action: none;
+			-webkit-touch-callout:none;
+			-webkit-user-select:none;
+			-khtml-user-select:none;
+			-moz-user-select:none;
+			-ms-user-select:none;
+			user-select:none;
+			-webkit-tap-highlight-color:rgba(0,0,0,0);
+			}
+			
+			.center {
+				margin-left: auto;
+				margin-right: auto;
+			}			
+			#ui-page1 {		
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;
+				position: absolute;
+				background-color: #4455AA;
+				top: 30%;
+				height: 29%;
+				width:49%;
+				left: 0%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}	
+		</style>
+	</head>
+	<body>
+		<canvas id="ui-page1" width="320" height="240"></canvas>	
+		<table class="center">
+		    <tr>
+        		<td id="some_id1"></td>
+ 		   </tr>
+		   	<tr>
+        		<td id="some_id2"></td>				
+        		<td id="some_id3"></td>								
+			</tr>
+		   	<tr>
+        		<td id="some_id4"></td>				
+        		<td id="some_id5"></td>								
+			</tr>
+			
+	   	</table>	
+		<script src="js/three.js"></script>
+		<script>
+				var canvas = document.getElementById("ui-page1");
+			//renderer = new THREE.WebGLRenderer({ canvas: canvas });			
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer({canvas:canvas});
+			renderer.setSize( window.innerWidth/4, window.innerHeight/4 );
+			renderer.shadowMap.Enabled=true;
+			scene.background = new THREE.Color( 0x000000);
+			
+			
+			camera.position.z = 60;		
+
+			//create an object
+			const geometry = new THREE.BoxGeometry(10, 10, 10);
+			var material = new THREE.MeshBasicMaterial({
+			  color: 0xfffff,
+			  wireframe: false,
+			 	});
+			const cube = new THREE.Mesh( geometry, material );
+			
+			//add the object to scene
+			scene.add(cube);
+			var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+			
+			scene.add( ambient );
+
+			// Put the three canvas inside the table at its
+			// some_id1 id
+			const ui_Page5Canvas = document.getElementById( 'ui-page1' );
+			const ui_Page5Context = ui_Page5Canvas.getContext( '2d' );	
+			ui_Page5Canvas.id="ab5";//props			
+			document.getElementById('some_id1').appendChild(ui_Page5Canvas);
+
+			function animate() {
+				requestAnimationFrame(animate);				
+				
+				
+				
+				renderer.render( scene, camera );
+			}	
+			animate();	
+	</script>
+	</body>
+	</html>					
