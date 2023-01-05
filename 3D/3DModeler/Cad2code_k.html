@@ -1,0 +1,3238 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Cad2Code</title>
+		
+		<style>
+		body {
+
+  
+
+			background-color: #112277;			
+			touch-action: none;
+			-webkit-touch-callout:none;
+			-webkit-user-select:none;
+			-khtml-user-select:none;
+			-moz-user-select:none;
+			-ms-user-select:none;
+			user-select:none;
+			-webkit-tap-highlight-color:rgba(0,0,0,0);
+			}
+			
+			.center {
+				margin-left: auto;
+				margin-right: auto;
+			}			
+			#ui-page1 {		
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;
+				position: absolute;
+				background-color: #4455AA;
+				top: 30%;
+				height: 29%;
+				width:49%;
+				left: 0%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#ui-page2 {
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;
+				position: absolute;
+				background-color: #4455AA;
+				top: 60%;
+				height: 25%;
+				width:49%;
+				left: 0%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#ui-page3 {
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;				
+				position: absolute;
+				background-color: #4455AA;
+				top: 30%;
+				height: 29%;
+				width:49%;
+				left: 50%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#ui-page4 {
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;				
+				position: absolute;
+				background-color: #4455AA;
+				top: 60%;
+				height: 25%;
+				width:49%;
+				left: 50%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}			
+			#ui-page5 {
+ 			 	image-rendering: -moz-crisp-edges;
+  				image-rendering: -webkit-crisp-edges;
+  				image-rendering: pixelated;				
+				position: absolute;
+				background-color: #4455AA;
+				top: 60%;
+				height: 25%;
+				width:49%;
+				left: 50%;
+				z-index: 3000;
+				cursor: crosshair;
+				touch-action: none;
+			}				
+		</style>
+	</head>
+	<body>
+		<canvas id="ui-page1" width="320" height="240"></canvas>			
+		<canvas id="ui-page2" width="320" height="240"></canvas>			
+		<canvas id="ui-page3" width="320" height="240"></canvas>			
+		<canvas id="ui-page4" width="320" height="240"></canvas>			
+		<canvas id="ui-page5" width="320" height="240"></canvas>			
+		
+		
+		<table class="center">
+		    <tr>
+        		<td id="some_id1"></td>
+				<td>
+					<textarea id="output" name="output" rows="10" cols="50">
+					</textarea>
+		
+				</td>
+ 		   </tr>
+		   	<tr>
+        		<td id="some_id2"></td>				
+        		<td id="some_id3"></td>								
+			</tr>
+		   	<tr>
+        		<td id="some_id4"></td>				
+        		<td id="some_id5"></td>								
+			</tr>
+			
+	   	</table>	
+
+		
+
+							
+							
+
+	   
+		<script src="js/three.js"></script>
+		<script>
+
+			//
+			// Cad 2 Code - work in progress..
+			//
+			// requires three.js and a texture include
+			//
+			// Programmers note - this version..
+			// Since each point added requires two other points needed to be
+			// connected in order to get a triangle. I wil try and modify the
+			// canvas views to include the connected points. Brainstorming!/design
+			//
+			// Note - depth or something for points drawn on points...
+			//
+			//
+			//
+			var canvas = document.getElementById("ui-page5");
+			//renderer = new THREE.WebGLRenderer({ canvas: canvas });			
+			const scene = new THREE.Scene();
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			const renderer = new THREE.WebGLRenderer({canvas:canvas});
+			renderer.setSize( window.innerWidth/4, window.innerHeight/4 );
+			renderer.shadowMap.Enabled=true;
+			scene.background = new THREE.Color( 0x001133);
+			
+			
+			camera.position.z = 60;
+			
+			//create an object
+			//const geometry = new THREE.BoxGeometry(1, 1, 1);
+			//var material = new THREE.MeshBasicMaterial({
+			 // color: 0xfffff,
+			 // wireframe: false,
+		//	});
+
+			window.addEventListener("pointerdown", touchHandler,false);
+			window.addEventListener("pointerup", touchHandler,false);
+			window.addEventListener("touchstart", touchHandler,false);
+			window.addEventListener("touchmove", touchHandler,false);
+			window.addEventListener("touchend", touchHandler,false);			
+			window.addEventListener('keyup', control, false);		
+			window.addEventListener('keydown', control, false);
+			//var cube = new THREE.Mesh(geometry, material);
+			
+			// Our scene's vertices array - used to build and rebuild and
+			// edit the scene through the editor.
+			var quad_vertices =
+			[
+			-30.0,  30.0, 0.0,
+			30.0,  30.0, 0.0,
+			30.0, -30.0, 0.0,
+			-30.0, -30.0, 0.0,
+			
+			
+			];
+			var quad_verticesColor =
+			[
+			1.0,1.0,1.0,
+			1.0,1.0,1.0,
+			1.0,1.0,1.0,
+			1.0,1.0,1.0
+			];
+			
+			var quad_uvs =
+			[
+			0.0, 0.0,
+			1.0, 0.0,
+			1.0, 1.0,
+			0.0, 1.0,
+			];
+			//quad_uvs = addquaduvs(9,3);
+			//
+
+			//01
+			//32
+			//45
+			
+			var quad_indices =
+			[
+			//0, 2,1,  0,3,2,  3,5,2,  3,5,2,  3,4,5
+			0, 2,1,  0,3,2
+			];
+				
+			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
+			var frontCanvas = 2;
+			var topCanvas = 1;
+			var rightCanvas = 3;
+			var propsCanvas = 4;
+			var threeCanvas = 5; // the 3d window!
+			var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
+			var previousCanvas = frontCanvas;
+			var showVertexNumbers = true; // show the number of the vertex at the point in canvas.
+			var showIndicesLines = true; // show the lines between the vertices (indices)
+			var canvasScale = 200; // scale zoom in out on canvasses
+			var threeScale = 200; // scale zoom in out on three canvas.
+			var propCursorX = 0;
+			var propCursorY = 0;
+			var propBlinkTime = 0;
+			var propBlinkTimeMax = 30;
+			var propCursorVisible = true;
+			var propCollisionX = []; // collision coordinates for props canvas
+			var propCollisionY = [];
+			var propCollisionCursorX = []; //contains the selected cursor position.
+			var propCollisionCursorY = [];
+			var propCollisionTime = 0; //long press prop field is action
+			var propVertexSelect = []; // activeCanvas:,x:,y:,vertice:
+			var propCollisionSelect = false; // select from vertices on the screen.
+			
+			
+			var lastChar = ""; // Last character pressed by keyup.
+			var trackEditWindow = 0; // The current prop edit screen
+			var trackEditVertex = 0; // track edit screen 
+			var trackEdituv = 1; // ,,
+			var oldEditCursorX = 0;
+			var oldEditCursorY = 0;
+			var ctrlKeyDown = false;
+			var rightCanvasOffsetX = 0;
+			var rightCanvasOffsetY = 0;
+			var frontCanvasOffsetX = 0;
+			var frontCanvasOffsetY = 0;
+			var topCanvasOffsetX = 0;
+			var topCanvasOffsetY = 0;
+			// touch controls
+			var uiTouchStartX = 0;
+			var uiTouchStartY = 0;
+			var uiTouchLastX = 0;
+			var uiTouchLastY = 0;
+			var uiTouchStart = false;			
+			var uiTouchEnd = false;
+			var uiTouchDrag = false;
+			var uiTouchDragX = 0;
+			var uiTouchDragY = 0;
+			var uiSelectionStart = false;
+			var uiSelectionEnd = false;	
+			var uiPinchStartDist = 0;
+			var uiPointNumX = []; // holds the coordinates of the labels on the points (ids) selection
+			var uiPointNumY = [];
+			var uiPointNumVertice = [];
+			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
+			var uiPointY = [];
+			var uiPointVertice = [];
+			var uiSelectionVertice = []; // holds the selected points/vertices id's
+//			var uiPinchStart = false;
+//			var uiPinchStartDistX = 0; // pinch zoom variables
+//			var uiPinchStartDistY = 0;
+			var uiPinchStartX = 0; // pinch zoom in/out
+			var uiPinchStartY = 0;
+			var uiPinchStartDist = 0;
+			var uiPinchStartScale = 0;
+			var uiTouchPress = false; // for hold down touch 1 finger (popup menu)
+			var uiTouchPressX = 0;
+			var uiTouchPressY = 0;
+			var uiTouchPressTime = 0;
+			var uiTouchPressTimeMax = 30;
+			var uiPopUpActive = false;
+			var uiPopUpX = 0;
+			var uiPopUpY = 0;
+			var uiPopUpInstruction = ""; //"remove selection" "add vertice"
+			
+			
+			var cube = makeMesh01();
+			//add the object to scene
+			scene.add(cube);
+			var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+			
+			scene.add( ambient );
+
+			
+			const ui_Page5Canvas = document.getElementById( 'ui-page5' );
+			const ui_Page5Context = ui_Page5Canvas.getContext( '2d' );	
+			//drawTop(ui_Page5Context);	
+
+			//document.body.appendChild( renderer.domElement );
+			//var container = document.getElementById( 'some_id' );
+			//var container = document.getElementById( 'some_id' );
+			//const ui_ThreeContext = canvas.getContext( '2d' );
+			//const ui_ThreeCanvas = document.getElementById( 'ui-page5' );
+			//const ui_ThreeContext = ui_ThreeCanvas.getContext( '2d' );	
+			
+
+			//container.appendChild( renderer.domElement );			
+			//container.appendChild( document.getElementById("canvas)); 			
+			
+			
+			const ui_Page1Canvas = document.getElementById( 'ui-page1' );
+
+
+			//var frontCanvas = 2;
+			//var topCanvas = 1;
+			//var rightCanvas = 3;
+			//var propsCanvas = 4;
+			//var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
+			// front is ui_Page2Context
+			// top is ui_Page1Context
+			// right is ui_Page3Context
+			// props is ui_Page4Context
+			const ui_Page1Context = ui_Page1Canvas.getContext( '2d' );	
+			drawTop(ui_Page1Context);
+			const ui_Page2Canvas = document.getElementById( 'ui-page2' );
+			const ui_Page2Context = ui_Page2Canvas.getContext( '2d' );	
+			drawFront(ui_Page2Context);
+			const ui_Page3Canvas = document.getElementById( 'ui-page3' );
+			const ui_Page3Context = ui_Page3Canvas.getContext( '2d' );	
+			drawRight(ui_Page3Context);
+			const ui_Page4Canvas = document.getElementById( 'ui-page4' );
+			const ui_Page4Context = ui_Page4Canvas.getContext( '2d' );	
+			drawPropScreen(ui_Page4Context);
+			ui_Page1Canvas.id="ab1";//top
+			ui_Page2Canvas.id="ab2";//front
+			ui_Page3Canvas.id="ab3";//right
+			ui_Page4Canvas.id="ab4";//props
+			ui_Page5Canvas.id="ab5";//props
+			//canvas.addEventListener ('click', event => {
+			//  console.log(`x: ${event.screenX}, y: ${event.screenY}`)
+			//})			
+
+			//			ui_Page1Canvas.addEventListener ('click', event => {
+//				touchStartX = event.screenX;
+//				//console.log(touchStartX);
+//			})
+			//ui_Page1Canvas.addEventListener ('touchstart',touchHandler);
+			//ui_Page2Canvas.addEventListener ('touchstart',touchHandler);
+			//ui_Page3Canvas.addEventListener ('touchstart',touchHandler);
+			
+			/*
+			ui_Page1Canvas.addEventListener ('touchstart', event => {
+				uiTouchLastX = event.screenX;
+				console.log(event.screenX);
+			})
+			ui_Page2Canvas.addEventListener ('touchmove', event => {
+				uiTouchLastX = event.screenX;
+				console.log(uiTouchLastX);
+			})
+			ui_Page3Canvas.addEventListener ('touchmove', event => {
+				uiTouchLastX = event.screenX;
+				console.log(uiTouchLastX);
+			})
+			*/
+			
+			//var container2 = document.getElementById( 'some_id2' );
+			//var container3 = document.getElementById( 'some_id3' );
+			//container2.appendChild( ab1.domElement );				
+			//container3.appendChild( ui_Page2Context.domElement );				
+			document.getElementById('some_id1').appendChild(ui_Page5Canvas);
+			document.getElementById('some_id2').appendChild(ui_Page1Canvas);
+			document.getElementById('some_id3').appendChild(ui_Page3Canvas);			
+			document.getElementById('some_id4').appendChild(ui_Page2Canvas);
+			document.getElementById('some_id5').appendChild(ui_Page4Canvas);			
+			
+			// 
+			// Method to add text to text area
+			//
+			//<textarea id="myTextArea" rows="10" cols="20" name="work">
+			var a="Controls : Touch/press to activate window. Then : W/S/A/D to move vertice or cursor(props). wsad with Ctrl = move canvas\nZ to tab through vertices. X to tab between canvasses.\nI/J/K/L turn mesh in 3d view.\nO/P zoom camera in and out in camera view.\nEqual/Minus zoom on canvas. Leftshift is toggle indice numbers.\nRightShift is Hide or show uv/indices lines. V = add point\nProps:\nW/S/A/D num 0..9/Backspace/Return\n e key is tab though edit windows.\nM key is create webpage in text window(copy paste)\nLong hold = popup(canvas)\ndrag/pinch/select\npinch 2 finger drag on 3d view.";
+
+			//a+="var quad_vertices =[-30.0,  30.0, 0.0,30.0,  30.0, 0.0,30.0, -30.0, 0.0,-30.0, -30.0, 0.0];"
+
+			//a+="hello";
+
+			document.getElementById("output").value=a;
+			
+			function animate() {
+				requestAnimationFrame(animate);				
+				
+				
+				//if(Math.random()<.05){
+					//var rect1 = canvas.getBoundingClientRect();//(top)
+						
+					//console.log(rect1.left);
+					//var rect1 = ui_Page5Canvas.getBoundingClientRect();//(top)
+						
+					//console.log("b:"+rect1.left);
+					
+				//}
+				
+				//camera.position.x=Math.random()*150-77;
+				//camera.position.y=Math.random()*150-77;
+				//camera.position.z=Math.random()*150-77;
+				if(Math.random()<.1){
+				//ui_Page1Context.canvas.style.top=window.innerHeight/3+"px";
+				//ui_Page2Context.canvas.style.top=window.innerHeight/1.5+"px";
+				//ui_Page3Context.canvas.style.top=window.innerHeight/3+"px";
+				//ui_Page4Context.canvas.style.top=window.innerHeight/1.5+"px";
+
+				
+				ui_Page1Context.canvas.style.width=window.innerWidth/2-16+"px";
+				ui_Page1Context.canvas.style.height=window.innerHeight/3+"px";				
+				ui_Page2Context.canvas.style.width=window.innerWidth/2-16+"px";
+				ui_Page2Context.canvas.style.height=window.innerHeight/3+"px";				
+				ui_Page3Context.canvas.style.width=window.innerWidth/2-16+"px";
+				ui_Page3Context.canvas.style.height=window.innerHeight/3+"px";				
+				ui_Page4Context.canvas.style.width=window.innerWidth/2-16+"px";
+				ui_Page4Context.canvas.style.height=window.innerHeight/3+"px";				
+				}
+				
+				// increase touch press timer.(move points)
+				uiTouchPressTime+=1;
+				propCollisionTime++; // long press and hold on prop screen 
+				
+				//cube.rotation.x+=.07;
+				//cube.rotation.z+=.07;				
+				//cube.rotation.y+=.07;
+				//var propBlinkTime = 0;
+				//var propBlinkTimeMax = 30;
+				//var propCursorVisible = true;
+				if(activeCanvas==propsCanvas){
+					propBlinkTime++;
+					if(propBlinkTime>propBlinkTimeMax){
+						propBlinkTime=0;
+						if(propCursorVisible==true){
+							propCursorVisible=false;
+						}else{
+							propCursorVisible=true;
+						}
+						drawPropScreen(ui_Page4Context,propCursorVisible);
+					}
+				}
+				renderer.render( scene, camera );
+			}	
+			animate();	
+			
+			function canvasSelection(){
+
+				//var uiTouchStartX = 0;
+				//var uiTouchStartY = 0;
+				//var uiTouchLastX = 0;
+				//var uiTouchLastY = 0;
+				//var uiTouchStart = true;			
+				//var uiTouchEnd = true;
+				//var frontCanvas = 2;
+				//var topCanvas = 1;
+				//var rightCanvas = 3;
+				//var propsCanvas = 4;
+				//var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
+				if(uiTouchEnd==true){
+					var x1=y1=x2=y2=0;
+					//console.log(ui_Page1Context.canvas.style.top);
+					if(uiTouchStartX>x1 && uiTouchStartY>y1 && uiTouchStartX<x2 && uiTouchStartY<y2){
+						activeCanvas = topCanvas;
+					}
+				}
+				if(uiTouchStart==false)return;
+				
+				
+			}
+			
+			// draw top cad view.. note opengl style coordinates - up=down(stranger things)
+			function drawTop(c){
+				c.imageSmoothingEnabled = false;				
+				c.fillStyle="#001166"				
+				c.fillRect(0,0,c.canvas.width,c.canvas.height);				
+				c.font = "24px serif";
+				c.fillStyle = "#AAAAAA";
+				c.fillText('top',6,24);	
+				c.fillStyle = "#FF9999";
+				// horizontal center line
+				for(var x=0;x<c.canvas.width;x+=2){
+					c.fillRect(x,c.canvas.height/2,1,1);
+				}
+				// vertical center line
+				for(var y=0;y<c.canvas.height;y+=2){
+					c.fillRect(c.canvas.width/2,y,1,1);
+				}
+				
+				canvasSelection(c);
+				
+				c.translate(topCanvasOffsetX,topCanvasOffsetY);
+				
+				// Get the vertices for drawing on the canvas
+				var vx = [];
+				var vy = [];
+				//x+3;y+2
+				var a=0;
+				var b=2;
+				for(var i=0;i<quad_vertices.length;i+=3){
+					vx.push(quad_vertices[a]);
+					vy.push(quad_vertices[b]);
+					a+=3;
+					b=a+2;
+				}
+				/*				
+				vx.push(quad_vertices[0]);
+				vy.push(quad_vertices[2]);
+				vx.push(quad_vertices[3]);
+				vy.push(quad_vertices[5]);
+				vx.push(quad_vertices[6]);
+				vy.push(quad_vertices[8]);
+				vx.push(quad_vertices[9]);
+				vy.push(quad_vertices[11]);
+				vx.push(quad_vertices[12]);
+				vy.push(quad_vertices[14]);
+				vx.push(quad_vertices[15]);
+				vy.push(quad_vertices[17]);
+				*/
+				// scale the vertices on the canvas (press +/-)
+				for(var i=0;i<vx.length;i++){
+					vx[i]/=100;
+					vy[i]/=100;
+					vx[i]*=canvasScale;
+					vy[i]*=canvasScale;
+					vx[i]+=c.canvas.width/2;
+					vy[i]+=c.canvas.height/2;	
+				}
+				
+				/*
+				x1 = quad_vertices[0]+c.canvas.width/2;
+				y1 = quad_vertices[2]+c.canvas.height/2;
+				x2 = quad_vertices[3]+c.canvas.width/2;
+				y2 = quad_vertices[5]+c.canvas.height/2;
+				x3 = quad_vertices[6]+c.canvas.width/2;
+				y3 = quad_vertices[8]+c.canvas.height/2;
+				x4 = quad_vertices[9]+c.canvas.width/2;
+				y4 = quad_vertices[11]+c.canvas.height/2;
+				*/
+				
+				// Draw the points in the cad canvas
+				//c.fillStyle="#FFFFFF";
+				// Show number of the vertex on the point.
+				//c.font = "16px arial";				
+				// Store locations in here in case of doublers
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];				
+				
+				for(var i=0;i<vx.length;i++){
+					var bloke=false;
+					for(var j=0;j<uiSelectionVertice.length;j++){
+						if(i==uiSelectionVertice[j])bloke=true;
+					}
+					if(i==activeVertice || bloke==true){						
+						c.fillStyle="#AA0000";
+						c.fillRect(vx[i]-6,vy[i]-6,12,12);						
+						c.fillStyle="#FFFF00";
+					}else{
+						c.fillStyle="#AAAAAA";
+					}					
+					c.fillRect(vx[i]-4,vy[i]-4,8,8);
+					uiPointX.push(vx[i]-4);
+					uiPointY.push(vy[i]-4);
+					uiPointVertice.push(i*3)
+						
+					//if(showVertexNumbers)c.fillText(""+i,vx[i]-12+Math.random()*20,vy[i]-12+Math.random()*20);
+				}
+				/*
+				c.fillRect(x1,y1,5,5);
+				c.fillRect(x2,y2,5,5);
+				c.fillRect(x3,y3,5,5);
+				c.fillRect(x4,y4,5,5);
+				*/
+				
+			    // draw connected lines (uv's indices)
+				if(showIndicesLines){				
+					for(var i=0;i<quad_indices.length;i+=3){
+						if(quad_indices[i]==activeVertice || quad_indices[i+1]==activeVertice || quad_indices[i+2]==activeVertice){
+						    c.strokeStyle = 'red';					
+							c.lineWidth = 1;
+						}else{
+						    c.strokeStyle = 'yellow';					
+							c.lineWidth = 1;	
+						}
+					    c.beginPath();
+					    c.moveTo(vx[quad_indices[i]], vy[quad_indices[i]]);				
+						c.lineTo(vx[quad_indices[i+1]], vy[quad_indices[i+1]]);
+						c.lineTo(vx[quad_indices[i+2]], vy[quad_indices[i+2]]);
+						c.lineTo(vx[quad_indices[i]], vy[quad_indices[i]]);				
+					    c.stroke();				
+					}
+				}
+
+				// Draw the indices numbers
+				var dx = [];
+				var dy = [];
+				if(showVertexNumbers){
+					c.font = "12px arial";				
+					for(var i=0;i<vx.length;i++){
+						var x = vx[i]-12;//-26+Math.random()*26;
+						var y = vy[i]-12;//-26+Math.random()*26;
+						dx.push(x);
+						dy.push(y);
+						
+					}
+				}
+				// Check if there are double points on the canvas
+				// and then add space between.
+				var doub=true;
+				while(doub){
+					doub=false;
+					for(var i=0;i<dx.length;i++){
+						for(var j=0;j<dx.length;j++){
+							if(j==i)continue;
+							if(dx[i]==dx[j] && dy[i]==dy[j]){
+								dx[j]+=12;
+								//dy[j]+=24;
+								doub=true;
+							}
+						}
+					}
+				}
+				
+//			var uiPointNumX = []; // holds the coordinates of the labels on the points (ids) selection
+//			var uiPointNumY = [];
+//			var uiPointNumVertice = [];
+				uiPointNumX = [];
+				uiPointNumY = [];
+				uiPointNumVertice = [];				
+				//var propVertexSelect = []; // activeCanvas:,x:,y:,vertice:
+				// Remove previous occurence of canvas numbers in this canvas
+				for(var i=0;i<propVertexSelect.length;i++){
+					if(propVertexSelect.canvas==topCanvas){
+						propVertexSelect.splice(i,1);
+					}
+				}
+				// draw the points on the canvas
+				for(var i=0;i<dx.length;i++){
+					var x = dx[i];
+					var y = dy[i];
+					c.fillStyle="#000000";
+					c.fillRect(x,y-16,8,20);
+					if(propCollisionSelect){						
+						var R = 6;
+						c.beginPath();
+						c.arc(x+3, y-3, R, 0, 2 * Math.PI, false);
+						c.lineWidth = 2;
+						c.strokeStyle = '#FF0000';
+						c.stroke();						
+					}
+					uiPointNumX.push(x);
+					uiPointNumY.push(y-16);
+					uiPointNumVertice.push(i*3);
+					propVertexSelect.push({canvas:topCanvas,x:x,y:y-16,vertice:i*3});
+					c.fillStyle="#FFFFFF";
+					c.fillText(""+i,x,y);										
+				}
+
+				c.translate(-topCanvasOffsetX,-topCanvasOffsetY);
+				
+				
+				
+				if(uiPopUpActive == true && activeCanvas == topCanvas){
+
+
+					var x = uiPopUpX ;//- c.canvas.width+100;
+					var y = uiPopUpY;
+					if(x<10)x=10;
+					if(x+100>c.canvas.width)x=c.canvas.width-110;
+					if(y+50>c.canvas.height)y=c.canvas.height-50;
+					uiPopUpX = x;
+					uiPopupY = y;
+//					console.log(x);
+					c.fillStyle="#FFFFFF";
+					c.fillRect(x,y,100,50);
+					c.fillStyle="#000000";
+					c.fillRect(x+2,y+2,100-4,50-4);
+					c.fillStyle="#FFFFFF";
+					if(uiSelectionVertice.length>0){					
+						c.fillText("Delete Selection",x+4,y+15);
+						uiPopUpInstruction = "remove selection"
+					}else{
+						c.fillText("Add Vertice",x+4,y+15);
+						uiPopUpInstruction = "add vertice"
+					}
+					
+				}
+				
+				// If the active last touched or pressed or tabbed canvas is this
+				// then draw a outline.
+				if(activeCanvas==topCanvas){
+					c.fillStyle="#FF1188";					
+					//c.fillStyle="#0000FF";										
+					c.fillRect(0,0,c.canvas.width,3);
+					c.fillRect(0,c.canvas.height-3,c.canvas.width,3);
+					c.fillRect(0,0,3,c.canvas.height);
+					c.fillRect(c.canvas.width-3,0,3,c.canvas.height);
+				}
+				
+//			var propVertexSelect = []; // activeCanvas:,x:,y:,vertice:
+//			var propCollisionSelect = false; // select from vertices on the screen.
+/*			
+				if(propCollisionSelect){
+					console.log(propVertexSelect.length);
+					for(var i=0;i<propVertexSelect.length;i++){						
+						if(propVertexSelect[i].canvas==topCanvas){
+							var x = propVertexSelect[i].x;
+							var y = propVertexSelect[i].y;
+							var w = 64;
+							var h = 64;
+							c.fillStyle="#FFFFFF";
+							//c.fillRect(x,y,w,h);
+						}
+					}
+
+					
+				}
+*/				
+				
+				
+			}
+			
+			
+			
+			
+			// draw front side cad view - note opengl coordinates			
+			function drawFront(c){
+				
+
+				
+				c.imageSmoothingEnabled = false;								
+				c.fillStyle="#001166"				
+				c.fillRect(0,0,c.canvas.width,c.canvas.height);				
+				c.font = "24px serif";
+				c.fillStyle = "#AAAAAA";
+				c.fillText('front',6,24);	
+				c.fillStyle = "#FF9999";
+				
+				
+				// horizontal center line
+				for(var x=0;x<c.canvas.width;x+=2){
+					c.fillRect(x,c.canvas.height/2,1,1);
+				}
+				// vertical center line
+				for(var y=0;y<c.canvas.height;y+=2){
+					c.fillRect(c.canvas.width/2,y,1,1);
+				}
+				
+				// Scroll the canvas..
+				c.translate(frontCanvasOffsetX,frontCanvasOffsetY);
+				
+				var vx = [];
+				var vy = [];
+				//x+3;y+1
+				var a=0;
+				var b=1;
+				for(var i=0;i<quad_vertices.length;i+=3){
+					vx.push(quad_vertices[a]);
+					vy.push(quad_vertices[b]);
+					a+=3;
+					b=a+1;
+				}
+				
+				/*
+				vx.push(quad_vertices[0]);
+				vy.push(quad_vertices[1]);
+				vx.push(quad_vertices[3]);
+				vy.push(quad_vertices[4]);
+				vx.push(quad_vertices[6]);
+				vy.push(quad_vertices[7]);
+				vx.push(quad_vertices[9]);
+				vy.push(quad_vertices[10]);
+				vx.push(quad_vertices[12]);
+				vy.push(quad_vertices[13]);
+				vx.push(quad_vertices[15]);
+				vy.push(quad_vertices[16]);
+				*/
+				// scale the vertices on the canvas (press +/-)
+				for(var i=0;i<vx.length;i++){
+					vx[i]/=100;
+					vy[i]/=100;
+					vx[i]*=canvasScale;
+					vy[i]*=canvasScale;
+					vx[i]+=c.canvas.width/2;
+					vy[i]+=c.canvas.height/2;	
+				}
+				
+				/*
+				x1 = quad_vertices[0]+c.canvas.width/2;
+				y1 = quad_vertices[1]+c.canvas.height/2;
+				x2 = quad_vertices[3]+c.canvas.width/2;
+				y2 = quad_vertices[4]+c.canvas.height/2;
+				x3 = quad_vertices[6]+c.canvas.width/2;
+				y3 = quad_vertices[7]+c.canvas.height/2;
+				x4 = quad_vertices[9]+c.canvas.width/2;
+				y4 = quad_vertices[10]+c.canvas.height/2;
+				*/
+				
+				// Draw the points in the cad canvas
+				//c.fillStyle="#FFFFFF";
+				//c.font = "16px arial";
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];				
+				
+				for(var i=0;i<vx.length;i++){
+					var bloke=false;
+					for(var j=0;j<uiSelectionVertice.length;j++){
+						if(i==uiSelectionVertice[j])bloke=true;
+					}
+					if(i==activeVertice || bloke==true){
+						c.fillStyle="#AA0000";
+						c.fillRect(vx[i]-6,vy[i]-6,12,12);						
+						c.fillStyle="#FFFF00";
+					}else{
+						c.fillStyle="#AAAAAA";
+					}					
+					c.fillRect(vx[i]-4,vy[i]-4,8,8);									
+					uiPointX.push(vx[i]-4);
+					uiPointY.push(vy[i]-4);
+					uiPointVertice.push(i*3)
+					
+					//if(showVertexNumbers)c.fillText(""+i,vx[i]-12+Math.random()*20,vy[i]-12+Math.random()*20);					
+				}
+				
+				// Draw lines between the connected points.
+			    //c.strokeStyle = 'yellow';
+			    //c.lineWidth = .1;
+				//c.setLineDash([3, 3]);				
+			
+			    // draw connected lines (uv's indices)
+				if(showIndicesLines){				
+					for(var i=0;i<quad_indices.length;i+=3){
+						if(quad_indices[i]==activeVertice || quad_indices[i+1]==activeVertice || quad_indices[i+2]==activeVertice){
+						    c.strokeStyle = 'red';					
+							c.lineWidth = 1;
+						}else{
+						    c.strokeStyle = 'yellow';					
+							c.lineWidth = 1;	
+						}
+					    c.beginPath();
+					    c.moveTo(vx[quad_indices[i]], vy[quad_indices[i]]);				
+						c.lineTo(vx[quad_indices[i+1]], vy[quad_indices[i+1]]);
+						c.lineTo(vx[quad_indices[i+2]], vy[quad_indices[i+2]]);
+						c.lineTo(vx[quad_indices[i]], vy[quad_indices[i]]);				
+					    c.stroke();				
+					}
+				}
+				// Draw the indices numbers
+	//			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
+	//			var uiPointY = [];
+	//			var uiPointVertice = [];
+				var dx = [];
+				var dy = [];
+
+				if(showVertexNumbers){
+					c.font = "12px arial";				
+					for(var i=0;i<vx.length;i++){
+						var x = vx[i]-12;
+						var y = vy[i]-12;
+						dx.push(x);
+						dy.push(y);
+					}
+				}
+				// Check if there are double points on the canvas
+				// and then add space between.
+				var doub=true;
+				while(doub){
+					doub=false;
+					for(var i=0;i<dx.length;i++){
+						for(var j=0;j<dx.length;j++){
+							if(j==i)continue;
+							if(dx[i]==dx[j] && dy[i]==dy[j]){
+								dx[j]+=12;
+								//dy[j]+=24;
+								doub=true;
+							}
+						}
+					}
+				}
+				
+				// draw the points on the canvas
+				uiPointNumX = [];
+				uiPointNumY = [];
+				uiPointNumVertice = [];			
+				// Remove previous occurence of canvas numbers in this canvas				
+				for(var i=0;i<propVertexSelect.length;i++){
+					if(propVertexSelect.canvas==topCanvas){
+						propVertexSelect.splice(i,1);
+					}
+				}
+				
+				for(var i=0;i<dx.length;i++){
+					var x = dx[i];
+					var y = dy[i];
+					c.fillStyle="#000000";
+					c.fillRect(x,y-16,8,20);
+					if(propCollisionSelect){						
+						var R = 6;
+						c.beginPath();
+						c.arc(x+3, y-3, R, 0, 2 * Math.PI, false);
+						c.lineWidth = 2;
+						c.strokeStyle = '#FF0000';
+						c.stroke();						
+					}
+					
+					uiPointNumX.push(x);
+					uiPointNumY.push(y-16);
+					uiPointNumVertice.push(i*3);
+					propVertexSelect.push({canvas:topCanvas,x:x,y:y-16,vertice:i*3});					
+					c.fillStyle="#FFFFFF";
+					c.fillText(""+i,x,y);										
+				}				
+				
+				/*
+				c.fillRect(x1,y1,5,5);
+				c.fillRect(x2,y2,5,5);
+				c.fillRect(x3,y3,5,5);
+				c.fillRect(x4,y4,5,5);
+				*/
+				
+				c.translate(-frontCanvasOffsetX,-frontCanvasOffsetY);
+				
+				// draw popup
+				if(uiPopUpActive == true && activeCanvas == frontCanvas){
+
+
+					var x = uiPopUpX ;//- c.canvas.width+100;
+					var y = uiPopUpY;
+					if(x<10)x=10;
+					if(x+100>c.canvas.width)x=c.canvas.width-110;
+					if(y+50>c.canvas.height)y=c.canvas.height-50;
+					uiPopUpX = x;
+					uiPopupY = y;
+//					console.log(x);
+					c.fillStyle="#FFFFFF";
+					c.fillRect(x,y,100,50);
+					c.fillStyle="#000000";
+					c.fillRect(x+2,y+2,100-4,50-4);
+					c.fillStyle="#FFFFFF";
+					if(uiSelectionVertice.length>0){					
+						c.fillText("Delete Selection",x+4,y+15);
+						uiPopUpInstruction = "remove selection"
+					}else{
+						c.fillText("Add Vertice",x+4,y+15);
+						uiPopUpInstruction = "add vertice"
+					}
+					
+				}				
+				
+				// If the active last touched or pressed or tabbed canvas is this
+				// then draw a outline.
+				if(activeCanvas==frontCanvas){
+					c.fillStyle="#FF1188";					
+					c.fillRect(0,0,c.canvas.width,3);
+					c.fillRect(0,c.canvas.height-3,c.canvas.width,3);
+					c.fillRect(0,0,3,c.canvas.height);
+					c.fillRect(c.canvas.width-3,0,3,c.canvas.height);
+				}
+		
+			}
+			
+			
+			// draw right side cad view - note opengl coordinates
+			function drawRight(c){
+				c.imageSmoothingEnabled = false;	
+				c.fillStyle="#001166"				
+				c.fillRect(0,0,c.canvas.width,c.canvas.height);				
+				c.font = "24px serif";
+				c.fillStyle = "#AAAAAA";
+				c.fillText('right',6,24);	
+				c.fillStyle = "#FF9999";
+				// horizontal center line
+				for(var x=0;x<c.canvas.width;x+=2){
+					c.fillRect(x,c.canvas.height/2,1,1);
+				}
+				// vertical center line
+				for(var y=0;y<c.canvas.height;y+=2){
+					c.fillRect(c.canvas.width/2,y,1,1);
+				}
+				
+				
+				c.translate(rightCanvasOffsetX,rightCanvasOffsetY);
+				
+				var vx = [];
+				var vy = [];
+				//x+3;y-1
+				var a=2;
+				var b=1;
+				for(var i=0;i<quad_vertices.length;i+=3){
+					vx.push(quad_vertices[a]);
+					vy.push(quad_vertices[b]);
+					a+=3;
+					b=a-1;
+				}
+				/*
+				vx.push(quad_vertices[2]);
+				vy.push(quad_vertices[1]);
+				vx.push(quad_vertices[5]);
+				vy.push(quad_vertices[4]);
+				vx.push(quad_vertices[8]);
+				vy.push(quad_vertices[7]);
+				vx.push(quad_vertices[11]);
+				vy.push(quad_vertices[10]);
+				vx.push(quad_vertices[14]);
+				vy.push(quad_vertices[13]);
+				vx.push(quad_vertices[17]);
+				vy.push(quad_vertices[16]);
+				*/
+				// scale the vertices on the canvas (press +/-)
+				for(var i=0;i<vx.length;i++){
+					vx[i]/=100;
+					vy[i]/=100;
+					vx[i]*=canvasScale;
+					vy[i]*=canvasScale;
+					vx[i]+=c.canvas.width/2;
+					vy[i]+=c.canvas.height/2;	
+				}
+				
+				/*
+				x1 = quad_vertices[2]+c.canvas.width/2;
+				y1 = quad_vertices[1]+c.canvas.height/2;
+				x2 = quad_vertices[5]+c.canvas.width/2;
+				y2 = quad_vertices[4]+c.canvas.height/2;
+				x3 = quad_vertices[8]+c.canvas.width/2;
+				y3 = quad_vertices[7]+c.canvas.height/2;
+				x4 = quad_vertices[11]+c.canvas.width/2;
+				y4 = quad_vertices[10]+c.canvas.height/2;
+				*/
+				// Draw the points in the cad canvas
+				//c.font = "16px arial";			
+				uiPointX = [];
+				uiPointY = [];
+				uiPointVertice = [];				
+				
+				for(var i=0;i<vx.length;i++){
+					// Multiple selection
+					var bloke=false;
+					for(var j=0;j<uiSelectionVertice.length;j++){
+						if(i==uiSelectionVertice[j])bloke=true;
+					}
+					if(i==activeVertice || bloke==true){
+						c.fillStyle="#AA0000";
+						c.fillRect(vx[i]-6,vy[i]-6,12,12);						
+						c.fillStyle="#FFFF00";
+					}else{
+						c.fillStyle="#AAAAAA";
+					}
+					c.fillRect(vx[i]-4,vy[i]-4,8,8);
+					uiPointX.push(vx[i]-4);
+					uiPointY.push(vy[i]-4);
+					uiPointVertice.push(i*3)
+					
+					//if(showVertexNumbers)c.fillText(""+i,vx[i]-12+Math.random()*20,vy[i]-12+Math.random()*20);					
+				}
+				/*
+				c.fillRect(x1,y1,5,5);
+				c.fillRect(x2,y2,5,5);
+				c.fillRect(x3,y3,5,5);
+				c.fillRect(x4,y4,5,5);
+				*/
+				
+			    // draw connected lines (uv's indices)
+				if(showIndicesLines){
+					for(var i=0;i<quad_indices.length;i+=3){
+						if(quad_indices[i]==activeVertice || quad_indices[i+1]==activeVertice || quad_indices[i+2]==activeVertice){
+						    c.strokeStyle = 'red';					
+							c.lineWidth = 1;
+						}else{
+						    c.strokeStyle = 'yellow';					
+							c.lineWidth = 1;	
+						}
+					    c.beginPath();
+					    c.moveTo(vx[quad_indices[i]], vy[quad_indices[i]]);				
+						c.lineTo(vx[quad_indices[i+1]], vy[quad_indices[i+1]]);
+						c.lineTo(vx[quad_indices[i+2]], vy[quad_indices[i+2]]);
+						c.lineTo(vx[quad_indices[i]], vy[quad_indices[i]]);				
+					    c.stroke();				
+					}
+				}
+				// Draw the indices numbers
+				
+				var dx = [];
+				var dy = [];
+				if(showVertexNumbers){
+					c.font = "12px arial";				
+					for(var i=0;i<vx.length;i++){
+						var x = vx[i]-12;
+						var y = vy[i]-12;
+						dx.push(x);
+						dy.push(y);
+					}
+				}
+				// Check if there are double points on the canvas
+				// and then add space between.
+				var doub=true;
+				while(doub){
+					doub=false;
+					for(var i=0;i<dx.length;i++){
+						for(var j=0;j<dx.length;j++){
+							if(j==i)continue;
+							if(dx[i]==dx[j] && dy[i]==dy[j]){
+								dx[j]+=12;
+								//dy[j]+=24;
+								doub=true;
+							}
+						}
+					}
+				}
+				// draw the points on the canvas
+				uiPointNumX = [];
+				uiPointNumY = [];
+				uiPointNumVertice = [];				
+				// Remove previous occurence of canvas numbers in this canvas				
+				for(var i=0;i<propVertexSelect.length;i++){
+					if(propVertexSelect.canvas==topCanvas){
+						propVertexSelect.splice(i,1);
+					}
+				}
+				
+				for(var i=0;i<dx.length;i++){
+					var x = dx[i];
+					var y = dy[i];
+					c.fillStyle="#000000";
+					c.fillRect(x,y-16,8,20);
+					if(propCollisionSelect){						
+						var R = 6;
+						c.beginPath();
+						c.arc(x+3, y-3, R, 0, 2 * Math.PI, false);
+						c.lineWidth = 2;
+						c.strokeStyle = '#FF0000';
+						c.stroke();						
+					}
+					
+					uiPointNumX.push(x);
+					uiPointNumY.push(y-16);
+					uiPointNumVertice.push(i*3);
+					propVertexSelect.push({canvas:topCanvas,x:x,y:y-16,vertice:i*3});					
+					c.fillStyle="#FFFFFF";
+					c.fillText(""+i,x,y);										
+				}				
+				
+				c.translate(-rightCanvasOffsetX,-rightCanvasOffsetY);
+
+				// draw popup
+				if(uiPopUpActive == true && activeCanvas == rightCanvas){
+
+
+					var x = uiPopUpX ;//- c.canvas.width+100;
+					var y = uiPopUpY;
+					if(x<10)x=10;
+					if(x+100>c.canvas.width)x=c.canvas.width-110;
+					if(y+50>c.canvas.height)y=c.canvas.height-50;
+					uiPopUpX = x;
+					uiPopupY = y;
+//					console.log(x);
+					c.fillStyle="#FFFFFF";
+					c.fillRect(x,y,100,50);
+					c.fillStyle="#000000";
+					c.fillRect(x+2,y+2,100-4,50-4);
+					c.fillStyle="#FFFFFF";
+					if(uiSelectionVertice.length>0){					
+						c.fillText("Delete Selection",x+4,y+15);
+						uiPopUpInstruction = "remove selection"
+					}else{
+						c.fillText("Add Vertice",x+4,y+15);
+						uiPopUpInstruction = "add vertice"
+					}
+					
+				}				
+				
+				
+				// If the active last touched or pressed or tabbed canvas is this
+				// then draw a outline.
+				if(activeCanvas==rightCanvas){
+					c.fillStyle="#FF1188";					
+					c.fillRect(0,0,c.canvas.width,3);
+					c.fillRect(0,c.canvas.height-3,c.canvas.width,3);
+					c.fillRect(0,0,3,c.canvas.height);
+					c.fillRect(c.canvas.width-3,0,3,c.canvas.height);
+				}
+		
+				
+			}
+			
+			function makeMesh01(){
+				/*			
+				var quad_vertices =
+				[
+				-30.0,  30.0, 0.0,
+				30.0,  30.0, 0.0,
+				30.0, -30.0, 0.0,
+				-30.0, -30.0, 0.0
+				];
+				
+				var quad_verticesColor =
+				[
+				1.0,1.0,1.0,
+				1.0,1.0,1.0,
+				1.0,1.0,1.0,
+				1.0,1.0,1.0
+				];
+				
+				var quad_uvs =
+				[
+				0.0, 0.0,
+				1.0, 0.0,
+				1.0, 1.0,
+				0.0, 1.0
+				];
+				quad_uvs = addquaduvs(9,3);
+				
+				var quad_indices =
+				[
+				0, 2, 1, 0, 3, 2
+				];
+				*/
+				//quad_indices = addquadindices(0);				
+				
+				var geometry = new THREE.BufferGeometry();
+				
+				var vertices = new Float32Array( quad_vertices );
+				var verticesColor = new Float32Array( quad_verticesColor );
+				// Each vertex has one uv coordinate for texture mapping
+				var uvs = new Float32Array( quad_uvs);
+				// Use the four vertices to draw the two triangles that make up the square.
+				var indices = new Uint32Array( quad_indices )
+				
+				geometry.setAttribute(
+				      'color',
+				      new THREE.BufferAttribute(verticesColor, 3));
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+				
+				//let sprite = new THREE.TextureLoader().load('resources/flourish-cc-by-nc-sa3.png');
+				let sprite = new THREE.TextureLoader().load('resources/star.png');
+				//sprite.minFilter = THREE.NearestFilter;
+				sprite.minFilter = THREE.NearestFilter;
+				sprite.magFilter = THREE.NearestFilter;
+
+				var material2 = new THREE.MeshLambertMaterial( {
+												map:sprite,	
+												transparent: true,
+												alphaTest:0.5,
+												color:0x446600,// note darkness for torches
+												vertexColors:true,												
+											});
+
+				material2.flatShading=true;
+
+
+				var mesh = new THREE.Mesh( geometry, material2 );
+				
+				//mesh.receiveShadow=true;
+				//mesh.castShadow=true;
+				//mesh.position.z = -100;
+				//mesh.receiveShadow=true;
+				return mesh;				
+			}
+			
+			
+			function addquaduvs(x,y){
+ 				const tileSize = 16.0;
+ 				const tileTextureWidth = 256.0;
+ 	 			const tileTextureHeight = 64.0;
+  
+				var x1=x,y1=y;
+				var x2=x1+1;
+				var y2=y1+1;
+				
+				// here we set the uv's with the atlas texture
+				var q = [
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y1,
+				(tileSize / tileTextureWidth)*x2, (tileSize/tileTextureHeight)*y2,
+				(tileSize / tileTextureWidth)*x1, (tileSize/tileTextureHeight)*y2,
+				];
+				
+				
+				return q;
+			}
+			function addquadindices(num){
+				q = [0+4*num, 2+4*num, 1+4*num, 0+4*num, 3+4*num, 2+4*num,
+				];
+				
+				return q;
+			}
+			
+			function control(e){
+				if(e.type=="keydown"){
+					// Used for scrolling canvasses
+					if(e.code==="ControlLeft" || e.code==="ControlRight"){ // if pressed control key
+						ctrlKeyDown=true;
+						//console.log("a");
+					}
+					e.preventDefault();
+				}
+				if(e.type=="keyup"){
+					if(e.code==="ControlLeft")ctrlKeyDown=false;
+					
+					// Disable line below to see key code pressed
+					//console.log(e.code);
+					// add vertex
+					if(e.code==="KeyV"){
+						quad_vertices.push(0.0);
+						quad_vertices.push(-60.0);
+						quad_vertices.push(0.0);
+						quad_verticesColor.push(1.0);
+						quad_verticesColor.push(1.0);
+						quad_verticesColor.push(1.0);	
+						quad_uvs.push(0.0);
+						quad_uvs.push(1.0);
+						quad_indices.push(0);
+						quad_indices.push(0);
+						quad_indices.push(0);						
+					}
+					
+					//if pressed 'e' then switch edit track screen.
+					if(e.code==="KeyE"){
+						// Get previous prop window cursor positio
+						var tx = propCursorX;
+						var ty = propCursorY;
+						propCursorX = oldEditCursorX;
+						propCursorY = oldEditCursorY;
+						oldEditCursorX = tx;
+						oldEditCursorY = ty;
+						trackEditWindow++;
+						if(trackEditWindow>1){
+							trackEditWindow=0;
+						}
+					}
+											
+					
+					// if pressed w key then move vertice up on screen. down on canvas.
+					var av = Math.floor(activeVertice*3);
+					if(e.code==="KeyW"){
+						if(ctrlKeyDown==false){
+							if(uiSelectionVertice.length>0){
+								if(activeCanvas==frontCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+1]+=10;
+									}
+								}	
+								if(activeCanvas==rightCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+1]+=10;
+									}
+								}	
+								if(activeCanvas==topCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+2]+=10;
+									}
+								}	
+								
+							}else{
+								if(activeCanvas==frontCanvas)quad_vertices[av+1]+=10;
+								if(activeCanvas==rightCanvas)quad_vertices[av+1]+=10;						
+								if(activeCanvas==topCanvas)quad_vertices[av+2]+=10;
+							}
+						}
+						if(ctrlKeyDown==true){
+							if(activeCanvas==frontCanvas)frontCanvasOffsetY+=10;	
+							if(activeCanvas==rightCanvas)rightCanvasOffsetY+=10;	
+							if(activeCanvas==topCanvas)topCanvasOffsetY+=10;	
+						}
+					}
+					// If pressed Key S on canvas then move vertice(s)
+					if(e.code==="KeyS"){
+						if(ctrlKeyDown==false){
+							if(uiSelectionVertice.length>0){
+								if(activeCanvas==frontCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+1]-=10;
+									}
+								}	
+								if(activeCanvas==rightCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+1]-=10;
+									}
+								}	
+								if(activeCanvas==topCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+2]-=10;
+									}
+								}									
+							}else{							
+								if(activeCanvas==frontCanvas)quad_vertices[av+1]-=10;
+								if(activeCanvas==rightCanvas)quad_vertices[av+1]-=10;						
+								if(activeCanvas==topCanvas)quad_vertices[av+2]-=10;
+							}
+						}
+						if(ctrlKeyDown==true){
+							if(activeCanvas==frontCanvas)frontCanvasOffsetY-=10;	
+							if(activeCanvas==rightCanvas)rightCanvasOffsetY-=10;	
+							if(activeCanvas==topCanvas)topCanvasOffsetY-=10;	
+						}
+						
+					}
+					//If pressed key A on canvas then move vertice(s)
+					if(e.code==="KeyA"){
+						if(ctrlKeyDown==false){
+							if(uiSelectionVertice.length>0){
+								if(activeCanvas==frontCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3]+=10;
+									}
+								}	
+								if(activeCanvas==rightCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+2]+=10;
+									}
+								}	
+								if(activeCanvas==topCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3]+=10;
+									}
+								}									
+							}else{							
+								if(activeCanvas==frontCanvas)quad_vertices[av]+=10;
+								if(activeCanvas==rightCanvas)quad_vertices[av+2]+=10;						
+								if(activeCanvas==topCanvas)quad_vertices[av]+=10;	
+							}
+						}	
+						if(ctrlKeyDown==true){
+							if(activeCanvas==frontCanvas)frontCanvasOffsetX+=10;	
+							if(activeCanvas==rightCanvas)rightCanvasOffsetX+=10;	
+							if(activeCanvas==topCanvas)topCanvasOffsetX+=10;	
+							
+						}
+						
+					}
+					// if pressed key D on canvas then move vertice(s)
+					if(e.code==="KeyD"){
+						if(ctrlKeyDown==false){
+							if(uiSelectionVertice.length>0){
+								if(activeCanvas==frontCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3]-=10;
+									}
+								}	
+								if(activeCanvas==rightCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3+2]-=10;
+									}
+								}	
+								if(activeCanvas==topCanvas){
+									for(var i=0;i<uiSelectionVertice.length;i++){
+										quad_vertices[uiSelectionVertice[i]*3]-=10;
+									}
+								}									
+							}else{							
+								if(activeCanvas==frontCanvas)quad_vertices[av]-=10;
+								if(activeCanvas==rightCanvas)quad_vertices[av+2]-=10;						
+								if(activeCanvas==topCanvas)quad_vertices[av]-=10;
+							}
+						}
+						if(ctrlKeyDown==true){
+							if(activeCanvas==frontCanvas)frontCanvasOffsetX-=10;	
+							if(activeCanvas==rightCanvas)rightCanvasOffsetX-=10;	
+							if(activeCanvas==topCanvas)topCanvasOffsetX-=10;	
+							
+						}
+						
+					}					
+					if(e.code==="KeyZ"){ // tab points/vertices
+						activeVertice++;
+						if(activeVertice>=Math.floor(quad_vertices.length/3))activeVertice=0;
+					}
+					if(e.code==="KeyX"){ // tab canvasses
+						activeCanvas++;
+						if(activeCanvas>=5)activeCanvas=1;
+					}
+					// canvas zoom in and out scale
+					if(e.code==="Equal"){
+						canvasScale+=25;
+					}
+					// canvas zoom in and out scale
+					if(e.code==="KeyM"){
+						//document.getElementById("output").value=a;
+						makeHtmlTemplate();
+					}
+					
+					if(e.code==="Minus"){
+						canvasScale-=25;
+						if(canvasScale<25)canvasScale=25;
+					}
+					
+					// Show the vertex number on the points.
+					if(e.code==="ShiftLeft"){
+						if(showVertexNumbers == true){
+							showVertexNumbers = false;
+						}else{
+							showVertexNumbers = true;
+						};
+						//console.log("showVertexNumbers = " + showVertexNumbers);
+					}
+					// Show the indices connections(uv) on the points.
+					if(e.code==="ShiftRight"){
+						if(showIndicesLines == true){
+							showIndicesLines = false;
+						}else{
+							showIndicesLines = true;
+						};
+						//console.log("showIndicesLines = " + showIndicesLines);
+					}
+					
+					
+					//
+					// Props Canvas
+					//
+					if(activeCanvas==propsCanvas){
+						if(e.code=="Digit0")lastChar="0";
+						if(e.code=="Digit1")lastChar="1";
+						if(e.code=="Digit2")lastChar="2";
+						if(e.code=="Digit3")lastChar="3";
+						if(e.code=="Digit4")lastChar="4";
+						if(e.code=="Digit5")lastChar="5";
+						if(e.code=="Digit6")lastChar="6";
+						if(e.code=="Digit7")lastChar="7";
+						if(e.code=="Digit8")lastChar="8";
+						if(e.code=="Digit9")lastChar="9";		
+						if(e.code=="Backspace")lastChar="Backspace";
+						if(e.code=="Enter")lastChar="Enter";
+						if(e.code=="KeyW"){//Move cursor up in indices field
+							propCursorY-=1;
+
+							if(propCursorY<0)propCursorY=0;
+							// If in the add remove indice section.
+							if(propCursorY==quad_indices.length/3){
+								if(propCursorX==0)propCursorX=1;
+							}							
+						}						
+						if(e.code=="KeyS"){// move cursor down in indices field
+							propCursorY++;
+							if(trackEditWindow==trackEditVertex){
+								if(propCursorY>=Math.floor(quad_indices.length/3))propCursorY=Math.floor(quad_indices.length/3);
+							}
+							if(trackEditWindow==trackEdituv){
+								if(propCursorY>=Math.floor(quad_uvs.length/2))propCursorY=Math.floor(quad_uvs.length/2);
+							}
+							if(trackEditWindow==trackEditVertex && propCursorY == quad_indices.length/3 && propCursorX==0)propCursorX++;
+							if(trackEditWindow==trackEdituv && propCursorY == quad_uvs.length/2 && propCursorX==2)propCursorX--;
+							if(trackEditWindow==trackEditVertex && propCursorY == quad_indices.length/3 && propCursorX==3)propCursorX--;
+							
+							
+						}
+						if(e.code=="KeyA"){//move cursor left in indices field
+							propCursorX-=1;
+							if(propCursorX<0)propCursorX=0;
+							if(trackEditWindow==trackEditVertex && propCursorY == quad_indices.length/3 && propCursorX==0)propCursorX++;
+						}
+						if(e.code=="KeyD"){//move cursor right in indices field
+							var r = 4;
+							if(trackEditWindow==trackEdituv)r=2;
+							propCursorX++;
+							if(propCursorX>r)propCursorX=r;
+							// If in the add remove indice section.
+							if(propCursorY==quad_indices.length/r+1){
+								if(propCursorX==r)propCursorX=r-1;								
+							}
+							if(trackEditWindow==trackEdituv && propCursorY > quad_uvs.length/2 && propCursorX==2)propCursorX--;
+							
+						}
+					}
+					
+					//
+					// 3d View controls
+					//
+					if(e.code=="KeyJ"){//turn mesh left
+						cube.rotation.y-=.25;
+					}
+					if(e.code=="KeyL"){//turn mesh right
+						cube.rotation.y+=.25;
+					}
+					if(e.code=="KeyI"){//turn mesh up
+						cube.rotation.x-=.25;
+					}
+					if(e.code=="KeyK"){//turn mesh down
+						cube.rotation.x+=.25;
+					}
+					if(e.code=="KeyO"){//zoom camera out
+						camera.position.z-=10;
+					}
+					if(e.code=="KeyP"){//zoom camera in
+						camera.position.z+=10;
+					}
+					updateScene();
+					
+					
+					e.preventDefault();
+			}
+			
+		}
+		// Update and rebuil;d the 3d view (scene)
+		function updateScene(){
+			// Store 3d view variables
+			var oldrx = cube.rotation.x;
+			var oldry = cube.rotation.y;
+			var oldrz = cube.rotation.z;
+			var oldcpz = camera.position.z;
+			
+			// update mesh
+			scene.remove(cube);
+			cube = makeMesh01();
+			scene.add(cube);
+			drawTop(ui_Page1Context);			
+			drawFront(ui_Page2Context);			
+			drawRight(ui_Page3Context);
+			drawPropScreen(ui_Page4Context);	
+			
+			// restore 3d view variables
+			cube.rotation.x = oldrx;
+			cube.rotation.y = oldry;
+			cube.rotation.z = oldrz;
+			camera.position.z = oldcpz;	
+		}
+		
+		function drawPropScreen(c,blink=true){
+			c.imageSmoothingEnabled = false;
+			c.fillStyle="#001144";			
+			c.fillRect(0,0,c.canvas.width,c.canvas.height);				
+			c.font = "24px serif";
+			c.fillStyle = "#AAAAAA";
+			c.fillText('props',10,24);	
+			c.fillStyle = "#FF9999";
+
+			// 
+			//var propCursorX = 0;
+			//var propCursorY = 0;
+			
+			if(trackEditWindow==trackEditVertex)trackEdit(c,quad_indices,3,blink);
+			
+			// handle key input (0..9)
+			for(var i=0;i<10;i++){
+				if(trackEditWindow==trackEditVertex && lastChar==i.toString())setIndice(i);
+			}
+			
+			//if(lastChar=="9")setIndice(9)
+			function setIndice(num){
+				lastChar="";
+				var i=0;
+				for(var y=0;y<quad_indices.length/3;y++){
+				for(var x=0;x<3;x++){
+				if(propCursorX==x && propCursorY==y){					
+					var num2;
+					if(quad_indices[i]>0){
+						num2=quad_indices[i]+""+num;
+					}else{
+						num2=num;
+					}
+					quad_indices[i]=num2;
+				}	
+				i++;					
+				}}
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);		
+				updateScene();
+			}
+			if(lastChar=="Backspace" && trackEditWindow==trackEditVertex)removeIndice();
+			function removeIndice(){
+				lastChar="";
+				var i=0;
+				for(var y=0;y<quad_indices.length/3;y++){
+				for(var x=0;x<3;x++){
+					if(propCursorX==x && propCursorY==y){					
+						var a=quad_indices[i];
+						var b;
+						if(a.length>1){
+							b = a.slice(0,a.length-1);
+						}else{
+							b=0;
+						}
+						quad_indices[i]=b;
+					}	
+					i++;					
+				}}
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);	
+				updateScene();
+			}
+			
+			// Handle the Return and dice (random indices based on values already present..)
+			if(lastChar=="Enter" && trackEditWindow==trackEditVertex){
+				lastChar="";
+				if(propCursorX>2)randomIndice();
+				if(propCursorX==4 && propCursorY==quad_indices.length/3){
+					//create htgmlk template
+					lastChar="";
+					makeHtmlTemplate();
+				}
+				
+				if(propCursorX==1 && propCursorY==quad_indices.length/3){
+					//remove_indices
+					lastChar="";
+					if(quad_indices.length>0)quad_indices.pop()
+					if(quad_indices.length>0)quad_indices.pop()
+					if(quad_indices.length>0)quad_indices.pop()					
+					if(propCursorY>0)propCursorY-=1;
+				}
+				//console.log("a");				
+				if(propCursorX==2 && propCursorY==quad_indices.length/3){
+					//add_indices
+					lastChar="";
+					quad_indices.push(0);
+					quad_indices.push(0);
+					quad_indices.push(0);					
+					propCursorY++;
+
+				}
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);	
+				updateScene();								
+			}
+			function randomIndice(){
+				lastChar="";
+				var i=0;
+				for(var y=0;y<quad_indices.length/3;y++){
+					if(propCursorX==3 && propCursorY==y){
+						// get the values already there.
+						var d=[];
+						for(j=0;j<3;j++){
+							d.push(quad_indices[i+j]);
+						}	
+						for(j=0;j<3;j++){				
+							var s = Math.floor(Math.random()*d.length);
+							var a = d[s];
+							d.splice(s,1);
+							
+							quad_indices[i+j]=a;
+						}
+					}	
+					for(var x=0;x<3;x++){
+						i++;
+					}				
+				}
+			}
+			
+			
+			//
+			// Draw texture uv
+			//
+			//
+			//var quad_uvs =
+			//[
+			//0.0, 0.0,
+			//1.0, 0.0,
+			//1.0, 1.0,
+			//0.0, 1.0,
+			//];
+			//var trackEditWindow = 0; // The current prop edit screen
+			//var trackEditVertex = 0; // track edit screen 
+			//var trackEdituv = 1; // ,,
+			if(trackEditWindow==trackEdituv){
+				trackEdit(c,quad_uvs,2,blink);
+			}
+			// handle key input (0..9)
+			for(var i=0;i<10;i++){
+				if(trackEditWindow==trackEdituv && lastChar==i.toString())setuv(i);
+			}
+			
+			//if(lastChar=="9")setIndice(9)
+			function setuv(num){
+				lastChar="";
+				var i=0;
+				for(var y=0;y<quad_uvs.length/2;y++){
+				for(var x=0;x<2;x++){
+				if(propCursorX==x && propCursorY==y){					
+					var num2;
+					if(quad_uvs[i]>0){
+						num2=quad_uvs[i]+""+num;
+					}else{
+						num2=num;
+					}
+					quad_uvs[i]=num2;
+				}	
+				i++;					
+				}}
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);		
+				updateScene();
+			}			
+			
+			if(lastChar=="Backspace" && trackEditWindow==trackEdituv)removeuv();
+			function removeuv(){
+				lastChar="";
+				var i=0;
+				for(var y=0;y<quad_uvs.length/2;y++){
+				for(var x=0;x<2;x++){
+					if(propCursorX==x && propCursorY==y){					
+						var a=quad_uvs[i];
+						var b;
+						if(a.length>1){
+							b = a.slice(0,a.length-1);
+						}else{
+							b=0;
+						}
+						quad_uvs[i]=b;
+					}	
+					i++;					
+				}}
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);	
+				updateScene();
+			}			
+			
+			// Handle the Return and uvs.
+			if(lastChar=="Enter" && trackEditWindow==trackEdituv){
+				if(propCursorX>1)randomuv();
+				if(propCursorX==3 && propCursorY==quad_uvs.length/2){
+					//Generate html template
+					lastChar="";
+					makeHtmlTemplate();
+				}
+				
+				if(propCursorX==0 && propCursorY==quad_uvs.length/2){
+					//remove_indices
+					lastChar="";
+					if(quad_uvs.length>0)quad_uvs.pop()
+					if(quad_uvs.length>0)quad_uvs.pop()
+					if(propCursorY>0)propCursorY-=1;
+				}
+				//console.log("a");				
+				if(propCursorX==1 && propCursorY==quad_uvs.length/2){
+					//add_indices
+					lastChar="";
+					quad_uvs.push(0);
+					quad_uvs.push(0);
+					propCursorY++;
+
+				}
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);		
+				updateScene();								
+			}
+			function randomuv(){
+				lastChar="";
+				var i=0;
+				for(var y=0;y<quad_uvs.length/2;y++){
+					if(propCursorX==2 && propCursorY==y){						
+						for(j=0;j<2;j++){				
+							var s = Math.floor(Math.random()*2);							
+							quad_uvs[i+j]=s;
+						}
+					}	
+					for(var x=0;x<2;x++){
+						i++;
+					}				
+				}
+			}
+			
+			
+			
+			
+			// If the active last touched or pressed or tabbed canvas is this
+			// then draw a outline.
+			if(activeCanvas==propsCanvas){
+				c.fillStyle="#FF1188";					
+				c.fillRect(0,0,c.canvas.width,3);
+				c.fillRect(0,c.canvas.height-3,c.canvas.width,3);
+				c.fillRect(0,0,3,c.canvas.height);
+				c.fillRect(c.canvas.width-3,0,3,c.canvas.height);
+			}
+			
+		}
+		
+		function trackEdit(c,arr,collumns,blink){
+			propCollisionX = [];
+			propCollisionY = [];
+			propCollisionCursorX = [];
+			propCollisionCursorY = [];
+			
+			//draw indices
+			//c.fillStyle="#FFFFFF";
+			//c.font="20px serif";
+			//c.fillText("Indices",20,60);
+			var i=propCursorY*collumns-(5*collumns);
+			if(i<0)i=0;
+			//var st=0;
+			//var lt=0;
+			var x = 0;
+			var y = 0;
+			//var xOff = 0;
+			var yOff = 0;
+			//var lasty = 0;
+			//potential memory leak or ?? when y1 is used here in y2 (bug??)
+			//draw indices
+			c.fillStyle="#FFFFFF";
+			c.font="20px serif";
+			if(collumns==3)c.fillText("Indices",20,60);
+			if(collumns==2)c.fillText("Uvs",20,60);			
+			var i=0;
+			if(propCursorY>5){
+				//yOff -= 20;
+			}
+			var x=y=0;
+			var bana=false;
+			for(y=0;y<(arr.length/collumns)+1;y++){				
+			for(x=0;x<collumns+1;x++){
+				//20+x*30
+
+				if(80+y*20>190 && bana==false){
+					yOff=80+y*20-200;
+					yOff=-yOff;
+				}
+				if(y==propCursorY){
+					bana=true;
+					if((60+y*20+20)<=60){
+					//console.log(60+y*20);
+						//yOff=60+y*20;
+					yOff=60+y*20+20;
+					yOff=-yOff;
+					//console.log("a");
+					
+					
+					}
+					
+				}
+			}}	
+			//var propsCollisionX = []; // collision coordinates for props canvas
+			//var propsCollisionY = [];
+			//var propsCollisionCursorX = []; //contains the selected cursor position.
+			//var propsCollisionCursorY = [];
+			// draw the numbers for the tracker edit
+			for(y=0;y<(arr.length/collumns)+1;y++){				
+
+			for(x=0;x<collumns+2;x++){
+				// Draw the indice values
+				if(x<collumns && y<arr.length/collumns){//Draw the indices
+					if(80+y*20+yOff>=70){
+					if(propCursorX==x && propCursorY==y && blink==true){
+						c.fillStyle="#AA0000";
+						c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
+						c.fillStyle="#FFFFFF";
+					}
+					c.fillText(arr[i],20+x*30	,80+y*20+yOff);
+					// Create a collision map
+					propCollisionX.push(20+x*30);
+					propCollisionY.push(80+y*20+yOff);
+					propCollisionCursorX.push(x);
+					propCollisionCursorY.push(y);
+					
+
+					}
+					i++;
+				}
+				// Draw the dices
+				if(80+y*20+yOff>=70 && x==collumns && y<arr.length/collumns){//Draw the dice icon(s)
+					var a=false;
+					if(propCursorX==x && propCursorY==y && blink==true)a=true;
+					//if(propCursorX==x && propCursorY==y && blink==true)a=false;					
+					drawDice(20+x*30	,60+y*20+4+yOff, 20, 18,a);
+					// create a collision map
+					propCollisionX.push(20+x*30);
+					propCollisionY.push(60+y*20+4+yOff);
+					propCollisionCursorX.push(x);
+					propCollisionCursorY.push(y);
+						
+				}
+				// Draw the switch tracker section
+				if(80+y*20+yOff>=70 && x==collumns && y==arr.length/collumns){//Draw the dice icon(s)
+					var a=false;
+					if(propCursorX==x && propCursorY==y && blink==true)a=true;
+					//if(propCursorX==x && propCursorY==y && blink==true)a=false;		
+					if(propCursorX==x && propCursorY==y && blink==true){
+						c.fillStyle="#AA0000";
+						c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
+						// create a collision map					
+						c.fillStyle="#FFFFFF";
+					}
+					
+					var a=">";
+					if(trackEditWindow==1)a="<";					
+					c.fillText(a,20+x*30	,80+y*20+yOff);
+							
+					// create a collision map
+					propCollisionX.push(20+x*30);
+					propCollisionY.push(60+y*20+4+yOff);
+					propCollisionCursorX.push(x);
+					propCollisionCursorY.push(y);
+						
+				}
+				// Draw the Generate html template
+				if(80+y*20+yOff>=70 && x==collumns+1 && y==arr.length/collumns){//Draw the dice icon(s)
+					var a=false;
+					if(propCursorX==x && propCursorY==y && blink==true)a=true;
+					//if(propCursorX==x && propCursorY==y && blink==true)a=false;		
+					if(propCursorX==x && propCursorY==y && blink==true){
+						c.fillStyle="#AA0000";
+						c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
+						// create a collision map					
+						c.fillStyle="#FFFFFF";
+					}
+					
+					var a="Generate";					
+					c.fillText(a,20+x*30	,80+y*20+yOff);
+							
+					// create a collision map
+					propCollisionX.push(20+x*30);
+					propCollisionY.push(60+y*20+4+yOff);
+					propCollisionCursorX.push(x);
+					propCollisionCursorY.push(y);
+						
+				}
+				
+				// Draw the add and remove buttons..
+				if(y>=arr.length/collumns){
+						var z=1;
+						if(collumns==2)z=0;
+						if(x>=z && x<collumns){	
+							if(propCursorX==x && propCursorY==y && blink==true){
+								c.fillStyle="#AA0000";
+								c.fillRect(20+x*30	,60+y*20+20+yOff,16,4);
+								// create a collision map					
+								c.fillStyle="#FFFFFF";
+							}
+	
+							var a="-";
+							if(x==collumns-1)a="+";
+							c.fillText(a,20+x*30	,80+y*20+yOff);
+							// add to the collision map(touch)
+							propCollisionX.push(20+x*30);
+							propCollisionY.push(80+y*20+yOff);
+							propCollisionCursorX.push(x);
+							propCollisionCursorY.push(y);								
+																
+						}	
+					}	
+			
+				}			
+			}	
+			//draw a dice icon
+			function drawDice(x,y,w,h,sel=false){
+				c.fillStyle = 'white';
+				if(sel==false){
+					c.strokeStyle = 'black';
+				}else{
+					c.strokeStyle = 'red';
+				}
+				var fillRect = true;
+				c.rect(x,y,w,h);
+				c.lineWidth = 3;				
+				if (fillRect) {
+				  c.fill();
+				}
+				c.stroke();
+				
+				var d = [1,0,1,0,1,0,1,0,1];
+				var i=0;
+				if(sel==false){
+					c.strokeStyle = '#000000';
+				}else{
+					c.strokeStyle = '#FF0000';
+				}						
+				for(y1=3;y1<(h-6);y1+=(h-6)/3){
+				for(x1=3;x1<(w-6);x1+=(w-6)/3){
+					if(d[i]==1){
+						c.beginPath();
+						c.arc(x+x1+w/8, y+y1+h/8, w/100, 0, 2 * Math.PI, true);
+						c.lineWidth = 2;
+						c.stroke();						
+						
+					}
+					i++;
+				}}
+
+			}		
+		}		
+		
+		
+	// Touch controls function	
+	//
+	// Currently working on adding selection of points (note scaling!! zoom)
+	//
+	function touchHandler(e){
+
+//			function getTouchPos(canvasDom, touchEvent) {
+//	  var rect = canvasDom.getBoundingClientRect();
+//	  return {
+//	    x: touchEvent.touches[0].clientX - rect.left,
+//	    y: touchEvent.touches[0].clientY - rect.top
+//	  };
+//	}	
+			//var frontCanvas = 2;
+			//var topCanvas = 1;
+			//var rightCanvas = 3;
+			//var propsCanvas = 4;
+			//var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
+			// front is ui_Page2Context
+			// top is ui_Page1Context
+			// right is ui_Page3Context
+			// props is ui_Page4Context
+//			var uiSelectionStart = false;
+//			var uiSelectionEnd = false;	
+//			var uiPinchStartDist = 0;
+			
+			
+		var rect1 = ui_Page1Canvas.getBoundingClientRect();//(top)
+		var rect2 = ui_Page2Canvas.getBoundingClientRect();//(front)
+		var rect3 = ui_Page3Canvas.getBoundingClientRect();//(right)
+		var rect4 = ui_Page4Canvas.getBoundingClientRect();//(props)	
+		var rect5 = ui_Page5Canvas.getBoundingClientRect();//(three)
+
+		//
+		// touch start
+		if(e.type=="touchstart" && e.touches) {
+
+			// get the last touch coordinates
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				// Quick hack to get grid index of user interface canvas
+				// touch last pressed x and y location.
+				uiTouchStartX = x;
+				uiTouchStartY = y;				
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+				uiTouchStart = true;
+			}
+
+			// get the canvas client coordinates
+			activeCanvas=-1;
+			var mx=my=0;
+			if(x>=rect1.left && y>=rect1.top && x<rect1.right && y<rect1.bottom){
+				activeCanvas = topCanvas;
+				mx=rect1.left;
+				my=rect1.top;				
+			}
+			if(x>=rect2.left && y>=rect2.top && x<rect2.right && y<rect2.bottom){
+				activeCanvas = frontCanvas;				
+				mx=rect2.left;
+				my=rect2.top;				
+			}
+			if(x>=rect3.left && y>=rect3.top && x<rect3.right && y<rect3.bottom){
+				activeCanvas = rightCanvas;	
+				mx=rect3.left;
+				my=rect3.top;					
+			}
+			if(x>=rect4.left && y>=rect4.top && x<rect4.right && y<rect4.bottom){
+				activeCanvas = propsCanvas;				
+				mx=rect4.left;
+				my=rect4.top;								
+			}
+			if(x>=rect5.left && y>=rect5.top && x<rect5.right && y<rect5.bottom){
+				activeCanvas = threeCanvas;				
+				mx=rect5.left;
+				my=rect5.top;								
+			}
+			
+			// Bring back the coordinates to the ccurrent canvas coordinates..
+			uiTouchLastX = uiTouchLastX - mx;
+			uiTouchLastY = uiTouchLastY - my;
+			uiTouchStartX = uiTouchStartX - mx;
+			uiTouchStartY = uiTouchStartY - my;
+
+			//var uiTouchPress = false; // for hold down touch 1 finger
+			//var uiTouchPressX = 0;
+			//var uiTouchPressY = 0;
+			//var uiTouchPressTime = 0;
+			//var uiTouchPressTimeMax = 30;
+			
+
+			
+			// Selection of points/objects with touch screen
+			// 
+			if(e.changedTouches.length==1 && uiSelectionEnd==true && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
+
+				uiSelectionStart = true;
+
+				uiSelectionEnd = false;
+				// Touch move point.
+				uiTouchPress = true;
+				uiTouchPressX = uiTouchStartX;
+				uiTouchPressY = uiTouchStartY;
+				uiTouchPressTime = 0;
+
+			}
+		
+			// We almost never detect 2 finger start
+			// so our drag position for two fingers start from finger
+			// position 1.	
+			uiTouchDragX = e.changedTouches[0].clientX;
+			uiTouchDragY = e.changedTouches[0].clientY;
+				
+			if(e.changedTouches.length==2 && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas || activeCanvas==threeCanvas)){
+				var x3 = e.changedTouches[0].clientX;
+				var y3 = e.changedTouches[0].clientY;
+				var x4 = e.changedTouches[1].clientX;
+				var y4 = e.changedTouches[1].clientY;
+				// if we caught 2 fingers start then pinch and drag start variables here
+				uiPinchStartDist = Math.floor(Math.abs(Math.hypot(x3-x4,y3-y4)))
+				uiTouchDragX = (x3+x4)/2;
+				uiTouchDragY = (y3+y4)/2;
+				
+				
+			}
+			// We Might started pinching or dragging - start variables
+			uiPinchStart = true;
+			uiPinchStartScale = canvasScale;
+			if(activeCanvas==threeCanvas)uiPinchStartScale = threeScale;
+			uiTouchDrag = true;
+
+
+
+			// props canvas interaction
+			if(activeCanvas==propsCanvas){
+				propCollisionTime = 0;
+				var a=b=0;
+				var c;
+				if(activeCanvas == propsCanvas){
+					drawFront(ui_Page4Context);
+					c=ui_Page4Context;
+				}
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
+				
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
+				}			
+				//console.log("num :"+uiPointNumX.length);
+				//propCursorX - propsCollisionX
+				var ax = x1;
+				var ay = y1;
+				for(var i=0;i<propCollisionX.length;i++){
+					
+					if(x1>propCollisionX[i]+offx && x1<propCollisionX[i]+32+offx && y1>propCollisionY[i]+offy && y1<propCollisionY[i]+offy+32){
+						propCursorX = propCollisionCursorX[i];
+						propCursorY = propCollisionCursorY[i];
+					}			
+				}
+			}
+
+			
+			// update the screen.
+			drawTop(ui_Page1Context);			
+			drawFront(ui_Page2Context);			
+			drawRight(ui_Page3Context);					
+			drawPropScreen(ui_Page4Context);		
+			updateScene();								
+			//ui_Page2Context.fillStyle="#FF0000";
+			//var x1=uiTouchStartX/2;
+			//var y1=uiTouchStartY/2;
+			//var x2=uiTouchLastX/2;
+			//var y2=uiTouchLastY/2;
+			//ui_Page2Context.fillRect(x1,y1,20,20);
+			//console.log(ui_Page2Context.canvas.width+","+ui_Page2Context.canvas.clientWidth);
+			//var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;
+			//console.log(a);
+			
+			//console.log("touch start :"+uiTouchLastX+","+uiTouchLastY);
+			//ui_Page1Context.fillStyle="#FFFFFF";
+			//ui_Page1Context.fillRect(uiTouchLastX,uiTouchLastX,50,50);
+			e.preventDefault();
+		}
+
+		if(e.type=="touchmove" && e.touches) {
+			
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				// Quick hack to get grid index of user interface canvas
+				// touch last pressed x and y location.
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+			}
+			//var rect1 = ui_Page1Canvas.getBoundingClientRect();//(top)
+			//var rect2 = ui_Page2Canvas.getBoundingClientRect();//(front)
+			//var rect3 = ui_Page3Canvas.getBoundingClientRect();//(right)
+			//var rect4 = ui_Page4Canvas.getBoundingClientRect();//(props)			
+			// get the canvas client coordinates
+			var layout = [0,0];
+			var mx=my=0;
+			if(x>=rect1.left && y>=rect1.top && x<rect1.right && y<rect1.bottom){//top
+				if(uiSelectionStart && activeCanvas!=topCanvas){
+					uiSelectionStart=false;
+					uiSelectionEnd=true;
+				}
+				
+				//activeCanvas = topCanvas;
+				mx=rect1.left;
+				my=rect1.top;				
+			}
+			if(x>=rect2.left && y>=rect2.top && x<rect2.right && y<rect2.bottom){//front
+				if(uiSelectionStart && activeCanvas!=frontCanvas){
+					uiSelectionStart=false;
+					uiSelectionEnd=true;				
+				}
+				
+				//activeCanvas = frontCanvas;				
+				mx=rect2.left;
+				my=rect2.top;
+			}
+			if(x>=rect3.left && y>=rect3.top && x<rect3.right && y<rect3.bottom){//right
+				if(uiSelectionStart && activeCanvas!=rightCanvas){
+					uiSelectionStart=false;
+					uiSelectionEnd=true;				
+				}
+
+				//activeCanvas = rightCanvas;	
+				mx=rect3.left;
+				my=rect3.top;					
+			}
+			if(x>=rect4.left && y>=rect4.top && x<rect4.right && y<rect4.bottom){//props
+				if(uiSelectionStart && activeCanvas!=propsCanvas){
+					uiSelectionStart=false;
+					uiSelectionEnd=true;			
+				}
+				
+				//activeCanvas = propsCanvas;				
+				mx=rect4.left;
+				my=rect4.top;								
+			}
+			// Bring back the coordinates to the ccurrent canvas coordinates..
+			uiTouchLastX = uiTouchLastX - mx;
+			uiTouchLastY = uiTouchLastY - my;
+
+			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);		
+			//if(Math.random()<.01)console.log(e.changedTouches.length);	
+
+			if(uiTouchPressX!=uiTouchLastX || uiTouchPressY!=uiTouchLastY){
+				if(uiTouchPressTime<uiTouchPressTimeMax && uiTouchPress==true){
+					uiTouchPress=false;
+
+				}
+			}
+
+			//
+			// move vertex or point selection
+			if(e.changedTouches.length==1 && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas)){
+
+				//
+				//. Move the selection
+				//
+
+				if(uiTouchPress==true){
+					//if(Math.random()<.05)console.log("banana");
+					uiSelectionStart=false;
+					uiSelectionEnd=true;
+					/*				
+					var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
+					var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
+				
+					var x1=uiTouchStartX/a;
+					var y1=uiTouchStartY/b;
+					var x2=uiTouchLastX/a;
+					var y2=uiTouchLastY/b;
+					// Selection in all directions.
+					if(x1>x2){
+						[x1,x2] = [x2,x1];
+					}
+					if(y1>y2){
+						[y1,y2] = [y2,y1];
+					}
+
+					bb = uiTouchLastX-uiTouchPressX;
+					aa = uiTouchLastY-uiTouchPressY;
+					uiTouchPressX = uiTouchLastX;
+					uiTouchPressY = uiTouchLastY;
+					// move little bit slower
+					bb/=3;
+					aa/=3;
+					*/
+									
+					var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
+					var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
+				
+					var x1=(uiTouchStartX+mx)/a;
+					var y1=(uiTouchStartY+my)/b;
+					var x2=(uiTouchLastX+mx)/a;
+					var y2=(uiTouchLastY+my)/b;
+					// Selection in all directions.
+					if(x1>x2){
+						[x1,x2] = [x2,x1];
+					}
+					if(y1>y2){
+						[y1,y2] = [y2,y1];
+					}
+
+					
+					//bb = (uiTouchLastX+mx)-(uiTouchPressX+my+layout[0]);
+					//aa = (uiTouchLastY+my)-(uiTouchPressY+my+layout[1]);
+					bb = (uiTouchLastX)-(uiTouchPressX);
+					aa = (uiTouchLastY)-(uiTouchPressY);
+					//Quick fix to not let the point movement jump a larger part(!)
+					if(aa>10 || aa<-10)aa=0;
+					if(bb>10 || bb<-10)bb=0;
+					uiTouchPressX = uiTouchLastX;
+					uiTouchPressY = uiTouchLastY;
+					// move little bit slower
+					bb/=3;//x
+					aa/=2;//y
+					//if(Math.random()<.05)console.log('moving:'+aa+','+bb+","+activeCanvas+","+uiSelectionVertice.length);
+									
+					//move vertical
+					if(uiSelectionVertice.length>0){
+
+						if(activeCanvas==frontCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3+1]+=aa;
+							}
+						}	
+						if(activeCanvas==rightCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3+1]+=aa;
+							}
+						}	
+						if(activeCanvas==topCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3+2]+=aa;
+							}
+						}						
+					}
+					//move horizontal
+					if(uiSelectionVertice.length>0){
+						if(activeCanvas==frontCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3]+=bb;
+							}
+						}	
+						if(activeCanvas==rightCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								quad_vertices[uiSelectionVertice[i]*3+2]+=bb;
+							}
+						}	
+						if(activeCanvas==topCanvas){
+							for(var i=0;i<uiSelectionVertice.length;i++){
+								
+								quad_vertices[uiSelectionVertice[i]*3]+=bb;
+							}
+						}		
+					}		
+
+					//drawTop(ui_Page1Context);			
+					//drawFront(ui_Page2Context);			
+					//drawRight(ui_Page3Context);					
+				
+				}
+				
+
+			}
+
+			
+			// pinch !!!!!
+			if(e.changedTouches.length==2  && (activeCanvas==topCanvas || activeCanvas==frontCanvas || activeCanvas==rightCanvas || activeCanvas==threeCanvas)){
+
+				//var uiPinchStartX = 0; // pinch zoom in/out
+				//var uiPinchStartY = 0;
+				//var uiPinchStartDist = 0;
+				//var uiPinchStartScale = 0;
+			
+
+				uiTouchDrag=true;
+				
+				var x3 = e.changedTouches[0].clientX;
+				var y3 = e.changedTouches[0].clientY;
+				var x4 = e.changedTouches[1].clientX;
+				var y4 = e.changedTouches[1].clientY;
+				
+				var d = Math.floor(Math.hypot(x3-x4,y3-y4));
+				if(uiPinchStartDist==0)uiPinchStartDist=d;
+				//console.log(d+","+uiPinchStartDist+","+Math.abs(Math.hypot(d-uiPinchStartDist)));
+				if(Math.abs(Math.hypot(d-uiPinchStartDist))>2){
+					if(activeCanvas!=threeCanvas && activeCanvas!=-1){
+						canvasScale=uiPinchStartScale+(d-uiPinchStartDist);
+						if(canvasScale<50)canvasScale=50;
+						if(canvasScale>500)canvasScale=500;
+						uiTouchDrag=false;
+					}
+					if(activeCanvas==threeCanvas){
+						threeScale=uiPinchStartScale+(d-uiPinchStartDist);
+						if(threeScale<50)threeScale=50;
+						if(threeScale>500)threeScale=500;
+						//						camera.position.z+=10;
+						camera.position.z = threeScale-140;
+						uiTouchDrag=false;
+					}
+					
+				}
+				
+				
+
+				uiSelectionStart=false;
+
+				uiSelectionEnd=true;
+
+				
+				//drawTop(ui_Page1Context);			
+				//drawFront(ui_Page2Context);			
+				//drawRight(ui_Page3Context);					
+				//drawPropScreen(ui_Page4Context);				
+				//updateScene();					
+				
+				
+			}
+			
+			// drag!!
+			if(uiTouchDrag && e.changedTouches.length==2){
+				uiTouchDrag=false;
+				uiSelectionStart=false;
+
+				//var dx=uiTouchStartX-uiTouchLastX;
+				//var dy=uiTouchStartY-uiTouchLastY;
+				var x3 = (e.changedTouches[0].clientX+e.changedTouches[1].clientX)/2;
+				var y3 = (e.changedTouches[0].clientY+e.changedTouches[1].clientY)/2;
+
+				var dx=uiTouchDragX-x3;
+				var dy=uiTouchDragY-y3;
+				
+				//if(Math.random()<.1)console.log(""+uiTouchStartX+","+uiTouchLastX);
+				dx/=90;
+				dy/=45;
+				if(activeCanvas == frontCanvas){
+					frontCanvasOffsetX+=dx;
+					frontCanvasOffsetY+=dy;
+				}
+				if(activeCanvas == rightCanvas){
+					rightCanvasOffsetX+=dx;
+					rightCanvasOffsetY+=dy;
+				}
+				if(activeCanvas == topCanvas){
+					topCanvasOffsetX+=dx;
+					topCanvasOffsetY+=dy;
+				}
+				if(activeCanvas == threeCanvas){
+					cube.rotation.x+=dy/15;
+					cube.rotation.y+=dx/15;
+					
+					
+				}
+				
+				
+				
+				
+				// update the screen.
+				//drawTop(ui_Page1Context);			
+				//drawFront(ui_Page2Context);			
+				//drawRight(ui_Page3Context);					
+				//drawPropScreen(ui_Page4Context);				
+				//updateScene();					
+			}
+			
+			
+			
+			
+			
+			// If we are dragging the selection rectangle.
+			var drawRect = false;
+			var drawRectX=drawRectY=drawRectW=drawRectH=0;
+			
+			if(uiSelectionStart==true){
+
+				//console.log("a");
+				// Get the scale of the canvas..
+				var a = ui_Page2Context.canvas.clientWidth / ui_Page2Context.canvas.width;				
+				var b = ui_Page2Context.canvas.clientHeight / ui_Page2Context.canvas.height;		
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				var x2=uiTouchLastX/a;
+				var y2=uiTouchLastY/b;
+				// Selection in all directions.
+				if(x1>x2){
+					[x1,x2] = [x2,x1];
+				}
+				if(y1>y2){
+					[y1,y2] = [y2,y1];
+				}
+				var w=Math.abs(x1-x2);
+				var h=Math.abs(y1-y2);
+				// update the screen.
+				//drawTop(ui_Page1Context);			
+				//drawFront(ui_Page2Context);			
+				//drawRight(ui_Page3Context);					
+				// draw the selection rectangle.
+				var c;
+
+				// update the screen.
+				//drawTop(ui_Page1Context);			
+				//drawFront(ui_Page2Context);			
+				//drawRight(ui_Page3Context);					
+				//drawPropScreen(ui_Page4Context);				
+				//updateScene();					
+				
+				if(activeCanvas==topCanvas)c=ui_Page1Context;
+				if(activeCanvas==frontCanvas)c=ui_Page2Context;
+				if(activeCanvas==rightCanvas)c=ui_Page3Context;				
+				if(activeCanvas>-1 && activeCanvas<4){
+					drawRect=true;
+					drawRectX = x1;
+					drawRectY = y1;
+					drawRectW = w;
+					drawRectH = h;
+					//c.strokeStyle = 'yellow';;
+					//c.rect(x1,y1,w,h);
+					//c.stroke();
+				}
+				
+			}
+			
+			drawTop(ui_Page1Context);			
+			drawFront(ui_Page2Context);			
+			drawRight(ui_Page3Context);					
+			drawPropScreen(ui_Page4Context);	
+			updateScene();					
+			if(drawRect){
+				c.beginPath(); // Add a begin path when having glitches like smudge
+				c.strokeStyle = 'yellow';
+				c.rect(x1,y1,w,h);
+				c.stroke();				
+			}
+			
+			e.preventDefault();
+		}		
+		
+		
+		// touch end
+		if(e.type=="touchend" && e.touches) {
+
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				// Quick hack to get grid index of user interface canvas
+				// touch last pressed x and y location.
+				//uiTouchLastX = x;
+				//uiTouchLastY = y;
+				uiTouchStart = false;
+				uiTouchEnd = true;				
+			}
+			// Round vertices to 10..
+			for(var i=0;i<uiSelectionVertice.length;i++){					
+				var a = quad_vertices[uiSelectionVertice[i]*3]; 					
+				var b = quad_vertices[uiSelectionVertice[i]*3+1];  
+				var c = quad_vertices[uiSelectionVertice[i]*3+2];  
+				a = Math.round(a/10)*10;
+				b = Math.round(b/10)*10;
+				c = Math.round(c/10)*10;
+				quad_vertices[uiSelectionVertice[i]*3]=a; 					
+				quad_vertices[uiSelectionVertice[i]*3+1]=b;  
+				quad_vertices[uiSelectionVertice[i]*3+2]=c;  
+			}			
+			
+			
+
+			// popup menu execute
+			if(uiPopUpActive==true){
+				var a=b=0;
+				var c;
+				if(activeCanvas == frontCanvas){
+					drawFront(ui_Page2Context);
+					c=ui_Page2Context;
+				}
+				if(activeCanvas == rightCanvas){
+					drawRight(ui_Page3Context);
+					c=ui_Page3Context;
+				}
+				if(activeCanvas == topCanvas){
+					drawTop(ui_Page1Context);
+					c=ui_Page1Context;					
+				}				
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
+				
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				var x2=uiTouchLastX/a;
+				var y2=uiTouchLastY/b;				
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
+				}				
+				if(x2+offx > uiPopUpX && x2+offy<uiPopUpX+100 && y2+offy>uiPopUpY && y2+offy<uiPopUpY+40){
+					// popup used
+
+					if(uiPopUpInstruction == "add vertice"){
+						quad_vertices.push(0.0);
+						quad_vertices.push(-60.0);
+						quad_vertices.push(0.0);
+						quad_verticesColor.push(1.0);
+						quad_verticesColor.push(1.0);
+						quad_verticesColor.push(1.0);	
+						quad_uvs.push(0.0);
+						quad_uvs.push(1.0);
+						quad_indices.push(0);
+						quad_indices.push(0);
+						quad_indices.push(0);				
+					}		
+						
+					uiPopUpActive=false;
+				}else{
+					uiPopUpActive=false;
+				}
+				
+			}
+			// did we long press and on the same as start position = then activate popup			
+			if(uiPopUpActive==false && uiTouchPressX==uiTouchStartX || uiTouchPressY==uiTouchStartY){
+				if(uiTouchPressTime>uiTouchPressTimeMax && uiTouchPress==true){
+					uiTouchPress=false;
+
+					uiPopUpActive = true;
+					uiPopUpX = uiTouchPressX;
+					uiPopUpY = uiTouchPressY;
+
+				}
+			}			
+
+			// remove selections
+			if(uiPopUpActive==false){
+				uiSelectionVertice = [];
+				activeVertice = -1;
+			}
+			
+			
+			// selection
+			if(uiSelectionStart && activeCanvas!=propsCanvas && uiTouchPress==false){
+
+				var a=b=0;
+				var c;
+				if(activeCanvas == frontCanvas){
+					drawFront(ui_Page2Context);
+					c=ui_Page2Context;
+				}
+				if(activeCanvas == rightCanvas){
+					drawRight(ui_Page3Context);
+					c=ui_Page3Context;
+				}
+				if(activeCanvas == topCanvas){
+					drawTop(ui_Page1Context);
+					c=ui_Page1Context;					
+				}
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
+				
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				var x2=uiTouchLastX/a;
+				var y2=uiTouchLastY/b;
+				// Selection in all directions.
+				if(x1>x2){
+					[x1,x2] = [x2,x1];
+				}
+				if(y1>y2){
+					[y1,y2] = [y2,y1];
+				}
+				var w=Math.abs(x1-x2);
+				var h=Math.abs(y1-y2);
+				var points = [];
+				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
+				}
+				
+				if(w>1 && h>1){
+					var uiSelectionVertice2 = [];
+					for(var i=0;i<uiPointVertice.length;i++){			
+						if(uiPointX[i]+offx>x1 && uiPointX[i]+offx<x2 && uiPointY[i]+offy>y1 && uiPointY[i]+offy<y2){
+							points.push(uiPointVertice[i]/3);
+							uiSelectionVertice2.push(uiPointVertice[i]/3);
+							//console.log(uiPointVertice[i]+","+activeVertice);
+							
+						}
+						//ui_Page1Context.fillStyle="#FF0000";
+						//ui_Page1Context.fillRect(uiPointX[i],uiPointY[i],12,12);
+					}
+						// If there was something in the selection area then move this
+						// in the selection array.
+					if(uiSelectionVertice2.length>0){
+						uiSelectionVertice = [];
+						for(var i=0;i<uiSelectionVertice2.length;i++){
+							uiSelectionVertice.push(uiSelectionVertice2[i]);
+						}
+					}
+				}
+				
+
+				// No selection buffer right now...
+				// If we have multiple points below the selection ontop of
+				// each other then select either one of two.
+
+				if(points.length==1)activeVertice = points[0];
+				if(points.length==2){
+					if(points[0]==activeVertice){
+						activeVertice=points[1];
+
+					}else{
+						activeVertice=points[0];
+					}
+					
+				}else if(points.length>2){
+					activeVertice = points[Math.floor(Math.random()*points.length)];
+				}
+				//console.log("a");
+			}
+			uiSelectionStart = false;
+			uiSelectionEnd = true;
+			uiTouchPress = false;
+
+			
+			// select individual vertice point
+			if(activeCanvas==frontCanvas || activeCanvas==rightCanvas || activeCanvas==topCanvas){
+				var a=b=0;
+				var c;
+				if(activeCanvas == frontCanvas){
+					drawFront(ui_Page2Context);
+					c=ui_Page2Context;
+				}
+				if(activeCanvas == rightCanvas){
+					drawRight(ui_Page3Context);			
+					c=ui_Page3Context;
+				}
+				if(activeCanvas == topCanvas){
+					drawTop(ui_Page1Context);			
+					c=ui_Page1Context;					
+				}
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
+				
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
+				}			
+				//console.log("num :"+uiPointNumX.length);
+				var ax = x1;
+				var ay = y1;
+				for(var i=0;i<uiPointNumX.length;i++){
+					
+					if(x1>uiPointNumX[i]+offx && x1<uiPointNumX[i]+16+offx && y1>uiPointNumY[i]+offy && y1<uiPointNumY[i]+offy+16){
+						uiSelectionVertice = [];
+						uiSelectionVertice.push(uiPointNumVertice[i]/3);
+					}			
+				}
+			}
+			
+			// props canvas interaction
+			if(activeCanvas==propsCanvas){
+				var a=b=0;
+				var c;
+				if(activeCanvas == propsCanvas){
+					drawFront(ui_Page4Context);
+					c=ui_Page4Context;
+				}
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
+				
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
+				}			
+				//console.log("num :"+uiPointNumX.length);
+				//propCursorX - propsCollisionX
+				var ax = x1;
+				var ay = y1;
+				for(var i=0;i<propCollisionX.length;i++){
+					
+					if(x1>propCollisionX[i]+offx && x1<propCollisionX[i]+32+offx && y1>propCollisionY[i]+offy && y1<propCollisionY[i]+offy+32){
+						if(propCollisionTime>30 && propCollisionCursorX[i]==propCursorX && propCollisionCursorY[i]==propCursorY){
+							//console.log("special action");
+							//trackEditWindow==0
+							if(propCursorX<3 && propCursorY<quad_indices.length/3){
+								propCollisionSelect = true;
+								showVertexNumbers = true;
+							}
+							//
+							// Dices on track indices screen
+							//
+							if(trackEditWindow==0 && propCursorX==3){//dice on indices tracker
+								var i=0;
+								for(var y=0;y<quad_indices.length/3;y++){
+									if(propCursorY==y){
+										// get the values already there.
+										var d=[];
+										for(j=0;j<3;j++){
+											d.push(quad_indices[i+j]);
+										}	
+										for(j=0;j<3;j++){				
+											var s = Math.floor(Math.random()*d.length);
+											var a = d[s];
+											d.splice(s,1);											
+											quad_indices[i+j]=a;
+										}
+									}	
+									for(var x=0;x<3;x++){
+										i++;
+									}				
+								}												
+							}
+							//
+							
+							//
+							// Minus 
+							//
+							if(trackEditWindow==0 && propCursorX==1 && propCursorY==quad_indices.length/3){
+								//remove_indices
+								lastChar="";
+								if(quad_indices.length>0)quad_indices.pop()
+								if(quad_indices.length>0)quad_indices.pop()
+								if(quad_indices.length>0)quad_indices.pop()													
+								if(propCursorY>0)propCursorY-=1;
+							}
+							//
+							// Plus
+							//
+							//console.log("a");				
+							if(trackEditWindow==0 && propCursorX==2 && propCursorY==quad_indices.length/3){
+								//add_indices
+								lastChar="";
+								quad_indices.push(0);
+								quad_indices.push(0);
+								quad_indices.push(0);					
+								propCursorY++;
+							}							
+							//
+							// Next window
+							//
+							//console.log("a");				
+							if(trackEditWindow==0 && propCursorX==3 && propCursorY==quad_indices.length/3){
+								trackEditWindow=1;
+							}		
+							
+							if(trackEditWindow==1 && propCursorX==2 && propCursorY==quad_uvs.length/2){
+								trackEditWindow=0;
+							}			
+							// generate html template				
+							if(trackEditWindow==0 && propCursorX==4 && propCursorY==quad_indices.length/3){
+								makeHtmlTemplate();
+							}		
+							
+							if(trackEditWindow==1 && propCursorX==3 && propCursorY==quad_uvs.length/2){
+								makeHtmlTemplate();
+							}							
+							
+							
+						}
+					}			
+				}
+			}
+			
+			
+			// 	select a indice from any canvas and place it in the current cursor position.
+			//
+			// Long hold....
+			//
+			if(propCollisionSelect && activeCanvas!=propsCanvas){
+				
+				var a=b=0;
+				var c;
+				if(activeCanvas == frontCanvas){
+					drawFront(ui_Page2Context);
+					c=ui_Page2Context;
+				}
+				if(activeCanvas == rightCanvas){
+					drawRight(ui_Page3Context);			
+					c=ui_Page3Context;
+				}
+				if(activeCanvas == topCanvas){
+					drawTop(ui_Page1Context);			
+					c=ui_Page1Context;					
+				}
+				a = c.canvas.clientWidth / c.canvas.width;				
+				b = c.canvas.clientHeight / c.canvas.height;		
+				
+				
+				var x1=uiTouchStartX/a;
+				var y1=uiTouchStartY/b;
+				//var uiSelectionVertice = []; // holds the selected points/vertices id's				
+				var offx = 0;
+				var offy = 0;
+				// take into account the canvas offset
+				if(activeCanvas==frontCanvas){
+					offx = frontCanvasOffsetX;
+					offy = frontCanvasOffsetY;
+				}
+				if(activeCanvas==rightCanvas){
+					offx = rightCanvasOffsetX;
+					offy = rightCanvasOffsetY;
+				}
+				if(activeCanvas==topCanvas){
+					offx = topCanvasOffsetX;
+					offy = topCanvasOffsetY;
+				}			
+				//console.log("num :"+uiPointNumX.length);
+				
+				//propCollisionSelect=false;
+				
+				
+				for(var i=0;i<propVertexSelect.length;i++){						
+					//if(propVertexSelect[i].canvas==topCanvas){
+						var x = propVertexSelect[i].x;
+						var y = propVertexSelect[i].y;
+						var w = 64;
+						var h = 64;
+						if(x1>x+offx && x1<x+32+offx && y1>y+offy && y1<y+offy+32){		
+							if(trackEditWindow==0){
+								var j=0;
+								for(var y=0;y<quad_indices.length/3;y++){
+								for(var x=0;x<3;x++){
+									if(propCursorX==x && propCursorY==y){					
+										quad_indices[j]=propVertexSelect[i].vertice/3;
+	
+									}	
+									j++;					
+								}}
+							}
+							
+						}
+					//}
+				}
+				propCollisionSelect = false;				
+				drawTop(ui_Page1Context);			
+				drawFront(ui_Page2Context);			
+				drawRight(ui_Page3Context);					
+				drawPropScreen(ui_Page4Context);	
+				updateScene();
+				
+				
+			}
+				
+			
+//			var activeVertice = 0; // x,y,z (divide by 3 to get the point(canvas)
+			
+//			var uiPointX = []; // holds the coordinates of the points of last drawn canvas.
+//			var uiPointY = [];
+//			var uiPointVertice = [];
+			
+			// update the screen.
+			drawTop(ui_Page1Context);			
+			drawFront(ui_Page2Context);			
+			drawRight(ui_Page3Context);					
+			drawPropScreen(ui_Page4Context);				
+			updateScene();		
+			//ui_Page1Context.fillStyle="#FFFFFF";
+			//ui_Page1Context.fillRect(ax,ay,20,20);
+			//ui_Page1Context.fillRect(uiPointNumX[0],uiPointNumY[0],30,30);
+
+			//console.log("touch end :"+uiTouchLastX+","+uiTouchLastY);					
+			//e.preventDefault();
+		}
+	
+		
+	
+		
+	}
+	
+	//
+	// Create a html text file with the 3d data from the app.
+	function makeHtmlTemplate(){
+		
+		// work in progress
+		
+		var a="";
+		a+="<html>\n\t<head>\n\t\t<title>3d</title>\n\t</head>\n<body>\n";
+		a+="<script src=\"js/three.js\"><\/script>\n";
+		a+="<script>\n";
+		a+="const scene = new THREE.Scene();\n";
+		a+="const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );\n";
+		a+="const renderer = new THREE.WebGLRenderer();\n";
+		a+="renderer.setSize( window.innerWidth, window.innerHeight );\n";
+		a+="document.body.appendChild( renderer.domElement );\n";
+		a+="camera.position.z = 60;\n";
+		a+="\n";
+		a+="var quad_vertices =\n";
+		a+="[\n";
+		for(var i=0;i<quad_vertices.length;i+=3){
+			a+=""+quad_vertices[i]+",";
+			a+=""+quad_vertices[i+1]+",";
+			a+=""+quad_vertices[i+2]+",\n";			
+		}
+		a+="];\n";
+		a+="\n\n";
+		a+="var quad_verticesColor =\n";
+		a+="[\n";
+		for(var i=0;i<quad_verticesColor.length;i+=3){
+			a+=""+quad_verticesColor[i]+",";
+			a+=""+quad_verticesColor[i+1]+",";
+			a+=""+quad_verticesColor[i+2]+",\n";			
+		}
+		a+="];\n";
+		a+="\n\n";
+		a+="var quad_uvs =\n";
+		a+="[\n";
+		for(var i=0;i<quad_uvs.length;i+=2){
+			a+=""+quad_uvs[i]+",";
+			a+=""+quad_uvs[i+1]+",\n";
+		}		
+		a+="];\n";
+		a+="\n\n";
+		a+="var quad_indices =\n";
+		a+="[\n";
+		for(var i=0;i<quad_indices.length;i+=3){
+			a+=""+quad_indices[i]+",";
+			a+=""+quad_indices[i+1]+",";
+			a+=""+quad_indices[i+2]+",\n";			
+		}		
+		a+="];\n";
+		a+="\n\n";
+
+		a+="var geometry = new THREE.BufferGeometry();\n";
+				
+		a+="var vertices = new Float32Array( quad_vertices );\n";
+		a+="var verticesColor = new Float32Array( quad_verticesColor );\n";
+		a+="var uvs = new Float32Array( quad_uvs);\n";
+		a+="var indices = new Uint32Array( quad_indices );\n";
+				
+		a+="geometry.setAttribute(\n";
+		a+="\t\t'color',\n";
+		a+="\t\tnew THREE.BufferAttribute(verticesColor, 3));\n";
+		a+="geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );\n";
+		a+="geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );\n";
+		a+="geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );\n";				
+		a+="let sprite = new THREE.TextureLoader().load('resources/star.png');\n";
+		a+="sprite.minFilter = THREE.NearestFilter;\n";
+		a+="sprite.magFilter = THREE.NearestFilter;\n";
+
+		a+="var material2 = new THREE.MeshLambertMaterial( {\n";
+		a+="\t\t\t\t\t\t\t\tmap:sprite,\n";
+		a+="\t\t\t\t\t\t\t\ttransparent: true,\n";
+		a+="\t\t\t\t\t\t\t\talphaTest:0.5,\n";
+		a+="\t\t\t\t\t\t\t\tcolor:0x446600,\n";
+		a+="\t\t\t\t\t\t\t\tvertexColors:true,\n";
+		a+="\t\t\t\t\t\t\t\t});\n";
+		a+="material2.flatShading=true;\n";
+		a+="var mesh = new THREE.Mesh( geometry, material2 );\n";
+		a+="scene.add(mesh);\n";
+		a+="\n\n";
+		
+		a+="var ambient = new THREE.AmbientLight( 0xffffff, 2 );\n";
+		a+="scene.add( ambient );\n";
+		a+="function animate() {\n";
+		a+="\trequestAnimationFrame(animate);\n";
+		// rotate here
+		a+="\tmesh.rotation.x += .025;\n";
+		a+="\tmesh.rotation.y += .025;\n";
+		a+="\tmesh.rotation.z += .025;\n";		
+		a+="\trenderer.render( scene, camera );\n";
+		a+="}\n";	
+		a+="animate();\n";
+		a+="\n\n";
+
+		
+		a+="<\/script>\n</body>\n</html>";
+		document.getElementById("output").value=a;
+	}
+	</script>
+	</body>
+	</html>			
+	
