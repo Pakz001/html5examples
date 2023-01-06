@@ -223,7 +223,7 @@
 			var threeCanvas = 5; // the 3d window!
 			var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
 			var previousCanvas = frontCanvas;
-			var showVertexNumbers = true; // show the number of the vertex at the point in canvas.
+			var showVertexNumbers = false; // show the number of the vertex at the point in canvas.
 			var showIndicesLines = true; // show the lines between the vertices (indices)
 			var canvasScale = 200; // scale zoom in out on canvasses
 			var threeScale = 200; // scale zoom in out on three canvas.
@@ -2949,13 +2949,54 @@
 							//console.log("special action");
 							//trackEditWindow==0
 							if(propCursorX<3 && propCursorY<quad_indices.length/3){
+								
 								propCollisionSelect = true;
-								showVertexNumbers = true;
+								if(trackEditWindow==0){
+									showVertexNumbers = true;									
+								}else{
+									showVertexNumbers = false;
+								}
 							}
 							//
-							// Dices on track indices screen
+							// cursor selection on track uvs screen (uvs)
+							//
+							if(trackEditWindow==1 && propCursorX<2){//dice on indices tracker
+
+								var i=0;
+								for(var y=0;y<quad_uvs.length/2;y++){
+									if(propCursorY==y){
+										// set one or the other to either one or zero.
+										var j=0;
+										if(propCursorX==1)j=1;
+										if(quad_uvs[i+j]==0){
+											quad_uvs[i+j] = 1;
+										}else{
+											quad_uvs[i+j] = 0;
+										}
+									}
+									i+=2;	
+								}												
+							}								
+							//
+							// Dices on track uvs screen (uvs)
+							//
+							if(trackEditWindow==1 && propCursorX==2){//dice on indices tracker
+
+								var i=0;
+								for(var y=0;y<quad_uvs.length/2;y++){
+									if(propCursorY==y){
+										// set one or the other to either one or zero.
+										var r = Math.floor(Math.random()*2);
+										quad_uvs[i+r] = Math.floor(Math.random()*2);
+									}
+									i+=2;	
+								}												
+							}							
+							//
+							// Dices on track indices screen (indices)
 							//
 							if(trackEditWindow==0 && propCursorX==3){//dice on indices tracker
+
 								var i=0;
 								for(var y=0;y<quad_indices.length/3;y++){
 									if(propCursorY==y){
