@@ -223,7 +223,7 @@
 			var threeCanvas = 5; // the 3d window!
 			var activeCanvas = frontCanvas; // 2=front - 1 = top, 3 = right
 			var previousCanvas = frontCanvas;
-			var showVertexNumbers = false; // show the number of the vertex at the point in canvas.
+			var showVertexNumbers = true; // show the number of the vertex at the point in canvas.
 			var showIndicesLines = true; // show the lines between the vertices (indices)
 			var canvasScale = 200; // scale zoom in out on canvasses
 			var threeScale = 200; // scale zoom in out on three canvas.
@@ -604,13 +604,24 @@
 				// Draw the indices numbers
 				var dx = [];
 				var dy = [];
+				var dxc = [];
 				if(showVertexNumbers){
 					c.font = "12px arial";				
 					for(var i=0;i<vx.length;i++){
+						var bloke=false;
+						for(var j=0;j<uiSelectionVertice.length;j++){
+							if(i==uiSelectionVertice[j])bloke=true;
+						}
+					
 						var x = vx[i]-12;//-26+Math.random()*26;
 						var y = vy[i]-12;//-26+Math.random()*26;
 						dx.push(x);
 						dy.push(y);
+						if(bloke==true){
+							dxc.push(true);
+						}else{
+							dxc.push(false);
+						}
 						
 					}
 				}
@@ -650,7 +661,7 @@
 					var y = dy[i];
 					c.fillStyle="#000000";
 					c.fillRect(x,y-16,8,20);
-					if(propCollisionSelect){						
+					if(propCollisionSelect && trackEditWindow==0){						
 						var R = 6;
 						c.beginPath();
 						c.arc(x+3, y-3, R, 0, 2 * Math.PI, false);
@@ -662,7 +673,11 @@
 					uiPointNumY.push(y-16);
 					uiPointNumVertice.push(i*3);
 					propVertexSelect.push({canvas:topCanvas,x:x,y:y-16,vertice:i*3});
-					c.fillStyle="#FFFFFF";
+					if(dxc[i]==false){
+						c.fillStyle="#FFFFFF";
+					}else{
+						c.fillStyle="#FF0000";
+					}
 					c.fillText(""+i,x,y);										
 				}
 
@@ -686,6 +701,7 @@
 					c.fillStyle="#000000";
 					c.fillRect(x+2,y+2,100-4,50-4);
 					c.fillStyle="#FFFFFF";
+					c.font = "12px arial";					
 					if(uiSelectionVertice.length>0){					
 						c.fillText("Delete Selection",x+4,y+15);
 						uiPopUpInstruction = "remove selection"
@@ -862,14 +878,26 @@
 	//			var uiPointVertice = [];
 				var dx = [];
 				var dy = [];
-
+				var dxc = [];
 				if(showVertexNumbers){
+					
 					c.font = "12px arial";				
 					for(var i=0;i<vx.length;i++){
+						var bloke=false;
+						for(var j=0;j<uiSelectionVertice.length;j++){
+							if(i==uiSelectionVertice[j])bloke=true;
+						}
+					
 						var x = vx[i]-12;
 						var y = vy[i]-12;
 						dx.push(x);
 						dy.push(y);
+						if(bloke==true){
+							dxc.push(true);
+						}else{
+							dxc.push(false);
+						}
+						
 					}
 				}
 				// Check if there are double points on the canvas
@@ -905,7 +933,7 @@
 					var y = dy[i];
 					c.fillStyle="#000000";
 					c.fillRect(x,y-16,8,20);
-					if(propCollisionSelect){						
+					if(propCollisionSelect  && trackEditWindow==0){						
 						var R = 6;
 						c.beginPath();
 						c.arc(x+3, y-3, R, 0, 2 * Math.PI, false);
@@ -918,7 +946,12 @@
 					uiPointNumY.push(y-16);
 					uiPointNumVertice.push(i*3);
 					propVertexSelect.push({canvas:topCanvas,x:x,y:y-16,vertice:i*3});					
-					c.fillStyle="#FFFFFF";
+					if(dxc[i]==false){
+						c.fillStyle="#FFFFFF";
+					}else{
+						c.fillStyle="#FF0000";
+					}
+					
 					c.fillText(""+i,x,y);										
 				}				
 				
@@ -948,6 +981,7 @@
 					c.fillStyle="#000000";
 					c.fillRect(x+2,y+2,100-4,50-4);
 					c.fillStyle="#FFFFFF";
+					c.font = "12px arial";										
 					if(uiSelectionVertice.length>0){					
 						c.fillText("Delete Selection",x+4,y+15);
 						uiPopUpInstruction = "remove selection"
@@ -1092,13 +1126,26 @@
 				
 				var dx = [];
 				var dy = [];
+				var dxc = [];
 				if(showVertexNumbers){
-					c.font = "12px arial";				
+					c.font = "12px arial";
+					
 					for(var i=0;i<vx.length;i++){
+						var bloke=false;
+						for(var j=0;j<uiSelectionVertice.length;j++){
+							if(i==uiSelectionVertice[j])bloke=true;
+						}
+					
 						var x = vx[i]-12;
 						var y = vy[i]-12;
 						dx.push(x);
 						dy.push(y);
+						if(bloke==true){
+							dxc.push(true);
+						}else{
+							dxc.push(false);
+						}
+						
 					}
 				}
 				// Check if there are double points on the canvas
@@ -1133,7 +1180,7 @@
 					var y = dy[i];
 					c.fillStyle="#000000";
 					c.fillRect(x,y-16,8,20);
-					if(propCollisionSelect){						
+					if(propCollisionSelect  && trackEditWindow==0){						
 						var R = 6;
 						c.beginPath();
 						c.arc(x+3, y-3, R, 0, 2 * Math.PI, false);
@@ -1146,7 +1193,12 @@
 					uiPointNumY.push(y-16);
 					uiPointNumVertice.push(i*3);
 					propVertexSelect.push({canvas:topCanvas,x:x,y:y-16,vertice:i*3});					
-					c.fillStyle="#FFFFFF";
+					if(dxc[i]==false){
+						c.fillStyle="#FFFFFF";
+					}else{
+						c.fillStyle="#FF0000";
+					}
+					
 					c.fillText(""+i,x,y);										
 				}				
 				
@@ -1169,6 +1221,7 @@
 					c.fillStyle="#000000";
 					c.fillRect(x+2,y+2,100-4,50-4);
 					c.fillStyle="#FFFFFF";
+					c.font = "12px arial";										
 					if(uiSelectionVertice.length>0){					
 						c.fillText("Delete Selection",x+4,y+15);
 						uiPopUpInstruction = "remove selection"
@@ -2953,8 +3006,6 @@
 								propCollisionSelect = true;
 								if(trackEditWindow==0){
 									showVertexNumbers = true;									
-								}else{
-									showVertexNumbers = false;
 								}
 							}
 							//
@@ -3073,10 +3124,11 @@
 			//
 			// Long hold....
 			//
-			if(propCollisionSelect && activeCanvas!=propsCanvas){
+			if(propCollisionSelect && activeCanvas!=propsCanvas && activeCanvas!=threeCanvas){
 				
 				var a=b=0;
 				var c;
+				
 				if(activeCanvas == frontCanvas){
 					drawFront(ui_Page2Context);
 					c=ui_Page2Context;
