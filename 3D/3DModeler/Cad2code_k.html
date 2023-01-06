@@ -3174,7 +3174,7 @@
 						var y = propVertexSelect[i].y;
 						var w = 64;
 						var h = 64;
-						if(x1>x+offx && x1<x+32+offx && y1>y+offy && y1<y+offy+32){		
+						if(x1>x+offx-8 && x1<x+16+offx+8 && y1>y+offy-8 && y1<y+offy+16+8){		
 							if(trackEditWindow==0){
 								var j=0;
 								for(var y=0;y<quad_indices.length/3;y++){
