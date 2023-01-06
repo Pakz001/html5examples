@@ -2613,9 +2613,11 @@
 					topCanvasOffsetY+=dy;
 				}
 				if(activeCanvas == threeCanvas){
+					if(Math.abs(dy)>Math.abs(dx)){// maybe this works to turn 3d better?
 					cube.rotation.x+=dy/15;
+				}else{
 					cube.rotation.y+=dx/15;
-					
+					}
 					
 				}
 				
@@ -3147,7 +3149,7 @@
 			//
 			// Long hold....
 			//
-			if(propCollisionSelect && activeCanvas!=propsCanvas && activeCanvas!=threeCanvas){
+			if(propCollisionSelect && activeCanvas!=propsCanvas && activeCanvas!=threeCanvas && activeCanvas!=-1){
 				
 				var a=b=0;
 				var c;
