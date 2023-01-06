@@ -2963,6 +2963,7 @@
 			
 			// props canvas interaction
 			if(activeCanvas==propsCanvas){
+
 				var a=b=0;
 				var c;
 				if(activeCanvas == propsCanvas){
@@ -2999,6 +3000,7 @@
 					
 					if(x1>propCollisionX[i]+offx && x1<propCollisionX[i]+32+offx && y1>propCollisionY[i]+offy && y1<propCollisionY[i]+offy+32){
 						if(propCollisionTime>30 && propCollisionCursorX[i]==propCursorX && propCollisionCursorY[i]==propCursorY){
+							propCollisionTime=0;
 							//console.log("special action");
 							//trackEditWindow==0
 							if(propCursorX<3 && propCursorY<quad_indices.length/3){
@@ -3069,9 +3071,30 @@
 								}												
 							}
 							//
-							
 							//
-							// Minus 
+							// Minus in props uv screen
+							//
+							if(trackEditWindow==1 && propCursorX==0 && propCursorY==quad_uvs.length/2){
+
+								//remove_indices
+
+								if(quad_uvs.length>0)quad_uvs.pop()
+								if(quad_uvs.length>0)quad_uvs.pop()
+								if(propCursorY>0)propCursorY-=1;
+							}
+							//
+							// Plus in props uv screen
+							//
+							//console.log("a");				
+							if(trackEditWindow==1 && propCursorX==1 && propCursorY==quad_uvs.length/2){
+								//add_indices
+								quad_uvs.push(0);
+								quad_uvs.push(0);				
+								propCursorY++;
+
+							}								
+							//
+							// Minus in props indices screen
 							//
 							if(trackEditWindow==0 && propCursorX==1 && propCursorY==quad_indices.length/3){
 								//remove_indices
@@ -3082,7 +3105,7 @@
 								if(propCursorY>0)propCursorY-=1;
 							}
 							//
-							// Plus
+							// Plus in props indices screen.
 							//
 							//console.log("a");				
 							if(trackEditWindow==0 && propCursorX==2 && propCursorY==quad_indices.length/3){
