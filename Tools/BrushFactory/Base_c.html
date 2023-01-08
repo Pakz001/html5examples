@@ -36,7 +36,7 @@ Use different browser.
 	var uiTouchLastX = 0;
 	var uiTouchLastY = 0;
 	var uiTouchStart = false;
-	var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider)
+	var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
 
 	// slider position of the brush size
 	var uiBrushSliderPos=0;	
@@ -55,6 +55,7 @@ Use different browser.
 	palette.push({r:210,g:156,b:151,a:255});//hightlight	
 	palette.push({r:200,g:131,b:131,a:255});//hightlight
 	-1
+	var activePalette = 0;
 
 	// drawing surface
 	var surface = [];
@@ -77,7 +78,7 @@ Use different browser.
 	var a=32;
 	var b=1;
 	addSurfaceNoise();	
-	surfaceImage = updateSurfaceImage(0,0,16); // draw our surface (palettes) to image
+	surfaceImage = updateSurfaceImage(0,0,8); // draw our surface (palettes) to image
 	function doGameLoop(){
 		myCanvas.height = window.innerHeight-32;
 		myCanvas.width = window.innerWidth-32;
@@ -111,7 +112,7 @@ Use different browser.
 		//ctx.fillText("Javascript Html canvas example.",10,10); 
 		//outlineRect(0,0,200,200,2,5);
 		touchCollision = [];
-		drawPaletteBar(0);
+		drawPaletteBar(activePalette);
 		drawBrushSizeSlider();
 
 	}
@@ -186,7 +187,9 @@ Use different browser.
 		var y=window.innerHeight-w*2;
 		for(var i=0;i<palette.length;i++){
 			drawPaletteRect(x,y,w,h,i);
+			touchCollision.push({x:x,y:y,w:w,h:h,id:1,data:i});
 			if(i==active){ // if highlight needed
+				outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
 				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
 			}
 			x+=w;
@@ -388,6 +391,20 @@ Use different browser.
 				uiTouchLastX = x;
 				uiTouchLastY = y;
 				uiTouchStart = false;
+			}
+
+			//
+			// Palette selection boxes
+			for(var i=0;i<touchCollision.length;i++){
+				if(touchCollision[i].id==1){
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						activePalette = touchCollision[i].data;
+					}
+				}
 			}
 			
 			//
