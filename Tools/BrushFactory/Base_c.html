@@ -78,17 +78,27 @@ Use different browser.
 	var a=32;
 	var b=1;
 	addSurfaceNoise();	
+	smudgeSurface(5,22);
+	smudgeSurface(3,82);
+	smudgeSurface(4,162);
+	smudgeColor(1,7,1)
+	smudgeColor(3,5,.2)
+	
 	surfaceImage = updateSurfaceImage(0,0,8); // draw our surface (palettes) to image
+	var s1=10;
+	var s2=.5;
 	function doGameLoop(){
 		myCanvas.height = window.innerHeight-32;
 		myCanvas.width = window.innerWidth-32;
-		cls(1);
+		cls(0);
 
-		if(Math.random()<0.05){
-			var s=Math.random()*64;
+		if(Math.random()<0.5){
+			s1+=s2;
+			if(s1>32)s2=-.5;
+			if(s1<2)s2=.5;
 			//s+=16;
 			//console.log(s);
-			//surfaceImage = updateSurfaceImage(0,0,s); // draw our surface (palettes) to image
+			surfaceImage = updateSurfaceImage(0,0,s1); // draw our surface (palettes) to image
 		}
 		
 		ctx.drawImage(surfaceImage,0,0);
@@ -115,6 +125,25 @@ Use different browser.
 		drawPaletteBar(activePalette);
 		drawBrushSizeSlider();
 
+	}
+	
+	function smudgeColor(a,b,intensity){
+
+		for(var i=0;i<(surfaceWidth*surfaceHeight)*intensity;i++){
+
+			var x = Math.floor(Math.random()*(surfaceWidth-2));
+			var y = Math.floor(Math.random()*(surfaceHeight-2));
+
+			x++;
+			y++;
+			if(surface[x][y]==a){
+				var x1 = 1;
+				var y1 = 1;
+				if(Math.random()<.5)x1=-1;
+				if(Math.random()<.5)y1=-1;
+				surface[x+x1][y+y1]=b;
+			}
+		}
 	}
 	
 	//
@@ -296,6 +325,33 @@ Use different browser.
 	}		
 	
 	
+	//
+	// Smudge out one particular color on the surface
+	//
+	function smudgeSurface(col,num=10){
+
+		for(var i=0;i<(surfaceWidth+surfaceHeight)*num;i++){
+
+			var x = Math.floor(Math.random()*(surfaceWidth-2));
+			var y = Math.floor(Math.random()*(surfaceHeight-2));
+
+			x++;
+			y++;
+			if(surface[x][y]==col){
+
+				for(var y1=-1;y1<2;y1++){
+					for(var x1=-1;x1<2;x1++){
+						if(Math.random()<.5)surface[x+x1][y+y1]=col;
+					}
+				}
+			}
+		}
+	}
+	
+	//
+	// Create a new surface completely out of random colors
+	// from the palette.
+	//
 	function addSurfaceNoise(){
 		for(var y=0;y<surfaceHeight;y++){
 			for(var x=0;x<surfaceWidth;x++){
