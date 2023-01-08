@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	gameloop=setInterval(doGameLoop,16);
+
+	//
+	// Temp palette
+	var palette = [];
+	palette.push({r:0,g:0,b:0,a:255});//black
+	palette.push({r:255,g:255,b:255,a:255});//white
+	palette.push({r:160,g:61,b:112,a:255});// base
+	palette.push({r:135,g:44,b:94,a:255});//base -1
+	palette.push({r:107,g:22,b:68,a:255}); // darkest
+	palette.push({r:219,g:115,b:146,a:255}); //light
+	palette.push({r:196,g:76,b:120,a:255});//light -1
+	palette.push({r:210,g:156,b:151,a:255});//hightlight	
+	palette.push({r:200,g:131,b:131,a:255});//hightlight
+	-1
+
+	//console.log(rgbToHex(50,50,50));
+	//console.log(hexToRgb("#323232").r);
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		cls(1);
+
+		setColor(2);
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		outlineRect(0,0,200,200,2,5);
+		
+		drawPaletteBar(0);
+
+	}
+	
+	//
+	// Draw a strip of colors from the palette[];
+	function drawPaletteBar(active=-1){
+		var x=0;
+		var w = window.innerWidth/20;
+		var h = w;
+		var y=window.innerHeight-w*2;
+		for(var i=0;i<palette.length;i++){
+			drawPaletteRect(x,y,w,h,i);
+			if(i==active){ // if highlight needed
+				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
+			}
+			x+=w;
+		}
+	}
+	
+	//
+	// Draw a rectangle with a color from the palette[] inside it.
+	function drawPaletteRect(x,y,w,h,c){
+		outlineRect(x,y,w,h,0,3);
+		drawRect(x+1,y+1,w-2,h-2,c);
+	}
+	
+	// helper functions
+	//
+	//
+	function drawRect(x,y,w,h,c){
+		setColor(c);
+		ctx.fillRect(x,y,w,h);
+	}
+	// clear screen using palette(c) color
+	function cls(c){
+		setColor(c);
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+	}
+	// set the fillstyle color of palette(c)
+	function setColor(c){
+		ctx.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+	}
+	
+	// draw outline rect
+	// x,y,w,h,palette color, line width.
+	function outlineRect(x,y,w,h,c,lineWidth=1){
+		ctx.beginPath();
+		ctx.lineWidth = lineWidth;
+		ctx.strokeStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+		ctx.rect(x,y,w,h);
+		ctx.stroke();
+	}
+	
+	//
+	// Helper functions
+	function rgbToHex(r, g, b) {
+  		return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+	}	
+	function hexToRgb(hex) {
+	  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	  return result ? {
+	    r: parseInt(result[1], 16),
+	    g: parseInt(result[2], 16),
+	    b: parseInt(result[3], 16)
+	  } : null;
+	}	
+</script>
+</body>
+</html>
