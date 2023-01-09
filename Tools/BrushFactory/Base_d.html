@@ -68,6 +68,8 @@ Use different browser.
 	var surfacePinchStart = false;
 	var surfacePinchStartScale = surfaceScale;
 	var surfacePinchStartDist = 0;	
+	var surfaceCameraX = 0;
+	var surfaceCameraY = 0;
 			//uiPinchStart = true;
 			//uiPinchStartScale = canvasScale;
 			//if(activeCanvas==threeCanvas)uiPinchStartScale = threeScale;
@@ -93,7 +95,7 @@ Use different browser.
 	smudgeColor(1,7,1)
 	smudgeColor(3,5,.2)
 	
-	surfaceImage = updateSurfaceImage(0,0,8); // draw our surface (palettes) to image
+	surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
 	var s1=10;
 	var s2=.5;
 	function doGameLoop(){
@@ -110,7 +112,7 @@ Use different browser.
 			if(s1<2)s2=.5;
 			//s+=16;
 			//console.log(s);
-			surfaceImage = updateSurfaceImage(0,0,surfaceScale); // draw our surface (palettes) to image
+			surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
 		}
 		
 		ctx.drawImage(surfaceImage,0,0);
@@ -455,8 +457,21 @@ Use different browser.
 				if(surfacePinchStartDist==0)surfacePinchStartDist=d;
 				//console.log(d+","+uiPinchStartDist+","+Math.abs(Math.hypot(d-uiPinchStartDist)));
 				if(Math.abs(Math.hypot(d-surfacePinchStartDist))>1){
-						//console.log(surfacePinchStartScale+(d-surfacePinchStartDist));
 						surfaceScale=surfacePinchStartScale+((d-surfacePinchStartDist)/10);
+						
+						var diff = surfaceScale - oldSurfaceScale;
+						var diffX = diff*surfaceWidth;
+						diffX /=2;
+						var diffY = diff*surfaceHeight;
+						diffY /=2;
+						
+						//console.log(diff);
+						surfaceCameraX+=diffX;
+						surfaceCameraX-=diffY;						
+						if(surfaceCameraX<0)surfaceCameraX=0;
+						if(surfaceCameraY<0)surfaceCameraY=0;
+						//if(surfaceCameraX>surfaceWidth*surfaceScale/2)surfaceCameraX=surfaceWidth*surfaceScale/2;
+						//console.log(surfacePinchStartScale+(d-surfacePinchStartDist));
 						//console.log(surfaceScale);
 						if(surfaceScale<3)surfaceScale=3;
 						if(surfaceScale>64)surfaceScale=64;
