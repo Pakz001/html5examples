@@ -26,7 +26,7 @@ Use different browser.
 	window.addEventListener("touchstart", touchHandler,false);
 	window.addEventListener("touchmove", touchHandler,false);
 	window.addEventListener("touchend", touchHandler,false);			
-			
+	window.addEventListener("resize", resizeHandler,false);			
 
 	gameloop=setInterval(doGameLoop,16);
 	
@@ -68,6 +68,8 @@ Use different browser.
 	var surfaceWidth = 320;
 	var surfaceHeight = 240;
 	var surfaceImage = 0; // our image where we our pixels are on
+	var surfaceImageBuffer = 0; // flickering
+	var surfaceImageBufferTime = -1;
 	surface = makeSurface(surfaceWidth,surfaceHeight);
 	var surfaceScale = 6; // pinch touch zoom in and out
 	var oldSurfaceScale = 6;
@@ -111,9 +113,7 @@ Use different browser.
 	var s1=10;
 	var s2=.5;
 	function doGameLoop(){
-		myCanvas.height = window.innerHeight-32;
-		myCanvas.width = window.innerWidth-32;
-		cls(0);
+		//cls(0);
 		
 		if(pinchDragCoolDown<250)pinchDragCoolDown++;
 
@@ -123,37 +123,32 @@ Use different browser.
 		if(updateSurface){
 			updateSurface = false;
 			oldSurfaceScale = surfaceScale;
-			s1+=s2;
-			if(s1>32)s2=-.5;
-			if(s1<2)s2=.5;
 			//s+=16;
 			//console.log(s);
 			surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
+			//surfaceImageBufferTime=2;
+		}
+		if(surfaceImageBufferTime>0)surfaceImageBufferTime-=1;
+		if(surfaceImageBufferTime==0){
+			//surfaceImageBufferTime=-1;
+			//surfaceImage=surfaceImageBuffer;
 		}
 		
-		ctx.drawImage(surfaceImage,0,0);
+
 		
 		//drawSurface(0,0,3);
 		
 		// Temp demonstrate the brush routines
-		if(brushRoundSize>100)b=0;
-		if(brushRoundSize<20)b=1;
-		if(b==1){
-			//brushRoundSize++;
-			//makeRoundBrush(brushRoundSize);
-		}
-		if(b==0){
-			//brushRoundSize-=1;
-			//makeRoundBrush(brushRoundSize);
-		}
+		
+		//setColor(2);
+		//ctx.fillText("Javascript Html canvas example.",10,10); 
+		//outlineRect(0,0,200,200,2,5);
+		touchCollision = [];
+		ctx.drawImage(surfaceImage,0,0);		
 		if(uiBrushTimeOut>0){
 			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/2-brushRoundSize/2);
 			uiBrushTimeOut-=1;
 		}
-		setColor(2);
-		//ctx.fillText("Javascript Html canvas example.",10,10); 
-		//outlineRect(0,0,200,200,2,5);
-		touchCollision = [];
 		drawPaletteBar(activePalette);
 		drawBrushSizeSlider();
 
@@ -443,12 +438,12 @@ Use different browser.
 			//var surfacePinchStartScale = surfaceScale;
 			
 			// initiate pinch mode
-			surfacePinchStart = true;
+			surfacePinchStart = false;
 			surfacePinchStartScale = surfaceScale;
 			surfacePinchStartDist = 0;
 			uiTouchLastAverageX	= -1;
 			uiTouchLastAverageY = -1;
-			pinchDragCoolDown=0;
+			if(e.targetTouches.length>=1)pinchDragCoolDown=0;
 			//pinchDragCoolDown = 0;
 		}		
 		if(e.type=="touchmove" && e.touches) {
@@ -460,13 +455,13 @@ Use different browser.
 				uiTouchLastX = x;
 				uiTouchLastY = y;
 			}
-
+			
 			//
 			// Pinch scale zoom surface.
-			surfacePinchStart=false;
-			if(e.changedTouches.length==2){
+			
+			if(e.changedTouches.length===2){
 				surfacePinchStart=true;
-				banana=2;
+				pinchDragCountDown=0;
 				updateSurface = true;
 				pinchDragCoolDown = 0; // disable other ui while draggin or pinching. time
 				oldSurfaceScale = surfaceScale;
@@ -549,7 +544,7 @@ Use different browser.
 			//
 			// Brush move
 			//
-			if(e.changedTouches.length==1){			
+			if(e.changedTouches.length===1){			
 				if(brushMode==0 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
 
 
@@ -588,8 +583,8 @@ Use different browser.
 			
 			//
 			// Brush size  Slider position
-			if(e.changedTouches.length==1 && pinchDragCoolDown>10){		
-	
+			if(e.changedTouches.length==1 && pinchDragCoolDown>20){		
+			
 				for(var i=0;i<touchCollision.length;i++){
 					if(touchCollision[i].id==0){
 						var x = touchCollision[i].x;
@@ -631,7 +626,11 @@ Use different browser.
 			uiTouchLastAverageX = -1;
 			uiTouchLastAverageY = -1;
 
-
+							//uiTouchStartX = x;
+				//uiTouchStartY = y;				
+				//uiTouchLastX = x;
+				//uiTouchLastY = 
+			
 			//
 			// Palette selection boxes
 			for(var i=0;i<touchCollision.length;i++){
@@ -679,8 +678,9 @@ Use different browser.
 			// plot brush
 			//var brush = [];
 			//var brushRoundSize = 32;
-	
-			if(brushMode==0 && pinchDragCoolDown>50 && uiTouchLastY<window.innerHeight*.8){//plot
+			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY){
+			if(brushMode==0 && uiTouchLastY<window.innerHeight*.8){//plot
+				
 				//console.log(pinchDragCoolDown);
 				if(e.changedTouches.length==1){
 
@@ -703,7 +703,7 @@ Use different browser.
 					}}
 					updateSurface = true;
 				}
-			}
+			}}
 			
 			// plot pixel
 			if(brushMode==1){//plot
@@ -722,6 +722,14 @@ Use different browser.
 			
 			
 		}		
+		
+	}
+	function resizeHandler(){
+//		if(Math.random()<.01){
+			myCanvas.height = window.innerHeight-32;
+			myCanvas.width = window.innerWidth-32;
+			surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) 			
+//		}
 		
 	}
 </script>
