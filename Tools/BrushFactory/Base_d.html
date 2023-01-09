@@ -64,6 +64,7 @@ Use different browser.
 	var surfaceImage = 0; // our image where we our pixels are on
 	surface = makeSurface(surfaceWidth,surfaceHeight);
 	var surfaceScale = 6; // pinch touch zoom in and out
+	var oldSurfaceScale = 6;
 	var surfacePinchStart = false;
 	var surfacePinchStartScale = surfaceScale;
 	var surfacePinchStartDist = 0;	
@@ -100,7 +101,8 @@ Use different browser.
 		myCanvas.width = window.innerWidth-32;
 		cls(0);
 
-		if(Math.random()<0.5){
+		if(Math.random()<0.5 || oldSurfaceScale!=surfaceScale){
+			oldSurfaceScale = surfaceScale;
 			s1+=s2;
 			if(s1>32)s2=-.5;
 			if(s1<2)s2=.5;
@@ -437,6 +439,7 @@ Use different browser.
 			//
 			// Pinch scale zoom surface.
 			if(e.changedTouches.length==2){
+				oldSurfaceScale = surfaceScale;
 				var x3 = e.changedTouches[0].clientX;
 				var y3 = e.changedTouches[0].clientY;
 				var x4 = e.changedTouches[1].clientX;
@@ -545,7 +548,7 @@ Use different browser.
 		}		
 		// if we modified anything than do this
 		if(hasChanged){
-			surfaceImage = updateSurfaceImage(0,0,surfaceScale); // draw our surface (palettes) to image			
+			//surfaceImage = updateSurfaceImage(0,0,surfaceScale); // draw our surface (palettes) to image			
 		}
 		
 	}
