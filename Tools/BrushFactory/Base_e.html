@@ -98,6 +98,7 @@ Use different browser.
 	var lastBrushPointX;
 	var lastBrushPointY;
 	var brushMode = 0;	
+	var brushActive = false;
 	
 	//console.log(rgbToHex(50,50,50));
 	//console.log(hexToRgb("#323232").r);
@@ -111,6 +112,7 @@ Use different browser.
 	smudgeColor(3,5,.2)
 	
 	surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
+	oldSurfaceImage = surfaceImage;
 	var s1=10;
 	var s2=.5;
 	function doGameLoop(){
@@ -119,24 +121,15 @@ Use different browser.
 		if(pinchDragCoolDown<250)pinchDragCoolDown++;
 		if(uiActiveTime>0)uiActiveTime-=1;
 
-		// If the scale of the canvas surface has changed then
-		// update the surface image(redraw)
-		//if(oldSurfaceScale!=surfaceScale){
 		if(updateSurface){
 			updateSurface = false;
 			oldSurfaceScale = surfaceScale;
 			//s+=16;
 			//console.log(s);
+			oldSurfaceImage = surfaceImage;
 			surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
 			//surfaceImageBufferTime=2;
 		}
-		if(surfaceImageBufferTime>0)surfaceImageBufferTime-=1;
-		if(surfaceImageBufferTime==0){
-			//surfaceImageBufferTime=-1;
-			//surfaceImage=surfaceImageBuffer;
-		}
-		
-
 		
 		//drawSurface(0,0,3);
 		
@@ -146,6 +139,7 @@ Use different browser.
 		//ctx.fillText("Javascript Html canvas example.",10,10); 
 		//outlineRect(0,0,200,200,2,5);
 		touchCollision = [];
+		ctx.drawImage(oldSurfaceImage,0,0);
 		ctx.drawImage(surfaceImage,0,0);		
 		if(uiBrushTimeOut>0){
 			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/2-brushRoundSize/2);
@@ -153,7 +147,7 @@ Use different browser.
 		}
 		drawPaletteBar(activePalette);
 		drawBrushSizeSlider();
-
+		
 	}
 	
 	function smudgeColor(a,b,intensity){
@@ -553,7 +547,7 @@ Use different browser.
 			if(e.changedTouches.length===1 && uiActiveTime==0){			
 				if(brushMode==0 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
 
-
+					brushActive = true;
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 					//console.log(brushPointX);
@@ -589,7 +583,7 @@ Use different browser.
 			
 			//
 			// Brush size  Slider position
-			if(e.changedTouches.length==1 && pinchDragCoolDown>20){		
+			if(e.changedTouches.length==1 && pinchDragCoolDown>20 && brushActive==false){		
 			
 				for(var i=0;i<touchCollision.length;i++){
 					if(touchCollision[i].id==0){
@@ -632,7 +626,7 @@ Use different browser.
 			surfacePinchStart = false;
 			uiTouchLastAverageX = -1;
 			uiTouchLastAverageY = -1;
-
+			brushActive = false;
 							//uiTouchStartX = x;
 				//uiTouchStartY = y;				
 				//uiTouchLastX = x;
