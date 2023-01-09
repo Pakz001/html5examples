@@ -115,7 +115,7 @@ Use different browser.
 		myCanvas.width = window.innerWidth-32;
 		cls(0);
 		
-		if(pinchDragCoolDown<50)pinchDragCoolDown++;
+		if(pinchDragCoolDown<250)pinchDragCoolDown++;
 
 		// If the scale of the canvas surface has changed then
 		// update the surface image(redraw)
@@ -448,7 +448,8 @@ Use different browser.
 			surfacePinchStartDist = 0;
 			uiTouchLastAverageX	= -1;
 			uiTouchLastAverageY = -1;
-			pinchDragCoolDown = 0;
+			pinchDragCoolDown=0;
+			//pinchDragCoolDown = 0;
 		}		
 		if(e.type=="touchmove" && e.touches) {
 
@@ -459,13 +460,13 @@ Use different browser.
 				uiTouchLastX = x;
 				uiTouchLastY = y;
 			}
-			
-			
+
 			//
 			// Pinch scale zoom surface.
 			surfacePinchStart=false;
 			if(e.changedTouches.length==2){
 				surfacePinchStart=true;
+				banana=2;
 				updateSurface = true;
 				pinchDragCoolDown = 0; // disable other ui while draggin or pinching. time
 				oldSurfaceScale = surfaceScale;
@@ -548,8 +549,9 @@ Use different browser.
 			//
 			// Brush move
 			//
-			if(brushMode==0 && pinchDragCoolDown>9	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
-				if(e.changedTouches.length==1){
+			if(e.changedTouches.length==1){			
+				if(brushMode==0 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
+
 
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
@@ -678,7 +680,8 @@ Use different browser.
 			//var brush = [];
 			//var brushRoundSize = 32;
 	
-			if(brushMode==5 && pinchDragCoolDown>20 && uiTouchLastY<window.innerHeight*.8){//plot
+			if(brushMode==0 && pinchDragCoolDown>50 && uiTouchLastY<window.innerHeight*.8){//plot
+				//console.log(pinchDragCoolDown);
 				if(e.changedTouches.length==1){
 
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
