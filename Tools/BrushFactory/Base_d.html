@@ -35,6 +35,10 @@ Use different browser.
 	var uiTouchStartY = 0;				
 	var uiTouchLastX = 0;
 	var uiTouchLastY = 0;
+	var uiTouchLastAverageX = -1;
+	var uiTouchLastAverageY = -1;
+	var uiTouchAverageX = 0;
+	var uiTouchAverageY = 0;
 	var uiTouchStart = false;
 	var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
 
@@ -448,6 +452,28 @@ Use different browser.
 				var y3 = e.changedTouches[0].clientY;
 				var x4 = e.changedTouches[1].clientX;
 				var y4 = e.changedTouches[1].clientY;
+//	var uiTouchLastAverageX = 0;
+//	var uiTouchLastAverageY = 0;
+//	var uiTouchAverageX = 0;
+//	var uiTouchAverageY = 0;
+	
+				uiTouchAverageX = (x3+x4)/2;
+				uiTouchAverageY = (y3+y4)/2;
+
+				if(uiTouchLastAverageX==-1){
+					uiTouchLastAverageX = uiTouchAverageX;
+					uiTouchLastAverageY = uiTouchAverageY;
+					
+				}
+					
+				var mx = uiTouchLastAverageX - uiTouchAverageX;
+				var my = uiTouchLastAverageY - uiTouchAverageY;
+				surfaceCameraX += mx;
+				surfaceCameraY += my;
+				//console.log(my);
+				uiTouchLastAverageX = uiTouchAverageX;
+				uiTouchLastAverageY = uiTouchAverageY;
+				
 				//	var surfaceScale = 6; // pinch touch zoom in and out
 				//	var surfacePinchStart = false;
 				//	var surfacePinchStartScale = surfaceScale;
@@ -465,17 +491,26 @@ Use different browser.
 						var diffY = diff*surfaceHeight;
 						diffY /=2;
 						
-						//console.log(diff);
+						//Move the camera with the zoom and drag
 						surfaceCameraX+=diffX;
-						surfaceCameraY+=diffY;						
+						surfaceCameraY+=diffY;					
+						// keey the camera inside the screen	
 						if(surfaceCameraX<0)surfaceCameraX=0;
 						if(surfaceCameraY<0)surfaceCameraY=0;
+						if(surfaceWidth*surfaceScale>window.innerWidth){
+						if(surfaceCameraX>(surfaceScale*surfaceWidth)-(window.innerWidth*.9))surfaceCameraX=(surfaceScale*surfaceWidth)-(window.innerWidth*.9);
+						}
+						if(surfaceHeight*surfaceScale>window.innerHeight){
+						if(surfaceCameraY>(surfaceScale*surfaceHeight)-(window.innerHeight*.9))surfaceCameraY=(surfaceScale*surfaceHeight)-(window.innerHeight*.9);
+						}
+						
 						//if(surfaceCameraX>surfaceWidth*surfaceScale/2)surfaceCameraX=surfaceWidth*surfaceScale/2;
 						//console.log(surfacePinchStartScale+(d-surfacePinchStartDist));
 						//console.log(surfaceScale);
-						if(surfaceScale<3)surfaceScale=3;
+						// Keep the scale within limits
+						if(surfaceScale<2)surfaceScale=2;
 						if(surfaceScale>64)surfaceScale=64;
-						hasChanged = true;
+						//hasChanged = true;
 
 
 					
@@ -520,6 +555,9 @@ Use different browser.
 				uiTouchStart = false;
 			}
 
+			uiTouchLastAverageX = -1;
+			uiTouchLastAverageY = -1;
+			
 			//
 			// Palette selection boxes
 			for(var i=0;i<touchCollision.length;i++){
