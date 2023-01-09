@@ -101,7 +101,9 @@ Use different browser.
 		myCanvas.width = window.innerWidth-32;
 		cls(0);
 
-		if(Math.random()<0.5 || oldSurfaceScale!=surfaceScale){
+		// If the scale of the canvas surface has changed then
+		// update the surface image(redraw)
+		if(oldSurfaceScale!=surfaceScale){
 			oldSurfaceScale = surfaceScale;
 			s1+=s2;
 			if(s1>32)s2=-.5;
