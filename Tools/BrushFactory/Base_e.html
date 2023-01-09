@@ -500,17 +500,32 @@ Use different browser.
 				if(surfacePinchStartDist==0)surfacePinchStartDist=d;
 				//console.log(d+","+uiPinchStartDist+","+Math.abs(Math.hypot(d-uiPinchStartDist)));
 				if(Math.abs(Math.hypot(d-surfacePinchStartDist))>1){
-						surfaceScale=surfacePinchStartScale+((d-surfacePinchStartDist)/10);
+						var divver=10;
+						divver = (64-oldSurfaceScale);
+						if(oldSurfaceScale>32)divver/=2;
+																		
+						surfaceScale=surfacePinchStartScale+((d-surfacePinchStartDist)/divver);
 						// Keep the scale within limits
-						if(surfaceScale<2)surfaceScale=2;
+						if(surfaceScale<1)surfaceScale=1;
 						if(surfaceScale>64)surfaceScale=64;
 						
 						var diff = surfaceScale - oldSurfaceScale;
 
 						// zoom into our out of the center(avarage) position between
 						// the two touch points.
-						var diffX = diff*((surfaceCameraX+(uiTouchAverageX))/surfaceScale);
-						var diffY = diff*((surfaceCameraY+(uiTouchAverageY))/surfaceScale);
+						//var diffX = diff*((surfaceCameraX+(uiTouchAverageX))/surfaceScale);
+						//var diffY = diff*((surfaceCameraY+(uiTouchAverageY))/surfaceScale);
+						var px = uiTouchAverageX;
+						var py = uiTouchAverageY;
+						px+=surfaceCameraX;
+						py+=surfaceCameraY;
+						//if(surfaceCameraX>0)px-=surfaceCameraX;
+						//if(surfaceCameraY>0)py-=surfaceCameraY;
+
+						var diffX = diff*(px)/oldSurfaceScale;
+						var diffY = diff*(py)/oldSurfaceScale;
+						
+
 						//diffX*=surfaceScale;
 						//diffY*=2;
 						//var diffX = diff*(window.innerWidth);
@@ -522,14 +537,14 @@ Use different browser.
 						surfaceCameraX+=diffX;
 						surfaceCameraY+=diffY;					
 						// keey the camera inside the screen	
-						if(surfaceCameraX<0)surfaceCameraX=0;
-						if(surfaceCameraY<0)surfaceCameraY=0;
-						if(surfaceWidth*surfaceScale>window.innerWidth){
-						if(surfaceCameraX>(surfaceScale*surfaceWidth)-(window.innerWidth*.9))surfaceCameraX=(surfaceScale*surfaceWidth)-(window.innerWidth*.9);
-						}
-						if(surfaceHeight*surfaceScale>window.innerHeight){
-						if(surfaceCameraY>(surfaceScale*surfaceHeight)-(window.innerHeight*.9))surfaceCameraY=(surfaceScale*surfaceHeight)-(window.innerHeight*.9);
-						}
+						//if(surfaceCameraX<0)surfaceCameraX=0;
+						//if(surfaceCameraY<0)surfaceCameraY=0;
+						//if(surfaceWidth*surfaceScale>window.innerWidth){
+						//if(surfaceCameraX>(surfaceScale*surfaceWidth)-(window.innerWidth*.9))surfaceCameraX=(surfaceScale*surfaceWidth)-(window.innerWidth*.9);
+						//}
+						//if(surfaceHeight*surfaceScale>window.innerHeight){
+						//if(surfaceCameraY>(surfaceScale*surfaceHeight)-(window.innerHeight*.9))surfaceCameraY=(surfaceScale*surfaceHeight)-(window.innerHeight*.9);
+						//}
 						
 						//if(surfaceCameraX>surfaceWidth*surfaceScale/2)surfaceCameraX=surfaceWidth*surfaceScale/2;
 						//console.log(surfacePinchStartScale+(d-surfacePinchStartDist));
