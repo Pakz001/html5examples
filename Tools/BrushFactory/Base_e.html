@@ -42,6 +42,7 @@ Use different browser.
 	var uiTouchStart = false;
 	var uiBrushTimeOut = 0 // show brush change image on screen.
 	var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
+	var uiActiveTime = 0; // when at zero ui is no longer in use
 
 
 	// slider position of the brush size
@@ -87,7 +88,7 @@ Use different browser.
 	
 	// brush
 	var brush = [];
-	var brushRoundSize = 32;
+	var brushRoundSize = 3;
 	var maxBrushRoundSize = 32;
 	var minBrushRoundSize = 1;
 	makeRoundBrush(brushRoundSize);
@@ -113,9 +114,10 @@ Use different browser.
 	var s1=10;
 	var s2=.5;
 	function doGameLoop(){
-		//cls(0);
+		cls(0);
 		
 		if(pinchDragCoolDown<250)pinchDragCoolDown++;
+		if(uiActiveTime>0)uiActiveTime-=1;
 
 		// If the scale of the canvas surface has changed then
 		// update the surface image(redraw)
@@ -193,14 +195,17 @@ Use different browser.
 	// Draw our brush to the screen (show!)
 	//
 	function drawBrush(posX,posY){
+		var size = (window.innerWidth+window.innerHeight)/100;
+		posX-=brush.length*size/2;
+		posY-=brush.length*size/2;
 		for(var y=0;y<brush.length;y++){
 		for(var x=0;x<brush.length;x++){	
 			if(brush[x][y]==1){
 				ctx.fillStyle="#000000";
-				ctx.fillRect(posX+x,posY+y,2,2);
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
 			}else{
 				ctx.fillStyle="#FF00FF";
-				ctx.fillRect(posX+x,posY+y,2,2);
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
 				
 			
 			}
@@ -214,6 +219,7 @@ Use different browser.
 	// 0 is nothing
 	// 1 is valid
 	function makeRoundBrush(r){
+		r+=2;
 		brush = [];
 		for(var i=0;i<r;i++){
 			brush[i] = new Array();
@@ -221,14 +227,14 @@ Use different browser.
 				brush[i][j]=0;
 			}
 		}			
-		var radius = ((r-2)/2);
+		var radius = ((r-3)/2);
 		for(var y2=-radius;y2<=radius;y2++){
 		for(var x2=-radius;x2<=radius;x2++){
 			if((y2*y2+x2*x2) <= radius*radius+radius*0.8){
-				var x3 = x2+r/2;
-				var y3 = y2+r/2;
-				if(x3>=0 && y3>=0 && x3<=r && y3<=r){
-					brush[x3][y3] = 1;
+				var x3 = Math.round(x2+r/2);
+				var y3 = Math.round(y2+r/2);
+				if(x3>0 && y3>0 && x3<r && y3<r){
+					brush[x3-1][y3-1] = 1;
 				}
 			}
 		}}		
@@ -459,7 +465,7 @@ Use different browser.
 			//
 			// Pinch scale zoom surface.
 			
-			if(e.changedTouches.length===2){
+			if(e.changedTouches.length===2 && uiActiveTime==0){
 				surfacePinchStart=true;
 				pinchDragCountDown=0;
 				updateSurface = true;
@@ -544,7 +550,7 @@ Use different browser.
 			//
 			// Brush move
 			//
-			if(e.changedTouches.length===1){			
+			if(e.changedTouches.length===1 && uiActiveTime==0){			
 				if(brushMode==0 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
 
 
@@ -569,7 +575,7 @@ Use different browser.
 				}
 			}			
 			// plot pixel
-			if(brushMode==1 && pinchDragCoolDown>20){//plot
+			if(brushMode==1 && pinchDragCoolDown>20 && uiActiveTime==0){//plot
 				if(e.changedTouches.length==1){
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
@@ -607,6 +613,7 @@ Use different browser.
 							if(brushRoundSize<1)brushRoundSize=1;
 							makeRoundBrush(brushRoundSize)
 							uiBrushTimeOut=30;
+							uiActiveTime=30;
 						}
 					}
 				}	
@@ -641,6 +648,7 @@ Use different browser.
 					var h = touchCollision[i].h;
 					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
 						activePalette = touchCollision[i].data;
+						uiActiveTime=30;						
 					}
 				}
 			}
@@ -669,7 +677,8 @@ Use different browser.
 						brushRoundSize = Math.round(uiBrushSliderPos*step);						
 						if(brushRoundSize<1)brushRoundSize=1;
 						makeRoundBrush(brushRoundSize)
-						uiBrushTimeOut=30;						
+						uiBrushTimeOut=30;		
+						uiActiveTime=30;				
 					}
 				}
 			}
@@ -678,7 +687,7 @@ Use different browser.
 			// plot brush
 			//var brush = [];
 			//var brushRoundSize = 32;
-			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY){
+			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY && uiActiveTime==0){
 			if(brushMode==0 && uiTouchLastY<window.innerHeight*.8){//plot
 				
 				//console.log(pinchDragCoolDown);
@@ -706,7 +715,7 @@ Use different browser.
 			}}
 			
 			// plot pixel
-			if(brushMode==1){//plot
+			if(brushMode==1 && uiActiveTime==0){//plot
 				if(e.changedTouches.length==1){
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
