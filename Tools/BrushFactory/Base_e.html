@@ -551,8 +551,8 @@ Use different browser.
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 					//console.log(brushPointX);
-					for(var y1=0;y1<brushRoundSize;y1++){
-					for(var x1=0;x1<brushRoundSize;x1++){
+					for(var y1=0;y1<brush.length;y1++){
+					for(var x1=0;x1<brush.length;x1++){
 						var val = brush[x1][y1];
 						if(val==0)continue;
 						var x2 = Math.floor((brushPointX+x1)-brushRoundSize/2);
@@ -690,8 +690,8 @@ Use different browser.
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 					//console.log(brushPointX);
-					for(var y1=0;y1<brushRoundSize;y1++){
-					for(var x1=0;x1<brushRoundSize;x1++){
+					for(var y1=0;y1<brush.length;y1++){
+					for(var x1=0;x1<brush.length;x1++){
 						var val = brush[x1][y1];
 						if(val==0)continue;
 						var x2 = Math.floor((brushPointX+x1)-brushRoundSize/2);
