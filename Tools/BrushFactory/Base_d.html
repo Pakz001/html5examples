@@ -74,6 +74,7 @@ Use different browser.
 	var surfacePinchStartDist = 0;	
 	var surfaceCameraX = 0;
 	var surfaceCameraY = 0;
+	var updateSurface = false; // update surface next frame.
 			//uiPinchStart = true;
 			//uiPinchStartScale = canvasScale;
 			//if(activeCanvas==threeCanvas)uiPinchStartScale = threeScale;
@@ -109,7 +110,9 @@ Use different browser.
 
 		// If the scale of the canvas surface has changed then
 		// update the surface image(redraw)
-		if(oldSurfaceScale!=surfaceScale){
+		//if(oldSurfaceScale!=surfaceScale){
+		if(updateSurface){
+			updateSurface = false;
 			oldSurfaceScale = surfaceScale;
 			s1+=s2;
 			if(s1>32)s2=-.5;
@@ -409,7 +412,7 @@ Use different browser.
 		//
 		// touch start
 		
-		var hasChanged = false;
+
 		
 		if(e.type=="touchstart" && e.touches) {
 
@@ -432,6 +435,8 @@ Use different browser.
 			surfacePinchStart = true;
 			surfacePinchStartScale = surfaceScale;
 			surfacePinchStartDist = 0;
+			uiTouchLastAverageX	= -1;
+			uiTouchLastAverageY = -1;
 		}		
 		if(e.type=="touchmove" && e.touches) {
 
@@ -447,6 +452,7 @@ Use different browser.
 			//
 			// Pinch scale zoom surface.
 			if(e.changedTouches.length==2){
+				updateSurface = true;
 				oldSurfaceScale = surfaceScale;
 				var x3 = e.changedTouches[0].clientX;
 				var y3 = e.changedTouches[0].clientY;
@@ -484,12 +490,22 @@ Use different browser.
 				//console.log(d+","+uiPinchStartDist+","+Math.abs(Math.hypot(d-uiPinchStartDist)));
 				if(Math.abs(Math.hypot(d-surfacePinchStartDist))>1){
 						surfaceScale=surfacePinchStartScale+((d-surfacePinchStartDist)/10);
+						// Keep the scale within limits
+						if(surfaceScale<2)surfaceScale=2;
+						if(surfaceScale>64)surfaceScale=64;
 						
 						var diff = surfaceScale - oldSurfaceScale;
-						var diffX = diff*surfaceWidth;
-						diffX /=2;
-						var diffY = diff*surfaceHeight;
-						diffY /=2;
+
+						// zoom into our out of the center(avarage) position between
+						// the two touch points.
+						var diffX = diff*((surfaceCameraX+(uiTouchAverageX))/surfaceScale);
+						var diffY = diff*((surfaceCameraY+(uiTouchAverageY))/surfaceScale);
+						//diffX*=surfaceScale;
+						//diffY*=2;
+						//var diffX = diff*(window.innerWidth);
+
+						//var diffY = diff*(window.innerHeight);
+
 						
 						//Move the camera with the zoom and drag
 						surfaceCameraX+=diffX;
@@ -507,9 +523,6 @@ Use different browser.
 						//if(surfaceCameraX>surfaceWidth*surfaceScale/2)surfaceCameraX=surfaceWidth*surfaceScale/2;
 						//console.log(surfacePinchStartScale+(d-surfacePinchStartDist));
 						//console.log(surfaceScale);
-						// Keep the scale within limits
-						if(surfaceScale<2)surfaceScale=2;
-						if(surfaceScale>64)surfaceScale=64;
 						//hasChanged = true;
 
 
@@ -601,10 +614,6 @@ Use different browser.
 			
 			
 		}		
-		// if we modified anything than do this
-		if(hasChanged){
-			//surfaceImage = updateSurfaceImage(0,0,surfaceScale); // draw our surface (palettes) to image			
-		}
 		
 	}
 </script>
