@@ -171,9 +171,12 @@ Use different browser.
  		if(brush.length<6)return; // if brush to small then no effect
 		// wiggle back from angle and leave smudge(2 colors)
 
-		edge(1,4,1.2); // line outer thickness and , depth to the center.
+		//edge(1,4,1.2); // line outer thickness and , depth to the center.
 				
-		edge(2,6,.4); // line outer thickness and , depth to the center.
+		//edge(2,6,.4); // line outer thickness and , depth to the center.
+		edge(1,4,.9); // line outer thickness and , depth to the center.
+				
+		edge(2,6,.3); // line outer thickness and , depth to the center.
 		
 		function edge(t,deep,rad){
 			var col1;
@@ -181,10 +184,12 @@ Use different browser.
 		if(angle>0){
 			col1 = 4;
 			col2 = 5;
+
 			//console.log("b");
 		}else{
 			col1 = 5
 			col2 = 4
+			deep*=1.5;
 			//console.log("a");
 		}
 		
@@ -519,7 +524,7 @@ Use different browser.
 			//var surfaceScale = 6; // pinch touch zoom in and out
 			//var surfacePinchStart = false;
 			//var surfacePinchStartScale = surfaceScale;
-			
+			brushPositionHistory = []; // reset location history;
 			// initiate pinch mode
 			surfacePinchStart = false;
 			surfacePinchStartScale = surfaceScale;
@@ -656,13 +661,14 @@ Use different browser.
 					}
 					
 					var angle = 0;
-					if(brushPositionHistory.length>3){
-						var x1 = brushPositionHistory[3].x;
-						var y1 = brushPositionHistory[3].y
+					if(brushPositionHistory.length>2){
+						var x1 = brushPositionHistory[2].x;
+						var y1 = brushPositionHistory[2].y
 						angle = Math.atan2(uiTouchLastY-y1, uiTouchLastX-x1);
+						smudgeHillBrush(brushPointX,brushPointY,angle);
 					}
 
-					smudgeHillBrush(brushPointX,brushPointY,angle);
+					
 					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
 					
 					updateSurface = true;
