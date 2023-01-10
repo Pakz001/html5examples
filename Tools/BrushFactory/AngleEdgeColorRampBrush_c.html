@@ -186,9 +186,10 @@ Use different browser.
 				
 		//edge(2,6,.4); // line outer thickness and , depth to the center.
 		
+		edge(2,6,.44); // line outer thickness and , depth to the center.
 		edge(1,4,.9); // line outer thickness and , depth to the center.
 				
-		edge(2,6,.44); // line outer thickness and , depth to the center.
+		
 
 		//edge(2,6,.9); // line outer thickness and , depth to the center.
 				
@@ -273,7 +274,8 @@ Use different browser.
 								if(done==false)surface[x4][y4] = color;
 								//outer edge bottom right darkest
 								if(direc==1 && done==false && flag<2 && color==3 && angle2<angle+.2)surface[x4][y4] = 4;
-								if(direc==2 && done==false && flag>1 && color==4 && angle2<angle-.5)surface[x4][y4] = 3;
+								//upper edges left side bit lighter
+								if(direc==2 && done==false && flag>0 && flag<5 && color==4 && angle2<angle-.5)surface[x4][y4] = 3;
 							}
 							tick = true;
 						}
