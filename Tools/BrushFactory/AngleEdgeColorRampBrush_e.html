@@ -87,6 +87,7 @@ Use different browser.
 	var surfaceCameraX = 0;
 	var surfaceCameraY = 0;
 	var updateSurface = false; // update surface next frame.
+	var surfaceBuffer = 0;
 			//uiPinchStart = true;
 			//uiPinchStartScale = canvasScale;
 			//if(activeCanvas==threeCanvas)uiPinchStartScale = threeScale;
@@ -121,11 +122,14 @@ Use different browser.
 	clearSurface(0); // clear surface with color x
 	//
 	surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
+	surfaceBuffer=1;
 	oldSurfaceImage = surfaceImage;
 	var s1=10;
 	var s2=.5;
 	function doGameLoop(){
-		cls(0);
+		//cls(0);
+		ctx.fillStyle="#111111";
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 		
 		if(pinchDragCoolDown<250)pinchDragCoolDown++;
 		if(uiActiveTime>0)uiActiveTime-=1;
@@ -135,8 +139,19 @@ Use different browser.
 			oldSurfaceScale = surfaceScale;
 			//s+=16;
 			//console.log(s);
-			oldSurfaceImage = surfaceImage;
-			surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
+			//oldSurfaceImage = surfaceImage;
+	
+			// now both hold the same values
+			if(surfaceBuffer==1){
+				surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
+				surfaceBuffer=0;
+			}else{
+				oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
+				surfaceBuffer=1
+			}
+			ctx.fillStyle="#111111";
+			ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		
 			//surfaceImageBufferTime=2;
 		}
 		
@@ -222,6 +237,7 @@ Use different browser.
 					if(brush[x3][y3]==0)continue;
 					var x4 = x3+posX;
 					var y4 = y3+posY;
+					if(x4<0 || y4<0 || x4>=surfaceWidth || y4>=surfaceHeight)continue;
 					if(surface[x4][y4]!=0)continue;
 					if(Math.random()<.2)nx2-=1;
 					if(Math.random()<.2)ny2-=1;
@@ -279,7 +295,7 @@ Use different browser.
 
 						var x4 = posX+x3;
 						var y4 = posY+y3;
-						if(x4>=0 && y4>=0 && x4<=surfaceWidth && y4<=surfaceHeight){
+						if(x4>=0 && y4>=0 && x4<surfaceWidth && y4<surfaceHeight){
 							
 							
 								
@@ -749,7 +765,7 @@ Use different browser.
 			if(e.changedTouches.length===2 && uiActiveTime==0){
 				surfacePinchStart=true;
 				pinchDragCountDown=0;
-				updateSurface = true;
+
 				pinchDragCoolDown = 0; // disable other ui while draggin or pinching. time
 				oldSurfaceScale = surfaceScale;
 				var x3 = e.changedTouches[0].clientX;
@@ -841,7 +857,7 @@ Use different browser.
 
 					
 				}				
-							
+				updateSurface = true;			
 			}
 			//
 			// Brush move brush 2
