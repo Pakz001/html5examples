@@ -10,3 +10,7 @@ Ideas:<br>
 Blob brushes - Use shapes other than round and square - generate a random* single blob of x,y size. The edges are read as a array for the brush logic to use.<br>
 pixel art tree/bush brush. Draw from the center out. reference: down black edges and darker inside. Up lighter edges and slightly darker smudge(leaf). angle ui / color range ui. / detailing level ui.<br>
 a brush where edges up and down are shaded. left and right are lighter and darker. (find reference<br>
+
+<br><br>
+<img src="Media/0581894F-C5D0-4F27-8652-A5DEC9D73256.png" width="60%"><br>
+<img src="Media/4E1651F4-87DA-4FD7-9E5E-24B67695F1DB.png" width="60%"><br>
