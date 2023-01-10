@@ -38,6 +38,10 @@ Use different browser.
 	// the original.
 	for (var i = 0; i < map.length; i++)
    map2[i] = map[i].slice();
+	  
+	// create new array and copy this array into it (all fields) (new)
+	//var map2 = JSON.parse(JSON.stringify(map));	
+	  
 
 gameloop=setInterval(doGameLoop,16);
 
