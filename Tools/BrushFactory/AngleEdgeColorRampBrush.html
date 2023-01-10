@@ -87,6 +87,7 @@ Use different browser.
 			
 	
 	// brush
+	var brushPositionHistory = []; // holds the previous x positions of brush
 	var brush = [];
 	var brushRoundSize = 3;
 	var maxBrushRoundSize = 32;
@@ -154,6 +155,9 @@ Use different browser.
 	// angle x points of brush ends with two colors from palette. shade..
 	// brush ends with a color ramp edge at the inputted angle
 	function smudgeHillBrush(posX,posY,angle=1){
+		//console.log(angle);
+		posX=Math.floor(posX-brush.length/2);
+		posY=Math.floor(posY-brush.length/2);
 		//var angle = 1.0;
 		// draw entire brush in one color..
 		for(var y=0;y<brush.length;y++){
@@ -163,8 +167,8 @@ Use different browser.
 			if(x2<0 || y2<0 || x2>=surfaceWidth || y2>= surfaceHeight)continue;
 			if(brush[x][y]==1)surface[x2][y2]=3
 		}}
-
-		if(brush.length<6)return; // if brush to small then no effect
+ 		
+ 		if(brush.length<6)return; // if brush to small then no effect
 		// wiggle back from angle and leave smudge(2 colors)
 
 		edge(1,4,1.2); // line outer thickness and , depth to the center.
@@ -172,8 +176,19 @@ Use different browser.
 		edge(2,6,.4); // line outer thickness and , depth to the center.
 		
 		function edge(t,deep,rad){
+			var col1;
+			var col2;
+		if(angle>0){
+			col1 = 4;
+			col2 = 5;
+			//console.log("b");
+		}else{
+			col1 = 5
+			col2 = 4
+			//console.log("a");
+		}
 		
-		var color = 4;
+		var color = col1;
 		var prevColor = -1;
 		var flag = 0;
 		for(var d=brush.length/2;d>(brush.length/2)-deep;d-=1){
@@ -181,8 +196,8 @@ Use different browser.
 				flag++;	
 			}
 			if(flag>t){
-				color=5;
-				prevColor = 4;
+				color=col2;
+				prevColor = col1;
 			}
 			var tick=false;
 			for(var angle2=angle-rad;angle2<angle+rad;angle2+=0.05){
@@ -624,6 +639,35 @@ Use different browser.
 				}				
 							
 			}
+			//
+			// Brush move brush 2
+			//
+			if(e.changedTouches.length===1 && uiActiveTime==0){			
+				if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
+
+					brushActive = true;
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+					//console.log(brushPointX);
+					//var brushPositionHistory = []; // holds the previous x positions of brush
+					if(brushPositionHistory.length==0)brushPositionHistory.unshift({x:uiTouchLastX,y:uiTouchLastY});
+					if(brushPositionHistory[0].x != uiTouchLastX && brushPositionHistory[0].y!=uiTouchLastY){
+						brushPositionHistory.unshift({x:uiTouchLastX,y:uiTouchLastY});
+					}
+					
+					var angle = 0;
+					if(brushPositionHistory.length>3){
+						var x1 = brushPositionHistory[3].x;
+						var y1 = brushPositionHistory[3].y
+						angle = Math.atan2(uiTouchLastY-y1, uiTouchLastX-x1);
+					}
+
+					smudgeHillBrush(brushPointX,brushPointY,angle);
+					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
+					
+					updateSurface = true;
+				}
+			}				
 			//
 			// Brush move
 			//
