@@ -118,7 +118,7 @@ Use different browser.
 	//smudgeSurface(4,162);
 	//smudgeColor(1,7,1)
 	//smudgeColor(3,5,.2)
-	clearSurface(2); // clear surface with color x
+	clearSurface(0); // clear surface with color x
 	//
 	surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
 	oldSurfaceImage = surfaceImage;
@@ -183,7 +183,7 @@ Use different browser.
 			var x2 = posX+x;
 			var y2 = posY+y;
 			if(x2<0 || y2<0 || x2>=surfaceWidth || y2>= surfaceHeight)continue;
-			if(brush[x][y]==1)surface[x2][y2]=2
+			if(brush[x][y]==1)surface[x2][y2]=0
 			
 
 		}}
@@ -222,7 +222,7 @@ Use different browser.
 					if(brush[x3][y3]==0)continue;
 					var x4 = x3+posX;
 					var y4 = y3+posY;
-					if(surface[x4][y4]!=2)continue;
+					if(surface[x4][y4]!=0)continue;
 					if(Math.random()<.2)nx2-=1;
 					if(Math.random()<.2)ny2-=1;
 					
@@ -1018,6 +1018,9 @@ Use different browser.
 						// create new array and copy this array into it (all fields)
 						palette = JSON.parse(JSON.stringify(palette2));	
 		
+						palette[0].r=Math.random()*64;
+						palette[0].g=Math.random()*64;
+						palette[0].b=Math.random()*64;						
 						var g=(Math.random()*255)
 						if(Math.random()<.5)g-=255;
 						var s=Math.floor(Math.random()*3);
