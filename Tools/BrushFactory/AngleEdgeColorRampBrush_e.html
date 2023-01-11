@@ -122,7 +122,8 @@ Use different browser.
 	clearSurface(0); // clear surface with color x
 	//
 	surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
-	surfaceBuffer=1;
+	oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image	
+	surfaceBuffer=0;
 	oldSurfaceImage = surfaceImage;
 	var s1=10;
 	var s2=.5;
@@ -143,11 +144,18 @@ Use different browser.
 	
 			// now both hold the same values
 			if(surfaceBuffer==1){
+				surfaceImage = null;
 				surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
+				//surfaceBuffer=0;
+			}else{
+				oldSurfaceImage = null;
+				oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
+				//surfaceBuffer=1
+			}
+			if(surfaceBuffer==1){
 				surfaceBuffer=0;
 			}else{
-				oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
-				surfaceBuffer=1
+				surfaceBuffer=1;
 			}
 			ctx.fillStyle="#111111";
 			ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -163,8 +171,18 @@ Use different browser.
 		//ctx.fillText("Javascript Html canvas example.",10,10); 
 		//outlineRect(0,0,200,200,2,5);
 		touchCollision = [];
-		ctx.drawImage(oldSurfaceImage,0,0);
-		ctx.drawImage(surfaceImage,0,0);		
+		if(surfaceBuffer==1){
+			ctx.drawImage(surfaceImage,0,0);
+			ctx.drawImage(oldSurfaceImage,0,0);		
+			//surfaceBuffer=0;
+		}else{
+			ctx.drawImage(oldSurfaceImage,0,0);
+			ctx.drawImage(surfaceImage,0,0);
+			//surfaceBuffer=1
+		}
+			
+
+		
 		if(uiBrushTimeOut>0){
 			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/2-brushRoundSize/2);
 			uiBrushTimeOut-=1;
@@ -747,6 +765,7 @@ Use different browser.
 			uiTouchLastAverageX	= -1;
 			uiTouchLastAverageY = -1;
 			if(e.targetTouches.length>=1)pinchDragCoolDown=0;
+			updateSurface = true;
 			//pinchDragCoolDown = 0;
 		}		
 		if(e.type=="touchmove" && e.touches) {
@@ -758,7 +777,7 @@ Use different browser.
 				uiTouchLastX = x;
 				uiTouchLastY = y;
 			}
-			
+			updateSurface=true;
 			//
 			// Pinch scale zoom surface.
 			
@@ -859,15 +878,19 @@ Use different browser.
 				}				
 				updateSurface = true;			
 			}
+
 			//
 			// Brush move brush 2
 			//
-			if(e.changedTouches.length===1 && uiActiveTime==0){			
+
+				
+			if(e.changedTouches.length==1 && uiActiveTime==0){			
 				if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
 //	var brushPushTime = 0; //if at the same spot long then increase this
 					brushActive = true;
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+
 					//console.log(brushPointX);
 					//var brushPositionHistory = []; // holds the previous x positions of brush
 					if(brushPositionHistory.length==0)brushPositionHistory.unshift({x:uiTouchLastX,y:uiTouchLastY});
@@ -917,8 +940,11 @@ Use different browser.
 					
 					updateSurface = true;
 				}
-			}				
+				
+			}
+	
 			//
+
 			// Brush move
 			//
 			if(e.changedTouches.length===1 && uiActiveTime==0){			
@@ -935,14 +961,16 @@ Use different browser.
 						var x2 = Math.floor((brushPointX+x1)-brushRoundSize/2);
 						var y2 = Math.floor((brushPointY+y1)-brushRoundSize/2);
 
-					if(x2>=0 && x2<surfaceWidth && y2>=0 && y2<surfaceHeight){
+						if(x2>=0 && x2<surfaceWidth && y2>=0 && y2<surfaceHeight){
 						//surface[brushPointX][brushPointY]=activePalette;
 
-						surface[x2][y2] = activePalette;
+							surface[x2][y2] = activePalette;
 
+						}
 					}
-					}}
+					}
 					updateSurface = true;
+
 				}
 			}			
 			// plot pixel
@@ -1004,6 +1032,7 @@ Use different browser.
 			uiTouchLastAverageX = -1;
 			uiTouchLastAverageY = -1;
 			brushActive = false;
+
 							//uiTouchStartX = x;
 				//uiTouchStartY = y;				
 				//uiTouchLastX = x;
@@ -1156,7 +1185,8 @@ Use different browser.
 //		if(Math.random()<.01){
 			myCanvas.height = window.innerHeight-32;
 			myCanvas.width = window.innerWidth-32;
-			surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) 			
+			//surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) 			
+			updateSurface=true;
 //		}
 		
 	}
