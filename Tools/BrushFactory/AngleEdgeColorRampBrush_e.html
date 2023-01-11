@@ -766,10 +766,23 @@ Use different browser.
 			uiTouchLastAverageY = -1;
 			if(e.targetTouches.length>=1)pinchDragCoolDown=0;
 			updateSurface = true;
+			if(surfaceBuffer==1){
+				ctx.drawImage(surfaceImage,0,0);
+				ctx.drawImage(oldSurfaceImage,0,0);		
+				//surfaceBuffer=0;
+			}else{
+				ctx.drawImage(oldSurfaceImage,0,0);
+				ctx.drawImage(surfaceImage,0,0);
+				//surfaceBuffer=1
+			}
+			drawPaletteBar(activePalette);
+			drawBrushSizeSlider();
+			drawColorBar();		
 			//pinchDragCoolDown = 0;
+			e.preventDefault();
 		}		
 		if(e.type=="touchmove" && e.touches) {
-
+		
 			// get the last touch coordinates
 			for(var i=0;i<e.changedTouches.length;i++){	
 				var x = e.changedTouches[i].clientX;
@@ -777,7 +790,7 @@ Use different browser.
 				uiTouchLastX = x;
 				uiTouchLastY = y;
 			}
-			updateSurface=true;
+
 			//
 			// Pinch scale zoom surface.
 			
@@ -875,8 +888,21 @@ Use different browser.
 
 
 					
-				}				
-				updateSurface = true;			
+				}	
+				if(surfaceBuffer==1){
+					ctx.drawImage(surfaceImage,0,0);
+					ctx.drawImage(oldSurfaceImage,0,0);		
+					//surfaceBuffer=0;
+				}else{
+					ctx.drawImage(oldSurfaceImage,0,0);
+					ctx.drawImage(surfaceImage,0,0);
+					//surfaceBuffer=1
+				}
+				drawPaletteBar(activePalette);
+				drawBrushSizeSlider();
+				drawColorBar();					
+				updateSurface = true;
+
 			}
 
 			//
@@ -935,10 +961,26 @@ Use different browser.
 						}}
 					}
 					*/
-					
+					if(surfaceBuffer==1){
+						ctx.drawImage(surfaceImage,0,0);
+						ctx.drawImage(oldSurfaceImage,0,0);		
+						//surfaceBuffer=0;
+					}else{
+						ctx.drawImage(oldSurfaceImage,0,0);
+						ctx.drawImage(surfaceImage,0,0);
+						//surfaceBuffer=1
+					}
+					drawPaletteBar(activePalette);
+					drawBrushSizeSlider();
+					drawColorBar();		
+		
 					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
 					
-					updateSurface = true;
+					//if(Math.random()<.05)updateSurface = true;
+					
+					updateSurface=true;
+					
+					
 				}
 				
 			}
@@ -969,7 +1011,7 @@ Use different browser.
 						}
 					}
 					}
-					updateSurface = true;
+					if(Math.random()<.05)pdateSurface = true;
 
 				}
 			}			
@@ -1016,7 +1058,8 @@ Use different browser.
 						}
 					}
 				}	
-			}		
+			}	
+			e.preventDefault();		
 		}		
 		if(e.type=="touchend" && e.touches) {
 
@@ -1177,11 +1220,12 @@ Use different browser.
 			
 			
 			
-			
+		e.preventDefault();	
 		}		
 		
 	}
-	function resizeHandler(){
+	function resizeHandler(e){
+		e.preventDefault();
 //		if(Math.random()<.01){
 			myCanvas.height = window.innerHeight-32;
 			myCanvas.width = window.innerWidth-32;
