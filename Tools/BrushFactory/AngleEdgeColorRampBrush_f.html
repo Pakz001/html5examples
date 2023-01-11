@@ -1129,13 +1129,13 @@ Use different browser.
 						//palette[0].r=Math.random()*64;
 						//palette[0].g=Math.random()*64;
 						//palette[0].b=Math.random()*64;						
-						var g=(Math.random()*128)
-						if(Math.random()<.5)g-=128;
+						var g=(Math.random()*2)
+						if(Math.random()<.5)g-=1;
 						var s=Math.floor(Math.random()*3);
 						for(var j=2;j<palette.length;j++){
-							if(s==0)palette[j].r+=g;
-							if(s==1)palette[j].g+=g;
-							if(s==2)palette[j].b+=g;
+							if(s==0)palette[j].r*=g;
+							if(s==1)palette[j].g*=g;
+							if(s==2)palette[j].b*=g;
 							if(palette[j].r>255)palette[j].r=255;
 							if(palette[j].g>255)palette[j].g=255;	
 							if(palette[j].b>255)palette[j].b=255;
