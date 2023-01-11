@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var brush = [];
+	var brushRoundSize = 32;
+	var maxBrushRoundSize = 32;
+	var minBrushRoundSize = 1;
+	makeRoundBrush(brushRoundSize);
+	// for the brush
+	var brushPointX;
+	var brushPointY;
+	var lastBrushPointX;
+	var lastBrushPointY;
+	var brushMode = 2;	
+	var brushActive = false;	
+	
+	
+	gameloop=setInterval(doGameLoop,16);
+
+	//let storage = navigator.deviceMemory();
+	    //console.log(`Available: ${storage.quota/(1024*1024)}MiB`);
+	//console.log(performance.memory.jsHeapSizeLimit);
+	//console.log(performance.memory.usedJSHeapSize);
+	
+	var n=brushRoundSize/2;//center of current brush
+	var nDir = 1;
+
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		drawBrush(window.innerWidth/2,window.innerHeight/2);
+		drawBrushLayer(window.innerWidth/2,window.innerHeight/2,n);
+		if(Math.random()<.1){
+			//n  = 	Math.floor(Math.random()*brushRoundSize);
+			n+=nDir;
+			if(n>brushRoundSize/2){
+				nDir=-1
+			}
+			if(n<2){
+				nDir=1;
+			}
+		}
+	}
+
+	
+	//
+	// Draw our brush layer to the screen.
+	// 1..brushRoundSize/2;
+	//
+	function drawBrushLayer(posX,posY,l){
+		// create new array and copy this array into it (all fields)
+		var brush2 = JSON.parse(JSON.stringify(brush));	
+		var brush3 = JSON.parse(JSON.stringify(brush));	
+		
+		for(var i=0;i<l;i++){
+			// first erase any edges we might have peeled
+			for(var y=0;y<brush.length;y++){
+				for(var x=0;x<brush.length;x++){
+					if(brush2[x][y]==2){
+						brush[x][y]=0;
+						brush2[x][y]=0;
+					}
+				}
+			}
+			// find new edge
+			for(var y=0;y<brush.length;y++){
+				for(var x=0;x<brush.length;x++){
+					if(brush[x][y]==1 && brush2[x][y]==1){
+						brush2[x][y]=2;
+						break;
+					}
+				}
+				for(var x=brush.length-1;x>=0;x-=1){
+					if(brush[x][y]==1 && brush2[x][y]==1){
+						brush2[x][y]=2;
+						break;
+					}
+				}
+				
+			}
+			for(var x=0;x<brush.length;x++){
+				for(var y=1;y<brush.length-1;y++){
+					if(brush[x][y-1]==0 && brush[x][y]==1 && brush2[x][y]==1){
+						brush2[x][y]=2;
+						break;
+					}
+				}
+				for(var y=brush.length-2;y>=1;y-=1){
+					if(brush[x][y+1]==0 && brush[x][y]==1 && brush2[x][y]==1){
+						brush2[x][y]=2;
+						break;
+					}
+				}			
+			}
+		}
+			
+		var size = (window.innerWidth+window.innerHeight)/196;
+		posX-=brush.length*size/2;
+		posY-=brush.length*size/2;
+		for(var y=0;y<brush.length;y++){
+		for(var x=0;x<brush.length;x++){	
+			if(brush2[x][y]==2){
+				ctx.fillStyle="#ff0000";
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+			}else{
+				//ctx.fillStyle="#FF00FF";
+				//ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+				
+			
+			}
+		}}
+		brush = JSON.parse(JSON.stringify(brush3));	
+		
+		
+	}	
+	//
+	// Draw our brush to the screen (show!)
+	//
+	function drawBrush(posX,posY){
+		var size = (window.innerWidth+window.innerHeight)/196;
+		posX-=brush.length*size/2;
+		posY-=brush.length*size/2;
+		for(var y=0;y<brush.length;y++){
+		for(var x=0;x<brush.length;x++){	
+			if(brush[x][y]==1){
+				ctx.fillStyle="#000000";
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+			}else{
+				ctx.fillStyle="#FF00FF";
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+				
+			
+			}
+		}}
+		
+	}
+	
+	//
+	// Make a standard brush (radius)
+	// brush[x][y]
+	// 0 is nothing
+	// 1 is valid
+	function makeRoundBrush(r){
+		r+=2;
+		brush = [];
+		for(var i=0;i<r;i++){
+			brush[i] = new Array();
+			for(var j=0;j<r;j++){
+				brush[i][j]=0;
+			}
+		}			
+		var radius = ((r-3)/2);
+		for(var y2=-radius;y2<=radius;y2++){
+		for(var x2=-radius;x2<=radius;x2++){
+			if((y2*y2+x2*x2) <= radius*radius+radius*0.8){
+				var x3 = Math.round(x2+r/2);
+				var y3 = Math.round(y2+r/2);
+				if(x3>0 && y3>0 && x3<r && y3<r){
+					brush[x3-1][y3-1] = 1;
+				}
+			}
+		}}		
+	}	
+	
+
+</script>
+</body>
+</html>
