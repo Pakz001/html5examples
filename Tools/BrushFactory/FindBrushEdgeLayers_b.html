@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+		//
+		// atan2 returns -Math.PI to +Math.PI
+		//
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var brushEdge = [];
+	var brush = [];
+	var brushRoundSize = 32;
+	var maxBrushRoundSize = 32;
+	var minBrushRoundSize = 1;
+	makeRoundBrush(brushRoundSize);
+	// for the brush
+	var brushPointX;
+	var brushPointY;
+	var lastBrushPointX;
+	var lastBrushPointY;
+	var brushMode = 2;	
+	var brushActive = false;	
+	
+	
+	gameloop=setInterval(doGameLoop,16);
+
+	//let storage = navigator.deviceMemory();
+	    //console.log(`Available: ${storage.quota/(1024*1024)}MiB`);
+	//console.log(performance.memory.jsHeapSizeLimit);
+	//console.log(performance.memory.usedJSHeapSize);
+	
+	var n=brushRoundSize/2;//center of current brush
+
+
+
+	var nDir = 1;
+	var a = 0;
+	var aa = 0.1;
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		drawBrush(window.innerWidth/2,window.innerHeight/2);
+		drawBrushLayer(window.innerWidth/2,window.innerHeight/2,n,a);
+		a+=aa;
+		if(Math.random()<.05){
+			aa=Math.random()-.5;
+		}
+		if(Math.random()<.3){
+			//n  = 	Math.floor(Math.random()*brushRoundSize);
+			n+=nDir;
+			if(n>brushRoundSize/2){
+				nDir=-1
+			}
+			if(n<2){
+				nDir=1;
+			}
+		}
+	}
+
+	
+	//
+	// Draw our brush layer to the screen.
+	// 1..brushRoundSize/2;
+	//
+	function drawBrushLayer(posX,posY,l,angle){
+		if(l>brushRoundSize/2)return;
+		// wrap angle back into usable range
+		var x = Math.cos(angle);
+		var y = Math.sin(angle);
+		angle = Math.atan2(y,x);
+		
+		var brush2 = JSON.parse(JSON.stringify(brush));	
+		var brush3 = JSON.parse(JSON.stringify(brush));	
+		
+		// trap edge
+		for(var i=0;i<l;i++){
+			// first erase any edges we might have peeled
+			for(var y=0;y<brush.length;y++){
+				for(var x=0;x<brush.length;x++){
+					if(brush2[x][y]==2){
+						brush[x][y]=0;
+						brush2[x][y]=0;
+					}
+				}
+			}
+			// find new edge
+			for(var y=0;y<brush.length;y++){
+				for(var x=0;x<brush.length;x++){
+					if(brush[x][y]==1 && brush2[x][y]==1){
+						brush2[x][y]=2;
+						break;
+					}
+				}
+				for(var x=brush.length-1;x>=0;x-=1){
+					if(brush[x][y]==1 && brush2[x][y]==1){
+						brush2[x][y]=2;
+						break;
+					}
+				}
+				
+			}
+			for(var x=0;x<brush.length;x++){
+				for(var y=1;y<brush.length-1;y++){
+					if(brush[x][y-1]==0 && brush[x][y]==1 && brush2[x][y]==1){
+						brush2[x][y]=2;
+						break;
+					}
+				}
+				for(var y=brush.length-2;y>=1;y-=1){
+					if(brush[x][y+1]==0 && brush[x][y]==1 && brush2[x][y]==1){
+						brush2[x][y]=2;
+						break;
+					}
+				}			
+			}
+		}
+		//if(Math.random()<.1)console.log(angle);
+			
+		brushEdge = [];		
+		//put edge into brushEdge
+		for(var y=0;y<brush.length;y++){
+			for(var x=0;x<brush.length;x++){
+				if(brush2[x][y]==2){
+					brush2[x][y] = 0;
+					var aangle=Math.atan2(brush.length/2-y,brush.length/2-x);
+					//var aangle=Math.atan2(y-brush.length/2,x-brush.length/2);
+					brushEdge.push({x:x,y:y,angle:aangle});
+
+				}
+			}
+		}
+
+		var brushEdgeTemp = [];//JSON.parse(JSON.stringify(brushEdge));	
+		for(var a=-(Math.PI+.2);a<Math.PI+.2;a+=.01){
+			for(var i=0;i<brushEdge.length;i++){
+				if(brushEdge[i].angle<a){
+					brushEdgeTemp.push({x:brushEdge[i].x,y:brushEdge[i].y,angle:brushEdge[i].angle});
+					brushEdge[i].angle=100;
+				}
+			}
+		}
+		brushEdge = JSON.parse(JSON.stringify(brushEdgeTemp));	
+		
+		
+		// find closest angle in edge array
+		var closest = 1000;
+		var num = -1;
+		var cnt=0;
+		for(var i=0;i<brushEdge.length;i++){
+			cnt++;
+			//Math.abs(x1-x0) +
+			var d = Math.abs(angle-brushEdge[i].angle);
+
+			if(d<closest){
+				//console.log(d);
+				closest=d;
+				num=i;
+			}
+		}
+
+		
+		// Draw the edge from our angle point into clock direction
+		var size = (window.innerWidth+window.innerHeight)/196;
+		posX-=brush.length*size/2;
+		posY-=brush.length*size/2;
+		
+		for(var i=0;i<10;i++){
+			var x = brushEdge[num].x;
+			var y = brushEdge[num].y;
+			ctx.fillStyle="#ff0000";
+			ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+				
+			num++;
+			if(num>=brushEdge.length)num=0;	
+		}
+		
+		brush = JSON.parse(JSON.stringify(brush3));	
+		
+		
+	}	
+	//
+	// Draw our brush to the screen (show!)
+	//
+	function drawBrush(posX,posY){
+		var size = (window.innerWidth+window.innerHeight)/196;
+		posX-=brush.length*size/2;
+		posY-=brush.length*size/2;
+		for(var y=0;y<brush.length;y++){
+		for(var x=0;x<brush.length;x++){	
+			if(brush[x][y]==1){
+				ctx.fillStyle="#000000";
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+			}else{
+				ctx.fillStyle="#FF00FF";
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+				
+			
+			}
+		}}
+		
+	}
+	
+	//
+	// Make a standard brush (radius)
+	// brush[x][y]
+	// 0 is nothing
+	// 1 is valid
+	function makeRoundBrush(r){
+		r+=2;
+		brush = [];
+		for(var i=0;i<r;i++){
+			brush[i] = new Array();
+			for(var j=0;j<r;j++){
+				brush[i][j]=0;
+			}
+		}			
+		var radius = ((r-3)/2);
+		for(var y2=-radius;y2<=radius;y2++){
+		for(var x2=-radius;x2<=radius;x2++){
+			if((y2*y2+x2*x2) <= radius*radius+radius*0.8){
+				var x3 = Math.round(x2+r/2);
+				var y3 = Math.round(y2+r/2);
+				if(x3>0 && y3>0 && x3<r && y3<r){
+					brush[x3-1][y3-1] = 1;
+				}
+			}
+		}}		
+	}	
+	
+
+</script>
+</body>
+</html>
