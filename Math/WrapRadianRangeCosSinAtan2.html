@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+		//
+		// atan2 returns -Math.PI to +Math.PI
+		//
+		var c=document.getElementById("myCanvas");
+		var ctx=c.getContext("2d");
+		gameloop=setInterval(doGameLoop,10);
+		var x=0;
+		var y=50;
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+			
+		function doGameLoop(){
+			ctx.fillStyle="rgb(255,255,255)";
+			ctx.fillText("Javascript Html canvas example.",10,10); 
+			
+			// get a random radian angle in range
+			// of -500 to 500..
+			var radianAngle = Math.random()*1000;
+			radianAngle-=500;
+			
+			// Wrap range our angle into range
+			var wrappedAngle = wrapRadians(radianAngle);
+			
+			// Draw our angle on the screen
+			ctx.fillText("angle :"+wrappedAngle,x,y); 
+			
+			// update cursor
+			x+=160;
+			if(x>window.innerWidth-100){
+				x=0;
+				y+=20;
+			}
+			// bottom clear cursor to top continue
+			if(y>window.innerHeight-80){
+				x=0;
+				y=50;
+				ctx.fillStyle="rgb(0,0,0)";
+				ctx.fillRect(0,0,c.width,c.height);	
+			}
+			
+		}
+		//		
+		// Wrap radians inside a usable range using
+		// cos and sin and atan2. The value inputted
+		// gets wrapped into the -Math.PI to Math.PI
+		// range.
+		//
+		function wrapRadians(val){
+			var x = Math.cos(val);
+			var y = Math.sin(val);
+			return Math.atan2(y,x);
+		}
+	</script>
+</body>
+</html>
