@@ -50,6 +50,7 @@ Use different browser.
 	var ya=[];
 	var wa=[];
 	var ha=[];
+	var wd=[];
 	for(var i=0; i<60;i++){
 		w = Math.random()*50;
 		w+=32;
@@ -64,7 +65,7 @@ Use different browser.
 			w*=2;
 			h*=2;
 		}
-		
+		wd.push((Math.random()/3)+.2)
 		xa.push(x);
 		ya.push(y);
 		wa.push(w);
@@ -83,16 +84,16 @@ Use different browser.
 		ctx.fillStyle="#555555";
 		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 		for(var i=0;i<xa.length;i++){
-			drawButton2(xa[i],ya[i],wa[i],ha[i]);
+			drawButton2(xa[i],ya[i],wa[i],ha[i],wd[i],3);
 		}
-		if(Math.random()<.01)randomizePalette();
+		if(Math.random()<.005)randomizePalette();
 	}
 	//
 	// Draw a horizontal or vertical slider for brush size.
 	//
-	function drawButton2(x,y,w,h,ps=3){
+	function drawButton2(x,y,w,h,depth=.2,ps=3){
 		//drawRect2(x,y,w,h,0);
-
+		if(depth>.4)depth=.4;
 		setColor(0);
 		var left = x;
 		var right = x+w;
@@ -114,7 +115,7 @@ Use different browser.
 		texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,8,7]);		
 		
 		//center mid part left to right
-		for(var i=0;i<h/8;i++){
+		for(var i=0;i<(h*(depth/2));i++){
 			top+=ps;
 			texLine(left+ps,top+ps*2,(w/(ps*2)),[3,7]);
 			texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[3,7]);		
