@@ -43,7 +43,7 @@ Use different browser.
 	var uiBrushTimeOut = 0 // show brush change image on screen.
 	var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
 	var uiActiveTime = 0; // when at zero ui is no longer in use
-
+	var uiToolOverwrite = true;
 
 	// slider position of the brush size
 	var uiBrushSliderPos=132;	
@@ -191,6 +191,49 @@ Use different browser.
 		drawPaletteBar(activePalette);
 		drawBrushSizeSlider();
 		drawColorBar();
+		drawToolBar();
+		
+	}
+	
+	//
+	// Collision set id = 3...
+	//
+	function drawToolBar(){
+		var x=0;
+		var w = window.innerWidth/20;
+		var h = w;
+		if(window.innerHeight>window.innerWidth)h-=h/6;
+		var y=window.innerHeight-(w*3);
+		for(var i=0;i<2;i++){
+			if(i==0)w*=2;
+			if(i==1)w/=2;
+			drawButton(x,y,w,h-4,depth=.5,ps=3);
+		
+			
+			touchCollision.push({x:x,y:y,w:w,h:h,id:3,data:i});
+			if(i==0){ // If overwrite insert button
+				drawPaletteRect(x+12,y+12,w-24,h/2,i);
+				setColor(1);
+				var sz=window.innerWidth/60;
+				var s="Insert";
+				if(uiToolOverwrite==true){
+					s="Overwrite";
+					sz/=1.2;
+				}				
+				ctx.font = "bold "+sz+"px serif";				
+				//const metrics = ctx.measureText(s);
+				var q=0;
+				if(window.innerWidth<window.innerHeight)q=h/8;
+				ctx.fillText(s,x+w/5,(y+h/2)+q);								
+				
+			}
+			if(i==-1){ // if highlight needed
+				outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
+				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
+			}
+
+			x+=w;
+		}		
 		
 	}
 	
@@ -646,6 +689,7 @@ Use different browser.
 			drawPaletteBar(activePalette);
 			drawBrushSizeSlider();
 			drawColorBar();		
+			drawToolBar();
 			//pinchDragCoolDown = 0;
 			e.preventDefault();
 		}		
@@ -768,7 +812,8 @@ Use different browser.
 				}
 				drawPaletteBar(activePalette);
 				drawBrushSizeSlider();
-				drawColorBar();					
+				drawColorBar();
+				drawToolBar();				
 				updateSurface = true;
 
 			}
@@ -823,6 +868,7 @@ Use different browser.
 					drawPaletteBar(activePalette);
 					drawBrushSizeSlider();
 					drawColorBar();		
+					drawToolBar();
 		
 					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
 					
@@ -900,7 +946,29 @@ Use different browser.
 				//uiTouchLastY = 
 			
 			//touchCollision.push({x:x,y:y,w:w,h:h,id:2});
-			
+
+
+			//
+			// Tool Section Buttons
+			for(var i=0;i<touchCollision.length;i++){
+				if(touchCollision[i].id==3){
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					var dat = touchCollision[i].data;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						if(dat==0){
+							if(uiToolOverwrite == true){
+								uiToolOverwrite=false;
+							}else{
+								uiToolOverwrite=true;
+							}
+							uiActiveTime=30;						
+						}
+					}
+				}
+			}			
 			//
 			// Palette selection boxes
 			for(var i=0;i<touchCollision.length;i++){
