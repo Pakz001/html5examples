@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	window.addEventListener("touchstart", touchHandler,false);
+	window.addEventListener("touchmove", touchHandler,false);
+	window.addEventListener("touchend", touchHandler,false);			
+	window.addEventListener("resize", resizeHandler,false);			
+
+	gameloop=setInterval(doGameLoop,16);
+	
+	// touch interface variables.
+	var uiTouchStartX = 0;
+	var uiTouchStartY = 0;				
+	var uiTouchLastX = 0;
+	var uiTouchLastY = 0;
+	var uiTouchLastAverageX = -1;
+	var uiTouchLastAverageY = -1;
+	var uiTouchAverageX = 0;
+	var uiTouchAverageY = 0;
+	var uiTouchStart = false;
+	var uiBrushTimeOut = 0 // show brush change image on screen.
+	var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
+	var uiActiveTime = 0; // when at zero ui is no longer in use
+	var uiToolOverwrite = true;
+
+	// slider position of the brush size
+	var uiBrushSliderPos=132;	
+
+	var paletteCart01 = [];
+	paletteCart01.push({r:0,g:0,b:0,a:255});//black
+	paletteCart01.push({r:4,g:12,b:6,a:255});
+	paletteCart01.push({r:17,g:35,b:24,a:255});
+	paletteCart01.push({r:30,g:58,b:41,a:255});
+	paletteCart01.push({r:48,g:93,b:66,a:255});
+	paletteCart01.push({r:77,g:128,b:97,a:255});
+	paletteCart01.push({r:137,g:162,b:87,a:255});
+	paletteCart01.push({r:190,g:220,b:127,a:255});
+	paletteCart01.push({r:238,g:255,b:204,a:255});
+	
+	//
+	// Temp palette
+	var palette = [];
+	palette.push({r:0,g:0,b:0,a:255});//black
+	palette.push({r:255,g:255,b:255,a:255});//white
+	palette.push({r:160,g:61,b:112,a:255});// base
+	palette.push({r:135,g:44,b:94,a:255});//base -1
+	palette.push({r:107,g:22,b:68,a:255}); // darkest
+	palette.push({r:219,g:115,b:146,a:255}); //light
+	palette.push({r:196,g:76,b:120,a:255});//light -1
+	palette.push({r:210,g:156,b:151,a:255});//hightlight	
+	palette.push({r:200,g:131,b:131,a:255});//hightlight
+	-1
+	
+	for(var i=0;i<paletteCart01.length;i++){
+		palette.push({r:paletteCart01[i].r,g:paletteCart01[i].g,b:paletteCart01[i].b,a:255})
+	}	
+	
+	//
+	// Temp palette
+	var palette = [];
+	palette.push({r:0,g:0,b:0,a:255});//black
+	palette.push({r:255,g:255,b:255,a:255});//white
+	palette.push({r:160,g:61,b:112,a:255});// base
+	palette.push({r:135,g:44,b:94,a:255});//base -1
+	palette.push({r:107,g:22,b:68,a:255}); // darkest
+	palette.push({r:219,g:115,b:146,a:255}); //light
+	palette.push({r:196,g:76,b:120,a:255});//light -1
+	palette.push({r:210,g:156,b:151,a:255});//hightlight	
+	palette.push({r:200,g:131,b:131,a:255});//hightlight
+	-1
+
+	// create new array and copy this array into it (all fields)
+	var palette2 = JSON.parse(JSON.stringify(palette));	
+	
+	
+	//numbersCopy = [...numbers];
+	var activePalette = 0;
+
+	// drawing surface
+	var surface = [];
+	var surfaceWidth = 320;
+	var surfaceHeight = 240;
+	var surfaceImage = 0; // our image where we our pixels are on
+	var surfaceImageBuffer = 0; // flickering
+	var surfaceImageBufferTime = -1;
+	surface = makeSurface(surfaceWidth,surfaceHeight);
+	var surfaceScale = 6; // pinch touch zoom in and out
+	var oldSurfaceScale = 6;
+	var surfacePinchStart = false;
+	var surfacePinchStartScale = surfaceScale;
+	var surfacePinchStartDist = 0;	
+	var pinchDragCoolDown = 0;
+	var surfaceCameraX = 0;
+	var surfaceCameraY = 0;
+	var updateSurface = false; // update surface next frame.
+	var surfaceBuffer = 0;
+			//uiPinchStart = true;
+			//uiPinchStartScale = canvasScale;
+			//if(activeCanvas==threeCanvas)uiPinchStartScale = threeScale;
+			
+	
+	// brush
+	var brushPositionHistory = []; // holds the previous x positions of brush
+	var brushPushTime = 0; //if at the same spot long then increase this
+	var brush = [];
+	var brushRoundSize = 3;
+	var maxBrushRoundSize = 32;
+	var minBrushRoundSize = 1;
+	makeRoundBrush(brushRoundSize);
+	// for the brush
+	var brushPointX;
+	var brushPointY;
+	var lastBrushPointX;
+	var lastBrushPointY;
+	var brushMode = 0;	
+	var brushActive = false;
+	var brushFX1 = 2;
+	var uiBrushFX1SliderPos = 10;
+	var uiPaletteCartActive = 0;
+	
+	
+	//console.log(rgbToHex(50,50,50));
+	//console.log(hexToRgb("#323232").r);
+	var a=32;
+	var b=1;
+	//addSurfaceNoise();	
+	//smudgeSurface(5,22);
+	//smudgeSurface(3,82);
+	//smudgeSurface(4,162);
+	//smudgeColor(1,7,1)
+	//smudgeColor(3,5,.2)
+	clearSurface(2); // clear surface with color x
+	//
+	surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
+	oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image	
+	surfaceBuffer=0;
+	oldSurfaceImage = surfaceImage;
+	var s1=10;
+	var s2=.5;
+	function doGameLoop(){
+		//cls(0);
+		ctx.fillStyle="#111111";
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		
+		if(pinchDragCoolDown<250)pinchDragCoolDown++;
+		if(uiActiveTime>0)uiActiveTime-=1;
+
+		if(updateSurface){
+			updateSurface = false;
+			oldSurfaceScale = surfaceScale;
+			//s+=16;
+			//console.log(s);
+			//oldSurfaceImage = surfaceImage;
+	
+			// now both hold the same values
+			
+			if(updateSurface==true)doUpdateSurface();
+			
+			
+			ctx.fillStyle="#111111";
+			ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		
+			//surfaceImageBufferTime=2;
+		}
+		
+		//drawSurface(0,0,3);
+		
+		// Temp demonstrate the brush routines
+		
+		//setColor(2);
+		//ctx.fillText("Javascript Html canvas example.",10,10); 
+		//outlineRect(0,0,200,200,2,5);
+		touchCollision = [];
+		if(surfaceBuffer==1){
+			ctx.drawImage(surfaceImage,0,0);
+			ctx.drawImage(oldSurfaceImage,0,0);		
+			//surfaceBuffer=0;
+		}else{
+			ctx.drawImage(oldSurfaceImage,0,0);
+			ctx.drawImage(surfaceImage,0,0);
+			//surfaceBuffer=1
+		}
+			
+
+		
+		if(uiBrushTimeOut>0){
+			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/2-brushRoundSize/2);
+			uiBrushTimeOut-=1;
+		}
+		drawPaletteBar(activePalette);
+		drawPaletteCart();		
+		drawBrushSizeSlider();
+		drawBrushFXSlider1();
+		drawColorBar();
+		drawToolBar();
+		
+	}
+
+	function doUpdateSurface(){
+	
+		updateSurface = false;
+		oldSurfaceScale = surfaceScale;
+		//s+=16;
+		//console.log(s);
+		//oldSurfaceImage = surfaceImage;
+
+		// now both hold the same values
+		if(surfaceBuffer==1){
+			surfaceImage = null;
+			surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
+			//surfaceBuffer=0;
+		}else{
+			oldSurfaceImage = null;
+			oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
+			//surfaceBuffer=1
+		}
+		if(surfaceBuffer==1){
+			surfaceBuffer=0;
+		}else{
+			surfaceBuffer=1;
+		}
+		ctx.fillStyle="#111111";
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+	
+		//surfaceImageBufferTime=2;		
+	}	
+	//
+	// Collision set id = 3...
+	//
+	function drawToolBar(){
+		var x=0;
+		var w = window.innerWidth/20;
+		var h = w;
+		if(window.innerHeight>window.innerWidth)h-=h/6;
+		var y=window.innerHeight-(w*4);
+		for(var i=0;i<2;i++){
+			if(i==0)w*=2;
+			if(i==1)w/=2;
+			drawButton(x,y,w,h-4,depth=.5,ps=3);
+		
+			
+			touchCollision.push({x:x,y:y,w:w,h:h,id:3,data:i});
+			if(i==0){ // If overwrite insert button
+				drawPaletteRect(x+12,y+12,w-24,h/2,i);
+				setColor(1);
+				var sz=window.innerWidth/60;
+				var s="Insert";
+				if(uiToolOverwrite==true){
+					s="Overwrite";
+					sz/=1.2;
+				}				
+				ctx.font = "bold "+sz+"px serif";				
+				//const metrics = ctx.measureText(s);
+				var q=0;
+				if(window.innerWidth<window.innerHeight)q=h/8;
+				ctx.fillText(s,x+w/5,(y+h/2)+q);								
+				
+			}
+			if(i==-1){ // if highlight needed
+				outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
+				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
+			}
+
+			x+=w;
+		}		
+		
+	}
+	
+	// clear/erase surface and fill with color from current (activePalette) palette.
+	function clearSurface(c=activePalette){
+		for(var y=0;y<surfaceHeight;y++){
+			for(var x=0;x<surfaceWidth;x++){
+				surface[x][y] = c;
+			}
+		}
+		
+	}
+	
+	function smudgeColor(a,b,intensity){
+
+		for(var i=0;i<(surfaceWidth*surfaceHeight)*intensity;i++){
+
+			var x = Math.floor(Math.random()*(surfaceWidth-2));
+			var y = Math.floor(Math.random()*(surfaceHeight-2));
+
+			x++;
+			y++;
+			if(surface[x][y]==a){
+				var x1 = 1;
+				var y1 = 1;
+				if(Math.random()<.5)x1=-1;
+				if(Math.random()<.5)y1=-1;
+				surface[x+x1][y+y1]=b;
+			}
+		}
+	}
+	//
+	// Draw a horizontal or vertical slider for brush size.
+	//
+	function drawBrushFXSlider1(){
+		var x = window.innerWidth*.50;
+		var y = window.innerHeight*.90;
+		var w = window.innerWidth/3;
+		var h = window.innerHeight/32;
+		
+		drawButton(x,y,w,h);
+		drawRect(x+12,y+h/4,w-24,h/2,0);
+		//outlineRect(x,y,w,h,1,5);
+		sliderPos = uiBrushFX1SliderPos;
+		//var brushFX = 2;
+		//var uiBrushFXSliderPos = 10;
+	
+		drawButton(x+sliderPos,y-4,24,h+8,.5,2);
+		//drawRect(x+sliderPos,y,16,h,1);
+		//outlineRect(x+sliderPos,y,16,h,1,5);
+		touchCollision.push({x:x,y:y-6,w:w,h:h+12,id:4});
+	}		
+	//
+	// Draw a horizontal or vertical slider for brush size.
+	//
+	function drawBrushSizeSlider(){
+		var x = window.innerWidth*.50;
+		var y = window.innerHeight*.80;
+		var w = window.innerWidth/3;
+		var h = window.innerHeight/32;
+		
+		drawButton(x,y,w,h);
+		drawRect(x+12,y+h/4,w-24,h/2,0);
+		//outlineRect(x,y,w,h,1,5);
+		sliderPos = uiBrushSliderPos;
+		drawButton(x+sliderPos,y-4,24,h+8,.5,2);
+		//drawRect(x+sliderPos,y,16,h,1);
+		//outlineRect(x+sliderPos,y,16,h,1,5);
+		touchCollision.push({x:x,y:y-6,w:w,h:h+12,id:0});
+	}
+	
+	//
+	// Draw our brush to the screen (show!)
+	//
+	function drawBrush(posX,posY){
+		var size = (window.innerWidth+window.innerHeight)/100;
+		posX-=brush.length*size/2;
+		posY-=brush.length*size/2;
+		for(var y=0;y<brush.length;y++){
+		for(var x=0;x<brush.length;x++){	
+			if(brush[x][y]==1){
+				ctx.fillStyle="#000000";
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+			}else{
+				ctx.fillStyle="#FF00FF";
+				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+				
+			
+			}
+		}}
+		
+	}
+	
+	//
+	// Make a standard brush (radius)
+	// brush[x][y]
+	// 0 is nothing
+	// 1 is valid
+	function makeRoundBrush(r){
+		r+=2;
+		brush = [];
+		for(var i=0;i<r;i++){
+			brush[i] = new Array();
+			for(var j=0;j<r;j++){
+				brush[i][j]=0;
+			}
+		}			
+		var radius = ((r-3)/2);
+		for(var y2=-radius;y2<=radius;y2++){
+		for(var x2=-radius;x2<=radius;x2++){
+			if((y2*y2+x2*x2) <= radius*radius+radius*0.8){
+				var x3 = Math.round(x2+r/2);
+				var y3 = Math.round(y2+r/2);
+				if(x3>0 && y3>0 && x3<r && y3<r){
+					brush[x3-1][y3-1] = 1;
+				}
+			}
+		}}		
+	}
+	
+	//
+	// Make a standard brush (radius)
+	// brush[x][y]
+	// 0 is nothing
+	// 1 is valid
+	function makeRoundBrush(r){
+		r+=2;
+		brush = [];
+		for(var i=0;i<r;i++){
+			brush[i] = new Array();
+			for(var j=0;j<r;j++){
+				brush[i][j]=0;
+			}
+		}			
+		var radius = ((r-3)/2);
+		for(var y2=-radius;y2<=radius;y2++){
+		for(var x2=-radius;x2<=radius;x2++){
+			if((y2*y2+x2*x2) <= radius*radius+radius*0.8){
+				var x3 = Math.round(x2+r/2);
+				var y3 = Math.round(y2+r/2);
+				if(x3>0 && y3>0 && x3<r && y3<r){
+					brush[x3-1][y3-1] = 1;
+				}
+			}
+		}}		
+	}
+	
+	//
+	// Draw a button for random colors
+	function drawColorBar(){
+		
+		//return;
+		var x=window.innerWidth-((window.innerWidth/20)*3);
+		var w = window.innerWidth/20;
+		var h = w;
+		var y=window.innerHeight-w*2;
+		for(var i=0;i<1;i++){
+			
+			drawButton(x,y,w,h-5,.7,3);
+			drawPaletteRect(x+10,y+10,w-20,h-20,0);
+			var a=100;
+			var b=100;
+			var c=100;
+			for(var x2=x;x2<x+w-24;x2++){
+				b+=4;
+				c+=6;
+				ctx.fillStyle="rgb("+a+","+b+","+c+")";	
+				ctx.fillRect(x2+12,y+12,1,h-24);
+			}
+			touchCollision.push({x:x,y:y,w:w,h:h,id:2});
+			x+=w;
+		}
+	}	
+	
+	//
+	// Draw a strip of colors from the palette[];
+	function drawPaletteCart(cart=0){
+		var x=0;
+		var w = window.innerWidth/20;
+		var h = w;
+		var y=window.innerHeight-w*3;
+		for(var i=0;i<paletteCart01.length;i++){
+			drawButton(x,y,w,h-4,depth=.5,ps=3);
+		
+			drawPaletteRectCart(x+12,y+12,w-24,h/2,i);
+			touchCollision.push({x:x,y:y,w:w,h:h,id:5,data:i});
+			//var uiPaletteCartActive = 0;			
+			if(i==uiPaletteCartActive){ // if highlight needed
+				outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
+				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
+			}
+			x+=w;
+		}
+	}		
+	
+	//
+	// Draw a strip of colors from the palette[];
+	function drawPaletteBar(active=-1){
+		var x=0;
+		var w = window.innerWidth/20;
+		var h = w;
+		var y=window.innerHeight-w*2;
+		for(var i=0;i<palette.length;i++){
+			drawButton(x,y,w,h-4,depth=.5,ps=3);
+		
+			drawPaletteRect(x+12,y+12,w-24,h/2,i);
+			touchCollision.push({x:x,y:y,w:w,h:h,id:1,data:i});
+			if(i==active){ // if highlight needed
+				outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
+				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
+			}
+			x+=w;
+		}
+	}
+	//
+	// Draw a rectangle with a color from the palette[] inside it.
+	function drawPaletteRectCart(x,y,w,h,c){
+		outlineRect(x,y,w,h,0,3);
+		drawRectCart(x+1,y+1,w-2,h-2,c);
+	}
+	
+	//
+	// Draw a rectangle with a color from the palette[] inside it.
+	function drawPaletteRect(x,y,w,h,c){
+		outlineRect(x,y,w,h,0,3);
+		drawRect(x+1,y+1,w-2,h-2,c);
+	}
+	
+	// helper functions
+	//
+	//
+	function drawRectCart(x,y,w,h,c){
+		setColorCart(c);
+		ctx.fillRect(x,y,w,h);
+	}
+	
+	function drawRect(x,y,w,h,c){
+		setColor(c);
+		ctx.fillRect(x,y,w,h);
+	}
+	// clear screen using palette(c) color
+	function cls(c){
+		setColor(c);
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+	}
+	// set the fillstyle color of palette(c)
+	function setColorCart(c){
+		ctx.fillStyle = "rgb("+paletteCart01[c].r+","+paletteCart01[c].g+","+paletteCart01[c].b+","+paletteCart01[c].a+")";
+	}
+	
+	// set the fillstyle color of palette(c)
+	function setColor(c){
+		ctx.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+	}
+	function setCtxColor(can,c){
+		can.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+	}
+	
+	// draw outline rect
+	// x,y,w,h,palette color, line width.
+	function outlineRect(x,y,w,h,c,lineWidth=1){
+		ctx.beginPath();
+		ctx.lineWidth = lineWidth;
+		ctx.strokeStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+		ctx.rect(x,y,w,h);
+		ctx.stroke();
+	}
+	
+	//
+	// Draw surface on ctx. test..
+	//
+	function drawSurface(x,y,scale=1){
+		for(var y=0;y<surfaceHeight;y++){
+			for(var x=0;x<surfaceWidth;x++){
+				setColor(surface[x][y]+2);
+				ctx.fillRect(x*scale,y*scale,scale,scale);
+			}
+		}
+	}
+	//
+	// Draw our pixel editing surface on a new canvas
+	// and return that as a image.
+	// We draw using a tilemap drawing method
+	// where we have camera x and y and scale.
+	// only draw what is shown on the screen.
+	// msdn
+	function updateSurfaceImage(posX=0,posY=0,scale=1) {
+
+		var startX = Math.floor(posX/scale);
+		var startY = Math.floor(posY/scale);		
+		var endX = startX + (window.innerWidth)/scale;
+		var endY = startY + (window.innerHeight)/scale;
+		var offsetX = -posX+startX*scale;
+		var offsetY = -posY+startY*scale;
+		
+		let canvas = document.getElementById("myCanvas");
+
+		let canvasAsImage = new Image(Math.floor(surfaceWidth*scale),Math.floor(surfaceHeight*scale));
+
+		let cv=canvas.getContext("2d");
+		cv.canvas.width=window.innerWidth-32;
+		cv.canvas.height=window.innerHeight-32;
+		for (let c = startX; c <= endX; c++) {
+		  for (let r = startY; r <= endY; r++) {
+			if(c<0 || r<0 || c>=surfaceWidth || r>=surfaceHeight)continue;
+		    //const tile = surface[c][r];
+		    const x = (c - startX) * scale + offsetX;
+		    const y = (r - startY) * scale + offsetY;
+			setCtxColor(cv,surface[c][r]);
+
+
+			cv.fillRect(Math.round(x),Math.round(y),scale+1,scale+1);
+		}
+		}
+		//for(var y=0;y<surfaceHeight;y++){
+		//	for(var x=0;x<surfaceWidth;x++){
+		//		setCtxColor(cv,surface[x][y]);
+		//		cv.fillRect(x*scale,y*scale,scale+1,scale+1);
+		//	}
+		//}
+		/*
+		cv.fillStyle='green';
+		cv.fillText("Hello",10,10);
+		cv.fillRect(0,0,64,4);
+		cv.fillRect(0,64-4,640,4);
+		*/
+		canvasAsImage.src = canvas.toDataURL();
+		return canvasAsImage;
+	}		
+	
+	
+	//
+	// Smudge out one particular color on the surface
+	//
+	function smudgeSurface(col,num=10){
+
+		for(var i=0;i<(surfaceWidth+surfaceHeight)*num;i++){
+
+			var x = Math.floor(Math.random()*(surfaceWidth-2));
+			var y = Math.floor(Math.random()*(surfaceHeight-2));
+
+			x++;
+			y++;
+			if(surface[x][y]==col){
+
+				for(var y1=-1;y1<2;y1++){
+					for(var x1=-1;x1<2;x1++){
+						if(Math.random()<.5)surface[x+x1][y+y1]=col;
+					}
+				}
+			}
+		}
+	}
+	
+	//
+	// Create a new surface completely out of random colors
+	// from the palette.
+	//
+	function addSurfaceNoise(){
+		for(var y=0;y<surfaceHeight;y++){
+			for(var x=0;x<surfaceWidth;x++){
+				surface[x][y]=Math.floor(Math.random() * palette.length);;
+			}
+		}
+	}
+	
+	//
+	// Make our drawing surface
+	function makeSurface(w,h){
+		surface = [];
+		for(var i=0;i<w;i++){
+			surface[i] = new Array();
+			for(var j=0;j<h;j++){
+				surface[i][j]=0;
+			}
+		}
+		return surface;		
+	}
+	
+	//
+	// Helper functions
+	function rgbToHex(r, g, b) {
+  		return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+	}	
+	function hexToRgb(hex) {
+	  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	  return result ? {
+	    r: parseInt(result[1], 16),
+	    g: parseInt(result[2], 16),
+	    b: parseInt(result[3], 16)
+	  } : null;
+	}	
+	
+	//
+	// Draw a horizontal or vertical slider for brush size.
+	//
+	function drawButton(x,y,w,h,depth=.2,ps=3){
+		//drawRect2(x,y,w,h,0);
+		if(depth>.5)depth=.5;
+		setColor(0);
+		var left = x;
+		var right = x+w;
+		var bottom = y+h;
+		var top = y;
+		
+		//outer edge..
+		ctx.fillRect(left,bottom,w,ps+2);//bottom center
+		ctx.fillRect(left,bottom,ps,-(h-2*ps));//left center
+		ctx.fillRect(left+ps*2,top,w-4*ps,ps);//top center
+		ctx.fillRect(right-ps,bottom,ps,-(h-2*ps));//right center
+		ctx.fillRect(left+ps,top+ps,ps,ps); // dot left top
+		ctx.fillRect(right-ps*2,top+ps,ps,ps); // dot left top
+		//
+		// top area
+		texLine(left+ps*2,top+ps,(w/(ps*2)),[2,8,7]);
+		texLine(right-ps*3,top+ps,-(w/(ps*2)),[2,8,7]);		
+		texLine(left+ps,top+ps*2,(w/(ps*2)),[2,8,7]);
+		texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,8,7]);		
+		
+		//center mid part left to right
+		for(var i=0;i<(h*(depth/2));i++){
+			top+=ps;
+			texLine(left+ps,top+ps*2,(w/(ps*2)),[3,7]);
+			texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[3,7]);		
+		}
+		
+		//top+=h/10;
+		// bottom area
+		texLine(left+ps,top+ps,(w/(ps*2)),[3,8,7]);
+		texLine(right-ps*2,top+ps,-(w/(ps*2)),[3,8,7]);		
+		
+		texLine(left+ps,top+ps*2,(w/(ps*2)),[2,3,8,7]);
+		texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,3,8,7]);		
+
+		texLine(left+ps,top+ps*3,(w/(ps*2)),[3,4]);
+		texLine(right-ps*2,top+ps*3,-(w/(ps*2)),[3,4]);		
+				
+		top+=ps;
+		// Bottom dark
+		setColor(4);
+		do{
+			ctx.fillRect(left+ps,top+ps*3,w-ps*2,ps);
+			top+=ps;
+		}while(top+(ps*3)<bottom);
+		
+		function texLine(x,y,stp,tx){
+		//var tx = [2,8,1];
+		//var y = top+6;
+		//var x = left+6;
+		//var stp = 10;
+		var direc = 1;
+		if(stp<0)direc=-1;
+		var x1 = x;
+		var n = 0;
+		var e=0;
+		do{
+			setColor(tx[n]);
+			ctx.fillRect(x1,y,ps+1,ps+1);
+			x1+=(direc*ps);
+			n++;
+			if(n>=tx.length)n=tx.length-1;
+			e++;
+			
+		}while(e<Math.abs(stp));
+
+		}	
+	}	
+	
+	
+	function touchHandler(e){
+		//
+		// touch start
+		
+
+		
+		if(e.type=="touchstart" && e.touches) {
+
+			// get the last touch coordinates
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				uiTouchStartX = x;
+				uiTouchStartY = y;				
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+				uiTouchStart = true;
+			}
+			
+			//var surfaceScale = 6; // pinch touch zoom in and out
+			//var surfacePinchStart = false;
+			//var surfacePinchStartScale = surfaceScale;
+			brushPositionHistory = []; // reset location history;
+			// initiate pinch mode
+			surfacePinchStart = false;
+			surfacePinchStartScale = surfaceScale;
+			surfacePinchStartDist = 0;
+			uiTouchLastAverageX	= -1;
+			uiTouchLastAverageY = -1;
+			if(e.targetTouches.length>=1)pinchDragCoolDown=0;
+			updateSurface = true;
+			if(surfaceBuffer==1){
+				ctx.drawImage(surfaceImage,0,0);
+				ctx.drawImage(oldSurfaceImage,0,0);		
+				//surfaceBuffer=0;
+			}else{
+				ctx.drawImage(oldSurfaceImage,0,0);
+				ctx.drawImage(surfaceImage,0,0);
+				//surfaceBuffer=1
+			}
+			drawPaletteBar(activePalette);
+			drawPaletteCart();
+			drawBrushSizeSlider();
+			drawBrushFXSlider1();
+			drawColorBar();		
+			drawToolBar();
+			//pinchDragCoolDown = 0;
+			e.preventDefault();
+		}		
+		if(e.type=="touchmove" && e.touches) {
+		
+			// get the last touch coordinates
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+			}
+
+			//
+			// Pinch scale zoom surface.
+			
+			if(e.changedTouches.length===2 && uiActiveTime==0){
+				surfacePinchStart=true;
+				pinchDragCountDown=0;
+
+				pinchDragCoolDown = 0; // disable other ui while draggin or pinching. time
+				oldSurfaceScale = surfaceScale;
+				var x3 = e.changedTouches[0].clientX;
+				var y3 = e.changedTouches[0].clientY;
+				var x4 = e.changedTouches[1].clientX;
+				var y4 = e.changedTouches[1].clientY;
+//	var uiTouchLastAverageX = 0;
+//	var uiTouchLastAverageY = 0;
+//	var uiTouchAverageX = 0;
+//	var uiTouchAverageY = 0;
+	
+				uiTouchAverageX = (x3+x4)/2;
+				uiTouchAverageY = (y3+y4)/2;
+
+				if(uiTouchLastAverageX==-1){
+					uiTouchLastAverageX = uiTouchAverageX;
+					uiTouchLastAverageY = uiTouchAverageY;
+					
+				}
+					
+				var mx = uiTouchLastAverageX - uiTouchAverageX;
+				var my = uiTouchLastAverageY - uiTouchAverageY;
+				surfaceCameraX += mx;
+				surfaceCameraY += my;
+				//console.log(my);
+				uiTouchLastAverageX = uiTouchAverageX;
+				uiTouchLastAverageY = uiTouchAverageY;
+				
+				//	var surfaceScale = 6; // pinch touch zoom in and out
+				//	var surfacePinchStart = false;
+				//	var surfacePinchStartScale = surfaceScale;
+	
+				//var d = Math.floor(Math.hypot(x3-x4,y3-y4)/100);
+				var d = Math.hypot(x3-x4,y3-y4);
+				if(surfacePinchStartDist==0)surfacePinchStartDist=d;
+				//console.log(d+","+uiPinchStartDist+","+Math.abs(Math.hypot(d-uiPinchStartDist)));
+				if(Math.abs(Math.hypot(d-surfacePinchStartDist))>1){
+						var divver=10;
+						divver = (64-oldSurfaceScale);
+						if(oldSurfaceScale>32)divver/=2;
+																		
+						surfaceScale=surfacePinchStartScale+((d-surfacePinchStartDist)/divver);
+						// Keep the scale within limits
+						if(surfaceScale<1)surfaceScale=1;
+						if(surfaceScale>64)surfaceScale=64;
+						
+						var diff = surfaceScale - oldSurfaceScale;
+
+						// zoom into our out of the center(avarage) position between
+						// the two touch points.
+						//var diffX = diff*((surfaceCameraX+(uiTouchAverageX))/surfaceScale);
+						//var diffY = diff*((surfaceCameraY+(uiTouchAverageY))/surfaceScale);
+						var px = uiTouchAverageX;
+						var py = uiTouchAverageY;
+						px+=surfaceCameraX;
+						py+=surfaceCameraY;
+						//if(surfaceCameraX>0)px-=surfaceCameraX;
+						//if(surfaceCameraY>0)py-=surfaceCameraY;
+
+						var diffX = diff*(px)/oldSurfaceScale;
+						var diffY = diff*(py)/oldSurfaceScale;
+						
+
+						//diffX*=surfaceScale;
+						//diffY*=2;
+						//var diffX = diff*(window.innerWidth);
+
+						//var diffY = diff*(window.innerHeight);
+
+						
+						//Move the camera with the zoom and drag
+						surfaceCameraX+=diffX;
+						surfaceCameraY+=diffY;					
+						// keey the camera inside the screen	
+						//if(surfaceCameraX<0)surfaceCameraX=0;
+						//if(surfaceCameraY<0)surfaceCameraY=0;
+						//if(surfaceWidth*surfaceScale>window.innerWidth){
+						//if(surfaceCameraX>(surfaceScale*surfaceWidth)-(window.innerWidth*.9))surfaceCameraX=(surfaceScale*surfaceWidth)-(window.innerWidth*.9);
+						//}
+						//if(surfaceHeight*surfaceScale>window.innerHeight){
+						//if(surfaceCameraY>(surfaceScale*surfaceHeight)-(window.innerHeight*.9))surfaceCameraY=(surfaceScale*surfaceHeight)-(window.innerHeight*.9);
+						//}
+						
+						//if(surfaceCameraX>surfaceWidth*surfaceScale/2)surfaceCameraX=surfaceWidth*surfaceScale/2;
+						//console.log(surfacePinchStartScale+(d-surfacePinchStartDist));
+						//console.log(surfaceScale);
+						//hasChanged = true;
+
+
+					
+				}	
+				if(surfaceBuffer==1){
+					ctx.drawImage(surfaceImage,0,0);
+					ctx.drawImage(oldSurfaceImage,0,0);		
+					//surfaceBuffer=0;
+				}else{
+					ctx.drawImage(oldSurfaceImage,0,0);
+					ctx.drawImage(surfaceImage,0,0);
+					//surfaceBuffer=1
+				}
+				drawPaletteBar(activePalette);
+				drawPaletteCart();
+				drawBrushSizeSlider();
+				drawBrushFXSlider1();
+				drawColorBar();
+				drawToolBar();				
+				updateSurface = true;
+
+			}
+
+			//
+			// Brush move brush 2
+			//
+
+				
+			if(e.changedTouches.length==1 && uiActiveTime==0){			
+				if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
+					
+				}
+				
+			}
+	
+			//
+
+			// Brush move
+			//
+			if(e.changedTouches.length===1 && uiActiveTime==0){			
+				if(brushMode==0 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
+
+					brushActive = true;
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+					//console.log(brushPointX);
+					for(var y1=0;y1<brush.length;y1++){
+					for(var x1=0;x1<brush.length;x1++){
+						var val = brush[x1][y1];
+						if(val==0)continue;
+						var x2 = Math.floor((brushPointX+x1)-brushRoundSize/2);
+						var y2 = Math.floor((brushPointY+y1)-brushRoundSize/2);
+
+						if(x2>=0 && x2<surfaceWidth && y2>=0 && y2<surfaceHeight){
+						//surface[brushPointX][brushPointY]=activePalette;
+
+							surface[x2][y2] = activePalette;
+
+						}
+					}
+					}
+					if(surfaceBuffer==1){
+						ctx.drawImage(surfaceImage,0,0);
+						ctx.drawImage(oldSurfaceImage,0,0);		
+						//surfaceBuffer=0;
+					}else{
+						ctx.drawImage(oldSurfaceImage,0,0);
+						ctx.drawImage(surfaceImage,0,0);
+						//surfaceBuffer=1
+					}
+					drawPaletteBar(activePalette);
+					drawPaletteCart();
+					drawBrushSizeSlider();
+					drawBrushFXSlider1();
+					drawColorBar();		
+					drawToolBar();
+		
+					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
+					
+					//if(Math.random()<.05)updateSurface = true;
+					
+					updateSurface=true;
+
+				}
+			}			
+			// plot pixel
+			if(brushMode==1 && pinchDragCoolDown>20 && uiActiveTime==0){//plot
+				if(e.changedTouches.length==1){
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+					//console.log(brushPointX);
+					if(brushPointX>=0 && brushPointX<surfaceWidth && brushPointY>=0 && brushPointY<surfaceHeight){
+						surface[brushPointX][brushPointY]=activePalette;
+						updateSurface = true;
+					}
+					
+				}
+			}
+			
+			//
+			// Brush size  Slider position
+			if(e.changedTouches.length==1 && pinchDragCoolDown>20 && brushActive==false){		
+			
+				for(var i=0;i<touchCollision.length;i++){
+					//
+					// Brush FX 1  Slider position // smudge smear
+					if(touchCollision[i].id==4){
+	
+						var x = touchCollision[i].x;
+						var y = touchCollision[i].y;
+						var w = touchCollision[i].w;
+						var h = touchCollision[i].h;
+						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+							// set new slider position
+							// uiBrushSliderPos
+							//	var brushRoundSize = 32;
+							// makeRoundBrush(brushRoundSize);
+							//	var maxBrushRoundSize = 32;
+							// var minBrushRoundSize = 1;
+							//var brushFX1 = 2;
+							//var uiBrushFX1SliderPos = 10;
+		
+							
+							var step = 3/w;//maxBrushRoundSize/w;
+							var p = uiTouchLastX-x;
+							uiBrushFX1SliderPos = p;
+							if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+							brushFX1 = (uiBrushFX1SliderPos*step)-1;						
+							//if(brushFX1<0)brushFX1=0;
+							//console.log(brushFX1);
+							//uiBrushTimeOut=30;		
+							uiActiveTime=30;				
+						}
+					}	
+					// Slider brush size					
+					if(touchCollision[i].id==0){
+						var x = touchCollision[i].x;
+						var y = touchCollision[i].y;
+						var w = touchCollision[i].w;
+						var h = touchCollision[i].h;
+						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+							// set new slider position
+							// uiBrushSliderPos
+							//	var brushRoundSize = 32;
+							// makeRoundBrush(brushRoundSize);
+							//	var maxBrushRoundSize = 32;
+							// var minBrushRoundSize = 1;
+							//console.log("a" + e.changedTouches.length);
+							var step = maxBrushRoundSize/w;
+							var p = uiTouchLastX-x;
+							uiBrushSliderPos = p;
+							if(uiBrushSliderPos+16>w)uiBrushSliderPos-=16;
+							brushRoundSize = Math.round(uiBrushSliderPos*step);						
+							if(brushRoundSize<1)brushRoundSize=1;
+							makeRoundBrush(brushRoundSize)
+							uiBrushTimeOut=30;
+							uiActiveTime=30;
+						}
+					}
+				}	
+			}	
+			e.preventDefault();		
+		}		
+		if(e.type=="touchend" && e.touches) {
+
+			// get the last touch coordinates
+			for(var i=0;i<e.changedTouches.length;i++){	
+				var x = e.changedTouches[i].clientX;
+				var y = e.changedTouches[i].clientY;				
+				uiTouchLastX = x;
+				uiTouchLastY = y;
+				uiTouchStart = false;
+			}
+			surfacePinchStart = false;
+			uiTouchLastAverageX = -1;
+			uiTouchLastAverageY = -1;
+			brushActive = false;
+
+							//uiTouchStartX = x;
+				//uiTouchStartY = y;				
+				//uiTouchLastX = x;
+				//uiTouchLastY = 
+			
+			//touchCollision.push({x:x,y:y,w:w,h:h,id:2});
+
+
+			//
+			// Tool Section Buttons
+			for(var i=0;i<touchCollision.length;i++){
+				if(touchCollision[i].id==3){
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					var dat = touchCollision[i].data;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						if(dat==0){
+							if(uiToolOverwrite == true){
+								uiToolOverwrite=false;
+							}else{
+								uiToolOverwrite=true;
+							}
+							uiActiveTime=30;						
+						}
+					}
+				}
+			}			
+			//
+			// Palette selection boxes
+			for(var i=0;i<touchCollision.length;i++){
+				if(touchCollision[i].id==5){
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						uiPaletteCartActive = touchCollision[i].data;
+						uiActiveTime=30;						
+					}
+				}					
+				if(touchCollision[i].id==1){
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						activePalette = touchCollision[i].data;
+						uiActiveTime=30;						
+					}
+				}
+				if(touchCollision[i].id==2){	
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+							
+						// create new array and copy this array into it (all fields)
+						palette = JSON.parse(JSON.stringify(palette2));	
+						if(Math.random()<.8){
+							//palette[0].r=Math.random()*64;
+							//palette[0].g=Math.random()*64;
+							//palette[0].b=Math.random()*64;						
+	
+							var r=(Math.random()*155);
+							var g=(Math.random()*155);
+							var b=(Math.random()*155);
+							//r+=100;
+							//g+=100;
+							//b+=100;
+							if(Math.random()<.22)r=0;
+							if(Math.random()<.22)g=0;
+							if(Math.random()<.22)b=0;
+							
+							//r=0;
+							//g=255;
+							//b=0;
+							var aa=.8;
+							var bb=.8;
+							var cc=.8;
+							var done=false;
+							if(Math.random()<.3){
+								b=Math.random()*128;
+								b+=128;
+								cc=.2;
+								done=true;
+							}
+							if(done==false && Math.random()<.3){
+								g=Math.random()*128;
+								g+=128;
+								bb=.2;
+								done=true;
+							}
+							
+							for(var j=2;j<palette.length;j++){
+								//var grey = palette[j].r+palette[j].g+palette[j].b;
+								//grey/=3;
+								//palette[j].r=(r/255)*grey;
+								//palette[j].g=(g/255)*grey;
+								//palette[j].b=(b/255)*grey;
+								palette[j].r=mix(palette[j].r,r,aa);
+								palette[j].g=mix(palette[j].g,g,bb);
+								palette[j].b=mix(palette[j].b,b,cc);							
+								
+								//palette[j].r=mix(palette[j].r,r,.7);
+								//palette[j].g=mix(palette[j].g,g,.7);
+								//palette[j].b=mix(palette[j].b,b,.7);							
+								if(palette[j].r>255)palette[j].r=255;
+								if(palette[j].g>255)palette[j].g=255;	
+								if(palette[j].b>255)palette[j].b=255;
+								if(palette[j].r<0)palette[j].r=0;
+								if(palette[j].g<0)palette[j].g=0;	
+								if(palette[j].b<0)palette[j].b=0;
+								
+							}
+							// Mix black color with darkest color from palette
+							palette[0].r = mix(palette[4].r,palette[0].r,.5);
+							palette[0].g = mix(palette[4].g,palette[0].g,.5);
+							palette[0].b = mix(palette[4].b,palette[0].b,.5);
+							// Mix white color with darkest color from palette
+							palette[1].r = mix(palette[7].r,palette[1].r,.5);
+							palette[1].g = mix(palette[7].g,palette[1].g,.5);
+							palette[1].b = mix(palette[7].b,palette[1].b,.5);
+							
+							
+							// stack overflow
+							function mix(colorChannelA, colorChannelB, amountToMix){
+							    var channelA = colorChannelA*amountToMix;
+							    var channelB = colorChannelB*(1-amountToMix);
+							    return parseInt(channelA+channelB);
+							}
+						}
+						doUpdateSurface()					
+					}
+				}
+				}
+			
+			//
+			// sliders fx and brush size
+			//
+
+			for(var i=0;i<touchCollision.length;i++){
+				if(touchCollision[i].id==4){// brush fx slider
+
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						// set new slider position
+						// uiBrushSliderPos
+						//	var brushRoundSize = 32;
+						// makeRoundBrush(brushRoundSize);
+						//	var maxBrushRoundSize = 32;
+						// var minBrushRoundSize = 1;
+						//var brushFX1 = 2;
+						//var uiBrushFX1SliderPos = 10;
+	
+						
+						var step = 3/w;//maxBrushRoundSize/w;
+						var p = uiTouchLastX-x;
+						uiBrushFX1SliderPos = p;
+						if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+						brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+						//console.log(brushFX1);			
+						//if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						//uiBrushTimeOut=30;		
+						uiActiveTime=30;				
+					}
+				}
+				if(touchCollision[i].id==0){
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						// set new slider position
+						// uiBrushSliderPos
+						//	var brushRoundSize = 32;
+						// makeRoundBrush(brushRoundSize);
+						//	var maxBrushRoundSize = 32;
+						// var minBrushRoundSize = 1;
+						var step = maxBrushRoundSize/w;
+						var p = uiTouchLastX-x;
+						uiBrushSliderPos = p;
+						if(uiBrushSliderPos+16>w)uiBrushSliderPos-=16;
+						brushRoundSize = Math.round(uiBrushSliderPos*step);						
+						if(brushRoundSize<1)brushRoundSize=1;
+						makeRoundBrush(brushRoundSize)
+						uiBrushTimeOut=30;		
+						uiActiveTime=30;				
+					}
+				}
+			}
+			
+
+			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY && uiActiveTime==0){
+			if(brushMode==2 && uiTouchLastY<window.innerHeight*.8){//plot
+				
+				//console.log(pinchDragCoolDown);
+				if(e.changedTouches.length==1){
+
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+
+					//smudgeHillBrush(brushPointX,brushPointY);
+					//console.log(brushPointX);
+				}
+					updateSurface = true;
+				
+			}}			
+			// plot brush
+			//var brush = [];
+			//var brushRoundSize = 32;
+			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY && uiActiveTime==0){
+			if(brushMode==0 && uiTouchLastY<window.innerHeight*.8){//plot
+				
+				//console.log(pinchDragCoolDown);
+				if(e.changedTouches.length==1){
+
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+					//console.log(brushPointX);
+					for(var y1=0;y1<brush.length;y1++){
+					for(var x1=0;x1<brush.length;x1++){
+						var val = brush[x1][y1];
+						if(val==0)continue;
+						var x2 = Math.floor((brushPointX+x1)-brushRoundSize/2);
+						var y2 = Math.floor((brushPointY+y1)-brushRoundSize/2);
+
+					if(x2>=0 && x2<surfaceWidth && y2>=0 && y2<surfaceHeight){
+						//surface[brushPointX][brushPointY]=activePalette;
+
+						surface[x2][y2] = activePalette;
+
+					}
+					}}
+					updateSurface = true;
+				}
+			}}
+			
+			// plot pixel
+			if(brushMode==1 && uiActiveTime==0){//plot
+				if(e.changedTouches.length==1){
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+					//console.log(brushPointX);
+					if(brushPointX>=0 && brushPointX<surfaceWidth && brushPointY>=0 && brushPointY<surfaceHeight){
+						surface[brushPointX][brushPointY]=activePalette;
+						updateSurface = true;
+					}
+				}
+			}
+			
+			
+			
+		e.preventDefault();	
+		}		
+		
+	}
+	function resizeHandler(e){
+		e.preventDefault();
+//		if(Math.random()<.01){
+			myCanvas.height = window.innerHeight-32;
+			myCanvas.width = window.innerWidth-32;
+			//surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) 			
+			updateSurface=true;
+//		}
+		
+}
+</script>
+</body>
+</html>
