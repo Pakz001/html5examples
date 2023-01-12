@@ -44,6 +44,7 @@ Use different browser.
 	var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
 	var uiActiveTime = 0; // when at zero ui is no longer in use
 	var uiToolOverwrite = false;
+	var uiToolSelected = 1;
 
 	// slider position of the brush size
 	var uiBrushSliderPos=132;	
@@ -121,6 +122,7 @@ Use different browser.
 	//smudgeColor(1,7,1)
 	//smudgeColor(3,5,.2)
 	clearSurface(2); // clear surface with color x
+	activePalette = 2;
 	//
 	surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image
 	oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) to image	
@@ -238,7 +240,7 @@ Use different browser.
 			var x2 = posX+x;
 			var y2 = posY+y;
 			if(x2<0 || y2<0 || x2>=surfaceWidth || y2>= surfaceHeight)continue;
-			if(brush[x][y]==1 && uiToolOverwrite==false)surface[x2][y2]=2
+			if(brush[x][y]==1 && uiToolOverwrite==false)surface[x2][y2]=activePalette;
 			//if(brush[x][y]==1 && uiToolOverwrite==true)surface[x2][y2]=temp3[x][y];
 
 		}}
@@ -488,13 +490,53 @@ Use different browser.
 		var h = w;
 		if(window.innerHeight>window.innerWidth)h-=h/6;
 		var y=window.innerHeight-(w*3);
-		for(var i=0;i<2;i++){
+		for(var i=0;i<3;i++){
 			if(i==0)w*=2;
 			if(i==1)w/=2;
 			drawButton(x,y,w,h-4,depth=.5,ps=3);
 		
 			
 			touchCollision.push({x:x,y:y,w:w,h:h,id:3,data:i});
+			if(i==2){
+				drawPaletteRect(x+12,y+12,w-24,h/2,0);				
+				setColor(1);
+				var sz=window.innerWidth/36;
+				ctx.font = "bold "+sz+"px serif";				
+				setColor(0);
+				drawPaletteRect(x+12+w/4,y+h/12,w-24-w/4,h/2,4);
+				setColor(1);
+				ctx.fillText(i,x+w/2,(y+h*.5)+q);				
+
+				var sz=window.innerWidth/50;
+				var s="B";
+				ctx.font = "bold "+sz+"px serif";				
+				//const metrics = ctx.measureText(s);
+				var q=0;
+				if(window.innerWidth<window.innerHeight)q=h/8;
+				ctx.fillText(s,x+w/4,(y+h/1.5)+q);
+				
+			}			
+			if(i==1){
+				drawPaletteRect(x+12,y+12,w-24,h/2,0);				
+				setColor(1);
+				var sz=window.innerWidth/36;
+				ctx.font = "bold "+sz+"px serif";				
+				setColor(0);
+				drawPaletteRect(x+12+w/4,y+h/12,w-24-w/4,h/2,4);
+				setColor(1);
+				ctx.fillText(i,x+w/2,(y+h*.5)+q);				
+
+				var sz=window.innerWidth/50;
+				var s="B";
+				ctx.font = "bold "+sz+"px serif";				
+				//const metrics = ctx.measureText(s);
+				var q=0;
+				if(window.innerWidth<window.innerHeight)q=h/8;
+				ctx.fillText(s,x+w/4,(y+h/1.5)+q);
+
+				
+			}
+
 			if(i==0){ // If overwrite insert button
 				drawPaletteRect(x+12,y+12,w-24,h/2,i);
 				setColor(1);
@@ -511,7 +553,7 @@ Use different browser.
 				ctx.fillText(s,x+w/5,(y+h/2)+q);								
 				
 			}
-			if(i==-1){ // if highlight needed
+			if(i==uiToolSelected){ // if highlight needed
 				outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
 				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
 			}
@@ -1182,8 +1224,26 @@ Use different browser.
 						}
 					}
 					}
-					if(Math.random()<.05)pdateSurface = true;
-
+					if(surfaceBuffer==1){
+						ctx.drawImage(surfaceImage,0,0);
+						ctx.drawImage(oldSurfaceImage,0,0);		
+						//surfaceBuffer=0;
+					}else{
+						ctx.drawImage(oldSurfaceImage,0,0);
+						ctx.drawImage(surfaceImage,0,0);
+						//surfaceBuffer=1
+					}
+					drawPaletteBar(activePalette);
+					drawBrushSizeSlider();
+					drawColorBar();		
+					drawToolBar();
+					//var brushLastAngle = 0;	
+					brushLastAngle = angle;
+					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
+					
+					//if(Math.random()<.05)updateSurface = true;
+					
+					updateSurface=true;
 				}
 			}			
 			// plot pixel
@@ -1271,6 +1331,17 @@ Use different browser.
 							}else{
 								uiToolOverwrite=true;
 							}
+							uiActiveTime=30;						
+						}
+
+						if(dat==1){
+							uiToolSelected = 1;
+							brushMode = 2;
+							uiActiveTime=30;						
+						}
+						if(dat==2){
+							uiToolSelected = 2;
+							brushMode = 0;
 							uiActiveTime=30;						
 						}
 					}
