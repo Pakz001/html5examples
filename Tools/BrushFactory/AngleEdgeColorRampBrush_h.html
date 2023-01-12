@@ -85,8 +85,12 @@ Use different browser.
 	palette.push({r:210,g:156,b:151,a:255});//hightlight	
 	palette.push({r:200,g:131,b:131,a:255});//hightlight
 	-1
-	
+
 	for(var i=0;i<paletteCart01.length;i++){
+		palette.push({r:paletteCart01[i].r,g:paletteCart01[i].g,b:paletteCart01[i].b,a:255})
+	}
+	
+	for(var i=0;i<paletteCart02.length;i++){
 		palette.push({r:paletteCart02[i].r,g:paletteCart02[i].g,b:paletteCart02[i].b,a:255})
 	}
 
@@ -141,6 +145,7 @@ Use different browser.
 	var uiBrushFX1SliderPos = 10;
 	var uiPaletteCartActive = 0; // current highlight in the palette cartridge
 	var uiPaletteCard = 1;
+	var uipaletteCardCount = 0;
 	
 	
 	//console.log(rgbToHex(50,50,50));
@@ -220,7 +225,7 @@ Use different browser.
 		kleur.push(6);
 		kleur.push(7);
 		kleur.push(8);
-		if(uiPaletteCartActive){
+		if(uiPaletteCartActive && uiPaletteCard==0){
 		kleur[3]=2+9;
 		kleur[2]=3+9;
 		kleur[1]=4+9;
@@ -228,7 +233,16 @@ Use different browser.
 		kleur[5]=5+9;
 		kleur[6]=8+9;
 		kleur[7]=7+9;
-		}		
+		}	
+		if(uiPaletteCartActive && uiPaletteCard==1){
+		kleur[3]=2+18;
+		kleur[2]=3+18;
+		kleur[1]=4+18;
+		kleur[4]=6+18;
+		kleur[5]=5+18;
+		kleur[6]=8+18;
+		kleur[7]=7+18;
+	}			
 		var r=64;
 		temp2 = [];
 		for(var i=0;i<r;i++){
@@ -1569,6 +1583,23 @@ Use different browser.
 			//
 			// Palette selection boxes
 			for(var i=0;i<touchCollision.length;i++){
+				if(touchCollision[i].id==5 && touchCollision[i].data==0){
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						if(uiPaletteCard==1){
+							uiPaletteCard=0;
+						}else{
+							uiPaletteCard=1;
+						}
+						//var uiPaletteCard = 1;
+						//var uipaletteCardCount = 0;
+	
+						uiActiveTime=30;						
+					}
+				}					
 				if(touchCollision[i].id==5){
 					var x = touchCollision[i].x;
 					var y = touchCollision[i].y;
