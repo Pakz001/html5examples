@@ -1397,6 +1397,9 @@ Use different browser.
 							if(palette[j].b<0)palette[j].b=0;
 							
 						}
+						palette[0].r = mix(palette[4].r,palette[0].r,.5);
+						palette[0].g = mix(palette[4].g,palette[0].g,.5);
+						palette[0].b = mix(palette[4].b,palette[0].b,.5);
 						// stack overflow
 						function mix(colorChannelA, colorChannelB, amountToMix){
 						    var channelA = colorChannelA*amountToMix;
