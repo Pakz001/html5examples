@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	window.addEventListener("resize", resizeHandler,false);	
+	//resizeHandler();
+
+	gameloop=setInterval(doGameLoop,16);
+	
+		//
+	// Temp palette
+	var palette = [];
+	palette.push({r:0,g:0,b:0,a:255});//black
+	palette.push({r:255,g:255,b:255,a:255});//white
+	palette.push({r:160,g:61,b:112,a:255});// base
+	palette.push({r:135,g:44,b:94,a:255});//base -1
+	palette.push({r:107,g:22,b:68,a:255}); // darkest
+	palette.push({r:219,g:115,b:146,a:255}); //light
+	palette.push({r:196,g:76,b:120,a:255});//light -1
+	palette.push({r:210,g:156,b:151,a:255});//hightlight	
+	palette.push({r:200,g:131,b:131,a:255});//hightlight
+	-1
+
+	// create new array and copy this array into it (all fields)
+	var palette2 = JSON.parse(JSON.stringify(palette));	
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;	
+	var x=y=w=h=0;
+	var xa=[];
+	var ya=[];
+	var wa=[];
+	var ha=[];
+	for(var i=0; i<60;i++){
+		w = Math.random()*50;
+		w+=32;
+		h = Math.random()*32;
+		h+=32;
+		//drawButton(x,y,w,h);
+		if(i>20){
+			w*=2;
+			h*=2;
+		}
+		if(i>40){
+			w*=2;
+			h*=2;
+		}
+		
+		xa.push(x);
+		ya.push(y);
+		wa.push(w);
+		ha.push(h);
+		x+=w*1.5;
+		if(x>window.innerWidth-100){
+			y+=100;
+			x=0;
+		}
+	}
+
+	
+	
+	function doGameLoop(){
+		//cls(0);
+		ctx.fillStyle="#555555";
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		for(var i=0;i<xa.length;i++){
+			drawButton2(xa[i],ya[i],wa[i],ha[i]);
+		}
+		if(Math.random()<.01)randomizePalette();
+	}
+	//
+	// Draw a horizontal or vertical slider for brush size.
+	//
+	function drawButton2(x,y,w,h,ps=3){
+		//drawRect2(x,y,w,h,0);
+
+		setColor(0);
+		var left = x;
+		var right = x+w;
+		var bottom = y+h;
+		var top = y;
+		
+		//outer edge..
+		ctx.fillRect(left,bottom,w,ps+2);//bottom center
+		ctx.fillRect(left,bottom,ps,-(h-2*ps));//left center
+		ctx.fillRect(left+ps*2,top,w-4*ps,ps);//top center
+		ctx.fillRect(right-ps,bottom,ps,-(h-2*ps));//right center
+		ctx.fillRect(left+ps,top+ps,ps,ps); // dot left top
+		ctx.fillRect(right-ps*2,top+ps,ps,ps); // dot left top
+		//
+		// top area
+		texLine(left+ps*2,top+ps,(w/(ps*2)),[2,8,7]);
+		texLine(right-ps*3,top+ps,-(w/(ps*2)),[2,8,7]);		
+		texLine(left+ps,top+ps*2,(w/(ps*2)),[2,8,7]);
+		texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,8,7]);		
+		
+		//center mid part left to right
+		for(var i=0;i<h/8;i++){
+			top+=ps;
+			texLine(left+ps,top+ps*2,(w/(ps*2)),[3,7]);
+			texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[3,7]);		
+		}
+		
+		//top+=h/10;
+		// bottom area
+		texLine(left+ps,top+ps,(w/(ps*2)),[3,8,7]);
+		texLine(right-ps*2,top+ps,-(w/(ps*2)),[3,8,7]);		
+		
+		texLine(left+ps,top+ps*2,(w/(ps*2)),[2,3,8,7]);
+		texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,3,8,7]);		
+
+		texLine(left+ps,top+ps*3,(w/(ps*2)),[3,4]);
+		texLine(right-ps*2,top+ps*3,-(w/(ps*2)),[3,4]);		
+				
+		top+=ps;
+		// Bottom dark
+		setColor(4);
+		do{
+			ctx.fillRect(left+ps,top+ps*3,w-ps*2,ps);
+			top+=ps;
+		}while(top+(ps*3)<bottom);
+		
+		function texLine(x,y,stp,tx){
+		//var tx = [2,8,1];
+		//var y = top+6;
+		//var x = left+6;
+		//var stp = 10;
+		var direc = 1;
+		if(stp<0)direc=-1;
+		var x1 = x;
+		var n = 0;
+		var e=0;
+		do{
+			setColor(tx[n]);
+			ctx.fillRect(x1,y,ps+1,ps+1);
+			x1+=(direc*ps);
+			n++;
+			if(n>=tx.length)n=tx.length-1;
+			e++;
+			
+		}while(e<Math.abs(stp));
+
+		}	
+	}	
+	//
+	// Draw a horizontal or vertical slider for brush size.
+	//
+	function drawButton(x,y,w,h){
+		//drawRect2(x,y,w,h,0);
+		setColor(0);
+		var left = x;
+		var right = x+w;
+		var bottom = y+h;
+		var top = y;
+		
+		//outer edge..
+		ctx.fillRect(left,bottom,w,3);//bottom center
+		ctx.fillRect(left,bottom,3,-(h-2*3));//left center
+		ctx.fillRect(left+6,top,w-4*3,3);//top center
+		ctx.fillRect(right-3,bottom,3,-(h-2*3));//right center
+		ctx.fillRect(left+3,top+3,3,3); // dot left top
+		ctx.fillRect(right-3*2,top+3,3,3); // dot left top
+		//
+		// top area
+		texLine(left+6,top+3,(w/6),[2,8,7]);
+		texLine(right-9,top+3,-(w/6),[2,8,7]);		
+		texLine(left+3,top+6,(w/6),[2,8,7]);
+		texLine(right-6,top+6,-(w/6),[2,8,7]);		
+		
+		//center mid part left to right
+		for(var i=0;i<h/8;i++){
+			top+=3;
+			texLine(left+3,top+6,(w/6),[3,7]);
+			texLine(right-6,top+6,-(w/6),[3,7]);		
+		}
+		
+		//top+=h/10;
+		// bottom area
+		texLine(left+3,top+3,(w/6),[3,8,7]);
+		texLine(right-6,top+3,-(w/6),[3,8,7]);		
+		
+		texLine(left+3,top+6,(w/6),[2,3,8,7]);
+		texLine(right-6,top+6,-(w/6),[2,3,8,7]);		
+
+		texLine(left+3,top+9,(w/6),[3,4]);
+		texLine(right-6,top+9,-(w/6),[3,4]);		
+				
+		top+=3;
+		// Bottom dark
+		setColor(4);
+		do{
+			ctx.fillRect(left+3,top+9,w-6,3);
+			top+=3;
+		}while(top+9<bottom);
+		
+		function texLine(x,y,stp,tx){
+		//var tx = [2,8,1];
+		//var y = top+6;
+		//var x = left+6;
+		//var stp = 10;
+		var direc = 1;
+		if(stp<0)direc=-1;
+		var x1 = x;
+		var n = 0;
+		var e=0;
+		do{
+			setColor(tx[n]);
+			ctx.fillRect(x1,y,3+1,3+1);
+			x1+=(direc*3);
+			n++;
+			if(n>=tx.length)n=tx.length-1;
+			e++;
+			
+		}while(e<Math.abs(stp));
+
+		}	
+	}
+	
+	
+	// helper functions
+	//
+	//
+	// draw outline rect
+	// x,y,w,h,palette color, line width.
+	function outlineRect2(x,y,w,h,c,lineWidth=1){
+		ctx.beginPath();
+		ctx.lineWidth = lineWidth;
+		ctx.strokeStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+		ctx.rect(x,y,w,h);
+		ctx.stroke();
+	}
+	
+	function drawRect2(x,y,w,h,c){
+		setColor(c);
+		ctx.fillRect(x,y,w,h);
+	}
+	// clear screen using palette(c) color
+	function cls(c){
+		setColor(c);
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+	}
+	// set the fillstyle color of palette(c)
+	function setColor(c){
+		ctx.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+	}
+	function setCtxColor(can,c){
+		can.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+	}
+	//
+	// Helper functions
+	function rgbToHex(r, g, b) {
+  		return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+	}	
+	function hexToRgb(hex) {
+	  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	  return result ? {
+	    r: parseInt(result[1], 16),
+	    g: parseInt(result[2], 16),
+	    b: parseInt(result[3], 16)
+	  } : null;
+	}
+	//	
+	function resizeHandler(e){
+		e.preventDefault();
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;			
+	}	
+	function randomizePalette(){
+		// create new array and copy this array into it (all fields)
+		palette = JSON.parse(JSON.stringify(palette2));	
+
+		//palette[0].r=Math.random()*64;
+		//palette[0].g=Math.random()*64;
+		//palette[0].b=Math.random()*64;						
+		var g=(Math.random()*2)
+		if(Math.random()<.5)g-=1;
+		var s=Math.floor(Math.random()*3);
+		var g1=g2=g3=0;
+		if(Math.random()<.33)g1=g;
+		if(Math.random()<.33)g2=g;
+		if(Math.random()<.33)g3=g;						
+		for(var j=2;j<palette.length;j++){
+			if(s==0)palette[j].r*=g1;
+			if(s==1)palette[j].g*=g2;
+			if(s==2)palette[j].b*=g3;
+			if(palette[j].r>255)palette[j].r=255;
+			if(palette[j].g>255)palette[j].g=255;	
+			if(palette[j].b>255)palette[j].b=255;
+			if(palette[j].r<0)palette[j].r=0;
+			if(palette[j].g<0)palette[j].g=0;	
+			if(palette[j].b<0)palette[j].b=0;
+			
+		}	
+	}
+</script>
+</body>
+</html>
