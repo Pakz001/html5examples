@@ -232,15 +232,28 @@ Use different browser.
 			}	
 		}
 		*/
+		// Manhattan Distance (less precise)
+		//float distance(float x1,float y1,float x2,float y2){
+    	//	return (float)abs(x2-x1)+abs(y2-y1);
+		//	}
 		
 		//var angle = 1.0;
 		// draw entire brush in one color..
+		var ex = brush.length/2;
+		var ey = brush.length/2;
+		var ex2 = ex+(Math.cos(angle)*(brush.length/2));
+		var ey2 = ey+(Math.sin(angle)*(brush.length/2));		
 		for(var y=0;y<brush.length;y++){
 		for(var x=0;x<brush.length;x++){
 			var x2 = posX+x;
 			var y2 = posY+y;
 			if(x2<0 || y2<0 || x2>=surfaceWidth || y2>= surfaceHeight)continue;
-			if(brush[x][y]==1 && uiToolOverwrite==false)surface[x2][y2]=activePalette;
+			//var d = Math.abs(ex2-x)+Math.abs(ey2-y);
+			d = Math.sqrt( (x-ex2)*(x-ex2)+(y-ey2)*(y-ey2) );
+			
+			if(d<brush.length/1.8){
+				if(brush[x][y]==1 && uiToolOverwrite==false)surface[x2][y2]=activePalette;
+			}
 			//if(brush[x][y]==1 && uiToolOverwrite==true)surface[x2][y2]=temp3[x][y];
 
 		}}
@@ -253,13 +266,21 @@ Use different browser.
 		//edge(1,4,1.2); // line outer thickness and , depth to the center.
 				
 		//edge(2,6,.4); // line outer thickness and , depth to the center.
+		//edge(2,8,.55); // line outer thickness and , depth to the center.
+		//edge(2,6,.44); // line outer thickness and , depth to the center.2,4,.44
+		//edge(1,4,.9); // line outer thickness and , depth to the center.1,4,.9
+
 		edge(2,8,.55); // line outer thickness and , depth to the center.
 		edge(2,6,.44); // line outer thickness and , depth to the center.2,4,.44
 		edge(1,4,.9); // line outer thickness and , depth to the center.1,4,.9
-				
+		//blackline(2,8,.55); // line outer thickness and , depth to the center.
+		//blackline(2,6,.44); // line outer thickness and , depth to the center.2,4,.44
+		//blackline(1,4,.9); // line outer thickness and , depth to the center.1,4,.9
+		
+		
 		//add some smudges
 		var col=3;
-		for(var i=0;i<brush.length;i++){
+		for(var i=0;i<brush.length/8;i++){
 			if(Math.random()<.5)col=3;
 			if(Math.random()<.5)col=6;
 			var x2 = Math.floor(Math.random()*brush.length);
@@ -297,6 +318,7 @@ Use different browser.
 		//edge(2,6,.9); // line outer thickness and , depth to the center.
 				
 		//edge(4,6,.3); // line outer thickness and , depth to the center.
+		
 		
 		function edge(t,deep,rad){
 			var col1;
@@ -633,6 +655,33 @@ Use different browser.
 		
 	}
 	
+	
+	//
+	// Make a standard brush (radius)
+	// brush[x][y]
+	// 0 is nothing
+	// 1 is valid
+	function makeSquareBrush(r){
+		r+=2;
+		brush = [];
+		for(var i=0;i<r;i++){
+			brush[i] = new Array();
+			for(var j=0;j<r;j++){
+				brush[i][j]=0;
+			}
+		}			
+		var radius = ((r-3)/2);
+		for(var y2=-radius;y2<=radius;y2++){
+		for(var x2=-radius;x2<=radius;x2++){
+			//if((y2*y2+x2*x2) <= radius*radius+radius*0.8){
+				var x3 = Math.round(x2+r/2);
+				var y3 = Math.round(y2+r/2);
+				if(x3>0 && y3>0 && x3<r && y3<r){
+					brush[x3-1][y3-1] = 1;
+				}
+			//}
+		}}		
+	}	
 	//
 	// Make a standard brush (radius)
 	// brush[x][y]
