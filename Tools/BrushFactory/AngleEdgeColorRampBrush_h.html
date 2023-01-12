@@ -49,6 +49,16 @@ Use different browser.
 	// slider position of the brush size
 	var uiBrushSliderPos=132;	
 	
+	var paletteCart01 = [];
+	paletteCart01.push({r:0,g:0,b:0,a:255});//black
+	paletteCart01.push({r:4,g:12,b:6,a:255});
+	paletteCart01.push({r:17,g:35,b:24,a:255});
+	paletteCart01.push({r:30,g:58,b:41,a:255});
+	paletteCart01.push({r:48,g:93,b:66,a:255});
+	paletteCart01.push({r:77,g:128,b:97,a:255});
+	paletteCart01.push({r:137,g:162,b:87,a:255});
+	paletteCart01.push({r:190,g:220,b:127,a:255});
+	paletteCart01.push({r:238,g:255,b:204,a:255});
 	
 	//
 	// Temp palette
@@ -63,6 +73,10 @@ Use different browser.
 	palette.push({r:210,g:156,b:151,a:255});//hightlight	
 	palette.push({r:200,g:131,b:131,a:255});//hightlight
 	-1
+	
+	for(var i=0;i<paletteCart01.length;i++){
+		palette.push({r:paletteCart01[i].r,g:paletteCart01[i].g,b:paletteCart01[i].b,a:255})
+	}
 
 	// create new array and copy this array into it (all fields)
 	var palette2 = JSON.parse(JSON.stringify(palette));	
@@ -113,6 +127,7 @@ Use different browser.
 	var brushLastAngle = 0;
 	var brushFX1 = 2;
 	var uiBrushFX1SliderPos = 10;
+	var uiPaletteCartActive = 0;
 	
 	//console.log(rgbToHex(50,50,50));
 	//console.log(hexToRgb("#323232").r);
@@ -168,6 +183,7 @@ Use different browser.
 			uiBrushTimeOut-=1;
 		}
 		drawPaletteBar(activePalette);
+		drawPaletteCart();
 		drawBrushSizeSlider();
 		drawBrushFXSlider1();
 		drawColorBar();
@@ -180,7 +196,25 @@ Use different browser.
 	// color 6 = highlight
 	function smudgeHillBrush(posX,posY,angle=1){
 		
+		var kleur = [];
 		
+		kleur.push(1);
+		kleur.push(2);
+		kleur.push(3);
+		kleur.push(4);
+		kleur.push(5);
+		kleur.push(6);
+		kleur.push(7);
+		kleur.push(8);
+		if(uiPaletteCartActive){
+		kleur[3]=2+9;
+		kleur[2]=3+9;
+		kleur[1]=4+9;
+		kleur[4]=6+9;
+		kleur[5]=5+9;
+		kleur[6]=8+9;
+		kleur[7]=7+9;
+		}		
 		var r=64;
 		temp2 = [];
 		for(var i=0;i<r;i++){
@@ -276,10 +310,10 @@ Use different browser.
 			if(y2+4>brush.length)continue;
 			var nx2=4;
 			var ny2=4;
-			if(col==3){
-				col=5;
+			if(col==kleur[2]){
+				col=kleur[4];
 			}else{
-				col=3;
+				col=kleur[2];
 			}
 			for(var x3=x2;x3<x2+nx2;x3++){
 				for(var y3=y2;y3<y2+ny2;y3++){
@@ -287,7 +321,7 @@ Use different browser.
 					var x4 = x3+posX;
 					var y4 = y3+posY;
 					if(x4<0 || y4<0 || x4>=surfaceWidth || y4>=surfaceHeight)continue;
-					if(surface[x4][y4]!=2)continue;
+					if(surface[x4][y4]!=kleur[1])continue;
 					if(Math.random()<.2)nx2-=1;
 					if(Math.random()<.2)ny2-=1;
 					
@@ -306,14 +340,14 @@ Use different browser.
 			var col2;
 			var direc =0;
 		if(angle>0){
-			col1 = 3;//4
-			col2 = 5;
+			col1 = kleur[2];//4
+			col2 = kleur[4];
 			direc=1;
 
 			//console.log("b");
 		}else{
-			col1 = 5;
-			col2 = 4;//4
+			col1 = kleur[4];
+			col2 = kleur[3];//4
 			//deep*=1.5;
 			direc=2;
 			//console.log("a");
@@ -356,47 +390,47 @@ Use different browser.
 									var done=false;
 								if(direc==1 && flag>deep/3 && flag<deep/2){//1.5
 								if(angle2>angle-(rad/2) && angle2<angle+(rad/2)){
-									surface[x4][y4] = 7;
+									surface[x4][y4] = kleur[6];
 									done=true;
 								}//1.6
 								}
 								if(direc==1 && flag>deep/3 && flag<deep/2.5){//1.5
 								if(done==false && angle2>angle-(rad/1.2) && angle2<angle+(rad/1.2)){
-										surface[x4][y4] = 8;
+										surface[x4][y4] = kleur[7];
 										done=true;	
 								}}//}
 								// inside of bottom left
 								if(done==false && direc==1 && flag>4 ){//1.5
 								if(done==false && angle2>angle-(rad/1.2) && angle2<angle+(rad/1.2)){
-										surface[x4][y4] = 6;
+										surface[x4][y4] = kleur[6];
 										done=true;	
 									}}//}
 								
 								//top right
 								if(direc==2 && flag>1 && flag<deep/3){//0. + 4+1
 									if(angle2>angle-(rad/2) && angle2<angle+(rad/2)){
-										surface[x4][y4] = 7;
+										surface[x4][y4] = kleur[6];
 										done=true;
 									}}
 								if(direc==2 && flag>0 && flag<deep/3){//0. + 4+1
 									if(done==false && angle2>angle-(rad/1.2) && angle2<angle+(rad/1.2)){
-										surface[x4][y4] = 8;
+										surface[x4][y4] = kleur[7];
 										done=true;
 									}									
 								}//}
 								// bottom of top right
 								if(direc==2 && flag>5 && flag<deep){//0. + 4+1
 									if(done==false && angle2>angle-(rad/1.2) && angle2<angle+(rad/1.2)){
-										//surface[x4][y4] = 3;
+										surface[x4][y4] = kleur[2];
 										done=true;
 									}									
 								}//}$
 								
 								if(done==false)surface[x4][y4] =color;//
 								//outer edge bottom right darkest
-								if(direc==1 && done==false && flag<2 && color==3 && angle2<angle+.2)surface[x4][y4] = 4;
+								if(direc==1 && done==false && flag<2 && color==3 && angle2<angle+.2)surface[x4][y4] = kleur[3];
 								//upper edges left side bit lighter
-								if(direc==2 && done==false && flag>0 && flag<5 && color==4 && angle2<angle-.5)surface[x4][y4] = 3;
+								if(direc==2 && done==false && flag>0 && flag<5 && color==4 && angle2<angle-.5)surface[x4][y4] = kleur[2];
 							}
 							tick = true;
 						}
@@ -525,7 +559,7 @@ Use different browser.
 		var w = window.innerWidth/20;
 		var h = w;
 		if(window.innerHeight>window.innerWidth)h-=h/6;
-		var y=window.innerHeight-(w*3);
+		var y=window.innerHeight-(w*4);
 		for(var i=0;i<3;i++){
 			if(i==0)w*=2;
 			if(i==1)w/=2;
@@ -770,6 +804,27 @@ Use different browser.
 			x+=w;
 		}
 	}	
+
+	//
+	// Draw a strip of colors from the palette[];
+	function drawPaletteCart(cart=0){
+		var x=0;
+		var w = window.innerWidth/20;
+		var h = w;
+		var y=window.innerHeight-w*3;
+		for(var i=0;i<paletteCart01.length;i++){
+			drawButton(x,y,w,h-4,depth=.5,ps=3);
+		
+			drawPaletteRectCart(x+12,y+12,w-24,h/2,i);
+			touchCollision.push({x:x,y:y,w:w,h:h,id:5,data:i});
+			//var uiPaletteCartActive = 0;			
+			if(i==uiPaletteCartActive){ // if highlight needed
+				outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
+				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
+			}
+			x+=w;
+		}
+	}	
 	
 	//
 	// Draw a strip of colors from the palette[];
@@ -778,7 +833,7 @@ Use different browser.
 		var w = window.innerWidth/20;
 		var h = w;
 		var y=window.innerHeight-w*2;
-		for(var i=0;i<palette.length;i++){
+		for(var i=0;i<9;i++){
 			drawButton(x,y,w,h-4,depth=.5,ps=3);
 		
 			drawPaletteRect(x+12,y+12,w-24,h/2,i);
@@ -793,6 +848,13 @@ Use different browser.
 	
 	//
 	// Draw a rectangle with a color from the palette[] inside it.
+	function drawPaletteRectCart(x,y,w,h,c){
+		outlineRect(x,y,w,h,0,3);
+		drawRectCart(x+1,y+1,w-2,h-2,c);
+	}
+	
+	//
+	// Draw a rectangle with a color from the palette[] inside it.
 	function drawPaletteRect(x,y,w,h,c){
 		outlineRect(x,y,w,h,0,3);
 		drawRect(x+1,y+1,w-2,h-2,c);
@@ -801,6 +863,15 @@ Use different browser.
 	// helper functions
 	//
 	//
+	
+	// helper functions
+	//
+	//
+	function drawRectCart(x,y,w,h,c){
+		setColorCart(c);
+		ctx.fillRect(x,y,w,h);
+	}
+	
 	function drawRect(x,y,w,h,c){
 		setColor(c);
 		ctx.fillRect(x,y,w,h);
@@ -811,12 +882,18 @@ Use different browser.
 		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 	}
 	// set the fillstyle color of palette(c)
+	function setColorCart(c){
+		ctx.fillStyle = "rgb("+paletteCart01[c].r+","+paletteCart01[c].g+","+paletteCart01[c].b+","+paletteCart01[c].a+")";
+	}
+	
+	// set the fillstyle color of palette(c)
 	function setColor(c){
 		ctx.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
 	}
 	function setCtxColor(can,c){
 		can.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
 	}
+
 	
 	// draw outline rect
 	// x,y,w,h,palette color, line width.
@@ -1069,6 +1146,7 @@ Use different browser.
 				//surfaceBuffer=1
 			}
 			drawPaletteBar(activePalette);
+			drawPaletteCart();
 			drawBrushSizeSlider();
 			drawBrushFXSlider1();			
 			drawColorBar();		
@@ -1194,6 +1272,7 @@ Use different browser.
 					//surfaceBuffer=1
 				}
 				drawPaletteBar(activePalette);
+				drawPaletteCart();
 				drawBrushSizeSlider();
 				drawBrushFXSlider1();				
 				drawColorBar();		
@@ -1268,6 +1347,7 @@ Use different browser.
 						//surfaceBuffer=1
 					}
 					drawPaletteBar(activePalette);
+					drawPaletteCart();
 					drawBrushSizeSlider();
 					drawBrushFXSlider1();	
 					drawColorBar();		
@@ -1321,6 +1401,7 @@ Use different browser.
 						//surfaceBuffer=1
 					}
 					drawPaletteBar(activePalette);
+					drawPaletteCart();
 					drawBrushSizeSlider();
 					drawBrushFXSlider1();					
 					drawColorBar();		
@@ -1439,6 +1520,7 @@ Use different browser.
 			//
 			// Tool Section Buttons
 			for(var i=0;i<touchCollision.length;i++){
+				
 				if(touchCollision[i].id==3){
 					var x = touchCollision[i].x;
 					var y = touchCollision[i].y;
@@ -1472,6 +1554,16 @@ Use different browser.
 			//
 			// Palette selection boxes
 			for(var i=0;i<touchCollision.length;i++){
+				if(touchCollision[i].id==5){
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						uiPaletteCartActive = touchCollision[i].data;
+						uiActiveTime=30;						
+					}
+				}				
 				if(touchCollision[i].id==1){
 					var x = touchCollision[i].x;
 					var y = touchCollision[i].y;
@@ -1555,6 +1647,17 @@ Use different browser.
 							palette[1].r = mix(palette[7].r,palette[1].r,.5);
 							palette[1].g = mix(palette[7].g,palette[1].g,.5);
 							palette[1].b = mix(palette[7].b,palette[1].b,.5);
+							/*
+							if(Math.random()<.5){
+								palette[4]=paletteCart01[2];
+								palette[3]=paletteCart01[3];
+								palette[2]=paletteCart01[4];
+								palette[5]=paletteCart01[6];
+								palette[6]=paletteCart01[5];
+								palette[7]=paletteCart01[8];
+								palette[8]=paletteCart01[7];								
+							}
+							*/
 							
 							// stack overflow
 							function mix(colorChannelA, colorChannelB, amountToMix){
