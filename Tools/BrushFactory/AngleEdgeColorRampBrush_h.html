@@ -89,6 +89,7 @@ Use different browser.
 	var surfaceCameraY = 0;
 	var updateSurface = false; // update surface next frame.
 	var surfaceBuffer = 0;
+	
 			//uiPinchStart = true;
 			//uiPinchStartScale = canvasScale;
 			//if(activeCanvas==threeCanvas)uiPinchStartScale = threeScale;
@@ -110,6 +111,8 @@ Use different browser.
 	var brushMode = 2;	
 	var brushActive = false;
 	var brushLastAngle = 0;
+	var brushFX1 = 2;
+	var uiBrushFX1SliderPos = 10;
 	
 	//console.log(rgbToHex(50,50,50));
 	//console.log(hexToRgb("#323232").r);
@@ -192,6 +195,7 @@ Use different browser.
 		}
 		drawPaletteBar(activePalette);
 		drawBrushSizeSlider();
+		drawBrushFXSlider1();
 		drawColorBar();
 		drawToolBar();
 		
@@ -251,7 +255,7 @@ Use different browser.
 			//var d = Math.abs(ex2-x)+Math.abs(ey2-y);
 			d = Math.sqrt( (x-ex2)*(x-ex2)+(y-ey2)*(y-ey2) );
 			
-			if(d<brush.length/1.8){
+			if(d<(brush.length*brushFX1)){
 				if(brush[x][y]==1 && uiToolOverwrite==false)surface[x2][y2]=activePalette;
 			}
 			//if(brush[x][y]==1 && uiToolOverwrite==true)surface[x2][y2]=temp3[x][y];
@@ -614,6 +618,27 @@ Use different browser.
 		}
 	}
 	
+	//
+	// Draw a horizontal or vertical slider for brush size.
+	//
+	function drawBrushFXSlider1(){
+		var x = window.innerWidth*.50;
+		var y = window.innerHeight*.90;
+		var w = window.innerWidth/3;
+		var h = window.innerHeight/32;
+		
+		drawButton(x,y,w,h);
+		drawRect(x+12,y+h/4,w-24,h/2,0);
+		//outlineRect(x,y,w,h,1,5);
+		sliderPos = uiBrushFX1SliderPos;
+		//var brushFX = 2;
+		//var uiBrushFXSliderPos = 10;
+	
+		drawButton(x+sliderPos,y-4,24,h+8,.5,2);
+		//drawRect(x+sliderPos,y,16,h,1);
+		//outlineRect(x+sliderPos,y,16,h,1,5);
+		touchCollision.push({x:x,y:y-6,w:w,h:h+12,id:4});
+	}	
 	//
 	// Draw a horizontal or vertical slider for brush size.
 	//
@@ -1035,6 +1060,7 @@ Use different browser.
 			}
 			drawPaletteBar(activePalette);
 			drawBrushSizeSlider();
+			drawBrushFXSlider1();			
 			drawColorBar();		
 			drawToolBar();
 			//pinchDragCoolDown = 0;
@@ -1159,6 +1185,7 @@ Use different browser.
 				}
 				drawPaletteBar(activePalette);
 				drawBrushSizeSlider();
+				drawBrushFXSlider1();				
 				drawColorBar();		
 				drawToolBar();
 				updateSurface = true;
@@ -1232,6 +1259,7 @@ Use different browser.
 					}
 					drawPaletteBar(activePalette);
 					drawBrushSizeSlider();
+					drawBrushFXSlider1();	
 					drawColorBar();		
 					drawToolBar();
 					//var brushLastAngle = 0;	
@@ -1284,6 +1312,7 @@ Use different browser.
 					}
 					drawPaletteBar(activePalette);
 					drawBrushSizeSlider();
+					drawBrushFXSlider1();					
 					drawColorBar();		
 					drawToolBar();
 					//var brushLastAngle = 0;	
@@ -1313,6 +1342,39 @@ Use different browser.
 			if(e.changedTouches.length==1 && pinchDragCoolDown>20 && brushActive==false){		
 			
 				for(var i=0;i<touchCollision.length;i++){
+			//
+			// Brush FX 1  Slider position // smudge smear
+
+
+
+				if(touchCollision[i].id==4){
+
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						// set new slider position
+						// uiBrushSliderPos
+						//	var brushRoundSize = 32;
+						// makeRoundBrush(brushRoundSize);
+						//	var maxBrushRoundSize = 32;
+						// var minBrushRoundSize = 1;
+						//var brushFX1 = 2;
+						//var uiBrushFX1SliderPos = 10;
+	
+						
+						var step = 2/w;//maxBrushRoundSize/w;
+						var p = uiTouchLastX-x;
+						uiBrushFX1SliderPos = p;
+						if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+						brushFX1 = (uiBrushFX1SliderPos*step)-1;						
+						//if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						//uiBrushTimeOut=30;		
+						uiActiveTime=30;				
+					}
+				}					
 					if(touchCollision[i].id==0){
 						var x = touchCollision[i].x;
 						var y = touchCollision[i].y;
@@ -1481,7 +1543,40 @@ Use different browser.
 					}
 				}
 			}
-			
+			//
+			// Brush FX 1  Slider position // smudge smear
+
+			for(var i=0;i<touchCollision.length;i++){
+
+				if(touchCollision[i].id==4){
+
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+						// set new slider position
+						// uiBrushSliderPos
+						//	var brushRoundSize = 32;
+						// makeRoundBrush(brushRoundSize);
+						//	var maxBrushRoundSize = 32;
+						// var minBrushRoundSize = 1;
+						//var brushFX1 = 2;
+						//var uiBrushFX1SliderPos = 10;
+	
+						
+						var step = 2/w;//maxBrushRoundSize/w;
+						var p = uiTouchLastX-x;
+						uiBrushFX1SliderPos = p;
+						if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+						brushFX1 = (uiBrushFX1SliderPos*step)-1;						
+						//if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						//uiBrushTimeOut=30;		
+						uiActiveTime=30;				
+					}
+				}
+			}			
 			//
 			// Brush size  Slider position
 
