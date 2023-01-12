@@ -1374,13 +1374,44 @@ Use different browser.
 						//palette[0].r=Math.random()*64;
 						//palette[0].g=Math.random()*64;
 						//palette[0].b=Math.random()*64;						
+
+						var r=(Math.random()*255);
+						var g=(Math.random()*255);
+						var b=(Math.random()*255);
+						if(Math.random()<.66)r=0;
+						if(Math.random()<.66)g=0;
+						if(Math.random()<.66)b=0;
+						//r=0;
+						//g=255;
+						//b=0;
+						
+						for(var j=2;j<palette.length;j++){
+							palette[j].r=mix(palette[j].r,r,.7);
+							palette[j].g=mix(palette[j].g,g,.7);
+							palette[j].b=mix(palette[j].b,b,.7);							
+							if(palette[j].r>255)palette[j].r=255;
+							if(palette[j].g>255)palette[j].g=255;	
+							if(palette[j].b>255)palette[j].b=255;
+							if(palette[j].r<0)palette[j].r=0;
+							if(palette[j].g<0)palette[j].g=0;	
+							if(palette[j].b<0)palette[j].b=0;
+							
+						}
+						// stack overflow
+						function mix(colorChannelA, colorChannelB, amountToMix){
+						    var channelA = colorChannelA*amountToMix;
+						    var channelB = colorChannelB*(1-amountToMix);
+						    return parseInt(channelA+channelB);
+						}											
+						/*
 						var g=(Math.random()*2)
 						if(Math.random()<.5)g-=1;
 						var s=Math.floor(Math.random()*3);
 						var g1=g2=g3=0;
-						if(Math.random()<.33)g1=g;
-						if(Math.random()<.33)g2=g;
-						if(Math.random()<.33)g3=g;						
+						if(Math.random()<.66)g1=g;
+						if(Math.random()<.66)g2=g;
+						if(Math.random()<.66)g3=g;
+												
 						for(var j=2;j<palette.length;j++){
 							if(s==0)palette[j].r*=g1;
 							if(s==1)palette[j].g*=g2;
@@ -1393,6 +1424,7 @@ Use different browser.
 							if(palette[j].b<0)palette[j].b=0;
 							
 						}
+						*/
 						updateSurface=true;
 					}
 				}
