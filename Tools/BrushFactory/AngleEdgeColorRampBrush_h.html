@@ -43,7 +43,7 @@ Use different browser.
 	var uiBrushTimeOut = 0 // show brush change image on screen.
 	var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
 	var uiActiveTime = 0; // when at zero ui is no longer in use
-	var uiToolOverwrite = true;
+	var uiToolOverwrite = false;
 
 	// slider position of the brush size
 	var uiBrushSliderPos=132;	
@@ -214,6 +214,7 @@ Use different browser.
 		posX=Math.floor(posX-brush.length/2);
 		posY=Math.floor(posY-brush.length/2);
 
+		/*
 		if(uiToolOverwrite){
 			var r=64;
 			temp3 = [];
@@ -228,6 +229,7 @@ Use different browser.
 				}
 			}	
 		}
+		*/
 		
 		//var angle = 1.0;
 		// draw entire brush in one color..
@@ -237,7 +239,7 @@ Use different browser.
 			var y2 = posY+y;
 			if(x2<0 || y2<0 || x2>=surfaceWidth || y2>= surfaceHeight)continue;
 			if(brush[x][y]==1 && uiToolOverwrite==false)surface[x2][y2]=2
-			
+			//if(brush[x][y]==1 && uiToolOverwrite==true)surface[x2][y2]=temp3[x][y];
 
 		}}
 		
