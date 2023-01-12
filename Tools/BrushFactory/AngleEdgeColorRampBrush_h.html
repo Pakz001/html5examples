@@ -49,7 +49,7 @@ Use different browser.
 	// slider position of the brush size
 	var uiBrushSliderPos=132;	
 	
-	var paletteCart01 = [];
+	var paletteCart01 = []; //ammo-8
 	paletteCart01.push({r:0,g:0,b:0,a:255});//black
 	paletteCart01.push({r:4,g:12,b:6,a:255});
 	paletteCart01.push({r:17,g:35,b:24,a:255});
@@ -59,7 +59,19 @@ Use different browser.
 	paletteCart01.push({r:137,g:162,b:87,a:255});
 	paletteCart01.push({r:190,g:220,b:127,a:255});
 	paletteCart01.push({r:238,g:255,b:204,a:255});
+	//
 	
+	var paletteCart02 = []; //rust-gold-8
+	paletteCart02.push({r:0,g:0,b:0,a:255});//black
+	paletteCart02.push({r:246,g:205,b:38,a:255});
+	paletteCart02.push({r:172,g:107,b:38,a:255});
+	paletteCart02.push({r:86,g:50,b:38,a:255});
+	paletteCart02.push({r:51,g:28,b:23,a:255});
+	paletteCart02.push({r:187,g:127,b:87,a:255});
+	paletteCart02.push({r:114,g:89,b:86,a:255});
+	paletteCart02.push({r:57,g:57,b:57,a:255});
+	paletteCart02.push({r:32,g:32,b:32,a:255});
+
 	//
 	// Temp palette
 	var palette = [];
@@ -75,7 +87,7 @@ Use different browser.
 	-1
 	
 	for(var i=0;i<paletteCart01.length;i++){
-		palette.push({r:paletteCart01[i].r,g:paletteCart01[i].g,b:paletteCart01[i].b,a:255})
+		palette.push({r:paletteCart02[i].r,g:paletteCart02[i].g,b:paletteCart02[i].b,a:255})
 	}
 
 	// create new array and copy this array into it (all fields)
@@ -127,7 +139,9 @@ Use different browser.
 	var brushLastAngle = 0;
 	var brushFX1 = 2;
 	var uiBrushFX1SliderPos = 10;
-	var uiPaletteCartActive = 0;
+	var uiPaletteCartActive = 0; // current highlight in the palette cartridge
+	var uiPaletteCard = 1;
+	
 	
 	//console.log(rgbToHex(50,50,50));
 	//console.log(hexToRgb("#323232").r);
@@ -183,7 +197,7 @@ Use different browser.
 			uiBrushTimeOut-=1;
 		}
 		drawPaletteBar(activePalette);
-		drawPaletteCart();
+		drawPaletteCart(uiPaletteCard);
 		drawBrushSizeSlider();
 		drawBrushFXSlider1();
 		drawColorBar();
@@ -815,7 +829,7 @@ Use different browser.
 		for(var i=0;i<paletteCart01.length;i++){
 			drawButton(x,y,w,h-4,depth=.5,ps=3);
 		
-			drawPaletteRectCart(x+12,y+12,w-24,h/2,i);
+			drawPaletteRectCart(x+12,y+12,w-24,h/2,i,cart);
 			touchCollision.push({x:x,y:y,w:w,h:h,id:5,data:i});
 			//var uiPaletteCartActive = 0;			
 			if(i==uiPaletteCartActive){ // if highlight needed
@@ -848,9 +862,9 @@ Use different browser.
 	
 	//
 	// Draw a rectangle with a color from the palette[] inside it.
-	function drawPaletteRectCart(x,y,w,h,c){
+	function drawPaletteRectCart(x,y,w,h,c,cart){
 		outlineRect(x,y,w,h,0,3);
-		drawRectCart(x+1,y+1,w-2,h-2,c);
+		drawRectCart(x+1,y+1,w-2,h-2,c,cart);
 	}
 	
 	//
@@ -867,8 +881,8 @@ Use different browser.
 	// helper functions
 	//
 	//
-	function drawRectCart(x,y,w,h,c){
-		setColorCart(c);
+	function drawRectCart(x,y,w,h,c,cart){
+		setColorCart(c,cart);
 		ctx.fillRect(x,y,w,h);
 	}
 	
@@ -882,8 +896,12 @@ Use different browser.
 		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 	}
 	// set the fillstyle color of palette(c)
-	function setColorCart(c){
-		ctx.fillStyle = "rgb("+paletteCart01[c].r+","+paletteCart01[c].g+","+paletteCart01[c].b+","+paletteCart01[c].a+")";
+	function setColorCart(c,cart){
+		if(cart==0){
+			ctx.fillStyle = "rgb("+paletteCart01[c].r+","+paletteCart01[c].g+","+paletteCart01[c].b+","+paletteCart01[c].a+")";
+		}else if(cart==1){
+			ctx.fillStyle = "rgb("+paletteCart02[c].r+","+paletteCart02[c].g+","+paletteCart02[c].b+","+paletteCart02[c].a+")";
+		}
 	}
 	
 	// set the fillstyle color of palette(c)
@@ -1146,7 +1164,7 @@ Use different browser.
 				//surfaceBuffer=1
 			}
 			drawPaletteBar(activePalette);
-			drawPaletteCart();
+			drawPaletteCart(uiPaletteCard);
 			drawBrushSizeSlider();
 			drawBrushFXSlider1();			
 			drawColorBar();		
@@ -1272,7 +1290,7 @@ Use different browser.
 					//surfaceBuffer=1
 				}
 				drawPaletteBar(activePalette);
-				drawPaletteCart();
+				drawPaletteCart(uiPaletteCard);
 				drawBrushSizeSlider();
 				drawBrushFXSlider1();				
 				drawColorBar();		
@@ -1347,7 +1365,7 @@ Use different browser.
 						//surfaceBuffer=1
 					}
 					drawPaletteBar(activePalette);
-					drawPaletteCart();
+					drawPaletteCart(uiPaletteCard);
 					drawBrushSizeSlider();
 					drawBrushFXSlider1();	
 					drawColorBar();		
@@ -1401,7 +1419,7 @@ Use different browser.
 						//surfaceBuffer=1
 					}
 					drawPaletteBar(activePalette);
-					drawPaletteCart();
+					drawPaletteCart(uiPaletteCard);
 					drawBrushSizeSlider();
 					drawBrushFXSlider1();					
 					drawColorBar();		
@@ -1433,39 +1451,36 @@ Use different browser.
 			if(e.changedTouches.length==1 && pinchDragCoolDown>20 && brushActive==false){		
 			
 				for(var i=0;i<touchCollision.length;i++){
-			//
-			// Brush FX 1  Slider position // smudge smear
-
-
-
-				if(touchCollision[i].id==4){
-
-					var x = touchCollision[i].x;
-					var y = touchCollision[i].y;
-					var w = touchCollision[i].w;
-					var h = touchCollision[i].h;
-					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-						// set new slider position
-						// uiBrushSliderPos
-						//	var brushRoundSize = 32;
-						// makeRoundBrush(brushRoundSize);
-						//	var maxBrushRoundSize = 32;
-						// var minBrushRoundSize = 1;
-						//var brushFX1 = 2;
-						//var uiBrushFX1SliderPos = 10;
+					//
+					// Brush FX 1  Slider position // smudge smear
+					if(touchCollision[i].id==4){
 	
-						
-						var step = 3/w;//maxBrushRoundSize/w;
-						var p = uiTouchLastX-x;
-						uiBrushFX1SliderPos = p;
-						if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
-						brushFX1 = (uiBrushFX1SliderPos*step)-1;						
-						//if(brushFX1<0)brushFX1=0;
-						//console.log(brushFX1);
-						//uiBrushTimeOut=30;		
-						uiActiveTime=30;				
-					}
-				}					
+						var x = touchCollision[i].x;
+						var y = touchCollision[i].y;
+						var w = touchCollision[i].w;
+						var h = touchCollision[i].h;
+						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+							// set new slider position
+							// uiBrushSliderPos
+							//	var brushRoundSize = 32;
+							// makeRoundBrush(brushRoundSize);
+							//	var maxBrushRoundSize = 32;
+							// var minBrushRoundSize = 1;
+							//var brushFX1 = 2;
+							//var uiBrushFX1SliderPos = 10;
+		
+							
+							var step = 3/w;//maxBrushRoundSize/w;
+							var p = uiTouchLastX-x;
+							uiBrushFX1SliderPos = p;
+							if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+							brushFX1 = (uiBrushFX1SliderPos*step)-1;						
+							//if(brushFX1<0)brushFX1=0;
+							//console.log(brushFX1);
+							//uiBrushTimeOut=30;		
+							uiActiveTime=30;				
+						}
+					}					
 					if(touchCollision[i].id==0){
 						var x = touchCollision[i].x;
 						var y = touchCollision[i].y;
@@ -1617,6 +1632,14 @@ Use different browser.
 								bb=.2;
 								done=true;
 							}
+							if(Math.random()<.8){
+								aa=Math.random();
+								bb=Math.random();
+								cc=Math.random();
+								//bb=Math.random()/2+.5;
+								//cc=Math.random()/2+.5;
+							}
+							
 							
 							for(var j=2;j<palette.length/2;j++){
 								//var grey = palette[j].r+palette[j].g+palette[j].b;
@@ -1625,8 +1648,8 @@ Use different browser.
 								//palette[j].g=(g/255)*grey;
 								//palette[j].b=(b/255)*grey;
 								palette[j].r=mix(palette[j].r,r,aa);
-								palette[j].g=mix(palette[j].g,g,bb);
-								palette[j].b=mix(palette[j].b,b,cc);							
+								palette[j].g=mix(palette[j].g,r,bb);
+								palette[j].b=mix(palette[j].b,r,cc);							
 								
 								//palette[j].r=mix(palette[j].r,r,.7);
 								//palette[j].g=mix(palette[j].g,g,.7);
@@ -1639,6 +1662,13 @@ Use different browser.
 								if(palette[j].b<0)palette[j].b=0;
 								
 							}
+							for(var j=2;j<palette.length/2;j++){
+								var grey = (palette[j].r+palette[j].g+palette[j].b)/3;
+								palette[j].r=grey;
+								palette[j].g=grey;
+								palette[j].b=grey;
+							}
+							
 							// Mix black color with darkest color from palette
 							palette[0].r = mix(palette[4].r,palette[0].r,.5);
 							palette[0].g = mix(palette[4].g,palette[0].g,.5);
@@ -1699,7 +1729,7 @@ Use different browser.
 				}
 			}
 			//
-			// Brush FX 1  Slider position // smudge smear
+			// Brush FX 1 and brush size  Slider position // smudge smear
 
 			for(var i=0;i<touchCollision.length;i++){
 
@@ -1732,11 +1762,11 @@ Use different browser.
 						uiActiveTime=30;				
 					}
 				}
-			}			
+
 			//
 			// Brush size  Slider position
 
-			for(var i=0;i<touchCollision.length;i++){
+
 
 				if(touchCollision[i].id==0){
 					var x = touchCollision[i].x;
