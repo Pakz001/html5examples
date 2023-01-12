@@ -108,6 +108,7 @@ Use different browser.
 	var lastBrushPointY;
 	var brushMode = 2;	
 	var brushActive = false;
+	var brushLastAngle = 0;
 	
 	//console.log(rgbToHex(50,50,50));
 	//console.log(hexToRgb("#323232").r);
@@ -198,6 +199,8 @@ Use different browser.
 	
 	// color 6 = highlight
 	function smudgeHillBrush(posX,posY,angle=1){
+		
+		
 		var r=64;
 		temp2 = [];
 		for(var i=0;i<r;i++){
@@ -210,6 +213,22 @@ Use different browser.
 		//console.log(angle);
 		posX=Math.floor(posX-brush.length/2);
 		posY=Math.floor(posY-brush.length/2);
+
+		if(uiToolOverwrite){
+			var r=64;
+			temp3 = [];
+			for(var i=0;i<r;i++){
+				temp3[i] = new Array();
+				for(var j=0;j<r;j++){
+					if(i>=0 && j>=0 && i<surfaceWidth && j<surfaceHeight){
+						temp3[i][j]=surface[i+posX][j+posY];
+					}else{
+						temp3[i][j]=-1;
+					}
+				}
+			}	
+		}
+		
 		//var angle = 1.0;
 		// draw entire brush in one color..
 		for(var y=0;y<brush.length;y++){
@@ -217,7 +236,7 @@ Use different browser.
 			var x2 = posX+x;
 			var y2 = posY+y;
 			if(x2<0 || y2<0 || x2>=surfaceWidth || y2>= surfaceHeight)continue;
-			if(brush[x][y]==1)surface[x2][y2]=2
+			if(brush[x][y]==1 && uiToolOverwrite==false)surface[x2][y2]=2
 			
 
 		}}
@@ -1084,7 +1103,7 @@ Use different browser.
 					//console.log(d);
 					}
 					// method 1
-					var angle = 0;
+					var angle = brushLastAngle;
 					if(brushPositionHistory.length>2){
 						var x1 = brushPositionHistory[2].x;
 						var y1 = brushPositionHistory[2].y
@@ -1122,7 +1141,8 @@ Use different browser.
 					drawBrushSizeSlider();
 					drawColorBar();		
 					drawToolBar();
-		
+					//var brushLastAngle = 0;	
+					brushLastAngle = angle;
 					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
 					
 					//if(Math.random()<.05)updateSurface = true;
@@ -1345,7 +1365,7 @@ Use different browser.
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 
-					smudgeHillBrush(brushPointX,brushPointY);
+					smudgeHillBrush(brushPointX,brushPointY,brushLastAngle);
 					//console.log(brushPointX);
 				}
 					updateSurface = true;
