@@ -257,11 +257,11 @@ Use different browser.
 		//blackline(1,4,.9); // line outer thickness and , depth to the center.1,4,.9
 		
 		
-		if(brushFX1>1)return;
+		if(brushFX1<1)return;
 		//if(Math.random()<.1)console.log("a")
 		//add some smudges
 		var col=3;
-		for(var i=0;i<brush.length/4;i++){
+		for(var i=0;i<brush.length/2;i++){
 			if(Math.random()<.5)col=3;
 			if(Math.random()<.5)col=6;
 			var x2 = Math.floor(Math.random()*brush.length);
