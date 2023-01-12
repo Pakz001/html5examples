@@ -141,33 +141,7 @@ Use different browser.
 		if(pinchDragCoolDown<250)pinchDragCoolDown++;
 		if(uiActiveTime>0)uiActiveTime-=1;
 
-		if(updateSurface){
-			updateSurface = false;
-			oldSurfaceScale = surfaceScale;
-			//s+=16;
-			//console.log(s);
-			//oldSurfaceImage = surfaceImage;
-	
-			// now both hold the same values
-			if(surfaceBuffer==1){
-				surfaceImage = null;
-				surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
-				//surfaceBuffer=0;
-			}else{
-				oldSurfaceImage = null;
-				oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
-				//surfaceBuffer=1
-			}
-			if(surfaceBuffer==1){
-				surfaceBuffer=0;
-			}else{
-				surfaceBuffer=1;
-			}
-			ctx.fillStyle="#111111";
-			ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
-		
-			//surfaceImageBufferTime=2;
-		}
+		if(updateSurface==true)doUpdateSurface();
 		
 		//drawSurface(0,0,3);
 		
@@ -256,6 +230,7 @@ Use different browser.
 			d = Math.sqrt( (x-ex2)*(x-ex2)+(y-ey2)*(y-ey2) );
 			
 			if(d<(brush.length*brushFX1)){
+			//if(d<(brush.length*10)){	
 				if(brush[x][y]==1 && uiToolOverwrite==false)surface[x2][y2]=activePalette;
 			}
 			//if(brush[x][y]==1 && uiToolOverwrite==true)surface[x2][y2]=temp3[x][y];
@@ -264,7 +239,7 @@ Use different browser.
 		
 
  		
- 		if(brush.length<6)return; // if brush to small then no effect
+ 		//if(brush.length<4)return; // if brush to small then no effect
 		// wiggle back from angle and leave smudge(2 colors)
 
 		//edge(1,4,1.2); // line outer thickness and , depth to the center.
@@ -282,9 +257,11 @@ Use different browser.
 		//blackline(1,4,.9); // line outer thickness and , depth to the center.1,4,.9
 		
 		
+		if(brushFX1>1)return;
+		//if(Math.random()<.1)console.log("a")
 		//add some smudges
 		var col=3;
-		for(var i=0;i<brush.length/8;i++){
+		for(var i=0;i<brush.length/4;i++){
 			if(Math.random()<.5)col=3;
 			if(Math.random()<.5)col=6;
 			var x2 = Math.floor(Math.random()*brush.length);
@@ -410,7 +387,7 @@ Use different browser.
 								// bottom of top right
 								if(direc==2 && flag>5 && flag<deep){//0. + 4+1
 									if(done==false && angle2>angle-(rad/1.2) && angle2<angle+(rad/1.2)){
-										surface[x4][y4] = 3;
+										//surface[x4][y4] = 3;
 										done=true;
 									}									
 								}//}$
@@ -430,6 +407,39 @@ Use different browser.
 		}
 		
 	}	
+	
+	
+	
+	function doUpdateSurface(){
+		
+			updateSurface = false;
+			oldSurfaceScale = surfaceScale;
+			//s+=16;
+			//console.log(s);
+			//oldSurfaceImage = surfaceImage;
+	
+			// now both hold the same values
+			if(surfaceBuffer==1){
+				surfaceImage = null;
+				surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
+				//surfaceBuffer=0;
+			}else{
+				oldSurfaceImage = null;
+				oldSurfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale);
+				//surfaceBuffer=1
+			}
+			if(surfaceBuffer==1){
+				surfaceBuffer=0;
+			}else{
+				surfaceBuffer=1;
+			}
+			ctx.fillStyle="#111111";
+			ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		
+			//surfaceImageBufferTime=2;		
+	}
+	
+	
 	// angle x points of brush ends with two colors from palette. shade..
 	// brush ends with a color ramp edge at the inputted angle
 	function smudgeHillBrush2(posX,posY,angle=1){
@@ -1364,7 +1374,7 @@ Use different browser.
 						//var uiBrushFX1SliderPos = 10;
 	
 						
-						var step = 2/w;//maxBrushRoundSize/w;
+						var step = 3/w;//maxBrushRoundSize/w;
 						var p = uiTouchLastX-x;
 						uiBrushFX1SliderPos = p;
 						if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
@@ -1481,42 +1491,78 @@ Use different browser.
 							
 						// create new array and copy this array into it (all fields)
 						palette = JSON.parse(JSON.stringify(palette2));	
-		
-						//palette[0].r=Math.random()*64;
-						//palette[0].g=Math.random()*64;
-						//palette[0].b=Math.random()*64;						
-
-						var r=(Math.random()*255);
-						var g=(Math.random()*255);
-						var b=(Math.random()*255);
-						if(Math.random()<.66)r=0;
-						if(Math.random()<.66)g=0;
-						if(Math.random()<.66)b=0;
-						//r=0;
-						//g=255;
-						//b=0;
-						
-						for(var j=2;j<palette.length;j++){
-							palette[j].r=mix(palette[j].r,r,.7);
-							palette[j].g=mix(palette[j].g,g,.7);
-							palette[j].b=mix(palette[j].b,b,.7);							
-							if(palette[j].r>255)palette[j].r=255;
-							if(palette[j].g>255)palette[j].g=255;	
-							if(palette[j].b>255)palette[j].b=255;
-							if(palette[j].r<0)palette[j].r=0;
-							if(palette[j].g<0)palette[j].g=0;	
-							if(palette[j].b<0)palette[j].b=0;
+						if(Math.random()<.8){
+							//palette[0].r=Math.random()*64;
+							//palette[0].g=Math.random()*64;
+							//palette[0].b=Math.random()*64;						
+	
+							var r=(Math.random()*155);
+							var g=(Math.random()*155);
+							var b=(Math.random()*155);
+							//r+=100;
+							//g+=100;
+							//b+=100;
+							if(Math.random()<.22)r=0;
+							if(Math.random()<.22)g=0;
+							if(Math.random()<.22)b=0;
 							
+							//r=0;
+							//g=255;
+							//b=0;
+							var aa=.8;
+							var bb=.8;
+							var cc=.8;
+							var done=false;
+							if(Math.random()<.3){
+								b=Math.random()*128;
+								b+=128;
+								cc=.2;
+								done=true;
+							}
+							if(done==false && Math.random()<.3){
+								g=Math.random()*128;
+								g+=128;
+								bb=.2;
+								done=true;
+							}
+							
+							for(var j=2;j<palette.length;j++){
+								//var grey = palette[j].r+palette[j].g+palette[j].b;
+								//grey/=3;
+								//palette[j].r=(r/255)*grey;
+								//palette[j].g=(g/255)*grey;
+								//palette[j].b=(b/255)*grey;
+								palette[j].r=mix(palette[j].r,r,aa);
+								palette[j].g=mix(palette[j].g,g,bb);
+								palette[j].b=mix(palette[j].b,b,cc);							
+								
+								//palette[j].r=mix(palette[j].r,r,.7);
+								//palette[j].g=mix(palette[j].g,g,.7);
+								//palette[j].b=mix(palette[j].b,b,.7);							
+								if(palette[j].r>255)palette[j].r=255;
+								if(palette[j].g>255)palette[j].g=255;	
+								if(palette[j].b>255)palette[j].b=255;
+								if(palette[j].r<0)palette[j].r=0;
+								if(palette[j].g<0)palette[j].g=0;	
+								if(palette[j].b<0)palette[j].b=0;
+								
+							}
+							// Mix black color with darkest color from palette
+							palette[0].r = mix(palette[4].r,palette[0].r,.5);
+							palette[0].g = mix(palette[4].g,palette[0].g,.5);
+							palette[0].b = mix(palette[4].b,palette[0].b,.5);
+							// Mix white color with darkest color from palette
+							palette[1].r = mix(palette[7].r,palette[1].r,.5);
+							palette[1].g = mix(palette[7].g,palette[1].g,.5);
+							palette[1].b = mix(palette[7].b,palette[1].b,.5);
+							
+							// stack overflow
+							function mix(colorChannelA, colorChannelB, amountToMix){
+							    var channelA = colorChannelA*amountToMix;
+							    var channelB = colorChannelB*(1-amountToMix);
+							    return parseInt(channelA+channelB);
+							}
 						}
-						palette[0].r = mix(palette[4].r,palette[0].r,.5);
-						palette[0].g = mix(palette[4].g,palette[0].g,.5);
-						palette[0].b = mix(palette[4].b,palette[0].b,.5);
-						// stack overflow
-						function mix(colorChannelA, colorChannelB, amountToMix){
-						    var channelA = colorChannelA*amountToMix;
-						    var channelB = colorChannelB*(1-amountToMix);
-						    return parseInt(channelA+channelB);
-						}											
 						/*
 						var g=(Math.random()*2)
 						if(Math.random()<.5)g-=1;
@@ -1539,7 +1585,13 @@ Use different browser.
 							
 						}
 						*/
-						updateSurface=true;
+						doUpdateSurface()
+					//drawPaletteBar(activePalette);
+					//drawBrushSizeSlider();
+					//drawBrushFXSlider1();					
+					//drawColorBar();		
+					//drawToolBar();		
+					
 					}
 				}
 			}
@@ -1565,11 +1617,12 @@ Use different browser.
 						//var uiBrushFX1SliderPos = 10;
 	
 						
-						var step = 2/w;//maxBrushRoundSize/w;
+						var step = 3/w;//maxBrushRoundSize/w;
 						var p = uiTouchLastX-x;
 						uiBrushFX1SliderPos = p;
 						if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
-						brushFX1 = (uiBrushFX1SliderPos*step)-1;						
+						brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+						//console.log(brushFX1);			
 						//if(brushFX1<0)brushFX1=0;
 						//console.log(brushFX1);
 						//uiBrushTimeOut=30;		
