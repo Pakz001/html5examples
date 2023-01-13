@@ -126,6 +126,14 @@ Use different browser.
 			
 	
 	// brush
+	var brushName = [	"Pixel Brush",
+						"Color Brush",
+						"Texture Brush",
+						];
+						//"Borrow Brush",
+						//"Mister Brush",
+						//"Last Brush"];
+	var brushMode = 2;							
 	var brushPositionHistory = []; // holds the previous x positions of brush
 	var brushPushTime = 0; //if at the same spot long then increase this
 	var brush = [];
@@ -138,7 +146,7 @@ Use different browser.
 	var brushPointY;
 	var lastBrushPointX;
 	var lastBrushPointY;
-	var brushMode = 2;	
+	
 	var brushActive = false;
 	var brushLastAngle = 0;
 	var brushFX1 = 2;
@@ -588,14 +596,26 @@ Use different browser.
 		var h = w;
 		if(window.innerHeight>window.innerWidth)h-=h/6;
 		var y=window.innerHeight-(w*4);
-		for(var i=0;i<3;i++){
+		for(var i=0;i<2;i++){
 			if(i==0)w*=2;
-			if(i==1)w/=2;
+			if(i==1)w*=2;
 			drawButton(x,y,w,h-4,depth=.5,ps=3);
 		
 			
 			touchCollision.push({x:x,y:y,w:w,h:h,id:3,data:i});
-			if(i==2){
+			if(i==1){
+				drawPaletteRect(x+12,y+12,w-24,h/2,0);
+				setColor(1);
+				var sz=window.innerWidth/60;
+				var s=brushName[brushMode];
+				ctx.font = "bold "+sz+"px serif";				
+				//const metrics = ctx.measureText(s);
+				var q=0;
+				if(window.innerWidth<window.innerHeight)q=h/8;
+				ctx.fillText(s,x+w/5,(y+h/2)+q);								
+				
+			}
+			if(i==12){
 				drawPaletteRect(x+12,y+12,w-24,h/2,0);				
 				setColor(1);
 				var sz=window.innerWidth/36;
@@ -614,7 +634,7 @@ Use different browser.
 				ctx.fillText(s,x+w/4,(y+h/1.5)+q);
 				
 			}			
-			if(i==1){
+			if(i==11){
 				drawPaletteRect(x+12,y+12,w-24,h/2,0);				
 				setColor(1);
 				var sz=window.innerWidth/36;
@@ -651,10 +671,10 @@ Use different browser.
 				ctx.fillText(s,x+w/5,(y+h/2)+q);								
 				
 			}
-			if(i==uiToolSelected){ // if highlight needed
-				outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
-				outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
-			}
+			//if(i==uiToolSelected){ // if highlight needed
+			//	outlineRect(x+3,y+3,w-8,h-8,0,4); // draw rect inside the rect				
+			//	outlineRect(x+2,y+2,w-6,h-6,1,4); // draw rect inside the rect
+			//}
 
 			x+=w;
 		}		
@@ -843,7 +863,7 @@ Use different browser.
 		for(var i=0;i<paletteCart01.length;i++){
 			drawButton(x,y,w,h-4,depth=.5,ps=3);
 		
-			drawPaletteRectCart(x+12,y+12,w-24,h/2,i,cart);
+			if(i>0)drawPaletteRectCart(x+12,y+12,w-24,h/2,i,cart);
 			touchCollision.push({x:x,y:y,w:w,h:h,id:5,data:i});
 			//var uiPaletteCartActive = 0;			
 			if(i==uiPaletteCartActive){ // if highlight needed
@@ -1402,8 +1422,11 @@ Use different browser.
 			// Brush move
 			//
 			if(e.changedTouches.length===1 && uiActiveTime==0){			
-				if(brushMode==0 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
-
+				if(brushMode==1 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
+					var z=0;
+					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
+					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
+					
 					brushActive = true;
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
@@ -1414,11 +1437,16 @@ Use different browser.
 						if(val==0)continue;
 						var x2 = Math.floor((brushPointX+x1)-brushRoundSize/2);
 						var y2 = Math.floor((brushPointY+y1)-brushRoundSize/2);
-
+						
 						if(x2>=0 && x2<surfaceWidth && y2>=0 && y2<surfaceHeight){
 						//surface[brushPointX][brushPointY]=activePalette;
-
-							surface[x2][y2] = activePalette;
+							if(z==0){
+								surface[x2][y2] = activePalette;
+							}else{
+								surface[x2][y2] = z;
+							}
+						
+							//surface[x2][y2] = activePalette;
 
 						}
 					}
@@ -1448,13 +1476,23 @@ Use different browser.
 				}
 			}			
 			// plot pixel
-			if(brushMode==1 && pinchDragCoolDown>20 && uiActiveTime==0){//plot
+			if(brushMode==0 && pinchDragCoolDown>20 && uiActiveTime==0){//plot
 				if(e.changedTouches.length==1){
+					var z=0;
+					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
+					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
+					
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 					//console.log(brushPointX);
 					if(brushPointX>=0 && brushPointX<surfaceWidth && brushPointY>=0 && brushPointY<surfaceHeight){
-						surface[brushPointX][brushPointY]=activePalette;
+						//surface[brushPointX][brushPointY]=activePalette;
+						if(z==0){
+							surface[brushPointX][brushPointY] = activePalette;
+						}else{
+							surface[brushPointX][brushPointY] = z;
+						}
+						
 						updateSurface = true;
 					}
 				}
@@ -1567,9 +1605,22 @@ Use different browser.
 						}
 
 						if(dat==1){
-							uiToolSelected = 1;
-							brushMode = 2;
-							uiActiveTime=30;						
+//							uiToolSelected = 1;
+//							brushMode = 2;
+//							uiActiveTime=30;						
+							// If we press left side go back in list 
+							// If we press right side go forwards in list.
+							if(uiTouchLastX>x+w/2){
+								brushMode++;
+							}else{
+								brushMode-=1;
+							}
+							// Stay inside list
+							if(brushMode>=brushName.length)brushMode=0;
+							if(brushMode<0)brushMode=brushName.length-1;
+							// Set variable that tells when we visited ui.
+							uiActiveTime=30;
+							
 						}
 						if(dat==2){
 							uiToolSelected = 2;
@@ -1607,6 +1658,7 @@ Use different browser.
 					var h = touchCollision[i].h;
 					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
 						uiPaletteCartActive = touchCollision[i].data;
+						//console.log(uiPaletteCartActive);
 						uiActiveTime=30;						
 					}
 				}				
@@ -1844,11 +1896,14 @@ Use different browser.
 			//var brush = [];
 			//var brushRoundSize = 32;
 			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY && uiActiveTime==0){
-			if(brushMode==0 && uiTouchLastY<window.innerHeight*.8){//plot
+			if(brushMode==1 && uiTouchLastY<window.innerHeight*.8){//plot
 				
 				//console.log(pinchDragCoolDown);
 				if(e.changedTouches.length==1){
-
+					var z=0;
+					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
+					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
+						
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 					//console.log(brushPointX);
@@ -1862,7 +1917,11 @@ Use different browser.
 					if(x2>=0 && x2<surfaceWidth && y2>=0 && y2<surfaceHeight){
 						//surface[brushPointX][brushPointY]=activePalette;
 
-						surface[x2][y2] = activePalette;
+						if(z==0){
+							surface[x2][y2] = activePalette;
+						}else{
+							surface[x2][y2] = z;
+						}
 
 					}
 					}}
@@ -1871,13 +1930,23 @@ Use different browser.
 			}}
 			
 			// plot pixel
-			if(brushMode==1 && uiActiveTime==0){//plot
+			if(brushMode==0 && uiActiveTime==0){//plot
 				if(e.changedTouches.length==1){
+					var z=0;
+					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
+					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
+					
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 					//console.log(brushPointX);
 					if(brushPointX>=0 && brushPointX<surfaceWidth && brushPointY>=0 && brushPointY<surfaceHeight){
-						surface[brushPointX][brushPointY]=activePalette;
+						if(z==0){
+							surface[brushPointX][brushPointY] = activePalette;
+						}else{
+							surface[brushPointX][brushPointY] = z;
+						}
+						
+						//surface[brushPointX][brushPointY]=activePalette+z;
 						updateSurface = true;
 					}
 				}
