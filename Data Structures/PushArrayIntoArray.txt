@@ -1,0 +1,6 @@
+	var edge = [];
+	var sledge1 = [10,20,30];
+	var sledge2 = [30,20,10];
+	edge.push(sledge1);
+	edge.push(sledge2);
+	console.log(edge[1][0]);
