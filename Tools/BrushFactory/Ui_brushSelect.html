@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+		
+		var brushName = [	"Standard Brush",
+							"Mount Brush",
+							"Borrow Brush",
+							"Mister Brush"];
+		var brushMode = 0;					
+		
+		var c=document.getElementById("myCanvas");
+		var ctx=c.getContext("2d");
+		window.addEventListener("touchend", touchHandler,false);			
+		window.addEventListener("resize", resizeHandler,false);			
+		var uiTouchLastX = uiTouchLastY = 0;
+		var uiActiveTime=0; // count down from last pressed a user interface element.	
+		var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
+	
+		gameloop=setInterval(doGameLoop,16);
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		
+		function doGameLoop(){
+			
+			ctx.fillStyle="rgb(0,0,0)";
+			ctx.fillRect(0,0,c.width,c.height);
+			ctx.fillStyle="rgb(255,255,255)";
+			ctx.font = "bold "+12+"px serif";			
+			ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+			touchCollision = []; // reset touch collision when repopulate
+			drawBrushSelectionBox(); // draw tool and populate collision list
+		
+		
+		}
+		
+		function drawBrushSelectionBox(){
+			var x=window.innerWidth/3;
+			var y=window.innerHeight/3;
+			var w=window.innerWidth/3;
+			var h=window.innerWidth/20;
+			//
+			// Add the area into the collision list
+			touchCollision.push({x:x,y:y,w:w,h:h,id:0,data:0});//set these to program
+			// Draw the box..
+			ctx.fillStyle="#111111";
+			ctx.fillRect(x,y,w,h);
+			x+=1;
+			y+=1;
+			w-=2;
+			h-=2;
+			ctx.fillStyle="#666666";
+			ctx.fillRect(x,y,w,h);
+			x+=6;
+			y+=6;
+			w-=12;
+			h-=12;
+			ctx.fillStyle="#000000";
+			ctx.fillRect(x,y,w,h);
+			//
+			// Draw the text label
+			var sz = window.innerWidth/36;
+			ctx.font = "bold "+sz+"px serif";					
+			ctx.fillStyle="#eeeeee";
+			var metrics = ctx.measureText(brushName[brushMode]);
+			x+=metrics.width/2.5;
+			metrics = ctx.measureText("W");
+			y+=metrics.width*0.9;
+			ctx.fillText(brushName[brushMode],x,y);
+			
+			
+		}
+		
+		
+		function touchHandler(e){
+					
+			if(e.type=="touchend" && e.touches) {			
+				for(var i=0;i<e.changedTouches.length;i++){	
+					var x = e.changedTouches[i].clientX;
+					var y = e.changedTouches[i].clientY;				
+					uiTouchLastX = x;
+					uiTouchLastY = y;
+				}
+				
+				// Touch collisions..
+				// One list with every user interface element x,y,w,h,id,data
+				for(var i=0;i<touchCollision.length;i++){
+					// Collision with element id
+					if(touchCollision[i].id==0){
+						var x = touchCollision[i].x;
+						var y = touchCollision[i].y;
+						var w = touchCollision[i].w;
+						var h = touchCollision[i].h;
+						// Collision check finger and user interface element.
+						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+							brushMode++;
+							if(brushMode>=brushName.length)brushMode=0;
+							uiActiveTime=30;
+						}	
+					}
+				}				
+			}
+			
+		}
+		//
+		//
+		function resizeHandler(e){
+			e.preventDefault();
+			myCanvas.height = window.innerHeight-32;
+			myCanvas.width = window.innerWidth-32;			
+		}		
+	
+</script>
+</body>
+</html>
