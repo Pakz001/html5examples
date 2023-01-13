@@ -42,7 +42,7 @@ Use different browser.
 	var brushActive = false;	
 	
 	
-	gameloop=setInterval(doGameLoop,1);
+	gameloop=setInterval(doGameLoop,16);
 
 	//let storage = navigator.deviceMemory();
 	    //console.log(`Available: ${storage.quota/(1024*1024)}MiB`);
@@ -57,8 +57,8 @@ Use different browser.
 	var a = 0;
 	var aa = 0.1;
 	var s=0;
-	var e=s+5;
-	var sInc=0.1;
+	var e=5;
+	var eInc=0.4;
 	var wdt=15;
 	var wdtInc=0.1;
 	function doGameLoop(){
@@ -70,8 +70,9 @@ Use different browser.
 		ctx.fillText("Javascript Html canvas example.",10,10); 
 		
 		drawBrush(window.innerWidth/2,window.innerHeight/2);
-		drawBrushLayer(window.innerWidth/2,window.innerHeight/2,s,e,a,wdt);
-		a+=0.01;//aa;
+			// e is inside to the
+		drawBrushLayer(window.innerWidth/2,window.innerHeight/2,1,e,a,wdt);
+		a+=0.05;//aa;
 		//if(Math.random()<.05){
 		//	aa=Math.random()-.5;
 		//}
@@ -85,16 +86,16 @@ Use different browser.
 				wdtInc=0.1;
 			}
 
-			s+=sInc;
-			e=s+5;
+			//s+=sInc;
+			e+=eInc;
 			//if(e>brushRoundSize/2){
-			if(s<=0){
+			if(e<=1){
 				//s=brushRoundSize/2-5;
-				sInc=0.1;
+				eInc=0.4;
 				//e=s+5;
 			}
-			if(s>=brushRoundSize/2-5){
-				sInc=-0.1;
+			if(e>=brushRoundSize/2-6){
+				eInc=-0.4;
 			}
 			n+=nDir;
 			if(n>brushRoundSize/2){
