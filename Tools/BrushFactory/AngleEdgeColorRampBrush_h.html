@@ -71,7 +71,28 @@ Use different browser.
 	paletteCart02.push({r:114,g:89,b:86,a:255});
 	paletteCart02.push({r:57,g:57,b:57,a:255});
 	paletteCart02.push({r:32,g:32,b:32,a:255});
-
+	
+	var paletteCart03 = []; //retrocal-8
+	paletteCart03.push({r:0,g:0,b:0,a:255});//black
+	paletteCart03.push({r:110,g:88,b:168,a:255});
+	paletteCart03.push({r:42,g:163,b:79,a:255});
+	paletteCart03.push({r:116,g:255,b:63,a:255});
+	paletteCart03.push({r:252,g:28,b:192,a:255});
+	paletteCart03.push({r:198,g:80,b:90,a:255});
+	paletteCart03.push({r:47,g:20,b:47,a:255});
+	paletteCart03.push({r:119,g:68,b:72,a:255});
+	paletteCart03.push({r:238,g:156,b:93,a:255});
+	
+	var paletteCart04 = []; //cl8uds-8
+	paletteCart04.push({r:0,g:0,b:0,a:255});//black
+	paletteCart04.push({r:252,g:176,b:140,a:255});
+	paletteCart04.push({r:239,g:157,b:127,a:255});
+	paletteCart04.push({r:214,g:147,b:138,a:255});
+	paletteCart04.push({r:180,g:141,b:146,a:255});
+	paletteCart04.push({r:165,g:151,b:161,a:255});
+	paletteCart04.push({r:143,g:160,b:191,a:255});
+	paletteCart04.push({r:154,g:171,b:201,a:255});
+	paletteCart04.push({r:165,g:183,b:212,a:255});
 	//
 	// Temp palette
 	var palette = [];
@@ -89,11 +110,16 @@ Use different browser.
 	for(var i=0;i<paletteCart01.length;i++){
 		palette.push({r:paletteCart01[i].r,g:paletteCart01[i].g,b:paletteCart01[i].b,a:255})
 	}
-	
 	for(var i=0;i<paletteCart02.length;i++){
 		palette.push({r:paletteCart02[i].r,g:paletteCart02[i].g,b:paletteCart02[i].b,a:255})
 	}
-
+	for(var i=0;i<paletteCart03.length;i++){
+		palette.push({r:paletteCart03[i].r,g:paletteCart03[i].g,b:paletteCart03[i].b,a:255})
+	}
+	for(var i=0;i<paletteCart04.length;i++){
+		palette.push({r:paletteCart04[i].r,g:paletteCart04[i].g,b:paletteCart04[i].b,a:255})
+	}
+	
 	// create new array and copy this array into it (all fields)
 	var palette2 = JSON.parse(JSON.stringify(palette));	
 	
@@ -152,7 +178,7 @@ Use different browser.
 	var brushFX1 = 2;
 	var uiBrushFX1SliderPos = 10;
 	var uiPaletteCartActive = 0; // current highlight in the palette cartridge
-	var uiPaletteCard = 1;
+	var uiPaletteCard = 2;
 	var uipaletteCardCount = 0;
 	
 	
@@ -250,7 +276,34 @@ Use different browser.
 		kleur[5]=5+18;
 		kleur[6]=8+18;
 		kleur[7]=7+18;
-	}			
+		}
+		if(uiPaletteCartActive && uiPaletteCard==2){
+		kleur[3]=2+27;
+		kleur[2]=3+27;
+		kleur[1]=4+27;
+		kleur[4]=6+27;
+		kleur[5]=5+27;
+		kleur[6]=8+27;
+		kleur[7]=7+27;	
+		}			
+		if(uiPaletteCartActive && uiPaletteCard==3){
+//		kleur[3]=2+36;
+//		kleur[2]=3+36;
+//		kleur[1]=4+36;
+//		kleur[4]=6+36;
+//		kleur[5]=5+36;
+//		kleur[6]=8+36;
+//		kleur[7]=7+36;	
+		kleur[3]=2+4+36;
+		kleur[2]=3+4+36;
+		kleur[1]=4+4+36;
+		kleur[4]=4+4+36;
+		kleur[5]=2+4+36;
+		kleur[6]=3+4+36;
+		kleur[7]=4+4+36;	
+		
+}			
+		
 		var r=64;
 		temp2 = [];
 		for(var i=0;i<r;i++){
@@ -935,6 +988,11 @@ Use different browser.
 			ctx.fillStyle = "rgb("+paletteCart01[c].r+","+paletteCart01[c].g+","+paletteCart01[c].b+","+paletteCart01[c].a+")";
 		}else if(cart==1){
 			ctx.fillStyle = "rgb("+paletteCart02[c].r+","+paletteCart02[c].g+","+paletteCart02[c].b+","+paletteCart02[c].a+")";
+		}else if(cart==2){
+			ctx.fillStyle = "rgb("+paletteCart03[c].r+","+paletteCart03[c].g+","+paletteCart03[c].b+","+paletteCart03[c].a+")";
+		}else if(cart==3){
+			ctx.fillStyle = "rgb("+paletteCart04[c].r+","+paletteCart04[c].g+","+paletteCart04[c].b+","+paletteCart04[c].a+")";
+			
 		}
 	}
 	
@@ -1426,6 +1484,8 @@ Use different browser.
 					var z=0;
 					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
 					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
+					if(uiPaletteCartActive>0 && uiPaletteCard==2)z=uiPaletteCartActive+27;
+					if(uiPaletteCartActive>0 && uiPaletteCard==3)z=uiPaletteCartActive+36;					
 					
 					brushActive = true;
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
@@ -1481,7 +1541,8 @@ Use different browser.
 					var z=0;
 					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
 					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
-					
+					if(uiPaletteCartActive>0 && uiPaletteCard==2)z=uiPaletteCartActive+27;					
+					if(uiPaletteCartActive>0 && uiPaletteCard==3)z=uiPaletteCartActive+36;
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 					//console.log(brushPointX);
@@ -1640,10 +1701,9 @@ Use different browser.
 					var w = touchCollision[i].w;
 					var h = touchCollision[i].h;
 					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-						if(uiPaletteCard==1){
+						uiPaletteCard++;
+						if(uiPaletteCard>3){
 							uiPaletteCard=0;
-						}else{
-							uiPaletteCard=1;
 						}
 						//var uiPaletteCard = 1;
 						//var uipaletteCardCount = 0;
@@ -1703,22 +1763,30 @@ Use different browser.
 							var bb=.8;
 							var cc=.8;
 							var done=false;
-							if(Math.random()<.3){
+							if(Math.random()<.5){
 								b=Math.random()*128;
 								b+=128;
 								cc=.2;
 								done=true;
 							}
-							if(done==false && Math.random()<.3){
+							if(done==false && Math.random()<.5){
 								g=Math.random()*128;
 								g+=128;
 								bb=.2;
 								done=true;
 							}
-							if(Math.random()<.8){
-								aa=Math.random();
-								bb=Math.random();
-								cc=Math.random();
+							if(done==false && Math.random()<.5){
+								g=Math.random()*128;
+								g+=128;
+								b=g;
+								bb=.2;
+								done=true;
+							}
+							
+							if(Math.random()<.9){
+								//aa=Math.random();
+								//bb=Math.random();
+								//cc=Math.random();
 								//bb=Math.random()/2+.5;
 								//cc=Math.random()/2+.5;
 							}
@@ -1731,8 +1799,8 @@ Use different browser.
 								//palette[j].g=(g/255)*grey;
 								//palette[j].b=(b/255)*grey;
 								palette[j].r=mix(palette[j].r,r,aa);
-								palette[j].g=mix(palette[j].g,r,bb);
-								palette[j].b=mix(palette[j].b,r,cc);							
+								palette[j].g=mix(palette[j].g,g,bb);
+								palette[j].b=mix(palette[j].b,b,cc);							
 								
 								//palette[j].r=mix(palette[j].r,r,.7);
 								//palette[j].g=mix(palette[j].g,g,.7);
@@ -1745,12 +1813,14 @@ Use different browser.
 								if(palette[j].b<0)palette[j].b=0;
 								
 							}
-							for(var j=2;j<palette.length/2;j++){
+							//make grayscale
+							if(Math.random()<.2){
+							for(var j=2;j<palette.length/3;j++){
 								var grey = (palette[j].r+palette[j].g+palette[j].b)/3;
 								palette[j].r=grey;
 								palette[j].g=grey;
 								palette[j].b=grey;
-							}
+							}}
 							
 							// Mix black color with darkest color from palette
 							palette[0].r = mix(palette[4].r,palette[0].r,.5);
@@ -1903,7 +1973,8 @@ Use different browser.
 					var z=0;
 					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
 					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
-						
+					if(uiPaletteCartActive>0 && uiPaletteCard==2)z=uiPaletteCartActive+27;
+					if(uiPaletteCartActive>0 && uiPaletteCard==3)z=uiPaletteCartActive+36;					
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
 					//console.log(brushPointX);
@@ -1935,6 +2006,8 @@ Use different browser.
 					var z=0;
 					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
 					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
+					if(uiPaletteCartActive>0 && uiPaletteCard==2)z=uiPaletteCartActive+27;
+					if(uiPaletteCartActive>0 && uiPaletteCard==3)z=uiPaletteCartActive+36;					
 					
 					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
 					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
