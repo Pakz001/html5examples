@@ -21,10 +21,12 @@ Use different browser.
 </canvas>
 	<script>
 		
-		var brushName = [	"Standard Brush",
+		var brushName = [	"First Brush",
+							"Standard Brush",
 							"Mount Brush",
 							"Borrow Brush",
-							"Mister Brush"];
+							"Mister Brush",
+							"Last Brush"];
 		var brushMode = 0;					
 		
 		var c=document.getElementById("myCanvas");
@@ -35,10 +37,12 @@ Use different browser.
 		var uiActiveTime=0; // count down from last pressed a user interface element.	
 		var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
 	
-		gameloop=setInterval(doGameLoop,16);
+		gameloop=setInterval(doGameLoop,16);// run our game loop at 60fps(16 ms of 1000 ms)
+		
 		myCanvas.height = window.innerHeight-32;
 		myCanvas.width = window.innerWidth-32;
 		
+		// Our main program loop
 		function doGameLoop(){
 			
 			ctx.fillStyle="rgb(0,0,0)";
@@ -46,7 +50,10 @@ Use different browser.
 			ctx.fillStyle="rgb(255,255,255)";
 			ctx.font = "bold "+12+"px serif";			
 			ctx.fillText("Javascript Html canvas example.",10,10); 
-		
+			
+			// Tell when we have last pressed a button
+			if(uiActiveTime>0)uiActiveTime-=1;
+			
 			touchCollision = []; // reset touch collision when repopulate
 			drawBrushSelectionBox(); // draw tool and populate collision list
 		
@@ -112,8 +119,17 @@ Use different browser.
 						var h = touchCollision[i].h;
 						// Collision check finger and user interface element.
 						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-							brushMode++;
+							// If we press left side go back in list 
+							// If we press right side go forwards in list.
+							if(uiTouchLastX>w+w/2){
+								brushMode++;
+							}else{
+								brushMode-=1;
+							}
+							// Stay inside list
 							if(brushMode>=brushName.length)brushMode=0;
+							if(brushMode<0)brushMode=brushName.length-1;
+							// Set variable that tells when we visited ui.
 							uiActiveTime=30;
 						}	
 					}
