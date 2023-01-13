@@ -177,7 +177,7 @@ Use different browser.
 	var brushLastAngle = 0;
 	var brushFX1 = 2;
 	var uiBrushFX1SliderPos = 10;
-	var uiPaletteCartActive = 0; // current highlight in the palette cartridge
+	var uiPaletteCartActive = 2; // current highlight in the palette cartridge
 	var uiPaletteCard = 2;
 	var uipaletteCardCount = 0;
 	
@@ -249,6 +249,7 @@ Use different browser.
 	// color 6 = highlight
 	function smudgeHillBrush(posX,posY,angle=1){
 		
+		// setting of kleur are the colors placed with this brush
 		var kleur = [];
 		
 		kleur.push(1);
@@ -260,6 +261,14 @@ Use different browser.
 		kleur.push(7);
 		kleur.push(8);
 		if(uiPaletteCartActive && uiPaletteCard==0){
+		//kleur[3]=2+9;
+		//kleur[2]=3+9;
+		//kleur[1]=4+9;
+		//kleur[4]=6+9;
+		//kleur[5]=5+9;
+		//kleur[6]=8+9;
+		//kleur[7]=7+9;
+		
 		kleur[3]=2+9;
 		kleur[2]=3+9;
 		kleur[1]=4+9;
@@ -278,8 +287,8 @@ Use different browser.
 		kleur[7]=7+18;
 		}
 		if(uiPaletteCartActive && uiPaletteCard==2){
-		kleur[3]=2+27;
-		kleur[2]=3+27;
+		kleur[3]=6+27;//2+27;
+		kleur[2]=7+27;//3+27;
 		kleur[1]=4+27;
 		kleur[4]=6+27;
 		kleur[5]=5+27;
