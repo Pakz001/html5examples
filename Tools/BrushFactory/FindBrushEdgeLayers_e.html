@@ -34,7 +34,7 @@ Use different browser.
 
 	var brushEdge = [];
 	var brush = [];
-	var brushRoundSize = 32;
+	var brushRoundSize = 16; // gets halved (minimum = 10)
 	var maxBrushRoundSize = 32;
 	var minBrushRoundSize = 1;
 	makeRoundBrush(brushRoundSize);
@@ -86,9 +86,9 @@ Use different browser.
 	var s=0;
 	var e=5;
 	var eInc=0.4;
-	var wdt=15;
+	var wdt=brushRoundSize/2;
 	var wdtInc=0.1;
-	bufferBrush(window.innerWidth/2,window.innerHeight/2,1,brushRoundSize/2,a,wdt);
+	bufferBrush(window.innerWidth/2,window.innerHeight/2,1,Math.floor(brushRoundSize/2),a,wdt);
 	
 	// Class countains 2 less then brushRoundSize/2; the inner two are not taken..
 	//console.log(Math.floor((brushRoundSize/2)-1));
@@ -111,7 +111,7 @@ Use different browser.
 		//drawBrush(window.innerWidth/2,window.innerHeight/2);
 			// e is inside to the
 		//drawBrushLayer(window.innerWidth/2,window.innerHeight/2,1,e,a,wdt);
-		fillBrushX(window.innerWidth/2,window.innerHeight/2,0,10,a,wdt);
+		fillBrushX(window.innerWidth/2,window.innerHeight/2,0,(brushRoundSize/2)-2,a,wdt);
 		//fillBrush(window.innerWidth/2,window.innerHeight/2,1,e,a,wdt);
 		a+=0.1;//aa;
 		//if(Math.random()<.05){
@@ -121,7 +121,7 @@ Use different browser.
 		if(Math.random()<.3){
 			//n  = 	Math.floor(Math.random()*brushRoundSize);
 			wdt+=wdtInc;
-			if(wdt>30){
+			if(wdt>brushRoundSize-2){
 				wdtInc=-0.1
 			}
 			if(wdt<10){
@@ -228,8 +228,8 @@ Use different browser.
 				ctx.fillStyle="#ff0000";
 				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
 			}else{					
-				//ctx.fillStyle="#999900";	
-				//ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+				ctx.fillStyle="#999900";	
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
 			}	
 			
 			
@@ -253,7 +253,7 @@ Use different browser.
 		//if(l1>brushRoundSize/2)return;
 		//if(l1<=0 || l1<=0)return;
 		l1 = 1;
-		l2 = brushRoundSize/2;		
+		l2 = Math.floor(brushRoundSize/2);		
 		// wrap angle back into usable range
 		var x = Math.cos(angle);
 		var y = Math.sin(angle);
