@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+		
+		// Like in my civclone(monkey 2) a message is dropped down from the top of the screen and disappears after
+		// a short time. The tip queue is first in first out. (stack push and pop)..
+		// Note: add config menu..
+		var systemMessage = [{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. \n(Be in anchor mode to do this..)"}];
+		var systemMessageQueue = [];
+		var systemMessageY = 500; // scroll position
+		var systemMessageYInc = 1; // scroll speed
+		var systemMessageWaitTime1 = 0; // count down from here to scroll back up.
+		var systemMessageWaitTime1Max = 60; // wait x when scrolled down.
+		var systemMessageStarted = false; // when new message started.
+		var systemMessageState = 0; // 0 = down , 1 = up
+		var systemMessageCurrentMessage=0; // contains the txt
+		var brushName = [	"First Brush",
+							"Standard Brush",
+							"Mount Brush",
+							"Borrow Brush",
+							"Mister Brush",
+							"Last Brush"];
+		var brushMode = 0;					
+		
+		var c=document.getElementById("myCanvas");
+		var ctx=c.getContext("2d");
+		window.addEventListener("touchend", touchHandler,false);			
+		window.addEventListener("resize", resizeHandler,false);			
+		var uiTouchLastX = uiTouchLastY = 0;
+		var uiActiveTime=0; // count down from last pressed a user interface element.	
+		var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
+	
+		gameloop=setInterval(doGameLoop,30);// run our game loop at 60fps(16 ms of 1000 ms)
+		
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		
+		addSystemMessage("anchorTip");
+		
+		// Our main program loop
+		function doGameLoop(){
+			
+			ctx.fillStyle="rgb(0,0,0)";
+			ctx.fillRect(0,0,c.width,c.height);
+			ctx.fillStyle="rgb(255,255,255)";
+			ctx.font = "bold "+12+"px serif";			
+			ctx.fillText("Javascript Html canvas example.",10,10); 
+			
+			// Tell when we have last pressed a button
+			if(uiActiveTime>0)uiActiveTime-=1;
+			
+			touchCollision = []; // reset touch collision when repopulate
+			drawBrushSelectionBox(); // draw tool and populate collision list
+			drawSystemMessage();
+		
+		
+		}
+
+		function drawSystemMessage(){
+			
+					//var systemMessage = [{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. (Be in anchor mode to do this..)"}];
+		//var systemMessageQueue = [];
+		//var systemMessageY = 0; // scroll position
+		//var systemMessageYInc = 1; // scroll speed
+		//var systemMessageWaitTime1 = 0; // count down from here to scroll back up.
+		//var systemMessageWaitTime1Max = 60; // wait x when scrolled down.
+		//var systemMessageStarted = false; // when new message started.
+		//var systemMessageState = 0; 0 down 1 up
+		//var systemMessageCurrentMessage=0;
+						//
+			var x=window.innerWidth/4;
+			var y=0+systemMessageY;
+			var w=window.innerWidth/2;
+			var h=window.innerWidth/20;
+			var myTxt = systemMessageCurrentMessage;
+			if(myTxt=="")myTxt=",";
+			if(systemMessageStarted==false && systemMessageQueue.length>0){
+				
+				systemMessageStarted=true;
+				systemMessageState=0;
+				systemMessageY=-h;
+				var id = systemMessageQueue.pop();
+				//console.log(id)
+				for(var i=0;i<systemMessage.length;i++){
+					//console.log(systemMessage[i].id);
+					if(systemMessage[i].id === id){
+						systemMessageCurrentMessage = systemMessage[i].m;
+					
+						break;
+					}
+				}
+				
+				
+				//systemMessageWaitTime1=systemMessageWaitTime1Max;
+			}
+			if(systemMessageStarted){
+				if(systemMessageState==0 && systemMessageWaitTime1==0)systemMessageY+=systemMessageYInc;
+				if(systemMessageState==1 && systemMessageWaitTime1==0)systemMessageY-=systemMessageYInc;
+				if(systemMessageState==0 && systemMessageY>=h/15 && systemMessageWaitTime1==0){
+					systemMessageWaitTime1=60;
+					systemMessageState=1;
+				}
+				if(systemMessageWaitTime1>0)systemMessageWaitTime1-=1;
+					
+				if(systemMessageState==1 && systemMessageY<=-h && systemMessageWaitTime1==0){
+					systemMessageStarted=false;
+				}
+				
+				if(systemMessageWaitTime1==0 && systemMessageState==2){
+					
+					//systemMessageStarted=false;
+				}
+					
+					
+				
+			}
+			
+		
+			
+			//
+			// draw
+			
+			//
+			// Add the area into the collision list
+			//touchCollision.push({x:x,y:y,w:w,h:h,id:0,data:0});//set these to program
+			// Draw the box..
+			ctx.fillStyle="#111111";
+			ctx.fillRect(x,y,w,h);
+			x+=1;
+			y+=1;
+			w-=2;
+			h-=2;
+			ctx.fillStyle="#666666";
+			ctx.fillRect(x,y,w,h);
+			x+=6;
+			y+=6;
+			w-=12;
+			h-=12;
+			ctx.fillStyle="#000000";
+			ctx.fillRect(x,y,w,h);
+			//
+			// Draw the text label
+			var sz = window.innerWidth/60;
+			ctx.font = "bold "+sz+"px serif";					
+			ctx.fillStyle="#eeeeee";
+			var metrics = ctx.measureText(brushName[brushMode]);
+			x+=metrics.width/2.5;
+			metrics = ctx.measureText("W");
+			y+=metrics.width*0.9;
+			
+			var lines = myTxt.split('\n');
+
+			for (var j = 0; j<lines.length; j++)
+			ctx.fillText(lines[j], x, y + (j*(metrics.width*0.9)) );
+			//ctx.fillText(theTxt,x,y);
+			
+			
+		}
+		function addSystemMessage(id){
+			
+		systemMessageQueue.push(id);
+			
+		}
+		function drawBrushSelectionBox(){
+			var x=window.innerWidth/3;
+			var y=window.innerHeight/3;
+			var w=window.innerWidth/3;
+			var h=window.innerWidth/20;
+			//
+			// Add the area into the collision list
+			touchCollision.push({x:x,y:y,w:w,h:h,id:0,data:0});//set these to program
+			// Draw the box..
+			ctx.fillStyle="#111111";
+			ctx.fillRect(x,y,w,h);
+			x+=1;
+			y+=1;
+			w-=2;
+			h-=2;
+			ctx.fillStyle="#666666";
+			ctx.fillRect(x,y,w,h);
+			x+=6;
+			y+=6;
+			w-=12;
+			h-=12;
+			ctx.fillStyle="#000000";
+			ctx.fillRect(x,y,w,h);
+			//
+			// Draw the text label
+			var sz = window.innerWidth/36;
+			ctx.font = "bold "+sz+"px serif";					
+			ctx.fillStyle="#eeeeee";
+			var metrics = ctx.measureText(brushName[brushMode]);
+			x+=metrics.width/2.5;
+			metrics = ctx.measureText("W");
+			y+=metrics.width*0.9;
+			ctx.fillText(brushName[brushMode],x,y);
+			
+			
+		}
+		
+		
+		function touchHandler(e){
+					
+			if(e.type=="touchend" && e.touches) {			
+				for(var i=0;i<e.changedTouches.length;i++){	
+					var x = e.changedTouches[i].clientX;
+					var y = e.changedTouches[i].clientY;				
+					uiTouchLastX = x;
+					uiTouchLastY = y;
+				}
+				
+				// Touch collisions..
+				// One list with every user interface element x,y,w,h,id,data
+				for(var i=0;i<touchCollision.length;i++){
+					// Collision with element id
+					if(touchCollision[i].id==0){
+						var x = touchCollision[i].x;
+						var y = touchCollision[i].y;
+						var w = touchCollision[i].w;
+						var h = touchCollision[i].h;
+						// Collision check finger and user interface element.
+						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+							// If we press left side go back in list 
+							// If we press right side go forwards in list.
+							if(uiTouchLastX>x+w/2){
+								brushMode++;
+							}else{
+								brushMode-=1;
+							}
+							// Stay inside list
+							if(brushMode>=brushName.length)brushMode=0;
+							if(brushMode<0)brushMode=brushName.length-1;
+							// Set variable that tells when we visited ui.
+							uiActiveTime=30;
+						}	
+					}
+				}				
+			}
+			
+		}
+		//
+		//
+		function resizeHandler(e){
+			e.preventDefault();
+			myCanvas.height = window.innerHeight-32;
+			myCanvas.width = window.innerWidth-32;			
+		}		
+	
+</script>
+</body>
+</html>
