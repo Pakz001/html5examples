@@ -13,7 +13,8 @@ notes:<br>
 * figure out smear logic.<br>
 * overwrite and insert mode button<br>
 <br>
-Ideas:<br>
+Ideas:
+
 * Brushes per image element category. Tree Branch brush: Tree Stump Brush: Leaf Brush: Grass Brush: Water Brush: (Pixel art referenced constructed)<br> 
 <br>
 
