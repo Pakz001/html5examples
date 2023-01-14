@@ -19,6 +19,9 @@ notes:<br>
 
 Ideas:
 
+* Brush tip designer user interface. Draw in a circle. The inside is drawn with the brush in the direction the brush moves. A slider
+determines the width of the tip(full total circle or part or circle)<br>
+
 * Brushes per image element category. Tree Branch brush: Tree Stump Brush: Leaf Brush: Grass Brush: Water Brush: (Pixel art referenced constructed)<br> 
 <br>
 
