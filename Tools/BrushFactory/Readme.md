@@ -12,6 +12,7 @@ figure out smear logic.<br>
 overwrite and insert mode button<br>
 <br>
 Ideas:<br>
+lock anchor. touch position brush tip is aimed* rotated at anchor. this for tunnel like effects. note: make brush tios x
 add alias brush. read area and place pixels<br>
 undo<br>
 cls<br>
