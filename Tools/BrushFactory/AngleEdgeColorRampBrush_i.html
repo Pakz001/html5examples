@@ -163,6 +163,10 @@ Use different browser.
 							{id:"insertModeTip",m:"Insert texture brush into canvas. Overwriting\npixels. Use slider 1"},
 							{id:"overwriteModeTip",m:"Overwrite with texture brush."},
 							{id:"randomizePaletteTip",m:"Randomize base Palette colors.\n(New color or reset)"},
+							{id:"paletteCart1",m:"ammo-8 palette(lospec)"},
+							{id:"paletteCart2",m:"rust-gold-8 palette(lospec)"},
+							{id:"paletteCart3",m:"retrocal-8 palette(lospec)"},
+							{id:"paletteCart4",m:"cl8uds-8 palette(lospec)"},
 							
 							];
 	var systemMessageQueue = [];
@@ -204,8 +208,8 @@ Use different browser.
 	var brushLastAngle = 0;
 	var brushFX1 = 2;
 	var uiBrushFX1SliderPos = 10;
-	var uiPaletteCartActive = 2; // current highlight in the palette cartridge
-	var uiPaletteCard = 2;
+	var uiPaletteCartActive = 0; // current highlight in the palette cartridge
+	var uiPaletteCard = 0;
 	var uipaletteCardCount = 0;
 	
 	
@@ -678,7 +682,7 @@ Use different browser.
 			//addSystemMessage("pixelBrushTip");
 			//addSystemMessage("colorBrushTip");
 			//addSystemMessage("textureBrushTip");
-						
+			
 			systemMessageY=-100;
 			systemMessageWaitTime1==0;
 			//systemMessageQueue.pop();
@@ -1872,12 +1876,30 @@ Use different browser.
 						if(uiPaletteCard>3){
 							uiPaletteCard=0;
 						}
+						if(uiPaletteCard==0){
+							addSystemMessage("paletteCart1");
+
+						}
+						if(uiPaletteCard==1){
+							addSystemMessage("paletteCart2");
+
+						}
+						if(uiPaletteCard==2){
+							addSystemMessage("paletteCart3");
+
+						}
+						if(uiPaletteCard==3){
+							addSystemMessage("paletteCart4");
+
+						}						
 						//var uiPaletteCard = 1;
 						//var uipaletteCardCount = 0;
 	
 						uiActiveTime=30;						
 					}
-				}					
+				}
+				//select palette cart upper palette bar
+				
 				if(touchCollision[i].id==5){
 					var x = touchCollision[i].x;
 					var y = touchCollision[i].y;
@@ -1885,6 +1907,9 @@ Use different browser.
 					var h = touchCollision[i].h;
 					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
 						uiPaletteCartActive = touchCollision[i].data;
+
+						
+						
 						//console.log(uiPaletteCartActive);
 						uiActiveTime=30;						
 					}
