@@ -24,21 +24,24 @@ Use different browser.
 		// Like in my civclone(monkey 2) a message is dropped down from the top of the screen and disappears after
 		// a short time. The tip queue is first in first out. (stack push and pop)..
 		// Note: add config menu..
-		var systemMessage = [{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. \n(Be in anchor mode to do this..)"}];
+		var systemMessage = [
+								{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. \n(Be in anchor mode to do this..)"},
+								{id:"standardBrushTip",m:"Regular brush. Erase or place."},
+								{id:"mountBrushTip",m:"Mount Brush"},
+								
+								];
 		var systemMessageQueue = [];
 		var systemMessageY = 500; // scroll position
-		var systemMessageYInc = 1; // scroll speed
+		var systemMessageYInc = 6; // scroll speed
 		var systemMessageWaitTime1 = 0; // count down from here to scroll back up.
 		var systemMessageWaitTime1Max = 60; // wait x when scrolled down.
 		var systemMessageStarted = false; // when new message started.
 		var systemMessageState = 0; // 0 = down , 1 = up
 		var systemMessageCurrentMessage=0; // contains the txt
-		var brushName = [	"First Brush",
+		var brushName = [	"Anchor",
 							"Standard Brush",
 							"Mount Brush",
-							"Borrow Brush",
-							"Mister Brush",
-							"Last Brush"];
+							]
 		var brushMode = 0;					
 		
 		var c=document.getElementById("myCanvas");
@@ -58,7 +61,9 @@ Use different browser.
 		
 		// Our main program loop
 		function doGameLoop(){
-			
+		//myCanvas.height = window.innerHeight-32;
+		//myCanvas.width = window.innerWidth-32;
+		
 			ctx.fillStyle="rgb(0,0,0)";
 			ctx.fillRect(0,0,c.width,c.height);
 			ctx.fillStyle="rgb(255,255,255)";
@@ -98,6 +103,7 @@ Use different browser.
 				systemMessageStarted=true;
 				systemMessageState=0;
 				systemMessageY=-h;
+				systemMessageWaitTime1=0;
 				var id = systemMessageQueue.pop();
 				//console.log(id)
 				for(var i=0;i<systemMessage.length;i++){
@@ -115,7 +121,7 @@ Use different browser.
 			if(systemMessageStarted){
 				if(systemMessageState==0 && systemMessageWaitTime1==0)systemMessageY+=systemMessageYInc;
 				if(systemMessageState==1 && systemMessageWaitTime1==0)systemMessageY-=systemMessageYInc;
-				if(systemMessageState==0 && systemMessageY>=h/15 && systemMessageWaitTime1==0){
+				if(systemMessageState==0 && systemMessageY>=h/10 && systemMessageWaitTime1==0){
 					systemMessageWaitTime1=60;
 					systemMessageState=1;
 				}
@@ -162,8 +168,8 @@ Use different browser.
 			var sz = window.innerWidth/60;
 			ctx.font = "bold "+sz+"px serif";					
 			ctx.fillStyle="#eeeeee";
-			var metrics = ctx.measureText(brushName[brushMode]);
-			x+=metrics.width/2.5;
+			var metrics = ctx.measureText(myTxt);
+			x+=metrics.width/12;
 			metrics = ctx.measureText("W");
 			y+=metrics.width*0.9;
 			
@@ -176,8 +182,14 @@ Use different browser.
 			
 		}
 		function addSystemMessage(id){
-			
-		systemMessageQueue.push(id);
+
+			systemMessageY=-100;
+			systemMessageWaitTime1==0;
+			//systemMessageQueue.pop();
+			systemMessageState=0;
+			systemMessageCurrentMessage="";
+			systemMessageStarted=false;
+			systemMessageQueue.push(id);
 			
 		}
 		function drawBrushSelectionBox(){
@@ -188,6 +200,7 @@ Use different browser.
 			//
 			// Add the area into the collision list
 			touchCollision.push({x:x,y:y,w:w,h:h,id:0,data:0});//set these to program
+
 			// Draw the box..
 			ctx.fillStyle="#111111";
 			ctx.fillRect(x,y,w,h);
@@ -246,11 +259,31 @@ Use different browser.
 							}else{
 								brushMode-=1;
 							}
+
+						//		var brushName = [	"Anchor",
+						//	"Standard Brush",
+						//	"Mount Brush",
+						//		function addSystemMessage(id){
+							
+						
 							// Stay inside list
 							if(brushMode>=brushName.length)brushMode=0;
 							if(brushMode<0)brushMode=brushName.length-1;
+						
+						if(brushMode==0){
+
+							addSystemMessage("anchorTip");
+						}
+						if(brushMode==1){
+							addSystemMessage("standardBrushTip");
+						}
+						if(brushMode==2){
+
+							addSystemMessage("mountBrushTip");
+						}							
 							// Set variable that tells when we visited ui.
 							uiActiveTime=30;
+							
 						}	
 					}
 				}				
