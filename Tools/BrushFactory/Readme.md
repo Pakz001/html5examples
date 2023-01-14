@@ -10,9 +10,12 @@ trying to create and learn to create specialized paint brushes.<br>
 initial idea, create a pixel art brush that has height. angle/edge/higlight/shade/move speed/slow add details.<br>
 <br><br>
 notes:<br>
+
 * figure out smear logic.<br>
+
 * overwrite and insert mode button<br>
 <br>
+
 Ideas:
 
 * Brushes per image element category. Tree Branch brush: Tree Stump Brush: Leaf Brush: Grass Brush: Water Brush: (Pixel art referenced constructed)<br> 
