@@ -15,14 +15,21 @@ notes:<br>
 Ideas:<br>
 *Brushes per image element category. Tree Branch brush: Tree Stump Brush: Leaf Brush: Grass Brush: Water Brush: (Pixel art referenced constructed)<br> 
 <br>
+
 *lock anchor. touch position brush tip is aimed* rotated at anchor. this for tunnel like effects. note: make brush tios x<br>
+
 *add alias brush. read area and place pixels<br>
+
 *undo<br>
+
 *cls<br>
+
 *random level generator for drawing on top off. sort of paint by numbers. maze generators top down land masses. random inspiration idea button<br>
 
 *Blob brushes - Use shapes other than round and square - generate a random* single blob of x,y size. The edges are read as a array for the brush logic to use.<br>
+
 *pixel art tree/bush brush. Draw from the center out. reference: down black edges and darker inside. Up lighter edges and slightly darker smudge(leaf). angle ui / color range ui. / detailing level ui.<br>
+
 *a brush where edges up and down are shaded. left and right are lighter and darker. (find reference<br>
 
 <br><br>
