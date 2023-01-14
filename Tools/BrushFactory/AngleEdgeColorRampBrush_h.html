@@ -149,10 +149,18 @@ Use different browser.
 			//uiPinchStart = true;
 			//uiPinchStartScale = canvasScale;
 			//if(activeCanvas==threeCanvas)uiPinchStartScale = threeScale;
+	
+	// Like in my civclone(monkey 2) a message is dropped down from the top of the screen and disappears after
+	// a short time. The tip queue is first in first out. (stack push and pop)..
+	// Note: add config menu..
+	var systemMessage = [{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. (Be in anchor mode to do this..)"}];
 			
+	// Features :(temp name) Extra tools....
+	var featureName = ["Brush rotation Anchor(lp)"];		
 	
 	// brush
-	var brushName = [	"Pixel Brush",
+	var brushName = [	"Rotation Anchor(lp)",
+	"Pixel Brush",
 						"Color Brush",
 						"Texture Brush",
 						];
