@@ -34,7 +34,7 @@ Use different browser.
 
 	var brushEdge = [];
 	var brush = [];
-	var brushRoundSize = 16; // gets halved (minimum = 10)
+	var brushRoundSize = 32; // gets halved (minimum = 10)16
 	var maxBrushRoundSize = 32;
 	var minBrushRoundSize = 1;
 	makeRoundBrush(brushRoundSize);
@@ -74,7 +74,7 @@ Use different browser.
 	
 	var n=0;//center of current brush
 
-	var mainBrushEdge = [];
+	//var mainBrushEdge = [];
 
 	
 
@@ -90,10 +90,12 @@ Use different browser.
 	var wdtInc=0.1;
 	bufferBrush(window.innerWidth/2,window.innerHeight/2,1,Math.floor(brushRoundSize/2),a,wdt);
 	
+	//console.log(classBrushEdges.length);
+	
 	// Class countains 2 less then brushRoundSize/2; the inner two are not taken..
 	//console.log(Math.floor((brushRoundSize/2)-1));
 	//console.log(classBrushEdges[Math.floor((brushRoundSize/2)-2)].cX[0]);
-	
+	var ccnt=0;
 	function doGameLoop(){
 		myCanvas.height = window.innerHeight-32;
 		myCanvas.width = window.innerWidth-32;
@@ -118,7 +120,9 @@ Use different browser.
 		//	aa=Math.random()-.5;
 
 		//}
-		if(Math.random()<.3){
+		ccnt++;
+		if(ccnt>2){
+			ccnt=0;
 			//n  = 	Math.floor(Math.random()*brushRoundSize);
 			wdt+=wdtInc;
 			if(wdt>brushRoundSize-2){
@@ -173,7 +177,8 @@ Use different browser.
 		
 		
 		// Draw the edge from our angle point into clock direction
-		var size = (window.innerWidth+window.innerHeight)/196;
+		//var size = (window.innerWidth+window.innerHeight)/196;
+		var size = (window.innerWidth+window.innerHeight)/659;
 		//posX-=brush.length*size/2;
 		//posY-=brush.length*size/2;
 		
@@ -205,6 +210,7 @@ Use different browser.
 		
 		//var rangeStart = angle-Math.PI/2;
 		//var rangeEnd = angle+Math.PI/2;
+		var j2 = j-l1;
 		
 		//for(var i=0;i<wdt+(-j);i++){
 		var num=0;
@@ -219,17 +225,73 @@ Use different browser.
 			//if(brushEdge[num].angle>angle)a=1;
 			//if((brushEdge[num].angle>=rs1 && brushEdge[num].angle<=re1))a=1;
 			//if((brushEdge[num].angle>=rs2 && brushEdge[num].angle<=re2))a=1;
+			var an = classBrushEdges[j].cAngle[num];
 			if((classBrushEdges[j].cAngle[num]>=rs1 && classBrushEdges[j].cAngle[num]<=re1))a=1;
 			if((classBrushEdges[j].cAngle[num]>=rs2 && classBrushEdges[j].cAngle[num]<=re2))a=1;
 			
-			if(a==1){
+			if(a==1 || a==-1){
+			//main body
+			if(j2==0 && an<0){ // bottom
+				ctx.fillStyle="#222222";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==0 && an>=0){ // top
+				ctx.fillStyle="#999999";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==1 && an<0){ // bottom
+				ctx.fillStyle="#444444";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==1 && an>=0){ // top
+				ctx.fillStyle="#bbbbbb";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==2 && an<0){ // bottom
+				ctx.fillStyle="#eeeeee";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==2 && an>=0){ // top
+				ctx.fillStyle="#eeeeee";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==3 && an<0){ // bottom
+				ctx.fillStyle="#888888";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==3 && an>=0){ // top
+				ctx.fillStyle="#111111";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==4 && an<0){ // bottom
+				ctx.fillStyle="#aaaaaa";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==4 && an>=0){ // top
+				ctx.fillStyle="#333333";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+
+			if(j2==1 && an>=Math.PI/3.5 && an<Math.PI/1.5){ // top
+				ctx.fillStyle="#ffffff";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			if(j2==2 && an>=Math.PI/4.5 && an<Math.PI/1.2){ // top
+				ctx.fillStyle="#aaaaaa";
+				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+			}
+			}
+			
+			if(j>0 && a==1){
+
 				
-					
-				ctx.fillStyle="#ff0000";
-				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
-			}else{					
-				ctx.fillStyle="#999900";	
-				ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+				//ctx.fillStyle="#ff0000";
+				//ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
+				
+				
+			}else if(a==0 && j>0){					
+				//ctx.fillStyle="#999900";	
+				//ctx.fillRect((posX-brush.length*size/2)+(x*size),(posY-brush.length*size/2)+(y*size),size+1,size+1);
 			}	
 			
 			
@@ -252,6 +314,7 @@ Use different browser.
 		//if(l2>brushRoundSize/2)return;
 		//if(l1>brushRoundSize/2)return;
 		//if(l1<=0 || l1<=0)return;
+		classBrushEdges = [];		
 		l1 = 1;
 		l2 = Math.floor(brushRoundSize/2);		
 		// wrap angle back into usable range
@@ -323,14 +386,14 @@ for(var j=l1;j<l2;j++){
 		}
 
 		var brushEdgeTemp = [];//JSON.parse(JSON.stringify(brushEdge));	
-		for(var a=-(Math.PI+.2);a<Math.PI+.2;a+=.01){
+		//for(var a=-(Math.PI+.2);a<Math.PI+.2;a+=.01){
 			for(var i=0;i<brushEdge.length;i++){
 				//if(brushEdge[i].angle<a){
 					brushEdgeTemp.push({x:brushEdge[i].x,y:brushEdge[i].y,angle:brushEdge[i].angle});
 				//	brushEdge[i].angle=100;
 				//}
 			}
-		}
+		//}
 		brushEdge = JSON.parse(JSON.stringify(brushEdgeTemp));	
 		
 		
