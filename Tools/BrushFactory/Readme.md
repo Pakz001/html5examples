@@ -1,3 +1,10 @@
+test markuo:<br>
+<br>
+Markup : - Bullet list
+              - Nested bullet
+                  - Sub-nested bullet etc
+          - Bullet list item 2 
+
 <br>
 Each file right now is a stand alone app. Download and run with a browser. Or copy out the text from one of these files here in the github repo in this browser and put it in a empty text file and save it with the .html extention. Then open it with a browser. Maybe it can also be pasted into a webpage online that runs html code.(learn html sites or codepen things<br> The tool here requires a touch device at the moment. No mouse or keyboard support. I might buy a apple pencil(gen 2) and start modifying the app to use features from that.<br><br>
 I am coding this app with Textastic(app store) on a ipad pro.<br>
