@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	var start = 0;
+	var end = 5;
+	var val = -5;
+	function clamp(val,start,end){
+		return Math.abs(val) % end;
+	}
+	//console.log((Math.abs(val) % end));
+	console.log(clamp(val,start,end));
+	
+	// 3dSage raycaster snippet from his github youtube repo.. 
+	//int nmp = mapF[(int)(ty / 32.0) * mapX + (int)(tx / 32.0)] * 32 * 32;
+	//int pixel = (((int)ty & 31) * 32 + ((int)tx & 31)) * 3 + nmp * 3;	
+	
+	var tex = [0,1,2,0,1,2];
+	
+	
+	gameloop=setInterval(doGameLoop,16);
+	
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		//cls(0);
+		ctx.fillStyle="#111111";
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		
+		for(var i=0;i<20;i++){
+			c = tex[clamp(i,0,tex.length)];
+			if(c==0)ctx.fillStyle="#FFFFFF";
+			if(c==1)ctx.fillStyle="#FF0000";
+			if(c==2)ctx.fillStyle="#FF00FF";			
+			ctx.fillRect(window.innerWidth/2+i*10,100,10,30);			
+		}	
+		ctx.fillStyle="#FFFFFF";
+		ctx.fillRect(window.innerWidth/2,50,2,50);
+		for(var i=20;i>0;i-=1){
+			c = tex[clamp(i,0,tex.length)];
+			if(c==0)ctx.fillStyle="#FFFFFF";
+			if(c==1)ctx.fillStyle="#FF0000";
+			if(c==2)ctx.fillStyle="#FF00FF";
+			
+			ctx.fillRect(window.innerWidth/2-i*10,100,10,30);			
+		}	
+		
+	}
+	
+	</script>
+</body>
+</html>
