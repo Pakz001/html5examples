@@ -19,7 +19,9 @@ notes:<br>
 
 Ideas:
 
-* edge color darkerst of current brush color when touching color outside of palette range(lighter too)<br>
+* screen anchor icon for setting light direction used for placing lighter and darker tones(angle) - make range function returning when point is inside radian range -pi , pi
+
+* edge color darkerst of current brush color when touching color outside of palette range(lighter too) - or with light angle or anchor.<br>
 
 * Brush tip designer user interface. Draw in a circle. When you draw the complete cirle edge. a slider sets the amount of the circle
 to be drawn. You move up. slider is set to 50 %. Only the top half is drawn with. You can set a shadow to the bottom and lighter
