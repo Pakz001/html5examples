@@ -19,6 +19,8 @@ notes:<br>
 
 Ideas:
 
+* edge color darkerst of current brush color when touching color outside of palette range(lighter too)<br>
+
 * Brush tip designer user interface. Draw in a circle. When you draw the complete cirle edge. a slider sets the amount of the circle
 to be drawn. You move up. slider is set to 50 %. Only the top half is drawn with. You can set a shadow to the bottom and lighter
 edge at the top. Or drawn or round texture.<br>
