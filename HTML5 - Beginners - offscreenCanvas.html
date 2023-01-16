@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	var offscreenCanvas = document.createElement("canvas");
+
+	var ctx2 = offscreenCanvas.getContext("2d")
+	
+	doGameLoop()
+	window.requestAnimationFrame(doGameLoop);
+	function doGameLoop(){
+		myCanvas.width = window.innerWidth-32;
+		myCanvas.height = window.innerHeight-32;
+	
+		// offscreen canvas
+		offscreenCanvas.width=window.innerWidth-32;
+		offscreenCanvas.height=window.innerHeight-32;
+		ctx2.fillStyle="#FFFF00";
+		ctx2.fillRect(0,0,320,400);
+	
+		//cls(0);
+		ctx.fillStyle="#1111FF";
+		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		ctx.drawImage(offscreenCanvas, 0, 0);		
+		window.requestAnimationFrame(doGameLoop);		
+		
+	}	
+		
+</script>
+</body>
+</html>
