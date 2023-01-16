@@ -45,6 +45,7 @@ Use different browser.
 	var uiActiveTime = 0; // when at zero ui is no longer in use
 	var uiToolOverwrite = false;
 	var uiToolSelected = 1;
+	
 
 	// slider position of the brush size
 	var uiBrushSliderPos=132;	
@@ -234,6 +235,8 @@ Use different browser.
 	var s2=.5;
 	addSystemMessage("introMessage");	
 	function doGameLoop(){
+		if(Math.random()<.05)bugHandler(); // Did the screen get turned? adjust screen/user interface..	
+			
 		//cls(0);
 		ctx.fillStyle="#111111";
 		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -574,124 +577,127 @@ Use different browser.
 		
 	}	
 	
-		//
-		// System messages on top of screen
-		//
-		function drawSystemMessage(){
-			
-					//var systemMessage = [{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. (Be in anchor mode to do this..)"}];
-		//var systemMessageQueue = [];
-		//var systemMessageY = 0; // scroll position
-		//var systemMessageYInc = 1; // scroll speed
-		//var systemMessageWaitTime1 = 0; // count down from here to scroll back up.
-		//var systemMessageWaitTime1Max = 60; // wait x when scrolled down.
-		//var systemMessageStarted = false; // when new message started.
-		//var systemMessageState = 0; 0 down 1 up
-		//var systemMessageCurrentMessage=0;
-						//
-			var x=window.innerWidth/4;
-			var y=0+systemMessageY;
-			var w=window.innerWidth/2;
-			var h=window.innerWidth/20;
-			var myTxt = systemMessageCurrentMessage;
-			if(myTxt=="")myTxt=",";
-			if(systemMessageStarted==false && systemMessageQueue.length>0){
-				
-				systemMessageStarted=true;
-				systemMessageState=0;
-				systemMessageY=-h;
-				systemMessageWaitTime1=0;
-				var id = systemMessageQueue.pop();
-				//console.log(id)
-				for(var i=0;i<systemMessage.length;i++){
-					//console.log(systemMessage[i].id);
-					if(systemMessage[i].id === id){
-						systemMessageCurrentMessage = systemMessage[i].m;
-					
-						break;
-					}
-				}
-				
-				
-				//systemMessageWaitTime1=systemMessageWaitTime1Max;
-			}
-			if(systemMessageStarted){
-				if(systemMessageState==0 && systemMessageWaitTime1==0)systemMessageY+=systemMessageYInc;
-				if(systemMessageState==1 && systemMessageWaitTime1==0)systemMessageY-=systemMessageYInc;
-				if(systemMessageState==0 && systemMessageY>=h/10 && systemMessageWaitTime1==0){
-					systemMessageWaitTime1=60;
-					systemMessageState=1;
-				}
-				if(systemMessageWaitTime1>0)systemMessageWaitTime1-=1;
-					
-				if(systemMessageState==1 && systemMessageY<=-h && systemMessageWaitTime1==0){
-					systemMessageStarted=false;
-				}
-				
-				if(systemMessageWaitTime1==0 && systemMessageState==2){
-					
-					//systemMessageStarted=false;
-				}
-					
-					
-				
-			}
-			
+	//
+	// System messages on top of screen
+	//
+	//
+	// System messages on top of screen
+	//
+	function drawSystemMessage(){
 		
+				//var systemMessage = [{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. (Be in anchor mode to do this..)"}];
+	//var systemMessageQueue = [];
+	//var systemMessageY = 0; // scroll position
+	//var systemMessageYInc = 1; // scroll speed
+	//var systemMessageWaitTime1 = 0; // count down from here to scroll back up.
+	//var systemMessageWaitTime1Max = 60; // wait x when scrolled down.
+	//var systemMessageStarted = false; // when new message started.
+	//var systemMessageState = 0; 0 down 1 up
+	//var systemMessageCurrentMessage=0;
+					//
+		var x=window.innerWidth/4;
+		var y=0+systemMessageY;
+		var w=window.innerWidth/2;
+		var h=window.innerWidth/20;
+		var myTxt = systemMessageCurrentMessage;
+		if(myTxt=="")myTxt=",";
+		if(systemMessageStarted==false && systemMessageQueue.length>0){
 			
-			//
-			// draw
+			systemMessageStarted=true;
+			systemMessageState=0;
+			systemMessageY=-h;
+			systemMessageWaitTime1=0;
+			var id = systemMessageQueue.pop();
+			//console.log(id)
+			for(var i=0;i<systemMessage.length;i++){
+				//console.log(systemMessage[i].id);
+				if(systemMessage[i].id === id){
+					systemMessageCurrentMessage = systemMessage[i].m;
+				
+					break;
+				}
+			}
 			
-			//
-			// Add the area into the collision list
-			//touchCollision.push({x:x,y:y,w:w,h:h,id:0,data:0});//set these to program
-			// Draw the box..
-			ctx.fillStyle="#111111";
-			ctx.fillRect(x,y,w,h);
-			x+=1;
-			y+=1;
-			w-=2;
-			h-=2;
-			ctx.fillStyle="#666666";
-			ctx.fillRect(x,y,w,h);
-			x+=6;
-			y+=6;
-			w-=12;
-			h-=12;
-			ctx.fillStyle="#000000";
-			ctx.fillRect(x,y,w,h);
-			//
-			// Draw the text label
-			var sz = window.innerWidth/60;
-			ctx.font = "bold "+sz+"px serif";					
-			ctx.fillStyle="#eeeeee";
-			var metrics = ctx.measureText(myTxt);
-			x+=metrics.width/12;
-			metrics = ctx.measureText("W");
-			y+=metrics.width*0.9;
 			
-			var lines = myTxt.split('\n');
-
-			for (var j = 0; j<lines.length; j++)
-			ctx.fillText(lines[j], x, y + (j*(metrics.width*0.9)) );
-			//ctx.fillText(theTxt,x,y);
+			//systemMessageWaitTime1=systemMessageWaitTime1Max;
+		}
+		if(systemMessageStarted){
+			if(systemMessageState==0 && systemMessageWaitTime1==0)systemMessageY+=systemMessageYInc;
+			if(systemMessageState==1 && systemMessageWaitTime1==0)systemMessageY-=systemMessageYInc;
+			if(systemMessageState==0 && systemMessageY>=h/10 && systemMessageWaitTime1==0){
+				systemMessageWaitTime1=60;
+				systemMessageState=1;
+			}
+			if(systemMessageWaitTime1>0)systemMessageWaitTime1-=1;
+				
+			if(systemMessageState==1 && systemMessageY<=-h && systemMessageWaitTime1==0){
+				systemMessageStarted=false;
+			}
 			
+			if(systemMessageWaitTime1==0 && systemMessageState==2){
+				
+				//systemMessageStarted=false;
+			}
+				
+				
 			
 		}
-		function addSystemMessage(id){
-			//addSystemMessage("pixelBrushTip");
-			//addSystemMessage("colorBrushTip");
-			//addSystemMessage("textureBrushTip");
-			
-			systemMessageY=-100;
-			systemMessageWaitTime1==0;
-			//systemMessageQueue.pop();
-			systemMessageState=0;
-			systemMessageCurrentMessage="";
-			systemMessageStarted=false;
-			systemMessageQueue.push(id);
-			
-		}	
+		
+	
+		
+		//
+		// draw
+		
+		//
+		// Add the area into the collision list
+		//touchCollision.push({x:x,y:y,w:w,h:h,id:0,data:0});//set these to program
+		// Draw the box..
+		ctx.fillStyle="#111111";
+		ctx.fillRect(x,y,w,h);
+		x+=1;
+		y+=1;
+		w-=2;
+		h-=2;
+		ctx.fillStyle="#666666";
+		ctx.fillRect(x,y,w,h);
+		x+=6;
+		y+=6;
+		w-=12;
+		h-=12;
+		ctx.fillStyle="#000000";
+		ctx.fillRect(x,y,w,h);
+		//
+		// Draw the text label
+		var sz = window.innerWidth/60;
+		ctx.font = "bold "+sz+"px serif";					
+		ctx.fillStyle="#eeeeee";
+		var metrics = ctx.measureText(myTxt);
+		x+=metrics.width/12;
+		metrics = ctx.measureText("W");
+		y+=metrics.width*0.9;
+		
+		var lines = myTxt.split('\n');
+
+		for (var j = 0; j<lines.length; j++)
+		ctx.fillText(lines[j], x, y + (j*(metrics.width*0.9)) );
+		//ctx.fillText(theTxt,x,y);
+		
+		
+	}
+	function addSystemMessage(id){
+		//addSystemMessage("pixelBrushTip");
+		//addSystemMessage("colorBrushTip");
+		//addSystemMessage("textureBrushTip");
+		
+		systemMessageY=-100;
+		systemMessageWaitTime1==0;
+		//systemMessageQueue.pop();
+		systemMessageState=0;
+		systemMessageCurrentMessage="";
+		systemMessageStarted=false;
+		systemMessageQueue.push(id);
+		
+	}	
 	
 	function doUpdateSurface(){
 		
@@ -2225,6 +2231,11 @@ Use different browser.
 		e.preventDefault();	
 		}		
 		
+	}
+	function bugHandler(){ // did the landscape mode <> portrait mode (sync)
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		updateSurface=true;						
 	}
 	function resizeHandler(e){
 		e.preventDefault();
