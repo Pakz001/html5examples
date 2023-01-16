@@ -63,9 +63,10 @@ Use different browser.
 		function doGameLoop(){
 		//myCanvas.height = window.innerHeight-32;
 		//myCanvas.width = window.innerWidth-32;
-		
-			ctx.fillStyle="rgb(0,0,0)";
-			ctx.fillRect(0,0,c.width,c.height);
+			if(Math.random()<.05)bugHandler(); // Did the screen get turned? adjust screen/user interface..	
+			
+			ctx.fillStyle="rgb(20,20,20)";
+			ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 			ctx.fillStyle="rgb(255,255,255)";
 			ctx.font = "bold "+12+"px serif";			
 			ctx.fillText("Javascript Html canvas example.",10,10); 
@@ -80,6 +81,9 @@ Use different browser.
 		
 		}
 
+		//
+		// System messages on top of screen
+		//
 		function drawSystemMessage(){
 			
 					//var systemMessage = [{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. (Be in anchor mode to do this..)"}];
@@ -92,10 +96,17 @@ Use different browser.
 		//var systemMessageState = 0; 0 down 1 up
 		//var systemMessageCurrentMessage=0;
 						//
+			
+			if(systemMessageCurrentMessage==null)return;
+			
 			var x=window.innerWidth/4;
 			var y=0+systemMessageY;
 			var w=window.innerWidth/2;
 			var h=window.innerWidth/20;
+			
+			//new message
+			
+			if(window.innerHeight>window.innerWidth)h*=2;
 			var myTxt = systemMessageCurrentMessage;
 			if(myTxt=="")myTxt=",";
 			if(systemMessageStarted==false && systemMessageQueue.length>0){
@@ -114,10 +125,8 @@ Use different browser.
 						break;
 					}
 				}
-				
-				
-				//systemMessageWaitTime1=systemMessageWaitTime1Max;
 			}
+			// are we currently handling a message
 			if(systemMessageStarted){
 				if(systemMessageState==0 && systemMessageWaitTime1==0)systemMessageY+=systemMessageYInc;
 				if(systemMessageState==1 && systemMessageWaitTime1==0)systemMessageY-=systemMessageYInc;
@@ -126,9 +135,11 @@ Use different browser.
 					systemMessageState=1;
 				}
 				if(systemMessageWaitTime1>0)systemMessageWaitTime1-=1;
-					
+				
+				//the message has ended	
 				if(systemMessageState==1 && systemMessageY<=-h && systemMessageWaitTime1==0){
 					systemMessageStarted=false;
+					systemMessageCurrentMessage=null;
 				}
 				
 				if(systemMessageWaitTime1==0 && systemMessageState==2){
@@ -291,7 +302,12 @@ Use different browser.
 			
 		}
 		//
-		//
+		// Fix ME!
+		function bugHandler(){ // did the landscape mode <> portrait mode (sync)
+			myCanvas.height = window.innerHeight-32;
+			myCanvas.width = window.innerWidth-32;
+			updateSurface=true;							
+		}		
 		function resizeHandler(e){
 			e.preventDefault();
 			myCanvas.height = window.innerHeight-32;
