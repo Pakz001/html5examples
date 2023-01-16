@@ -22,6 +22,10 @@ Use different browser.
 	<script>
 	var c=document.getElementById("myCanvas");
 	var ctx=c.getContext("2d");
+	
+	var offscreenCanvas = document.createElement("canvas");
+
+	var ctx2 = offscreenCanvas.getContext("2d")
 
 	window.addEventListener("touchstart", touchHandler,false);
 	window.addEventListener("touchmove", touchHandler,false);
@@ -237,7 +241,16 @@ Use different browser.
 	var s1=10;
 	var s2=.5;
 	addSystemMessage("introMessage");	
+	updateOffscreenCanvas();
+	var firstUpdate=2;
 	function doGameLoop(){
+		if(firstUpdate>0){
+			firstUpdate-=1;
+			if(firstUpdate==0){
+				updateOffscreenCanvas();
+			}
+			
+		}	
 		//cls(0);
 		ctx.fillStyle="#111111";
 		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -254,7 +267,7 @@ Use different browser.
 		//setColor(2);
 		//ctx.fillText("Javascript Html canvas example.",10,10); 
 		//outlineRect(0,0,200,200,2,5);
-		touchCollision = [];
+		//touchCollision = [];
 		if(surfaceBuffer==1){
 			ctx.drawImage(surfaceImage,0,0);
 			ctx.drawImage(oldSurfaceImage,0,0);		
@@ -271,6 +284,8 @@ Use different browser.
 			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/2-brushRoundSize/2);
 			uiBrushTimeOut-=1;
 		}
+		ctx.drawImage(offscreenCanvas, 0, 0);		
+		/*
 		drawPaletteBar(activePalette);
 		drawPaletteCart(uiPaletteCard);
 		drawTabWindow();
@@ -278,6 +293,7 @@ Use different browser.
 		drawBrushFXSlider1();
 		drawColorBar();
 		drawToolBar();
+		*/
 		drawSystemMessage();
 		
 			
@@ -354,13 +370,13 @@ Use different browser.
 			
 	//	}
 		//outer edge..
-		ctx.fillRect(left,bottom,w,top-bottom);
-		ctx.fillRect(left,bottom,w,ps+2);//bottom center
-		ctx.fillRect(left,bottom,ps,-(h-2*ps));//left center
-		ctx.fillRect(left+ps*2,top,w-4*ps,ps);//top center
-		ctx.fillRect(right-ps,bottom,ps,-(h-2*ps));//right center
-		ctx.fillRect(left+ps,top+ps,ps,ps); // dot left top
-		ctx.fillRect(right-ps*2,top+ps,ps,ps); // dot left top
+		ctx2.fillRect(left,bottom,w,top-bottom);
+		ctx2.fillRect(left,bottom,w,ps+2);//bottom center
+		ctx2.fillRect(left,bottom,ps,-(h-2*ps));//left center
+		ctx2.fillRect(left+ps*2,top,w-4*ps,ps);//top center
+		ctx2.fillRect(right-ps,bottom,ps,-(h-2*ps));//right center
+		ctx2.fillRect(left+ps,top+ps,ps,ps); // dot left top
+		ctx2.fillRect(right-ps*2,top+ps,ps,ps); // dot left top
 		//
 		// top area
 		texLine(left+ps*2,top+ps,(w/(ps*2)),[2,8,7],intensity);
@@ -400,7 +416,7 @@ Use different browser.
 			// Bottom dark
 			setColor(4);//4
 			do{
-				ctx.fillRect(left+ps,top+ps*3,w-ps*2,ps);
+				ctx2.fillRect(left+ps,top+ps*3,w-ps*2,ps);
 				top+=ps;
 			}while(top+(ps*3)<bottom);
 		}
@@ -416,7 +432,7 @@ Use different browser.
 		var e=0;
 		do{
 			setColorI(tx[n],intensity);
-			ctx.fillRect(x1,y,ps+1,ps+1);
+			ctx2.fillRect(x1,y,ps+1,ps+1);
 			x1+=(direc*ps);
 			n++;
 			if(n>=tx.length)n=tx.length-1;
@@ -433,7 +449,7 @@ Use different browser.
 	}	
 	// set the fillstyle color of palette(c)
 	function setColorI(c,intensity=1.0){
-		ctx.fillStyle = "rgb("+(palette[c].r*intensity)+","+(palette[c].g*intensity)+","+(palette[c].b*intensity)+","+palette[c].a+")";
+		ctx2.fillStyle = "rgb("+(palette[c].r*intensity)+","+(palette[c].g*intensity)+","+(palette[c].b*intensity)+","+palette[c].a+")";
 	}
 	
 	
@@ -981,26 +997,26 @@ Use different browser.
 				setColor(1);
 				var sz=window.innerWidth/60;
 				var s=brushName[brushMode];
-				ctx.font = "bold "+sz+"px serif";				
+				ctx2.font = "bold "+sz+"px serif";				
 				//const metrics = ctx.measureText(s);
 				var q=0;
 				if(window.innerWidth<window.innerHeight)q=h/8;
-				ctx.fillText(s,x+w/5,(y+h/2)+q);								
+				ctx2.fillText(s,x+w/5,(y+h/2)+q);								
 				
 			}
 			if(i==12){
 				drawPaletteRect(x+12,y+12,w-24,h/2,0);				
 				setColor(1);
 				var sz=window.innerWidth/36;
-				ctx.font = "bold "+sz+"px serif";				
+				ctx2.font = "bold "+sz+"px serif";				
 				setColor(0);
 				drawPaletteRect(x+12+w/4,y+h/12,w-24-w/4,h/2,4);
 				setColor(1);
-				ctx.fillText(i,x+w/2,(y+h*.5)+q);				
+				ctx2.fillText(i,x+w/2,(y+h*.5)+q);				
 
 				var sz=window.innerWidth/50;
 				var s="B";
-				ctx.font = "bold "+sz+"px serif";				
+				ctx2.font = "bold "+sz+"px serif";				
 				//const metrics = ctx.measureText(s);
 				var q=0;
 				if(window.innerWidth<window.innerHeight)q=h/8;
@@ -1011,19 +1027,19 @@ Use different browser.
 				drawPaletteRect(x+12,y+12,w-24,h/2,0);				
 				setColor(1);
 				var sz=window.innerWidth/36;
-				ctx.font = "bold "+sz+"px serif";				
+				ctx2.font = "bold "+sz+"px serif";				
 				setColor(0);
 				drawPaletteRect(x+12+w/4,y+h/12,w-24-w/4,h/2,4);
 				setColor(1);
-				ctx.fillText(i,x+w/2,(y+h*.5)+q);				
+				ctx2.fillText(i,x+w/2,(y+h*.5)+q);				
 
 				var sz=window.innerWidth/50;
 				var s="B";
-				ctx.font = "bold "+sz+"px serif";				
+				ctx2.font = "bold "+sz+"px serif";				
 				//const metrics = ctx.measureText(s);
 				var q=0;
 				if(window.innerWidth<window.innerHeight)q=h/8;
-				ctx.fillText(s,x+w/4,(y+h/1.5)+q);
+				ctx2.fillText(s,x+w/4,(y+h/1.5)+q);
 
 				
 			}
@@ -1037,11 +1053,11 @@ Use different browser.
 					s="Overwrite";
 					sz/=1.2;
 				}				
-				ctx.font = "bold "+sz+"px serif";				
+				ctx2.font = "bold "+sz+"px serif";				
 				//const metrics = ctx.measureText(s);
 				var q=0;
 				if(window.innerWidth<window.innerHeight)q=h/8;
-				ctx.fillText(s,x+w/5,(y+h/2)+q);								
+				ctx2.fillText(s,x+w/5,(y+h/2)+q);								
 				
 			}
 			//if(i==uiToolSelected){ // if highlight needed
@@ -1218,8 +1234,8 @@ Use different browser.
 			for(var x2=x;x2<x+w-24;x2++){
 				b+=4;
 				c+=6;
-				ctx.fillStyle="rgb("+a+","+b+","+c+")";	
-				ctx.fillRect(x2+12,y+12,1,h-24);
+				ctx2.fillStyle="rgb("+a+","+b+","+c+")";	
+				ctx2.fillRect(x2+12,y+12,1,h-24);
 			}
 			touchCollision.push({x:x,y:y,w:w,h:h,id:2});
 			x+=w;
@@ -1250,6 +1266,7 @@ Use different browser.
 	//
 	// Draw a strip of colors from the palette[];
 	function drawPaletteBar(active=-1){
+
 		var x=0;
 		var w = window.innerWidth/20;
 		var h = w;
@@ -1290,12 +1307,12 @@ Use different browser.
 	//
 	function drawRectCart(x,y,w,h,c,cart){
 		setColorCart(c,cart);
-		ctx.fillRect(x,y,w,h);
+		ctx2.fillRect(x,y,w,h);
 	}
 	
 	function drawRect(x,y,w,h,c){
 		setColor(c);
-		ctx.fillRect(x,y,w,h);
+		ctx2.fillRect(x,y,w,h);
 	}
 	// clear screen using palette(c) color
 	function cls(c){
@@ -1305,20 +1322,20 @@ Use different browser.
 	// set the fillstyle color of palette(c)
 	function setColorCart(c,cart){
 		if(cart==0){
-			ctx.fillStyle = "rgb("+paletteCart01[c].r+","+paletteCart01[c].g+","+paletteCart01[c].b+","+paletteCart01[c].a+")";
+			ctx2.fillStyle = "rgb("+paletteCart01[c].r+","+paletteCart01[c].g+","+paletteCart01[c].b+","+paletteCart01[c].a+")";
 		}else if(cart==1){
-			ctx.fillStyle = "rgb("+paletteCart02[c].r+","+paletteCart02[c].g+","+paletteCart02[c].b+","+paletteCart02[c].a+")";
+			ctx2.fillStyle = "rgb("+paletteCart02[c].r+","+paletteCart02[c].g+","+paletteCart02[c].b+","+paletteCart02[c].a+")";
 		}else if(cart==2){
-			ctx.fillStyle = "rgb("+paletteCart03[c].r+","+paletteCart03[c].g+","+paletteCart03[c].b+","+paletteCart03[c].a+")";
+			ctx2.fillStyle = "rgb("+paletteCart03[c].r+","+paletteCart03[c].g+","+paletteCart03[c].b+","+paletteCart03[c].a+")";
 		}else if(cart==3){
-			ctx.fillStyle = "rgb("+paletteCart04[c].r+","+paletteCart04[c].g+","+paletteCart04[c].b+","+paletteCart04[c].a+")";
+			ctx2.fillStyle = "rgb("+paletteCart04[c].r+","+paletteCart04[c].g+","+paletteCart04[c].b+","+paletteCart04[c].a+")";
 			
 		}
 	}
 	
 	// set the fillstyle color of palette(c)
 	function setColor(c){
-		ctx.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+		ctx2.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
 	}
 	function setCtxColor(can,c){
 		can.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
@@ -1328,11 +1345,11 @@ Use different browser.
 	// draw outline rect
 	// x,y,w,h,palette color, line width.
 	function outlineRect(x,y,w,h,c,lineWidth=1){
-		ctx.beginPath();
-		ctx.lineWidth = lineWidth;
-		ctx.strokeStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
-		ctx.rect(x,y,w,h);
-		ctx.stroke();
+		ctx2.beginPath();
+		ctx2.lineWidth = lineWidth;
+		ctx2.strokeStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+		ctx2.rect(x,y,w,h);
+		ctx2.stroke();
 	}
 	
 	//
@@ -1465,6 +1482,7 @@ Use different browser.
 	//
 	function drawButton(x,y,w,h,depth=.2,ps=3){
 		//drawRect2(x,y,w,h,0);
+
 		if(depth>.5)depth=.5;
 		setColor(0);
 		var left = x;
@@ -1473,12 +1491,12 @@ Use different browser.
 		var top = y;
 		
 		//outer edge..
-		ctx.fillRect(left,bottom,w,ps+2);//bottom center
-		ctx.fillRect(left,bottom,ps,-(h-2*ps));//left center
-		ctx.fillRect(left+ps*2,top,w-4*ps,ps);//top center
-		ctx.fillRect(right-ps,bottom,ps,-(h-2*ps));//right center
-		ctx.fillRect(left+ps,top+ps,ps,ps); // dot left top
-		ctx.fillRect(right-ps*2,top+ps,ps,ps); // dot left top
+		ctx2.fillRect(left,bottom,w,ps+2);//bottom center
+		ctx2.fillRect(left,bottom,ps,-(h-2*ps));//left center
+		ctx2.fillRect(left+ps*2,top,w-4*ps,ps);//top center
+		ctx2.fillRect(right-ps,bottom,ps,-(h-2*ps));//right center
+		ctx2.fillRect(left+ps,top+ps,ps,ps); // dot left top
+		ctx2.fillRect(right-ps*2,top+ps,ps,ps); // dot left top
 		//
 		// top area
 		texLine(left+ps*2,top+ps,(w/(ps*2)),[2,8,7]);
@@ -1508,7 +1526,7 @@ Use different browser.
 		// Bottom dark
 		setColor(4);
 		do{
-			ctx.fillRect(left+ps,top+ps*3,w-ps*2,ps);
+			ctx2.fillRect(left+ps,top+ps*3,w-ps*2,ps);
 			top+=ps;
 		}while(top+(ps*3)<bottom);
 		
@@ -1524,7 +1542,7 @@ Use different browser.
 		var e=0;
 		do{
 			setColor(tx[n]);
-			ctx.fillRect(x1,y,ps+1,ps+1);
+			ctx2.fillRect(x1,y,ps+1,ps+1);
 			x1+=(direc*ps);
 			n++;
 			if(n>=tx.length)n=tx.length-1;
@@ -1575,13 +1593,15 @@ Use different browser.
 				ctx.drawImage(surfaceImage,0,0);
 				//surfaceBuffer=1
 			}
-			drawPaletteBar(activePalette);
-			drawPaletteCart(uiPaletteCard);
-			drawTabWindow();
-			drawBrushSizeSlider();
-			drawBrushFXSlider1();			
-			drawColorBar();		
-			drawToolBar();
+			ctx.drawImage(offscreenCanvas, 0, 0);
+//			drawPaletteBar(activePalette);
+//			drawPaletteCart(uiPaletteCard);
+//			drawTabWindow();
+//			drawBrushSizeSlider();
+//			drawBrushFXSlider1();
+//			drawColorBar();
+//			drawToolBar();
+
 			//pinchDragCoolDown = 0;
 			e.preventDefault();
 		}		
@@ -1702,13 +1722,16 @@ Use different browser.
 					ctx.drawImage(surfaceImage,0,0);
 					//surfaceBuffer=1
 				}
-				drawPaletteBar(activePalette);
-				drawPaletteCart(uiPaletteCard);
-				drawTabWindow();
-				drawBrushSizeSlider();
-				drawBrushFXSlider1();				
-				drawColorBar();		
-				drawToolBar();
+				ctx.drawImage(offscreenCanvas, 0, 0);		
+					
+//				drawPaletteBar(activePalette);
+//				drawPaletteCart(uiPaletteCard);
+//				drawTabWindow();
+//				drawBrushSizeSlider();
+//				drawBrushFXSlider1();
+//				drawColorBar();
+//				drawToolBar();
+
 				updateSurface = true;
 
 			}
@@ -1778,13 +1801,17 @@ Use different browser.
 						ctx.drawImage(surfaceImage,0,0);
 						//surfaceBuffer=1
 					}
+					ctx.drawImage(offscreenCanvas, 0, 0);
+					/*
 					drawPaletteBar(activePalette);
 					drawPaletteCart(uiPaletteCard);
 					drawTabWindow();
 					drawBrushSizeSlider();
-					drawBrushFXSlider1();	
-					drawColorBar();		
+					drawBrushFXSlider1();
+					drawColorBar();
 					drawToolBar();
+					*/					
+					
 					//var brushLastAngle = 0;	
 					brushLastAngle = angle;
 					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
@@ -1843,13 +1870,16 @@ Use different browser.
 						ctx.drawImage(surfaceImage,0,0);
 						//surfaceBuffer=1
 					}
+					ctx.drawImage(offscreenCanvas, 0, 0);		
+					/*
 					drawPaletteBar(activePalette);
 					drawPaletteCart(uiPaletteCard);
 					drawTabWindow();
 					drawBrushSizeSlider();
-					drawBrushFXSlider1();					
-					drawColorBar();		
+					drawBrushFXSlider1();
+					drawColorBar();
 					drawToolBar();
+					*/					
 					//var brushLastAngle = 0;	
 					brushLastAngle = angle;
 					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
@@ -1915,7 +1945,8 @@ Use different browser.
 							//if(brushFX1<0)brushFX1=0;
 							//console.log(brushFX1);
 							//uiBrushTimeOut=30;		
-							uiActiveTime=30;				
+							uiActiveTime=30;		
+							updateOffscreenCanvas();		
 						}
 					}					
 					if(touchCollision[i].id==0){
@@ -1940,6 +1971,7 @@ Use different browser.
 							makeRoundBrush(brushRoundSize)
 							uiBrushTimeOut=30;
 							uiActiveTime=30;
+							updateOffscreenCanvas();							
 						}
 					}
 				}	
@@ -2286,7 +2318,8 @@ Use different browser.
 						//if(brushFX1<0)brushFX1=0;
 						//console.log(brushFX1);
 						//uiBrushTimeOut=30;		
-						uiActiveTime=30;				
+						uiActiveTime=30;		
+		
 					}
 				}
 
@@ -2399,7 +2432,7 @@ Use different browser.
 				}
 			}
 			
-			
+		updateOffscreenCanvas();			
 			
 		e.preventDefault();	
 		}		
@@ -2410,11 +2443,28 @@ Use different browser.
 //		if(Math.random()<.01){
 			myCanvas.height = window.innerHeight-32;
 			myCanvas.width = window.innerWidth-32;
+			updateOffscreenCanvas()
+//			offscreenCanvas.width=window.innerWidth-32;
+//			offscreenCanvas.height=window.innerHeight-32;
+		
 			//surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) 			
 			updateSurface=true;
 //		}
 		
 	}
+	function updateOffscreenCanvas(){
+		offscreenCanvas.width=window.innerWidth-32;
+		offscreenCanvas.height=window.innerHeight-32;
+		touchCollision = [];	
+		drawPaletteBar(activePalette);
+		drawPaletteCart(uiPaletteCard);
+		drawTabWindow();
+		drawBrushSizeSlider();
+		drawBrushFXSlider1();
+		drawColorBar();
+		drawToolBar();
+	}	
+	
 </script>
 </body>
 </html>
