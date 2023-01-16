@@ -46,6 +46,7 @@ Use different browser.
 	var uiToolOverwrite = false;
 	var uiToolSelected = 1;
 	var uiNumTabs = 4; // number of tabs in bottom right widnow
+	var uiActiveTab = 1;
 	//var uiPortraitMode = false; // Is the landscape mode used?  tiltHandler()
 	//var uiLandscapeMode = false; // is the uiLandscape mode used?
 
@@ -237,6 +238,7 @@ Use different browser.
 	var s2=.5;
 	addSystemMessage("introMessage");	
 	function doGameLoop(){
+		if(Math.random()<.08)uiActiveTab=Math.floor(Math.random()*(uiNumTabs+1));
 		//var uiPortraitMode = false; // Is the landscape mode used?
 		//var uiLandscapeMode = false; // is the 
 		if(Math.random()<.05)bugHandler(); // Did the screen get turned? adjust screen/user interface..	
@@ -311,13 +313,13 @@ Use different browser.
 		// draw the tabs
 		var tabWidth = (w/1.05)/(uiNumTabs+1);
 		var tabHeight = h/10;
-		for(var tab=uiNumTabs;tab>0;tab-=1){
+		for(var tab=uiNumTabs;tab>=0;tab-=1){
 			var x1 = tab*tabWidth;
 			//setColor(2);
-			if(tab!=0)setColor(5);
-			drawTabButton((x+x1),y,tabWidth+20,tabHeight,depth=.5,ps=3,0.5);
+			//if(tab!=0)setColor(5);
+			if(tab!=uiActiveTab)drawTabButton((x+x1),y,tabWidth+20,tabHeight,depth=.5,ps=3,0.67,true);
 		}
-		drawButton(x,y,tabWidth+20,tabHeight,depth=.5,ps=3,0);	
+		drawTabButton(x+(uiActiveTab*tabWidth),y,tabWidth+20,tabHeight,depth=.5,ps=3,1,false);	
 	}
 	
 	// angle x points of brush ends with two colors from palette. shade..
@@ -1200,6 +1202,10 @@ Use different browser.
 	}
 	
 	// set the fillstyle color of palette(c)
+	function setColorI(c,intensity=1.0){
+		ctx.fillStyle = "rgb("+(palette[c].r*intensity)+","+(palette[c].g*intensity)+","+(palette[c].b*intensity)+","+palette[c].a+")";
+	}
+	// set the fillstyle color of palette(c)
 	function setColor(c){
 		ctx.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
 	}
@@ -1346,7 +1352,7 @@ Use different browser.
 	//
 	// Draw a horizontal or vertical slider for brush size.
 	//
-	function drawTabButton(x,y,w,h,depth=.2,ps=3,alpha=1){
+	function drawTabButton(x,y,w,h,depth=.2,ps=3,intensity=1.0,drawBottom=true){
 		//drawRect2(x,y,w,h,0);
 		if(depth>.5)depth=.5;
 		setColor(0);
@@ -1354,12 +1360,14 @@ Use different browser.
 		var right = x+w;
 		var bottom = y+h;
 		var top = y;
+
+
 		//ctx.globalAlpha = alpha;
-		if(alpha<1){
-			ctx.globalAlpha = alpha;
+		//if(alpha<1){
+			//ctx.globalAlpha = alpha;
 //			ctx.globalCompositeOperation = "color-burn";			//whiter
 //			ctx.globalCompositeOperation = "hard-light";			//!			
-			ctx.globalCompositeOperation = "xor";			
+//			ctx.globalCompositeOperation = "xor";			
 			//ctx.globalCompositeOperation = "source-over";			//nothing
 			//ctx.globalCompositeOperation = "source-in";			//wth
 			//ctx.globalCompositeOperation = "source-out";			//wth
@@ -1377,7 +1385,7 @@ Use different browser.
 //			ctx.globalCompositeOperation = "soft-light";			//!
 			//ctx.globalCompositeOperation = "saturation";			//!
 			
-		}
+	//	}
 		//outer edge..
 		ctx.fillRect(left,bottom,w,top-bottom);
 		ctx.fillRect(left,bottom,w,ps+2);//bottom center
@@ -1388,38 +1396,48 @@ Use different browser.
 		ctx.fillRect(right-ps*2,top+ps,ps,ps); // dot left top
 		//
 		// top area
-		texLine(left+ps*2,top+ps,(w/(ps*2)),[2,8,7]);
-		texLine(right-ps*3,top+ps,-(w/(ps*2)),[2,8,7]);		
-		texLine(left+ps,top+ps*2,(w/(ps*2)),[2,8,7]);
-		texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,8,7]);		
+		texLine(left+ps*2,top+ps,(w/(ps*2)),[2,8,7],intensity);
+		texLine(right-ps*3,top+ps,-(w/(ps*2)),[2,8,7],intensity);		
+		texLine(left+ps,top+ps*2,(w/(ps*2)),[2,8,7],intensity);
+		texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,8,7],intensity);		
 		
 		//center mid part left to right
-		for(var i=0;i<(h*(depth/2));i++){
-			top+=ps;
-			texLine(left+ps,top+ps*2,(w/(ps*2)),[3,7]);
-			texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[3,7]);		
-		}
-		
-		//top+=h/10;
-		// bottom area
-		texLine(left+ps,top+ps,(w/(ps*2)),[3,8,7]);
-		texLine(right-ps*2,top+ps,-(w/(ps*2)),[3,8,7]);		
-		
-		texLine(left+ps,top+ps*2,(w/(ps*2)),[2,3,8,7]);
-		texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,3,8,7]);		
 
-		texLine(left+ps,top+ps*3,(w/(ps*2)),[3,4]);
-		texLine(right-ps*2,top+ps*3,-(w/(ps*2)),[3,4]);		
-				
-		top+=ps;
-		// Bottom dark
-		setColor(4);//4
-		do{
-			ctx.fillRect(left+ps,top+ps*3,w-ps*2,ps);
+		if(drawBottom==false){
+			for(var i=0;i<(h*(depth/2));i++){
+				top+=ps;
+				texLine(left+ps,top+ps*2,(w/(ps*2)),[3,7],intensity);
+				texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[3,7],intensity);		
+			}
+		}else{
+			for(var i=0;i<(h*(depth/3));i++){
+				top+=ps;
+				texLine(left+ps,top+ps*2,(w/(ps*2)),[3,7],intensity);
+				texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[3,7],intensity);		
+			}
+			
+		}	
+		//top+=h/10;
+		if(drawBottom){
+			// bottom area
+			texLine(left+ps,top+ps,(w/(ps*2)),[3,8,7],intensity);
+			texLine(right-ps*2,top+ps,-(w/(ps*2)),[3,8,7],intensity);		
+			
+			texLine(left+ps,top+ps*2,(w/(ps*2)),[2,3,8,7],intensity);
+			texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,3,8,7],intensity);		
+	
+			texLine(left+ps,top+ps*3,(w/(ps*2)),[3,4],intensity);
+			texLine(right-ps*2,top+ps*3,-(w/(ps*2)),[3,4],intensity);		
+					
 			top+=ps;
-		}while(top+(ps*3)<bottom);
-		
-		function texLine(x,y,stp,tx){
+			// Bottom dark
+			setColor(4);//4
+			do{
+				ctx.fillRect(left+ps,top+ps*3,w-ps*2,ps);
+				top+=ps;
+			}while(top+(ps*3)<bottom);
+		}
+		function texLine(x,y,stp,tx,intensity){
 		//var tx = [2,8,1];
 		//var y = top+6;
 		//var x = left+6;
@@ -1430,7 +1448,7 @@ Use different browser.
 		var n = 0;
 		var e=0;
 		do{
-			setColor(tx[n]);
+			setColorI(tx[n],intensity);
 			ctx.fillRect(x1,y,ps+1,ps+1);
 			x1+=(direc*ps);
 			n++;
@@ -1440,11 +1458,11 @@ Use different browser.
 		}while(e<Math.abs(stp));
 
 		}	
-		if(alpha<1){
-			ctx.globalCompositeOperation = "source-over";						
-				
-		}		
-		ctx.globalAlpha = 1;
+//		if(alpha<1){
+//			ctx.globalCompositeOperation = "source-over";						
+//				
+//		}		
+//		ctx.globalAlpha = 1;
 	}	
 	
 	//
@@ -1510,7 +1528,7 @@ Use different browser.
 		var n = 0;
 		var e=0;
 		do{
-			setColor(tx[n]);
+			setColorI(tx[n]);
 			ctx.fillRect(x1,y,ps+1,ps+1);
 			x1+=(direc*ps);
 			n++;
