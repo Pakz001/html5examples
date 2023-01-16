@@ -238,7 +238,7 @@ Use different browser.
 	var s2=.5;
 	addSystemMessage("introMessage");	
 	function doGameLoop(){
-		if(Math.random()<.08)uiActiveTab=Math.floor(Math.random()*(uiNumTabs+1));
+		//if(Math.random()<.08)uiActiveTab=Math.floor(Math.random()*(uiNumTabs+1));
 		//var uiPortraitMode = false; // Is the landscape mode used?
 		//var uiLandscapeMode = false; // is the 
 		if(Math.random()<.05)bugHandler(); // Did the screen get turned? adjust screen/user interface..	
@@ -272,20 +272,7 @@ Use different browser.
 			
 
 		
-		if(uiBrushTimeOut>0){
-			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/2-brushRoundSize/2);
-			uiBrushTimeOut-=1;
-		}
-		drawPaletteBar(activePalette);
-		drawPaletteCart(uiPaletteCard);
-		drawTabWindow();// Tabber
-		drawBrushSizeSlider();
-		drawBrushFXSlider1();
-		//drawColorBar();//random color button..
-		drawToolBar();
-		drawSystemMessage();
-			
-		
+		drawUserInterface();		
 	}
 	
 	//
@@ -317,9 +304,13 @@ Use different browser.
 			var x1 = tab*tabWidth;
 			//setColor(2);
 			//if(tab!=0)setColor(5);
-			if(tab!=uiActiveTab)drawTabButton((x+x1),y,tabWidth+20,tabHeight,depth=.5,ps=3,0.67,true);
+			if(tab!=uiActiveTab){
+				drawTabButton((x+x1),y,tabWidth+20,tabHeight,depth=.5,ps=3,0.67,true);
+				touchCollision.push({x:x+x1,y:y,w:tabWidth+20,h:tabHeight,id:6,data:tab});				
+			}
 		}
 		drawTabButton(x+(uiActiveTab*tabWidth),y,tabWidth+20,tabHeight,depth=.5,ps=3,1,false);	
+		touchCollision.push({x:x+(uiActiveTab*tabWidth),y:y,w:tabWidth+20,h:tabHeight,id:6,data:uiActiveTab});		
 	}
 	
 	// angle x points of brush ends with two colors from palette. shade..
@@ -973,7 +964,7 @@ Use different browser.
 	//
 	function drawBrushFXSlider1(){
 		var x = window.innerWidth*.50;
-		var y = window.innerHeight*.90;
+		var y = window.innerHeight*.88;
 		var w = window.innerWidth/3;
 		var h = window.innerHeight/32;
 		
@@ -994,7 +985,7 @@ Use different browser.
 	//
 	function drawBrushSizeSlider(){
 		var x = window.innerWidth*.50;
-		var y = window.innerHeight*.80;
+		var y = window.innerHeight*.78;
 		var w = window.innerWidth/3;
 		var h = window.innerHeight/32;
 		
@@ -1012,7 +1003,7 @@ Use different browser.
 	// Draw our brush to the screen (show!)
 	//
 	function drawBrush(posX,posY){
-		var size = (window.innerWidth+window.innerHeight)/100;
+		var size = (window.innerWidth+window.innerHeight)/150;
 		posX-=brush.length*size/2;
 		posY-=brush.length*size/2;
 		for(var y=0;y<brush.length;y++){
@@ -1580,13 +1571,7 @@ Use different browser.
 				ctx.drawImage(surfaceImage,0,0);
 				//surfaceBuffer=1
 			}
-			drawPaletteBar(activePalette);
-			drawPaletteCart(uiPaletteCard);
-			drawTabWindow();// Tabber
-			drawBrushSizeSlider();
-			drawBrushFXSlider1();			
-			//drawColorBar();		
-			drawToolBar();
+			drawUserInterface();
 			//pinchDragCoolDown = 0;
 			e.preventDefault();
 		}		
@@ -1707,14 +1692,7 @@ Use different browser.
 					ctx.drawImage(surfaceImage,0,0);
 					//surfaceBuffer=1
 				}
-				drawPaletteBar(activePalette);
-				drawPaletteCart(uiPaletteCard);
-				drawTabWindow();// Tabber
-				drawBrushSizeSlider();
-				drawBrushFXSlider1();				
-				//drawColorBar();		
-				drawToolBar();
-				updateSurface = true;
+				drawUserInterface();				
 
 			}
 
@@ -1783,20 +1761,7 @@ Use different browser.
 						ctx.drawImage(surfaceImage,0,0);
 						//surfaceBuffer=1
 					}
-					drawPaletteBar(activePalette);
-					drawPaletteCart(uiPaletteCard);
-					drawTabWindow();// Tabber
-					drawBrushSizeSlider();
-					drawBrushFXSlider1();	
-					//drawColorBar();		
-					drawToolBar();
-					//var brushLastAngle = 0;	
-					brushLastAngle = angle;
-					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
-					
-					//if(Math.random()<.05)updateSurface = true;
-					
-					updateSurface=true;
+					drawUserInterface();
 					
 					
 				}
@@ -1848,20 +1813,8 @@ Use different browser.
 						ctx.drawImage(surfaceImage,0,0);
 						//surfaceBuffer=1
 					}
-					drawPaletteBar(activePalette);
-					drawPaletteCart(uiPaletteCard);
-					drawTabWindow();// Tabber
-					drawBrushSizeSlider();
-					drawBrushFXSlider1();					
-					//drawColorBar();		
-					drawToolBar();
-					//var brushLastAngle = 0;	
+					drawUserInterface()
 					brushLastAngle = angle;
-					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
-					
-					//if(Math.random()<.05)updateSurface = true;
-					
-					updateSurface=true;
 				}
 			}			
 			// plot pixel
@@ -1977,6 +1930,21 @@ Use different browser.
 			//
 			// Tool Section Buttons
 			for(var i=0;i<touchCollision.length;i++){
+				//
+				// Tabbers
+				//
+				if(touchCollision[i].id==6){
+	
+					var x = touchCollision[i].x;
+					var y = touchCollision[i].y;
+					var w = touchCollision[i].w;
+					var h = touchCollision[i].h;
+					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){						
+						uiActiveTab = touchCollision[i].data;
+						uiActiveTime=30;						
+						//console.log(touchCollision[i].data);
+					}
+				}
 				
 				if(touchCollision[i].id==3){
 					var x = touchCollision[i].x;
@@ -2033,7 +2001,7 @@ Use different browser.
 			}	
 
 			//
-			// Palette selection boxes
+			// Collision selection 
 			for(var i=0;i<touchCollision.length;i++){
 				if(touchCollision[i].id==5 && touchCollision[i].data==0){
 					var x = touchCollision[i].x;
@@ -2247,70 +2215,70 @@ Use different browser.
 			}
 			//
 			// Brush FX 1 and brush size  Slider position // smudge smear
-
-			for(var i=0;i<touchCollision.length;i++){
-
-				if(touchCollision[i].id==4){
-
-					var x = touchCollision[i].x;
-					var y = touchCollision[i].y;
-					var w = touchCollision[i].w;
-					var h = touchCollision[i].h;
-					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-						// set new slider position
-						// uiBrushSliderPos
-						//	var brushRoundSize = 32;
-						// makeRoundBrush(brushRoundSize);
-						//	var maxBrushRoundSize = 32;
-						// var minBrushRoundSize = 1;
-						//var brushFX1 = 2;
-						//var uiBrushFX1SliderPos = 10;
+			if(uiActiveTab==0){
+				for(var i=0;i<touchCollision.length;i++){
 	
-						
-						var step = 3/w;//maxBrushRoundSize/w;
-						var p = uiTouchLastX-x;
-						uiBrushFX1SliderPos = p;
-						if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
-						brushFX1 = (uiBrushFX1SliderPos*step)-1;			
-						//console.log(brushFX1);			
-						//if(brushFX1<0)brushFX1=0;
-						//console.log(brushFX1);
-						//uiBrushTimeOut=30;		
-						uiActiveTime=30;				
+					if(touchCollision[i].id==4){
+	
+						var x = touchCollision[i].x;
+						var y = touchCollision[i].y;
+						var w = touchCollision[i].w;
+						var h = touchCollision[i].h;
+						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+							// set new slider position
+							// uiBrushSliderPos
+							//	var brushRoundSize = 32;
+							// makeRoundBrush(brushRoundSize);
+							//	var maxBrushRoundSize = 32;
+							// var minBrushRoundSize = 1;
+							//var brushFX1 = 2;
+							//var uiBrushFX1SliderPos = 10;
+		
+							
+							var step = 3/w;//maxBrushRoundSize/w;
+							var p = uiTouchLastX-x;
+							uiBrushFX1SliderPos = p;
+							if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+							brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+							//console.log(brushFX1);			
+							//if(brushFX1<0)brushFX1=0;
+							//console.log(brushFX1);
+							//uiBrushTimeOut=30;		
+							uiActiveTime=30;				
+						}
 					}
+	
+				//
+				// Brush size  Slider position		
+					if(touchCollision[i].id==0){
+						var x = touchCollision[i].x;
+						var y = touchCollision[i].y;
+						var w = touchCollision[i].w;
+						var h = touchCollision[i].h;
+						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
+							// set new slider position
+							// uiBrushSliderPos
+							//	var brushRoundSize = 32;
+							// makeRoundBrush(brushRoundSize);
+							//	var maxBrushRoundSize = 32;
+							// var minBrushRoundSize = 1;
+							var step = maxBrushRoundSize/w;
+							var p = uiTouchLastX-x;
+							uiBrushSliderPos = p;
+							if(uiBrushSliderPos+16>w)uiBrushSliderPos-=16;
+							brushRoundSize = Math.round(uiBrushSliderPos*step);						
+							if(brushRoundSize<1)brushRoundSize=1;
+							makeRoundBrush(brushRoundSize)
+							uiBrushTimeOut=30;		
+							uiActiveTime=30;				
+						}
+					}					
 				}
-
-			//
-			// Brush size  Slider position
-
-
-
-				if(touchCollision[i].id==0){
-					var x = touchCollision[i].x;
-					var y = touchCollision[i].y;
-					var w = touchCollision[i].w;
-					var h = touchCollision[i].h;
-					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-						// set new slider position
-						// uiBrushSliderPos
-						//	var brushRoundSize = 32;
-						// makeRoundBrush(brushRoundSize);
-						//	var maxBrushRoundSize = 32;
-						// var minBrushRoundSize = 1;
-						var step = maxBrushRoundSize/w;
-						var p = uiTouchLastX-x;
-						uiBrushSliderPos = p;
-						if(uiBrushSliderPos+16>w)uiBrushSliderPos-=16;
-						brushRoundSize = Math.round(uiBrushSliderPos*step);						
-						if(brushRoundSize<1)brushRoundSize=1;
-						makeRoundBrush(brushRoundSize)
-						uiBrushTimeOut=30;		
-						uiActiveTime=30;				
-					}
-				}
-			}
+			}	
 			
-
+			//
+			// Brush!!
+			//
 			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY && uiActiveTime==0){
 			if(brushMode==2 && uiTouchLastY<window.innerHeight*.8){//plot
 				
@@ -2431,6 +2399,24 @@ Use different browser.
 //		}
 		
 	}
+	// Draw the user interface elements
+	function drawUserInterface(){
+		if(uiBrushTimeOut>0){
+			drawBrush(window.innerWidth/2-brushRoundSize/2,(window.innerHeight/3-brushRoundSize/2));
+			uiBrushTimeOut-=1;
+		}		
+		drawPaletteBar(activePalette);
+		drawPaletteCart(uiPaletteCard);
+		drawTabWindow();// Tabber
+		if(uiActiveTab == 0){
+			drawBrushSizeSlider();
+			drawBrushFXSlider1();
+		}
+		//drawColorBar();//random color button..
+		drawToolBar();
+		drawSystemMessage();
+	}	
+	
 </script>
 </body>
 </html>
