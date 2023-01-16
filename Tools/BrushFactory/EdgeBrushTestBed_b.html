@@ -255,6 +255,8 @@ Use different browser.
 	var s2=.5;
 	addSystemMessage("introMessage");	
 	function doGameLoop(){
+		if(Math.random()<.05)bugHandler(); // Did the screen get turned? adjust screen/user interface..	
+		
 		//cls(0);
 		ctx.fillStyle="#111111";
 		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -691,6 +693,17 @@ Use different browser.
 	// System messages on top of screen
 	//
 	function drawSystemMessage(){
+		
+				//var systemMessage = [{id:"anchorTip",m:"Long press anywhere on canvas to enable/disable anchor. (Be in anchor mode to do this..)"}];
+	//var systemMessageQueue = [];
+	//var systemMessageY = 0; // scroll position
+	//var systemMessageYInc = 1; // scroll speed
+	//var systemMessageWaitTime1 = 0; // count down from here to scroll back up.
+	//var systemMessageWaitTime1Max = 60; // wait x when scrolled down.
+	//var systemMessageStarted = false; // when new message started.
+	//var systemMessageState = 0; 0 down 1 up
+	//var systemMessageCurrentMessage=0;
+					//
 		var x=window.innerWidth/4;
 		var y=0+systemMessageY;
 		var w=window.innerWidth/2;
@@ -2451,6 +2464,12 @@ Use different browser.
 							}
 						}
 					}
+	function bugHandler(){ // did the landscape mode <> portrait mode (sync)
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		updateSurface=true;						
+	}
+	
 	function resizeHandler(e){
 		e.preventDefault();
 //		if(Math.random()<.01){
