@@ -58,6 +58,8 @@ Use different browser.
 	var uiImage = 0; // image of bottom user interface.. (optimize)
 	var uiLockBrushPreview = false; // lock the popup brush preview (modify)
 	var uiLockBrushPreviewBlinkTime = 0;
+	var uiBrushPreviewAngle = 0;
+
 
 	// slider position of the brush size
 	var uiBrushSliderPos=32;	
@@ -269,6 +271,11 @@ Use different browser.
 //			}
 ///			
 //		}	
+
+		uiBrushPreviewAngle+=0.03;
+		if(uiBrushPreviewAngle>Math.PI){
+			uiBrushPreviewAngle=-Math.PI;
+		}
 		//cls(0);
 		ctx.fillStyle="#111111";
 		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -1264,6 +1271,10 @@ Use different browser.
 		var size = (window.innerWidth+window.innerHeight)/138;
 		posX-=brush.length*size/2;
 		posY-=brush.length*size/2;
+
+		ctx.fillStyle="#000000";
+		ctx.fillRect(posX-12,posY-12,((brush.length+1)*(size))+12,((brush.length+1)*(size))+12);
+		
 		for(var y=0;y<brush.length;y++){
 		for(var x=0;x<brush.length;x++){	
 			if(brush[x][y]==1){
@@ -1276,6 +1287,60 @@ Use different browser.
 			
 			}
 		}}
+		// Store surface area that we use to draw the brush preview
+		var r=32;
+		var temp2 = [];
+		for(var i=-32;i<r;i++){
+			temp2[i] = new Array();
+			for(var j=-32;j<r;j++){
+				if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight){
+					temp2[i][j]=surface[50+i][50+j];
+				}else{
+					temp2[i][j]=-1;
+				}
+			}
+		}	
+		//erase the surface
+		for(var i=-32;i<r;i++){
+			for(var j=-32;j<r;j++){
+				if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight){
+					surface[50+i][50+j] = activePalette;
+				}
+			}
+		}			
+		smudgeHillBrush(50,50,uiBrushPreviewAngle)
+		
+		
+		//heres
+		var l=brush.length/2;
+		for(var y=-l;y<l;y++){
+		for(var x=-l;x<l;x++){
+			x = Math.floor(x);
+			y = Math.floor(y);	
+//			if(temp2[x][y]>0){
+//				setCtxColor2(temp2[x][y]+2);
+				setCtxColor(ctx,surface[50-(x)][50-(y)]);				
+//				if(Math.random()<.005)console.log(temp2[x-32][y-32]);
+//				ctx.fillStyle="#000000";
+				ctx.fillRect(posX+((x+l)*size),posY+((y+l)*size),size+1,size+1);
+//			}else{
+//				ctx.fillStyle="#FF00FF";
+//				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+				
+			
+//			}
+		}}
+		// restore the surface area we use to get the brush preview colors.
+
+		for(var i=-32;i<r;i++){
+			for(var j=-32;j<r;j++){
+				//console.log(i+","+j)
+				if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight && temp2[i][j]!=-1){
+					surface[50+i][50+j] = temp2[i][j];
+				}
+			}
+		}			
+		
 		
 	}
 	
@@ -1493,6 +1558,11 @@ Use different browser.
 			
 		}
 	}
+
+	// set the fillstyle color of palette(c)
+	function setColor2(c){
+		ctx.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+	}
 	
 	// set the fillstyle color of palette(c)
 	function setColor(c){
@@ -1502,6 +1572,9 @@ Use different browser.
 		can.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
 	}
 
+	function setCtxColor2(can,c){
+		ctx.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+	}
 	
 	// draw outline rect
 	// x,y,w,h,palette color, line width.
