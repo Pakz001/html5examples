@@ -20,12 +20,16 @@ user-select:none;
 Use different browser.
 </canvas>
 	<script>
+	//
+	// Note : look at height at y position of user interface
+	// in portrait mode.. (double)
+	//
 	var c=document.getElementById("myCanvas");
 	var ctx=c.getContext("2d");
 	
-	var offscreenCanvas = document.createElement("canvas");
+	var uiCanvas = document.createElement("canvas");
 
-	var ctx2 = offscreenCanvas.getContext("2d")
+	var ctx2 = uiCanvas.getContext("2d")
 
 	window.addEventListener("touchstart", touchHandler,false);
 	window.addEventListener("touchmove", touchHandler,false);
@@ -241,16 +245,28 @@ Use different browser.
 	var s1=10;
 	var s2=.5;
 	addSystemMessage("introMessage");	
-	updateOffscreenCanvas();
-	var firstUpdate=2;
+	updateUiCanvas();
+	//var firstUpdate=2;
 	function doGameLoop(){
-		if(firstUpdate>0){
-			firstUpdate-=1;
-			if(firstUpdate==0){
-				updateOffscreenCanvas();
-			}
-			
-		}	
+		// Correct resize screen tilt?
+		if(Math.floor(c.width)!=Math.floor(window.innerWidth-32)){
+			//console.log(window.innerWidth+","+c.width);
+			updateSurface=true;
+			updateUiCanvas();
+		}
+		if(Math.floor(c.height)!=Math.floor(window.innerHeight-32)){
+			//console.log(window.innerHeight+","+c.height);
+			updateSurface=true;
+			updateUiCanvas();
+		}
+		// First thi
+//		if(firstUpdate>0){
+//			firstUpdate-=1;
+//			if(firstUpdate==0){
+//				updateUiCanvas();
+//			}
+///			
+//		}	
 		//cls(0);
 		ctx.fillStyle="#111111";
 		ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -281,10 +297,10 @@ Use different browser.
 
 		
 		if(uiBrushTimeOut>0){
-			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/2-brushRoundSize/2);
+			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/3-brushRoundSize/2);
 			uiBrushTimeOut-=1;
 		}
-		ctx.drawImage(offscreenCanvas, 0, 0);		
+		ctx.drawImage(uiCanvas, 0, 0);		
 		/*
 		drawPaletteBar(activePalette);
 		drawPaletteCart(uiPaletteCard);
@@ -1104,17 +1120,22 @@ Use different browser.
 	//
 	function drawBrushFXSlider1(){
 		var x = window.innerWidth*.50;
-		var y = window.innerHeight*.90;
+//		var y = window.innerHeight*.90;
 		var w = window.innerWidth/3;
 		var h = window.innerHeight/32;
-		
-		drawButton(x,y,w,h);
+		var y = window.innerHeight-(window.innerWidth/5)+(w/3.3);	
+
+		// thinner if smaller
+		if(window.innerWidth<window.innerHeight){			
+			h/=1.5;
+		}
+		drawButton(x,y,w,h,.5,1);
 		drawRect(x+12,y+h/4,w-24,h/2,0);
 		//outlineRect(x,y,w,h,1,5);
 		sliderPos = uiBrushFX1SliderPos;
 		//var brushFX = 2;
 		//var uiBrushFXSliderPos = 10;
-	
+		//thinner if smaller
 		drawButton(x+sliderPos,y-4,24,h+8,.5,2);
 		//drawRect(x+sliderPos,y,16,h,1);
 		//outlineRect(x+sliderPos,y,16,h,1,5);
@@ -1124,11 +1145,21 @@ Use different browser.
 	// Draw a horizontal or vertical slider for brush size.
 	//
 	function drawBrushSizeSlider(){
+		//var w = window.innerWidth/20;
+		//var h = w;
+		//if(window.innerHeight>window.innerWidth)h-=h/6;
+		//var y=window.innerHeight-(w*4);
+		
 		var x = window.innerWidth*.50;
-		var y = window.innerHeight*.80;
 		var w = window.innerWidth/3;
 		var h = window.innerHeight/32;
+//		var y = window.innerHeight*.8;
 		
+		var y = window.innerHeight-(window.innerWidth/5)+(w/6.5);
+		//thinner if smaller
+		if(window.innerWidth<window.innerHeight){	
+			h/=1.5;			
+		}
 		drawButton(x,y,w,h);
 		drawRect(x+12,y+h/4,w-24,h/2,0);
 		//outlineRect(x,y,w,h,1,5);
@@ -1143,7 +1174,7 @@ Use different browser.
 	// Draw our brush to the screen (show!)
 	//
 	function drawBrush(posX,posY){
-		var size = (window.innerWidth+window.innerHeight)/100;
+		var size = (window.innerWidth+window.innerHeight)/138;
 		posX-=brush.length*size/2;
 		posY-=brush.length*size/2;
 		for(var y=0;y<brush.length;y++){
@@ -1593,7 +1624,7 @@ Use different browser.
 				ctx.drawImage(surfaceImage,0,0);
 				//surfaceBuffer=1
 			}
-			ctx.drawImage(offscreenCanvas, 0, 0);
+			ctx.drawImage(uiCanvas, 0, 0);
 //			drawPaletteBar(activePalette);
 //			drawPaletteCart(uiPaletteCard);
 //			drawTabWindow();
@@ -1722,7 +1753,7 @@ Use different browser.
 					ctx.drawImage(surfaceImage,0,0);
 					//surfaceBuffer=1
 				}
-				ctx.drawImage(offscreenCanvas, 0, 0);		
+				ctx.drawImage(uiCanvas, 0, 0);		
 					
 //				drawPaletteBar(activePalette);
 //				drawPaletteCart(uiPaletteCard);
@@ -1801,7 +1832,7 @@ Use different browser.
 						ctx.drawImage(surfaceImage,0,0);
 						//surfaceBuffer=1
 					}
-					ctx.drawImage(offscreenCanvas, 0, 0);
+					ctx.drawImage(uiCanvas, 0, 0);
 					/*
 					drawPaletteBar(activePalette);
 					drawPaletteCart(uiPaletteCard);
@@ -1870,7 +1901,7 @@ Use different browser.
 						ctx.drawImage(surfaceImage,0,0);
 						//surfaceBuffer=1
 					}
-					ctx.drawImage(offscreenCanvas, 0, 0);		
+					ctx.drawImage(uiCanvas, 0, 0);		
 					/*
 					drawPaletteBar(activePalette);
 					drawPaletteCart(uiPaletteCard);
@@ -1946,7 +1977,7 @@ Use different browser.
 							//console.log(brushFX1);
 							//uiBrushTimeOut=30;		
 							uiActiveTime=30;		
-							updateOffscreenCanvas();		
+							updateUiCanvas();		
 						}
 					}					
 					if(touchCollision[i].id==0){
@@ -1971,7 +2002,7 @@ Use different browser.
 							makeRoundBrush(brushRoundSize)
 							uiBrushTimeOut=30;
 							uiActiveTime=30;
-							updateOffscreenCanvas();							
+							updateUiCanvas();							
 						}
 					}
 				}	
@@ -2432,7 +2463,7 @@ Use different browser.
 				}
 			}
 			
-		updateOffscreenCanvas();			
+		updateUiCanvas();			
 			
 		e.preventDefault();	
 		}		
@@ -2443,18 +2474,18 @@ Use different browser.
 //		if(Math.random()<.01){
 			myCanvas.height = window.innerHeight-32;
 			myCanvas.width = window.innerWidth-32;
-			updateOffscreenCanvas()
-//			offscreenCanvas.width=window.innerWidth-32;
-//			offscreenCanvas.height=window.innerHeight-32;
+			updateUiCanvas()
+//			uiCanvas.width=window.innerWidth-32;
+//			uiCanvas.height=window.innerHeight-32;
 		
 			//surfaceImage = updateSurfaceImage(surfaceCameraX,surfaceCameraY,surfaceScale); // draw our surface (palettes) 			
 			updateSurface=true;
 //		}
 		
 	}
-	function updateOffscreenCanvas(){
-		offscreenCanvas.width=window.innerWidth-32;
-		offscreenCanvas.height=window.innerHeight-32;
+	function updateUiCanvas(){
+		uiCanvas.width=window.innerWidth-32;
+		uiCanvas.height=window.innerHeight-32;
 		touchCollision = [];	
 		drawPaletteBar(activePalette);
 		drawPaletteCart(uiPaletteCard);
