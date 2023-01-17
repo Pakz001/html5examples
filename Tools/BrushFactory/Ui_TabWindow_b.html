@@ -329,6 +329,17 @@ Use different browser.
 		
 		var h = window.innerHeight/3;	
 		if(window.innerHeight>window.innerWidth)h=window.innerHeight/5;
+		if(window.innerHeight>window.innerWidth){
+			h=window.innerHeight/6.25;
+			y = window.innerHeight-(window.innerWidth/3.92);			
+			x = 0;	
+			
+			w = window.innerWidth*.95;
+			//h=w/1.25;
+			//y=window.innerHeight*.68;
+			
+		}
+		
 		//ctx.fillStyle="#FF0000";
 		//ctx.fillRect(x,y,w,h-4);
 		drawButton(x,y,w,h-4,depth=.5,ps=3);
@@ -999,8 +1010,13 @@ Use different browser.
 		var x=0;
 		var w = window.innerWidth/20;
 		var h = w;
-		if(window.innerHeight>window.innerWidth)h-=h/6;
 		var y=window.innerHeight-(w*4);
+		if(window.innerHeight>window.innerWidth){
+			h-=h/6;
+			y-=Math.abs(window.innerHeight/5);
+			w = window.innerWidth/10;
+		}
+		
 		for(var i=0;i<2;i++){
 			if(i==0)w*=2;
 			if(i==1)w*=2;
@@ -1128,8 +1144,11 @@ Use different browser.
 		// thinner if smaller
 		if(window.innerWidth<window.innerHeight){			
 			h/=1.5;
+			x /= 2;
+			y = window.innerHeight-(window.innerWidth/4)+(w/2.8);
+			
 		}
-		drawButton(x,y,w,h,.5,1);
+		drawButton(x,y,w,h,.5,2);
 		drawRect(x+12,y+h/4,w-24,h/2,0);
 		//outlineRect(x,y,w,h,1,5);
 		sliderPos = uiBrushFX1SliderPos;
@@ -1159,6 +1178,8 @@ Use different browser.
 		//thinner if smaller
 		if(window.innerWidth<window.innerHeight){	
 			h/=1.5;			
+			x /= 2;
+			y = window.innerHeight-(window.innerWidth/4)+(w/6.5);
 		}
 		drawButton(x,y,w,h);
 		drawRect(x+12,y+h/4,w-24,h/2,0);
@@ -1280,6 +1301,20 @@ Use different browser.
 		var w = window.innerWidth/20;
 		var h = w;
 		var y=window.innerHeight-w*3;
+//		if(window.innerHeight>window.innerWidth){
+//			h-=h/6;
+//			y-=Math.abs(window.innerHeight/6);
+//			w = window.innerWidth/10;
+//		}
+		
+		if(window.innerHeight>window.innerWidth){
+			
+			w = window.innerWidth/10;
+			h=w/1.25;
+			y=window.innerHeight*.685;
+			
+		}
+		
 		for(var i=0;i<paletteCart01.length;i++){
 			drawButton(x,y,w,h-4,depth=.5,ps=3);
 		
@@ -1302,6 +1337,14 @@ Use different browser.
 		var w = window.innerWidth/20;
 		var h = w;
 		var y=window.innerHeight-w*2;
+		if(window.innerHeight>window.innerWidth){
+			
+			w = window.innerWidth/10;
+			h=w/1.25;
+			y=window.innerHeight*.745;
+			
+		}
+		
 		for(var i=0;i<9;i++){
 			drawButton(x,y,w,h-4,depth=.5,ps=3);
 		
