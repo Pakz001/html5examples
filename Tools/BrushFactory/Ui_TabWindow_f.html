@@ -113,7 +113,8 @@ Use different browser.
 	var uiSlider4Id = 3;		
 	
 	classSliders.push(new classSlider(0,0,0,0,uiSlider1Id));
-		
+	classSliders.push(new classSlider(0,0,0,0,uiSlider2Id));
+	
 
 	
 	
@@ -1218,7 +1219,8 @@ Use different browser.
 			y=window.innerHeight/1.8+(h2*4.0);
 			//h*=2;
 		}
-			
+		classSliders[uiSlider2Id].updatePosition(x,y,w,h+8);
+		return;	
 		drawButton(x,y,w,h,.5,2);
 		drawRect(x+12,y+h/4,w-24,h/2,0);
 		//outlineRect(x,y,w,h,1,5);
@@ -1255,7 +1257,7 @@ Use different browser.
 			//h*=2;
 		}
 
-		classSliders[uiSlider1Id].updatePosition(x,y,w,h);
+		classSliders[uiSlider1Id].updatePosition(x,y,w,h+8);
 		return;		
 		//thinner if smaller
 		//if(window.innerWidth<window.innerHeight){	
@@ -2158,86 +2160,39 @@ Use different browser.
 			}
 			
 			
-			//
-			// Brush size  Slider position
-			if(e.changedTouches.length==1 && pinchDragCoolDown>20 && brushActive==false){		
-				//
-				// Slider class 
-				for(var i = 0;i<classSliders.length;i++){
-	
-					if(classSliders[i].update(uiTouchLastX,uiTouchLastY)){
-						
-						
-							brushRoundSize = Math.floor((classSliders[i].value*maxBrushRoundSize));
-							if(brushRoundSize<minBrushRoundSize)brushRoundSize=1;
-							makeRoundBrush(brushRoundSize)
-		
-							updateUiCanvas();
-							uiActiveTime=30;		
-							
-					}
+			//console.log(classSliders.length+" class length");
+								
+			// Slider class 
+			if(e.changedTouches.length==1 && brushActive==false){
+			for(var i = 0;i<classSliders.length;i++){
+
+				if(i==uiSlider1Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
 					
+						brushRoundSize = Math.floor((classSliders[i].value*maxBrushRoundSize));
+						if(brushRoundSize<minBrushRoundSize)brushRoundSize=1;
+						makeRoundBrush(brushRoundSize)
+						uiBrushTimeOut=30;	
+						updateUiCanvas();
+						uiActiveTime=30;		
+						
 				}
 				
-				for(var i=0;i<touchCollision.length;i++){
-					//
-					// Brush FX 1  Slider position // smudge smear
-					if(touchCollision[i].id==1){
-	
-						var x = touchCollision[i].x;
-						var y = touchCollision[i].y;
-						var w = touchCollision[i].w;
-						var h = touchCollision[i].h;
-						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-							// set new slider position
-							// uiBrushSliderPos
-							//	var brushRoundSize = 32;
-							// makeRoundBrush(brushRoundSize);
-							//	var maxBrushRoundSize = 32;
-							// var minBrushRoundSize = 1;
-							//var brushFX1 = 2;
-							//var uiBrushFX1SliderPos = 10;
-		
-							
-							var step = 3/w;//maxBrushRoundSize/w;
-							var p = uiTouchLastX-x;
-							uiBrushFX1SliderPos = p;
-							if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
-							brushFX1 = (uiBrushFX1SliderPos*step)-1;						
-							//if(brushFX1<0)brushFX1=0;
-							//console.log(brushFX1);
-							//uiBrushTimeOut=30;		
-							uiActiveTime=30;		
-							updateUiCanvas();		
-						}
-					}					
-					if(touchCollision[i].id==0){
-						var x = touchCollision[i].x;
-						var y = touchCollision[i].y;
-						var w = touchCollision[i].w;
-						var h = touchCollision[i].h;
-						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-							// set new slider position
-							// uiBrushSliderPos
-							//	var brushRoundSize = 32;
-							// makeRoundBrush(brushRoundSize);
-							//	var maxBrushRoundSize = 32;
-							// var minBrushRoundSize = 1;
-							//console.log("a" + e.changedTouches.length);
-							var step = maxBrushRoundSize/w;
-							var p = uiTouchLastX-x;
-							uiBrushSliderPos = p;
-							if(uiBrushSliderPos+16>w)uiBrushSliderPos-=16;
-							brushRoundSize = Math.round(uiBrushSliderPos*step);						
-							if(brushRoundSize<1)brushRoundSize=1;
-							makeRoundBrush(brushRoundSize)
-							uiBrushTimeOut=30;
-							uiActiveTime=30;
-							updateUiCanvas();							
-						}
-					}
-				}	
-			}	
+				if(i==uiSlider2Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){		
+						//var step = 3/w;//maxBrushRoundSize/w;
+						//var p = uiTouchLastX-x;
+						//uiBrushFX1SliderPos = p;
+						//if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+						brushFX1 = (classSliders[i].value);		
+						//brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+						//console.log(brushFX1);			
+						if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						uiBrushTimeOut=30;	
+						updateUiCanvas();						
+						uiActiveTime=30;					
+				}
+			}}
+				
 			e.preventDefault();		
 		}		
 		if(e.type=="touchend" && e.touches) {
@@ -2569,87 +2524,35 @@ Use different browser.
 				}
 			}
 			//
-			// Brush class 
+			// TAB SLIDERS
+			
 			for(var i = 0;i<classSliders.length;i++){
 
-				if(classSliders[i].update(uiTouchLastX,uiTouchLastY)){
+				if(i==uiSlider1Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
 					
-					
+						
 						brushRoundSize = Math.floor((classSliders[i].value*maxBrushRoundSize));
-						if(brushRoundSize<minBrushRoundSize)brushRoundSize=1;
+						//if(brushRoundSize<minBrushRoundSize)brushRoundSize=1;
 						makeRoundBrush(brushRoundSize)
 						uiBrushTimeOut=30;		
-
+						updateUiCanvas();
+						
 						uiActiveTime=30;		
 						
+				}
+				if(i==uiSlider2Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
+					brushFX1 = (classSliders[i].value-1)*2;			
+						//brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+						//console.log(brushFX1);
+						brushFX1 = (classSliders[i].value);				
+						if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						uiBrushTimeOut=30;	
+						updateUiCanvas();						
+						uiActiveTime=30;								
 				}
 				
 			}
-			//
-			// Brush FX 1 and brush size  Slider position // smudge smear
-
-			for(var i=0;i<touchCollision.length;i++){
-
-				if(touchCollision[i].id==4){
-
-					var x = touchCollision[i].x;
-					var y = touchCollision[i].y;
-					var w = touchCollision[i].w;
-					var h = touchCollision[i].h;
-					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-						// set new slider position
-						// uiBrushSliderPos
-						//	var brushRoundSize = 32;
-						// makeRoundBrush(brushRoundSize);
-						//	var maxBrushRoundSize = 32;
-						// var minBrushRoundSize = 1;
-						//var brushFX1 = 2;
-						//var uiBrushFX1SliderPos = 10;
-	
-						
-						var step = 3/w;//maxBrushRoundSize/w;
-						var p = uiTouchLastX-x;
-						uiBrushFX1SliderPos = p;
-						if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
-						brushFX1 = (uiBrushFX1SliderPos*step)-1;			
-						//console.log(brushFX1);			
-						//if(brushFX1<0)brushFX1=0;
-						//console.log(brushFX1);
-						//uiBrushTimeOut=30;		
-						uiActiveTime=30;		
-		
-					}
-				}
-
-			//
-			// Brush size  Slider position
-
-
-
-				if(touchCollision[i].id==110){//0
-					var x = touchCollision[i].x;
-					var y = touchCollision[i].y;
-					var w = touchCollision[i].w;
-					var h = touchCollision[i].h;
-					if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-						// set new slider position
-						// uiBrushSliderPos
-						//	var brushRoundSize = 32;
-						// makeRoundBrush(brushRoundSize);
-						//	var maxBrushRoundSize = 32;
-						// var minBrushRoundSize = 1;
-						var step = maxBrushRoundSize/w;
-						var p = uiTouchLastX-x;
-						uiBrushSliderPos = p;
-						if(uiBrushSliderPos+16>w)uiBrushSliderPos-=16;
-						brushRoundSize = Math.round(uiBrushSliderPos*step);						
-						if(brushRoundSize<1)brushRoundSize=1;
-						makeRoundBrush(brushRoundSize)
-						uiBrushTimeOut=30;		
-						uiActiveTime=30;				
-					}
-				}
-			}				
 			
 
 			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY && uiActiveTime==0){
@@ -2706,7 +2609,7 @@ Use different browser.
 			}}
 			
 			// plot pixel
-			if(brushMode==0 && uiActiveTime==0){//plot
+			if(brushMode==0 && uiActiveTime==0 &&uiActiveTime==0){//plot
 				if(e.changedTouches.length==1){
 					var z=0;
 					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
