@@ -48,6 +48,8 @@ edge at the top. Or drawn or round texture.<br>
 
 * a brush where there is a settable tip which draws a selected settable border at the direction it is moving in or ending in.
 
+* fill color area turns into selection area. only draw inside selection.
+
 <br><br>
 AngleEdgeColorRampBrush_x.html
 <br>
