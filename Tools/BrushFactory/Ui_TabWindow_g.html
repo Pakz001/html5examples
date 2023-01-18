@@ -49,8 +49,8 @@ Use different browser.
 			this.y = y;
 			this.w = w;
 			this.h = h;
-			this.value = 0;
-			this.sliderPos = 0;
+			this.value = .5;
+			this.sliderPos = 1280;
 			this.type = 0;
 			if(type="vertical"){
 				this.type = 1;
@@ -58,6 +58,7 @@ Use different browser.
 			
 		}
 		draw(){//using the c as ctx. 
+			if(this.sliderPos>this.w)this.sliderPos=this.w-24;
 			if(this.active==false)return;
 			drawButton(this.x,this.y,this.w,this.h);
 			drawRect(this.x+12,this.y+this.h/4,this.w-24,this.h/2,0);
@@ -291,11 +292,11 @@ Use different browser.
 						//"Borrow Brush",
 						//"Mister Brush",
 						//"Last Brush"];
-	var brushMode = 2;							
+	var brushMode = 2;		//0=pixel/1=regular/2=texbrush					
 	var brushPositionHistory = []; // holds the previous x positions of brush
 	var brushPushTime = 0; //if at the same spot long then increase this
 	var brush = [];
-	var brushRoundSize = 3;
+	var brushRoundSize = 16;
 	var maxBrushRoundSize = 32;
 	var minBrushRoundSize = 1;
 	makeRoundBrush(brushRoundSize);
@@ -1672,60 +1673,61 @@ Use different browser.
 			
 			}
 		}}
-		// Store surface area that we use to draw the brush preview
-		var r=32;
-		var temp2 = [];
-		for(var i=-32;i<r;i++){
-			temp2[i] = new Array();
-			for(var j=-32;j<r;j++){
-				if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight){
-					temp2[i][j]=surface[50+i][50+j];
-				}else{
-					temp2[i][j]=-1;
+		if(brushMode==2){//If tex brush(2)
+			// Store surface area that we use to draw the brush preview
+			var r=32;
+			var temp2 = [];
+			for(var i=-32;i<r;i++){
+				temp2[i] = new Array();
+				for(var j=-32;j<r;j++){
+					if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight){
+						temp2[i][j]=surface[50+i][50+j];
+					}else{
+						temp2[i][j]=-1;
+					}
 				}
-			}
-		}	
-		//erase the surface
-		for(var i=-32;i<r;i++){
-			for(var j=-32;j<r;j++){
-				if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight){
-					surface[50+i][50+j] = activePalette;
+			}	
+			//erase the surface
+			for(var i=-32;i<r;i++){
+				for(var j=-32;j<r;j++){
+					if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight){
+						surface[50+i][50+j] = activePalette;
+					}
 				}
-			}
-		}			
-		smudgeHillBrush(50,50,uiBrushPreviewAngle)
-		
-		
-		//heres
-		var l=brush.length/2;
-		for(var y=-l;y<l;y++){
-		for(var x=-l;x<l;x++){
-			x = Math.floor(x);
-			y = Math.floor(y);	
-//			if(temp2[x][y]>0){
-//				setCtxColor2(temp2[x][y]+2);
-				setCtxColor(ctx,surface[50-(x)][50-(y)]);				
-//				if(Math.random()<.005)console.log(temp2[x-32][y-32]);
-//				ctx.fillStyle="#000000";
-				ctx.fillRect(posX+((x+l)*size),posY+((y+l)*size),size+1,size+1);
-//			}else{
-//				ctx.fillStyle="#FF00FF";
-//				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
-				
+			}			
+			smudgeHillBrush(50,50,uiBrushPreviewAngle)
 			
-//			}
-		}}
-		// restore the surface area we use to get the brush preview colors.
-
-		for(var i=-32;i<r;i++){
-			for(var j=-32;j<r;j++){
-				//console.log(i+","+j)
-				if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight && temp2[i][j]!=-1){
-					surface[50+i][50+j] = temp2[i][j];
+			
+			//heres
+			var l=brush.length/2;
+			for(var y=-l;y<l;y++){
+			for(var x=-l;x<l;x++){
+				x = Math.floor(x);
+				y = Math.floor(y);	
+	//			if(temp2[x][y]>0){
+	//				setCtxColor2(temp2[x][y]+2);
+					setCtxColor(ctx,surface[50-(x)][50-(y)]);				
+	//				if(Math.random()<.005)console.log(temp2[x-32][y-32]);
+	//				ctx.fillStyle="#000000";
+					ctx.fillRect(posX+((x+l)*size),posY+((y+l)*size),size+1,size+1);
+	//			}else{
+	//				ctx.fillStyle="#FF00FF";
+	//				ctx.fillRect(posX+(x*size),posY+(y*size),size+1,size+1);
+					
+				
+	//			}
+			}}
+			// restore the surface area we use to get the brush preview colors.
+	
+			for(var i=-32;i<r;i++){
+				for(var j=-32;j<r;j++){
+					//console.log(i+","+j)
+					if(50+i>=0 && 50+j>=0 && 50+i<surfaceWidth && 50+j<surfaceHeight && temp2[i][j]!=-1){
+						surface[50+i][50+j] = temp2[i][j];
+					}
 				}
-			}
-		}			
-		
+			}			
+		}
 		
 	}
 	
