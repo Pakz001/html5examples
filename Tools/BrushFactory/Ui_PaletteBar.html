@@ -32,16 +32,23 @@ Use different browser.
 				this.y = a.y;
 				this.w = a.w;
 				this.h = a.h;
+				this.cList = [];
 				this.numOnColumn = a.numOnColumn;
 				this.slot = [];
+				this.palette = [];
 				this.numSlots = a.numSlots+2;
+				this.numSlots=4;
 				for(var i=0;i<this.numSlots;i++){
 					this.slot.push(a.slotIds);
+					this.palette.push(1);
 				}
-				this.slot[1]=-1;
-				this.slot[2]=-1;
+				//this.slot[1]=-1;
+				//this.slot[2]=-1;
 				this.slot[this.numSlots-1]=-2;
 				this.slot[this.numSlots-2]=-3;				
+				this.palette[this.numSlots-1]=-2;
+				this.palette[this.numSlots-2]=-3;				
+				
 			}
 			draw(){//using the c as ctx. 
 				//drawButton(this.x,this.y,this.w,this.h);
@@ -49,28 +56,35 @@ Use different browser.
 				//outlineRect(x,y,w,h,1,5);
 				//this.sliderPos = uiBrushSliderPos;
 				//console.log("a");
+				this.cList = [];//erase collision list
 				var x=this.x;
 				var y=this.y;
 				var w=this.w;
 				var h=this.h;
 				var column = 0;
+				var row = 0;
+				//
 				for(var i=0;i<this.numSlots;i++){
-					if(i>this.numOnColumn && column==0){
+					// Rows and collumns 
+					if(row>this.numOnColumn){
+						row=0;
 						column++;
 						x=this.x;
 						y+=this.h;
 					}
+					row++
 					drawButton(x,y,w,h-4);
+					this.cList.push({x1:x,y1:y,x2:x+w,y2:y+h,id:i});
 					if(this.slot[i]==0){// Palette
-						drawPaletteRect((x+12),y+12,(w-24),h/2,i);
+						drawPaletteRect((x+12),y+12,(w-24),h/2,this.palette[i]);
 					}
-					if(this.slot[i]==-2){//empty							
+					if(this.slot[i]==-2){//Insert							
 						setColor(4,.9);
 						ctx2.fillRect(x+8,y+8,(w-16),h-16);						
 						this.drawText("Ins",x,y,w,h);
 					}					
 					
-					if(this.slot[i]==-3){//empty							
+					if(this.slot[i]==-3){//delete						
 						setColor(4,.9);
 						ctx2.fillRect(x+8,y+8,(w-16),h-16);						
 						this.drawText("Del",x,y,w,h);
@@ -105,17 +119,49 @@ Use different browser.
 			//
 			// Update the slider... Takes input as point x,y
 			//
-			update(uiTouchLastX,uiTouchLastY){
-				// Collision check finger and user interface element.
-				if(uiTouchLastX>this.x && uiTouchLastY>this.y && uiTouchLastX<this.x+this.w-24 && uiTouchLastY<this.y+this.h){
-					// If we press left side go back in list 
+			update(uiTouchLastX,uiTouchLastY,endMode=false){
+				if(classPalettesDelay>0)return;
+				// If we press left side go back in list 
+				for(var i=0;i<this.cList.length;i++){
+					if(	uiTouchLastX>this.cList[i].x1 && uiTouchLastY>this.cList[i].y1 &&
+						uiTouchLastX<this.cList[i].x2 && uiTouchLastY<this.cList[i].y2){
+						this.selected = i;
+						uiActiveTime=30;
+						updateScreen = true;					
+						if(endMode==true && this.selected==this.cList.length-1){// If insert
+							this.numSlots++;
+							this.slot.splice(this.slot.length-2,0,0);
+							this.palette.splice(this.palette.length-2,0,Math.floor(Math.random()*9));							
+							updateScreen=true;
+							classPalettesDelay=30;
+						}
+						if(this.slot.length>2 && endMode==true && this.selected==this.cList.length-2){// If delete
+
+							// remove last 3
+							this.slot.pop();
+							this.palette.pop();
+							this.slot.pop();
+							this.palette.pop();
+							this.slot.pop();
+							this.palette.pop();
+							// rebuild last 2
+							this.numSlots-=1;
+							this.slot.push(-3);
+							this.palette.push(1);
+							this.slot.push(-2);
+							this.palette.push(1);
+							
+							updateScreen=true;
+							classPalettesDelay=30;
+						}
+						
+					}
+				}
+			}	
 					
-					uiActiveTime=30;
-					updateScreen = true;					
-				}	
+					
 						
 				
-			}
 			updatePosition(){
 				
 			}
@@ -133,7 +179,7 @@ Use different browser.
 			
 		}
 		var classPalettes = [];
-		
+		var classPalettesDelay = 0;
 		//
 		// Temp palette
 		var palette = [];
@@ -165,7 +211,7 @@ Use different browser.
 
 
 
-		gameloop=setInterval(doGameLoop,216);// run our game loop at 60fps(16 ms of 1000 ms)
+		gameloop=setInterval(doGameLoop,16);// run our game loop at 60fps(16 ms of 1000 ms)
 		
 
 
@@ -206,6 +252,8 @@ Use different browser.
 			// Tell when we have last pressed a button
 			if(uiActiveTime>0)uiActiveTime-=1;
 			
+			
+			if(classPalettesDelay>0)classPalettesDelay-=1;
 			// Update example here for ctx ofcanvas buffer
 			if(updateScreen){
 				updateScreen=false;
@@ -342,9 +390,10 @@ Use different browser.
 					uiTouchLastX = x;
 					uiTouchLastY = y;
 				}
-			
+				if(e.changedTouches.length==1){
 				for(var i=0;i<classPalettes.length;i++){
-					//classSliders[i].update(uiTouchLastX,uiTouchLastY);
+					classPalettes[i].update(uiTouchLastX,uiTouchLastY,true);
+				}
 				}
 				
 			}
@@ -355,9 +404,10 @@ Use different browser.
 					uiTouchLastX = x;
 					uiTouchLastY = y;
 				}
-
+				if(e.changedTouches.length==1){
 				for(var i=0;i<classPalettes.length;i++){
-					//classSliders[i].update(uiTouchLastX,uiTouchLastY);
+					classPalettes[i].update(uiTouchLastX,uiTouchLastY);
+				}
 				}
 			}
 				
