@@ -23,14 +23,25 @@ Use different browser.
 		//
 		// Palette class
 		class classPalette{
-			constructor(x,y,w,h,id,type=0){
-				this.id = id;
+			//constructor(x,y,w,h,id,numSlots,slotIds=0,type=0){
+			constructor(a){	
+				this.id = a.id;
 				//this.touchCollision = []; // x:,y:,w:,h:,id,data: (id = 0 = brush slider) id=1=palette
-				this.x = x;
-				this.y = y;
-				this.w = w;
-				this.h = h;
-				
+				this.x = a.x;
+				this.selected = 0;
+				this.y = a.y;
+				this.w = a.w;
+				this.h = a.h;
+				this.numOnColumn = a.numOnColumn;
+				this.slot = [];
+				this.numSlots = a.numSlots+2;
+				for(var i=0;i<this.numSlots;i++){
+					this.slot.push(a.slotIds);
+				}
+				this.slot[1]=-1;
+				this.slot[2]=-1;
+				this.slot[this.numSlots-1]=-2;
+				this.slot[this.numSlots-2]=-3;				
 			}
 			draw(){//using the c as ctx. 
 				//drawButton(this.x,this.y,this.w,this.h);
@@ -42,10 +53,45 @@ Use different browser.
 				var y=this.y;
 				var w=this.w;
 				var h=this.h;
-				for(var i=0;i<palette.length;i++){
+				var column = 0;
+				for(var i=0;i<this.numSlots;i++){
+					if(i>this.numOnColumn && column==0){
+						column++;
+						x=this.x;
+						y+=this.h;
+					}
 					drawButton(x,y,w,h-4);
-				
-					if(i>0)drawPaletteRect(x+12,y+12,w-24,h/2,i);
+					if(this.slot[i]==0){// Palette
+						drawPaletteRect((x+12),y+12,(w-24),h/2,i);
+					}
+					if(this.slot[i]==-2){//empty							
+						setColor(4,.9);
+						ctx2.fillRect(x+8,y+8,(w-16),h-16);						
+						this.drawText("Ins",x,y,w,h);
+					}					
+					
+					if(this.slot[i]==-3){//empty							
+						setColor(4,.9);
+						ctx2.fillRect(x+8,y+8,(w-16),h-16);						
+						this.drawText("Del",x,y,w,h);
+					}					
+					
+					if(this.slot[i]==-1){//empty
+						var w2=0;
+						var w3=0;
+						if(i+1<this.slot.length && this.slot[i+1]==-1)w2=10;
+						if(i-1>0 && this.slot[i-1]==-1){
+							w3=10;
+							w2=10;
+						}
+						setColor(4,.9);
+						ctx2.fillRect(x+8-w3,y+8,(w-16)+w2,h-16);
+						//drawPaletteRect(x+8-w3,y+8,(w-16)+w2,h-16,1);
+					}
+					if(this.selected==i){// the selected one
+						outlineRect(x+3,y+3,w-8,h-4,0,4); // draw rect inside the rect				
+						outlineRect(x+2,y+2,w-6,h-3,1,4); // draw rect inside the rect										
+					}
 					//touchCollision.push({x:x,y:y,w:w,h:h,id:5,data:i});
 					//var uiPaletteCartActive = 0;			
 //					if(i==uiPaletteCartActive){ // if highlight needed
@@ -72,6 +118,17 @@ Use different browser.
 			}
 			updatePosition(){
 				
+			}
+			drawText(s,x,y,w,h){
+				ctx2.fillStyle="#DDDDDD";
+				var sz=window.innerWidth/60;
+				if(window.innerHeight>window.innerWidth)sz*=2;
+				//var s="Del"
+				ctx2.font = "bold "+sz+"px serif";				
+				//const metrics = ctx.measureText(s);
+				var q=0;
+				if(window.innerWidth<window.innerHeight)q=-h/8;
+				ctx2.fillText(s,x+w/5,(y+h/1.6)+q);
 			}
 			
 		}
@@ -116,7 +173,10 @@ Use different browser.
 		myCanvas.height = window.innerHeight-32;
 		myCanvas.width = window.innerWidth-32;
 		
-		classPalettes.push(new classPalette(50,300,64,64,uiPalette1Id));	
+		classPalettes.push(new classPalette({	x:50,y:300,w:64,h:64,
+												Id:uiPalette1Id,numSlots:palette.length,
+												slotIds:0,type:0,
+												numOnColumn:5}));	
 //		classSliders.push(new classSlider(50,330,200,30,uiSlider2Id));
 //		classSliders.push(new classSlider(50,360,150,30,uiSlider3Id));
 //		classSliders.push(new classSlider(50,390,350,150,uiSlider4Id));		
@@ -246,8 +306,8 @@ Use different browser.
 		}	
 		
 		// set the fillstyle color of palette(c)
-		function setColor(c){
-			ctx2.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+		function setColor(c,br=1.0){
+			ctx2.fillStyle = "rgb("+palette[c].r*br+","+palette[c].g*br+","+palette[c].b*br+","+palette[c].a+")";
 		}
 		// Draw a style rectangle
 		//
@@ -283,8 +343,8 @@ Use different browser.
 					uiTouchLastY = y;
 				}
 			
-				for(var i=0;i<classSliders.length;i++){
-					classSliders[i].update(uiTouchLastX,uiTouchLastY);
+				for(var i=0;i<classPalettes.length;i++){
+					//classSliders[i].update(uiTouchLastX,uiTouchLastY);
 				}
 				
 			}
@@ -296,8 +356,8 @@ Use different browser.
 					uiTouchLastY = y;
 				}
 
-				for(var i=0;i<classSliders.length;i++){
-					classSliders[i].update(uiTouchLastX,uiTouchLastY);
+				for(var i=0;i<classPalettes.length;i++){
+					//classSliders[i].update(uiTouchLastX,uiTouchLastY);
 				}
 			}
 				
