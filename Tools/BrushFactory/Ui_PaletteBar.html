@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+		//
+		// Palette class
+		class classPalette{
+			constructor(x,y,w,h,id,type=0){
+				this.id = id;
+				//this.touchCollision = []; // x:,y:,w:,h:,id,data: (id = 0 = brush slider) id=1=palette
+				this.x = x;
+				this.y = y;
+				this.w = w;
+				this.h = h;
+				
+			}
+			draw(){//using the c as ctx. 
+				//drawButton(this.x,this.y,this.w,this.h);
+				//drawRect(this.x+12,this.y+this.h/4,this.w-24,this.h/2,0);
+				//outlineRect(x,y,w,h,1,5);
+				//this.sliderPos = uiBrushSliderPos;
+				//console.log("a");
+				var x=this.x;
+				var y=this.y;
+				var w=this.w;
+				var h=this.h;
+				for(var i=0;i<palette.length;i++){
+					drawButton(x,y,w,h-4);
+				
+					if(i>0)drawPaletteRect(x+12,y+12,w-24,h/2,i);
+					//touchCollision.push({x:x,y:y,w:w,h:h,id:5,data:i});
+					//var uiPaletteCartActive = 0;			
+//					if(i==uiPaletteCartActive){ // if highlight needed
+//						outlineRect(x+3,y+3,w-8,h-4,0,4); // draw rect inside the rect				
+//						outlineRect(x+2,y+2,w-6,h-3,1,4); // draw rect inside the rect
+//					}
+					x+=w;
+				}
+		
+			}
+			//
+			// Update the slider... Takes input as point x,y
+			//
+			update(uiTouchLastX,uiTouchLastY){
+				// Collision check finger and user interface element.
+				if(uiTouchLastX>this.x && uiTouchLastY>this.y && uiTouchLastX<this.x+this.w-24 && uiTouchLastY<this.y+this.h){
+					// If we press left side go back in list 
+					
+					uiActiveTime=30;
+					updateScreen = true;					
+				}	
+						
+				
+			}
+			updatePosition(){
+				
+			}
+			
+		}
+		var classPalettes = [];
+		
+		//
+		// Temp palette
+		var palette = [];
+		palette.push({r:0,g:0,b:0,a:255});//black
+		palette.push({r:255,g:255,b:255,a:255});//white
+		palette.push({r:160,g:61,b:112,a:255});// base
+		palette.push({r:135,g:44,b:94,a:255});//base -1
+		palette.push({r:107,g:22,b:68,a:255}); // darkest
+		palette.push({r:219,g:115,b:146,a:255}); //light
+		palette.push({r:196,g:76,b:120,a:255});//light -1
+		palette.push({r:210,g:156,b:151,a:255});//hightlight	
+		palette.push({r:200,g:131,b:131,a:255});//hightlight		
+				
+		var c=document.getElementById("myCanvas");
+		var ctx=c.getContext("2d");
+		var uiCanvas = document.createElement("canvas");
+		var ctx2 = uiCanvas.getContext("2d")
+	
+		window.addEventListener("touchend", touchHandler,false);			
+		window.addEventListener("touchmove", touchHandler,false);		
+		window.addEventListener("resize", resizeHandler,false);		
+		var uiPalette1Id = 0;
+		var uiPalette2Id = 1;
+		var uiPalette3Id = 2;
+		var uiPalette4Id = 3;		
+		var uiTouchLastX = uiTouchLastY = 0;
+		var uiActiveTime=0; // count down from last pressed a user interface element.	
+		
+
+
+
+		gameloop=setInterval(doGameLoop,216);// run our game loop at 60fps(16 ms of 1000 ms)
+		
+
+
+
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		
+		classPalettes.push(new classPalette(50,300,64,64,uiPalette1Id));	
+//		classSliders.push(new classSlider(50,330,200,30,uiSlider2Id));
+//		classSliders.push(new classSlider(50,360,150,30,uiSlider3Id));
+//		classSliders.push(new classSlider(50,390,350,150,uiSlider4Id));		
+		
+		var updateScreen = true;
+		bugHandler();
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		//
+		// Our main program loop
+		function doGameLoop(){
+			//myCanvas.height = window.innerHeight-32;
+		//myCanvas.width = window.innerWidth-32;
+			if(Math.random()<.05)bugHandler(); // Did the screen get turned? adjust screen/user interface..	
+			
+			ctx.fillStyle="rgb(20,20,20)";
+			ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+			ctx.fillStyle="rgb(255,255,255)";
+			ctx.font = "bold "+12+"px serif";			
+			ctx.fillText("Javascript Html canvas example.",10,10); 
+			
+			// Tell when we have last pressed a button
+			if(uiActiveTime>0)uiActiveTime-=1;
+			
+			// Update example here for ctx ofcanvas buffer
+			if(updateScreen){
+				updateScreen=false;
+				//console.log("screen update (ctx2)");
+				ctx2.fillStyle="#111111";
+				ctx2.fillRect(0,0,1000,1000);
+				ctx2.font = "bold "+40+"px serif";	
+				// draw slider values
+				for(var i=0;i<classPalettes.length;i++){
+					//setColor(1);
+					//ctx2.fillText(classPalettes[i].value,50,200+i*30);
+				}	
+				// draw the actual sliders from the class array list
+				for(var i=0;i<classPalettes.length;i++){
+					classPalettes[i].draw();
+				}
+			}	
+			// draw the offscreen canvas
+			ctx.drawImage(uiCanvas, 0, 0);		
+		
+		}
+		
+			
+		//
+		// Draw a horizontal or vertical slider for brush size.
+		//
+		function drawButton(x,y,w,h,depth=.2,ps=3){
+			//drawRect2(x,y,w,h,0);
+	
+			if(depth>.5)depth=.5;
+			setColor(0);
+			var left = x;
+			var right = x+w;
+			var bottom = y+h;
+			var top = y;
+			
+			//outer edge..
+			ctx2.fillRect(left,bottom,w,ps+2);//bottom center
+			ctx2.fillRect(left,bottom,ps,-(h-2*ps));//left center
+			ctx2.fillRect(left+ps*2,top,w-4*ps,ps);//top center
+			ctx2.fillRect(right-ps,bottom,ps,-(h-2*ps));//right center
+			ctx2.fillRect(left+ps,top+ps,ps,ps); // dot left top
+			ctx2.fillRect(right-ps*2,top+ps,ps,ps); // dot left top
+			//
+			// top area
+			texLine(left+ps*2,top+ps,(w/(ps*2)),[2,8,7]);
+			texLine(right-ps*3,top+ps,-(w/(ps*2)),[2,8,7]);		
+			texLine(left+ps,top+ps*2,(w/(ps*2)),[2,8,7]);
+			texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,8,7]);		
+			
+			//center mid part left to right
+			for(var i=0;i<(h*(depth/2));i++){
+				top+=ps;
+				texLine(left+ps,top+ps*2,(w/(ps*2)),[3,7]);
+				texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[3,7]);		
+			}
+			
+			//top+=h/10;
+			// bottom area
+			texLine(left+ps,top+ps,(w/(ps*2)),[3,8,7]);
+			texLine(right-ps*2,top+ps,-(w/(ps*2)),[3,8,7]);		
+			
+			texLine(left+ps,top+ps*2,(w/(ps*2)),[2,3,8,7]);
+			texLine(right-ps*2,top+ps*2,-(w/(ps*2)),[2,3,8,7]);		
+	
+			texLine(left+ps,top+ps*3,(w/(ps*2)),[3,4]);
+			texLine(right-ps*2,top+ps*3,-(w/(ps*2)),[3,4]);		
+					
+			top+=ps;
+			// Bottom dark
+			setColor(4);
+			do{
+				ctx2.fillRect(left+ps,top+ps*3,w-ps*2,ps);
+				top+=ps;
+			}while(top+(ps*3)<bottom);
+			
+			function texLine(x,y,stp,tx){
+			//var tx = [2,8,1];
+			//var y = top+6;
+			//var x = left+6;
+			//var stp = 10;
+			var direc = 1;
+			if(stp<0)direc=-1;
+			var x1 = x;
+			var n = 0;
+			var e=0;
+			do{
+				setColor(tx[n]);
+				ctx2.fillRect(x1,y,ps+1,ps+1);
+				x1+=(direc*ps);
+				n++;
+				if(n>=tx.length)n=tx.length-1;
+				e++;
+				
+			}while(e<Math.abs(stp));
+	
+			}	
+		}	
+		
+		// set the fillstyle color of palette(c)
+		function setColor(c){
+			ctx2.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+		}
+		// Draw a style rectangle
+		//
+		function drawRect(x,y,w,h,c){
+			setColor(c);
+			ctx2.fillRect(x,y,w,h);
+		}
+		//
+		//
+		// Draw a rectangle with a color from the palette[] inside it.
+		function drawPaletteRect(x,y,w,h,c){
+			outlineRect(x,y,w,h,0,3);
+			drawRect(x+1,y+1,w-2,h-2,c);
+		}
+		// draw outline rect
+		// x,y,w,h,palette color, line width.
+		function outlineRect(x,y,w,h,c,lineWidth=1){
+			ctx2.beginPath();
+			ctx2.lineWidth = lineWidth;
+			ctx2.strokeStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
+			ctx2.rect(x,y,w,h);
+			ctx2.stroke();
+		}
+	
+		
+		function touchHandler(e){
+					
+			if(e.type=="touchend" && e.touches) {			
+				for(var i=0;i<e.changedTouches.length;i++){	
+					var x = e.changedTouches[i].clientX;
+					var y = e.changedTouches[i].clientY;				
+					uiTouchLastX = x;
+					uiTouchLastY = y;
+				}
+			
+				for(var i=0;i<classSliders.length;i++){
+					classSliders[i].update(uiTouchLastX,uiTouchLastY);
+				}
+				
+			}
+			if(e.type=="touchmove" && e.touches) {			
+				for(var i=0;i<e.changedTouches.length;i++){	
+					var x = e.changedTouches[i].clientX;
+					var y = e.changedTouches[i].clientY;				
+					uiTouchLastX = x;
+					uiTouchLastY = y;
+				}
+
+				for(var i=0;i<classSliders.length;i++){
+					classSliders[i].update(uiTouchLastX,uiTouchLastY);
+				}
+			}
+				
+		}
+		//
+		// Fix ME!
+		function bugHandler(){ // did the landscape mode <> portrait mode (sync)
+			uiCanvas.width=window.innerWidth-32;
+			uiCanvas.height=window.innerHeight-32;			
+			updateScreen = true;
+			myCanvas.height = window.innerHeight-32;
+			myCanvas.width = window.innerWidth-32;
+					
+		}		
+		function resizeHandler(e){
+			e.preventDefault();
+			myCanvas.height = window.innerHeight-32;
+			myCanvas.width = window.innerWidth-32;			
+		}		
+	
+</script>
+</body>
+</html>
