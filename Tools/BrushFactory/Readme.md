@@ -46,6 +46,8 @@ edge at the top. Or drawn or round texture.<br>
 
 * a brush where edges up and down are shaded. left and right are lighter and darker. (find reference<br>
 
+* a brush where there is a sized tip which draws a selected border at the direction it is moving in.(ending in)
+
 <br><br>
 AngleEdgeColorRampBrush_x.html
 <br>
