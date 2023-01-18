@@ -624,7 +624,7 @@ Use different browser.
 	
 	
 		function smudgeHillBrush(posX,posY,angle=1){
-			if(brushRoundSize<6)return;
+			//if(brushRoundSize<6)return;
 		
 		// setting of kleur are the colors placed with this brush
 		var kleur = [];
@@ -760,10 +760,10 @@ Use different browser.
 
 		
 		var t=brushFX2*(Math.PI);
-		var t2=brushFX3*3;
-		edge(t2,8,t/2); // line outer thickness and , depth to the center.
-		edge(t2,6,t-.1); // line outer thickness and , depth to the center.2,4,.44
-		edge(t2-1,4,t); // line outer thickness and , depth to the center.1,4,.9
+		var t2=brushFX3*8;
+		edge(2,t2,t/2); // line outer thickness and , depth to the center.
+		edge(2,t2/2,t-.1); // line outer thickness and , depth to the center.2,4,.44
+		edge(1/2,t2/3,t); // line outer thickness and , depth to the center.1,4,.9
 		
 		//edge(2,8,.55); // line outer thickness and , depth to the center.
 		//edge(2,6,.44); // line outer thickness and , depth to the center.2,4,.44
@@ -777,7 +777,7 @@ Use different browser.
 		//blackline(1,4,.9); // line outer thickness and , depth to the center.1,4,.9
 		
 		
-		if(brushFX1<1)return;
+		if(brushFX1>.8)return;
 		//if(Math.random()<.1)console.log("a")
 		//add some smudges
 		var col=3;
