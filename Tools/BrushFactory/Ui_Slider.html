@@ -23,12 +23,15 @@ Use different browser.
 		//
 		// Slider class
 		class classSlider{
-			constructor(x,y,w,h,type=0){
+			constructor(x,y,w,h,id,type=0){
+				this.id = id;
+				//this.touchCollision = []; // x:,y:,w:,h:,id,data: (id = 0 = brush slider) id=1=palette
 				this.x = x;
 				this.y = y;
 				this.w = w;
 				this.h = h;
-				this.sliderPos;
+				this.value = 0;
+				this.sliderPos = 0;
 				this.type = 0;
 				if(type="vertical"){
 					this.type = 1;
@@ -40,8 +43,41 @@ Use different browser.
 				drawRect(this.x+12,this.y+this.h/4,this.w-24,this.h/2,0);
 				//outlineRect(x,y,w,h,1,5);
 				//this.sliderPos = uiBrushSliderPos;
-				drawButton(this.x+this.sliderPos,this.y-4,24,this.h+8,.5,2);
+				drawButton(		this.x+this.sliderPos,
+								this.y-4,
+								24,
+								this.h+8,
+								.5,
+								2);
+				//this.touchCollision.push({x:this+this.sliderPos,y:this.y-4,w:this.h+8,id:this.id});
 			}
+			//
+			// Update the slider... Takes input as point x,y
+			//
+			update(uiTouchLastX,uiTouchLastY){
+				// Collision check finger and user interface element.
+				if(uiTouchLastX>this.x && uiTouchLastY>this.y && uiTouchLastX<this.x+this.w-24 && uiTouchLastY<this.y+this.h){
+					// If we press left side go back in list 
+					this.sliderPos = uiTouchLastX-this.x;
+					if(this.sliderPos>this.w){
+						//this.sliderPos=this.x;
+					}
+					var val = (this.w-25)-this.sliderPos;
+					var val2 = (val/(this.w-25));
+					//val2 = Math.floor((this.w-25/val) * 100)
+					if(val2>.98)val2=1;
+					if(val2<.02)val2=0;
+					val2 = 1.0-val2;
+					//
+					// Value ranges from 0.0 left to 1.0 right....
+					this.value=val2;					
+					// Set variable that tells when we visited ui.
+					uiActiveTime=30;
+				}	
+						
+				
+			}
+			
 		}
 		var classSliders = [];
 		classSliders.push(new classSlider(100,200,100,30));	
@@ -64,10 +100,11 @@ Use different browser.
 		var ctx2 = uiCanvas.getContext("2d")
 	
 		window.addEventListener("touchend", touchHandler,false);			
+		window.addEventListener("touchmove", touchHandler,false);		
 		window.addEventListener("resize", resizeHandler,false);			
 		var uiTouchLastX = uiTouchLastY = 0;
 		var uiActiveTime=0; // count down from last pressed a user interface element.	
-		var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider) id=1=palette
+		var touchCollision = []; // x:,y:,w:,h:,id: (id = 0 = brush slider)data: id=1=palette
 	
 		gameloop=setInterval(doGameLoop,230);// run our game loop at 60fps(16 ms of 1000 ms)
 		
@@ -95,8 +132,12 @@ Use different browser.
 			if(uiActiveTime>0)uiActiveTime-=1;
 			
 			touchCollision = []; // reset touch collision when repopulate
-
-
+			ctx2.font = "bold "+40+"px serif";	
+			for(var i=0;i<classSliders.length;i++){
+				setColor(1);
+				ctx2.fillText(classSliders[0].value,50,100);
+			}
+			
 
 			drawSlider(100,100);
 			for(var i=0;i<classSliders.length;i++){
@@ -244,28 +285,25 @@ Use different browser.
 					uiTouchLastX = x;
 					uiTouchLastY = y;
 				}
-				
-				// Touch collisions..
-				// One list with every user interface element x,y,w,h,id,data
-				for(var i=0;i<touchCollision.length;i++){
-					// Collision with element id
-					if(touchCollision[i].id==8){
-						var x = touchCollision[i].x;
-						var y = touchCollision[i].y;
-						var w = touchCollision[i].w;
-						var h = touchCollision[i].h;
-						// Collision check finger and user interface element.
-						if(uiTouchLastX>x && uiTouchLastY>y && uiTouchLastX<x+w && uiTouchLastY<y+h){
-							// If we press left side go back in list 
-							
-							// Set variable that tells when we visited ui.
-							uiActiveTime=30;
-							
-						}	
-					}
-				}				
-			}
 			
+				for(var i=0;i<classSliders.length;i++){
+					classSliders[i].update(uiTouchLastX,uiTouchLastY);
+				}
+				
+			}
+			if(e.type=="touchmove" && e.touches) {			
+				for(var i=0;i<e.changedTouches.length;i++){	
+					var x = e.changedTouches[i].clientX;
+					var y = e.changedTouches[i].clientY;				
+					uiTouchLastX = x;
+					uiTouchLastY = y;
+				}
+
+				for(var i=0;i<classSliders.length;i++){
+					classSliders[i].update(uiTouchLastX,uiTouchLastY);
+				}
+			}
+				
 		}
 		//
 		// Fix ME!
