@@ -42,6 +42,7 @@ Use different browser.
 	// Slider class
 	class classSlider{
 		constructor(x,y,w,h,id,type=0){
+			this.active = true;
 			this.id = id;
 			//this.touchCollision = []; // x:,y:,w:,h:,id,data: (id = 0 = brush slider) id=1=palette
 			this.x = x;
@@ -57,7 +58,7 @@ Use different browser.
 			
 		}
 		draw(){//using the c as ctx. 
-
+			if(this.active==false)return;
 			drawButton(this.x,this.y,this.w,this.h);
 			drawRect(this.x+12,this.y+this.h/4,this.w-24,this.h/2,0);
 			//outlineRect(x,y,w,h,1,5);
@@ -74,6 +75,7 @@ Use different browser.
 		// Update the slider... Takes input as point x,y
 		//
 		update(uiTouchLastX,uiTouchLastY){
+			if(this.active==false)return;			
 			// Collision check finger and user interface element.
 			if(uiTouchLastX>this.x && uiTouchLastY>this.y && uiTouchLastX<this.x+this.w-24 && uiTouchLastY<this.y+this.h){
 				// If we press left side go back in list 
@@ -112,8 +114,10 @@ Use different browser.
 	var uiSlider3Id = 2;
 	var uiSlider4Id = 3;		
 	
-	classSliders.push(new classSlider(0,0,0,0,uiSlider1Id));
-	classSliders.push(new classSlider(0,0,0,0,uiSlider2Id));
+	classSliders.push(new classSlider(0,0,0,0,uiSlider1Id));//brush size
+	classSliders.push(new classSlider(0,0,0,0,uiSlider2Id));//brushFX1
+	classSliders.push(new classSlider(0,0,0,0,uiSlider3Id));//fx2
+	classSliders.push(new classSlider(0,0,0,0,uiSlider4Id));//fx3
 	
 
 	
@@ -1200,11 +1204,10 @@ Use different browser.
 			}
 		}
 	}
-	
 	//
 	// Draw a horizontal or vertical slider for brush size.
 	//
-	function drawBrushFXSlider1(){
+	function updateBrushFXSlider3(){
 		var x = window.innerWidth*.50;
 //		var y = window.innerHeight*.90;
 		var w = window.innerWidth/3;
@@ -1219,24 +1222,18 @@ Use different browser.
 			y=window.innerHeight/1.8+(h2*4.0);
 			//h*=2;
 		}
-		classSliders[uiSlider2Id].updatePosition(x,y,w,h+8);
+		// disable tab if not in tab 1
+		if(uiActiveTab!=1)classSliders[uiSlider3Id].active=false;
+		if(uiActiveTab==1)classSliders[uiSlider3Id].active=true;
+		//update tab screen position
+		classSliders[uiSlider3Id].updatePosition(x,y,w,h+8);
 		return;	
-		drawButton(x,y,w,h,.5,2);
-		drawRect(x+12,y+h/4,w-24,h/2,0);
-		//outlineRect(x,y,w,h,1,5);
-		sliderPos = uiBrushFX1SliderPos;
-		//var brushFX = 2;
-		//var uiBrushFXSliderPos = 10;
-		//thinner if smaller
-		drawButton(x+sliderPos,y-4,24,h+8,.5,2);
-		//drawRect(x+sliderPos,y,16,h,1);
-		//outlineRect(x+sliderPos,y,16,h,1,5);
-		touchCollision.push({x:x,y:y-6,w:w,h:h+12,id:4});
 	}	
+	
 	//
-	// Draw a horizontal or vertical slider for brush size.
+	// Update brush slider fx 2
 	//
-	function drawBrushSizeSlider(){
+	function updateBrushFXSlider2(){
 		//var w = window.innerWidth/20;
 		//var h = w;
 		//if(window.innerHeight>window.innerWidth)h-=h/6;
@@ -1256,25 +1253,68 @@ Use different browser.
 			y=window.innerHeight/1.8+(h2*3.5);
 			//h*=2;
 		}
-
-		classSliders[uiSlider1Id].updatePosition(x,y,w,h+8);
-		return;		
-		//thinner if smaller
-		//if(window.innerWidth<window.innerHeight){	
-			//h/=1.5;			
-			//x /= 2;
-			//y = window.innerHeight-(window.innerWidth/4)+(w/6.5);
-	//	}
-		drawButton(x,y,w,h);
-		drawRect(x+12,y+h/4,w-24,h/2,0);
-		//outlineRect(x,y,w,h,1,5);
-		sliderPos = uiBrushSliderPos;
-		drawButton(x+sliderPos,y-4,24,h+8,.5,2);
-		//drawRect(x+sliderPos,y,16,h,1);
-		//outlineRect(x+sliderPos,y,16,h,1,5);
-		touchCollision.push({x:x,y:y-6,w:w,h:h+12,id:0});
-	}
+		//disable tab if not in tab 0
+		if(uiActiveTab!=1)classSliders[uiSlider4Id].active=false;
+		if(uiActiveTab==1)classSliders[uiSlider4Id].active=true;
+		// update tab position
+		classSliders[uiSlider4Id].updatePosition(x,y,w,h+8);
+	}		
 	
+	//
+	// Draw a horizontal or vertical slider for brush size.
+	//
+	function updateBrushFXSlider1(){
+		var x = window.innerWidth*.50;
+//		var y = window.innerHeight*.90;
+		var w = window.innerWidth/3;
+		var h = window.innerHeight/32;
+		var y = window.innerHeight-(window.innerWidth/5)+(w/3.3);	
+
+		// thinner if smaller
+			if(window.innerHeight>window.innerWidth){
+			x/=2;
+			//w = window.innerWidth*.90;
+		  var	h2 = (window.innerHeight/14.55);
+			y=window.innerHeight/1.8+(h2*4.0);
+			//h*=2;
+		}
+		// disable tab if not in tab 1
+		if(uiActiveTab!=0)classSliders[uiSlider1Id].active=false;
+		if(uiActiveTab==0)classSliders[uiSlider1Id].active=true;
+		//update tab screen position
+		classSliders[uiSlider2Id].updatePosition(x,y,w,h+8);
+		return;	
+	}	
+	
+	//
+	// Draw a horizontal or vertical slider for brush size.
+	//
+	function updateBrushSizeSlider(){
+		//var w = window.innerWidth/20;
+		//var h = w;
+		//if(window.innerHeight>window.innerWidth)h-=h/6;
+		//var y=window.innerHeight-(w*4);
+		
+		var x = window.innerWidth*.50;
+		var w = window.innerWidth/3;
+		var h = window.innerHeight/32;
+//		var y = window.innerHeight*.8;
+		
+		var y = window.innerHeight-(window.innerWidth/5)+(w/6.5);
+		
+		if(window.innerHeight>window.innerWidth){
+			x/=2;
+			//w = window.innerWidth*.90;
+		 	 var	h2 = (window.innerHeight/14.55);
+			y=window.innerHeight/1.8+(h2*3.5);
+			//h*=2;
+		}
+		//disable tab if not in tab 0
+		if(uiActiveTab!=0)classSliders[uiSlider2Id].active=false;
+		if(uiActiveTab==0)classSliders[uiSlider2Id].active=true;
+		// update tab position
+		classSliders[uiSlider1Id].updatePosition(x,y,w,h+8);
+	}	
 	//
 	// Draw our brush to the screen (show!)
 	//
@@ -2166,6 +2206,7 @@ Use different browser.
 			if(e.changedTouches.length==1 && brushActive==false){
 			for(var i = 0;i<classSliders.length;i++){
 
+				// Brush size slider>>
 				if(i==uiSlider1Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
 					
 						brushRoundSize = Math.floor((classSliders[i].value*maxBrushRoundSize));
@@ -2176,7 +2217,7 @@ Use different browser.
 						uiActiveTime=30;		
 						
 				}
-				
+				// Brush FX slider 1
 				if(i==uiSlider2Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){		
 						//var step = 3/w;//maxBrushRoundSize/w;
 						//var p = uiTouchLastX-x;
@@ -2191,6 +2232,36 @@ Use different browser.
 						updateUiCanvas();						
 						uiActiveTime=30;					
 				}
+				// Brush FX slider 2
+				if(i==uiSlider3Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){		
+						//var step = 3/w;//maxBrushRoundSize/w;
+						//var p = uiTouchLastX-x;
+						//uiBrushFX1SliderPos = p;
+						//if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+						//brushFX1 = (classSliders[i].value);		
+						//brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+						//console.log(brushFX1);			
+						//if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						//uiBrushTimeOut=30;	//brush preview
+						updateUiCanvas();						
+						uiActiveTime=30;					
+					}
+				// Brush FX slider 3
+				if(i==uiSlider4Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){		
+						//var step = 3/w;//maxBrushRoundSize/w;
+						//var p = uiTouchLastX-x;
+						//uiBrushFX1SliderPos = p;
+						//if(uiBrushFX1SliderPos+16>w)uiBrushFX1SliderPos-=16;
+						//brushFX1 = (classSliders[i].value);		
+						//brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+						//console.log(brushFX1);			
+						//if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						//uiBrushTimeOut=30;	//brush preview
+						updateUiCanvas();						
+						uiActiveTime=30;					
+					}					
 			}}
 				
 			e.preventDefault();		
@@ -2527,7 +2598,7 @@ Use different browser.
 			// TAB SLIDERS
 			
 			for(var i = 0;i<classSliders.length;i++){
-
+				// Brush Size Slider
 				if(i==uiSlider1Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
 					
 						
@@ -2540,8 +2611,9 @@ Use different browser.
 						uiActiveTime=30;		
 						
 				}
+				// Brush FX 1 Slider
 				if(i==uiSlider2Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
-					brushFX1 = (classSliders[i].value-1)*2;			
+						brushFX1 = (classSliders[i].value-1)*2;			
 						//brushFX1 = (uiBrushFX1SliderPos*step)-1;			
 						//console.log(brushFX1);
 						brushFX1 = (classSliders[i].value);				
@@ -2551,7 +2623,30 @@ Use different browser.
 						updateUiCanvas();						
 						uiActiveTime=30;								
 				}
-				
+				// Brush FX 2 Slider
+				if(i==uiSlider3Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
+						//brushFX1 = (classSliders[i].value-1)*2;			
+						//brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+						//console.log(brushFX1);
+						//brushFX1 = (classSliders[i].value);				
+						//if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						//uiBrushTimeOut=30;	//brush preview enable
+						updateUiCanvas();						
+						uiActiveTime=30;								
+					}
+				// Brush FX 3 Slider
+				if(i==uiSlider4Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
+						//brushFX1 = (classSliders[i].value-1)*2;			
+						//brushFX1 = (uiBrushFX1SliderPos*step)-1;			
+						//console.log(brushFX1);
+						//brushFX1 = (classSliders[i].value);				
+						//if(brushFX1<0)brushFX1=0;
+						//console.log(brushFX1);
+						//uiBrushTimeOut=30;	//brush preview enable
+						updateUiCanvas();						
+						uiActiveTime=30;								
+					}					
 			}
 			
 
@@ -2661,9 +2756,12 @@ Use different browser.
 		drawPaletteBar(activePalette);
 		drawPaletteCart(uiPaletteCard);
 		drawTabWindow();
-		drawBrushSizeSlider();
+
+		updateBrushSizeSlider();
+		updateBrushFXSlider1();
+		updateBrushFXSlider2();
+		updateBrushFXSlider3();
 		
-		drawBrushFXSlider1();
 		drawColorBar();
 		drawToolBar();
 		for(var i = 0;i<classSliders.length;i++){
