@@ -42,6 +42,7 @@ Use different browser.
 	// Slider class
 	class classSlider{
 		constructor(x,y,w,h,id,type=0){
+			this.init = true;
 			this.active = true;
 			this.id = id;
 			//this.touchCollision = []; // x:,y:,w:,h:,id,data: (id = 0 = brush slider) id=1=palette
@@ -58,6 +59,10 @@ Use different browser.
 			
 		}
 		draw(){//using the c as ctx. 
+			if(this.init==true && this.w!=0){ // when the width is first set position the slidable button
+				this.sliderPos = (this.w-25)/2;				
+				this.init=false;
+			}			
 			if(this.sliderPos>this.w)this.sliderPos=this.w-24;
 			if(this.active==false)return;
 			drawButton(this.x,this.y,this.w,this.h);
@@ -76,7 +81,9 @@ Use different browser.
 		// Update the slider... Takes input as point x,y
 		//
 		update(uiTouchLastX,uiTouchLastY){
-			if(this.active==false)return;			
+			if(this.active==false)return;
+			
+
 			// Collision check finger and user interface element.
 			if(uiTouchLastX>this.x && uiTouchLastY>this.y && uiTouchLastX<this.x+this.w-24 && uiTouchLastY<this.y+this.h){
 				// If we press left side go back in list 
@@ -101,7 +108,6 @@ Use different browser.
 			
 		}
 		updatePosition(x,y,w,h){
-
 			this.x = x;
 			this.y = y;
 			this.w = w;
@@ -109,16 +115,23 @@ Use different browser.
 		}
 		
 	}
+	
 	var classSliders = [];
+	// The Ids currently need to be in number order 1.2.3.4...
+
 	var uiSlider1Id = 0;
 	var uiSlider2Id = 1;
 	var uiSlider3Id = 2;
 	var uiSlider4Id = 3;		
+	var uiSliderColorBrightnessId = 4;
 	
 	classSliders.push(new classSlider(0,0,0,0,uiSlider1Id));//brush size
 	classSliders.push(new classSlider(0,0,0,0,uiSlider2Id));//brushFX1
 	classSliders.push(new classSlider(0,0,0,0,uiSlider3Id));//fx2
 	classSliders.push(new classSlider(0,0,0,0,uiSlider4Id));//fx3
+	//individual color from palette(s) brightness (darker.-0.5..+0.5.whiter)(-0.5..0.5)
+	classSliders.push(new classSlider(0,0,0,0,uiSliderColorBrightnessId));
+	classSliders[uiSliderColorBrightnessId].update();
 	
 
 	
@@ -148,7 +161,7 @@ Use different browser.
 	
 
 	
-	
+	var paletteCart01Brightness = [];
 	var paletteCart01 = []; //ammo-8
 	paletteCart01.push({r:0,g:0,b:0,a:255});//black
 	paletteCart01.push({r:4,g:12,b:6,a:255});
@@ -160,7 +173,7 @@ Use different browser.
 	paletteCart01.push({r:190,g:220,b:127,a:255});
 	paletteCart01.push({r:238,g:255,b:204,a:255});
 	//
-	
+	var paletteCart02Brightness = [];
 	var paletteCart02 = []; //rust-gold-8
 	paletteCart02.push({r:0,g:0,b:0,a:255});//black
 	paletteCart02.push({r:246,g:205,b:38,a:255});
@@ -171,7 +184,7 @@ Use different browser.
 	paletteCart02.push({r:114,g:89,b:86,a:255});
 	paletteCart02.push({r:57,g:57,b:57,a:255});
 	paletteCart02.push({r:32,g:32,b:32,a:255});
-	
+	var paletteCart03Brightness = [];
 	var paletteCart03 = []; //retrocal-8
 	paletteCart03.push({r:0,g:0,b:0,a:255});//black
 	paletteCart03.push({r:110,g:88,b:168,a:255});
@@ -183,6 +196,7 @@ Use different browser.
 	paletteCart03.push({r:119,g:68,b:72,a:255});
 	paletteCart03.push({r:238,g:156,b:93,a:255});
 	
+	var paletteCart04Brightness = [];
 	var paletteCart04 = []; //cl8uds-8
 	paletteCart04.push({r:0,g:0,b:0,a:255});//black
 	paletteCart04.push({r:252,g:176,b:140,a:255});
@@ -195,6 +209,7 @@ Use different browser.
 	paletteCart04.push({r:165,g:183,b:212,a:255});
 	//
 	// Temp palette
+	var paletteBrightness = [];
 	var palette = [];
 	palette.push({r:0,g:0,b:0,a:255});//black
 	palette.push({r:255,g:255,b:255,a:255});//white
@@ -206,7 +221,18 @@ Use different browser.
 	palette.push({r:210,g:156,b:151,a:255});//hightlight	
 	palette.push({r:200,g:131,b:131,a:255});//hightlight
 	//-1
-
+	for(var i=0;i<9;i++){
+		paletteCart01Brightness.push(0.5);
+		paletteCart02Brightness.push(0.5);
+		paletteCart03Brightness.push(0.5);
+		paletteCart04Brightness.push(0.5);		
+		paletteBrightness.push(0.5);
+		palette.push({r:paletteCart01[i].r,g:paletteCart01[i].g,b:paletteCart01[i].b,a:255});		
+		palette.push({r:paletteCart02[i].r,g:paletteCart02[i].g,b:paletteCart02[i].b,a:255});
+		palette.push({r:paletteCart03[i].r,g:paletteCart03[i].g,b:paletteCart03[i].b,a:255});
+		palette.push({r:paletteCart04[i].r,g:paletteCart04[i].g,b:paletteCart04[i].b,a:255});
+	}
+/*
 	for(var i=0;i<paletteCart01.length;i++){
 		palette.push({r:paletteCart01[i].r,g:paletteCart01[i].g,b:paletteCart01[i].b,a:255})
 	}
@@ -219,7 +245,7 @@ Use different browser.
 	for(var i=0;i<paletteCart04.length;i++){
 		palette.push({r:paletteCart04[i].r,g:paletteCart04[i].g,b:paletteCart04[i].b,a:255})
 	}
-	
+	*/
 	// create new array and copy this array into it (all fields)
 	var palette2 = JSON.parse(JSON.stringify(palette));	
 	
@@ -1325,7 +1351,6 @@ Use different browser.
 		classSliders[uiSlider2Id].updatePosition(x,y,w,h+8);
 		return;	
 	}	
-	
 	//
 	// Draw a horizontal or vertical slider for brush size.
 	//
@@ -1355,6 +1380,25 @@ Use different browser.
 		// update tab position
 		classSliders[uiSlider1Id].updatePosition(x,y,w,h+8);
 	}	
+	// Brightness config for every color in the palette//
+	// located in <palettenam>+Brightness[]
+	function updateSliderColorBrightness(){
+		var x = window.innerWidth*.50;
+		var w = window.innerWidth/3;
+		var h = window.innerHeight/32;
+		var y = window.innerHeight-(window.innerWidth/5)+(w/6.5);
+		if(window.innerHeight>window.innerWidth){
+			x/=2;
+		 	 var	h2 = (window.innerHeight/14.55);
+			y=window.innerHeight/1.8+(h2*3.5);
+		}
+		//disable tab if not in tab 0
+		if(uiActiveTab!=4)classSliders[uiSliderColorBrightnessId].active=false;
+		if(uiActiveTab==4)classSliders[uiSliderColorBrightnessId].active=true;
+		// update tab position
+		classSliders[uiSliderColorBrightnessId].updatePosition(x,y,w,h+8);		
+	}
+	
 	//
 	// Draw our brush to the screen (show!)
 	//
@@ -1659,6 +1703,7 @@ Use different browser.
 	
 	// set the fillstyle color of palette(c)
 	function setColor(c){
+
 		ctx2.fillStyle = "rgb("+palette[c].r+","+palette[c].g+","+palette[c].b+","+palette[c].a+")";
 	}
 	function setCtxColor(can,c){
@@ -2808,7 +2853,7 @@ Use different browser.
 		updateBrushFXSlider1();
 		updateBrushFXSlider2();
 		updateBrushFXSlider3();
-		
+		updateSliderColorBrightness();
 		drawColorBar();
 		drawToolBar();
 		for(var i = 0;i<classSliders.length;i++){
