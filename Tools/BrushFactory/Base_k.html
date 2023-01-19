@@ -80,7 +80,17 @@ Use different browser.
 		// turn slider float into slider position value
 		setSliderPos(a){
 			this.sliderPos = (this.w-25)*a;
-		}
+			var val = (this.w-25)-this.sliderPos;
+			var val2 = (val/(this.w-25));
+			//val2 = Math.floor((this.w-25/val) * 100)
+			if(val2>.98)val2=1;
+			if(val2<.02)val2=0;
+			val2 = 1.0-val2;
+			//
+			// Value ranges from 0.0 left to 1.0 right....
+			this.value=val2;					
+			
+			}
 		//
 		// Update the slider... Takes input as point x,y
 		//
@@ -2993,19 +3003,22 @@ Use different browser.
 			//
 			if(i==uiSliderRId || i==uiSliderGId || i==uiSliderBId){
 			if(classSliders[i].update(uiTouchLastX,uiTouchLastY)){
+
 					var r = (classSliders[uiSliderRId].value);
 					var g = (classSliders[uiSliderGId].value);
 					var b = (classSliders[uiSliderBId].value);
+					
 					r = Math.floor(r*255);
 					g = Math.floor(g*255);
 					b = Math.floor(b*255);
+
 					// change regular palette?
 					if(uiPaletteCartActive==0){
 						palette[activePalette].r = r;
 						palette[activePalette].g = g;
 						palette[activePalette].b = b;						
 					}					
-					// change color brightness from palette cart
+					// change color rgb of carts
 					if(uiPaletteCard==0 && uiPaletteCartActive>0){
 						//console.log(uiPaletteCartActive);
 						paletteCart01[uiPaletteCartActive].r = r;
@@ -3041,7 +3054,7 @@ Use different browser.
 						palette[uiPaletteCartActive+(paletteCart01.length*4)].r=paletteCart04[uiPaletteCartActive].r;
 						palette[uiPaletteCartActive+(paletteCart01.length*4)].g=paletteCart04[uiPaletteCartActive].g;
 						palette[uiPaletteCartActive+(paletteCart01.length*4)].b=paletteCart04[uiPaletteCartActive].b;
-					}							
+					}											
 					uiBrushTimeOut=30;	//brush preview enable
 					updateUiCanvas();						
 					uiActiveTime=30;								
