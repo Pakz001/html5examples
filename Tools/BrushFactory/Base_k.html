@@ -1460,7 +1460,7 @@ Use different browser.
 		var w = window.innerWidth/3;
 		var h = window.innerHeight/32;
 		
-		var y = window.innerHeight-(window.innerWidth/5)+(w/4);
+		var y = window.innerHeight-(window.innerWidth/5)+(w/3.8);
 		
 		if(window.innerHeight>window.innerWidth){
 			x/=2;
@@ -1482,7 +1482,7 @@ Use different browser.
 		var w = window.innerWidth/3;
 		var h = window.innerHeight/32;
 		
-		var y = window.innerHeight-(window.innerWidth/5)+(w/3);
+		var y = window.innerHeight-(window.innerWidth/5)+(w/2.68);
 		
 		if(window.innerHeight>window.innerWidth){
 			x/=2;
@@ -2469,7 +2469,7 @@ Use different browser.
 							uiLockBrushPreview=true;
 							addSystemMessage("tabLockBrushTip");							
 						}
-						uiActiveTime=30;											
+						uiActiveTime=20;											
 						//console.log(touchCollision[i].data);
 					}
 				}
@@ -2531,7 +2531,7 @@ Use different browser.
 			//
 			// Palette selection boxes
 			for(var i=0;i<touchCollision.length;i++){
-				if(touchCollision[i].id==5 && touchCollision[i].data==0){
+				if(touchCollision[i].id==5 && touchCollision[i].data==0  && uiActiveTime==0){
 					var x = touchCollision[i].x;
 					var y = touchCollision[i].y;
 					var w = touchCollision[i].w;
@@ -2560,12 +2560,12 @@ Use different browser.
 						//var uiPaletteCard = 1;
 						//var uipaletteCardCount = 0;
 	
-						uiActiveTime=30;						
+						uiActiveTime=20;						
 					}
 				}
 				//select palette cart upper palette bar
 				
-				if(touchCollision[i].id==5){
+				if(touchCollision[i].id==5 && uiActiveTime==0){
 					var x = touchCollision[i].x;
 					var y = touchCollision[i].y;
 					var w = touchCollision[i].w;
@@ -2609,7 +2609,7 @@ Use different browser.
 						updateUiCanvas();
 						
 						//console.log(uiPaletteCartActive);
-						uiActiveTime=30;						
+						uiActiveTime=20;						
 					}
 				}		// regular bottom palette selection		
 				if(touchCollision[i].id==1){
@@ -2629,7 +2629,7 @@ Use different browser.
 						classSliders[uiSliderBId].setSliderPos(b);
 							
 						updateUiCanvas;
-						uiActiveTime=30;						
+						uiActiveTime=20;						
 					}
 				}
 				// random palette 0
