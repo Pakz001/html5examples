@@ -29,7 +29,6 @@ Use different browser.
 	
 	var uiCanvas = document.createElement("canvas");
 
-		
 	var ctx2 = uiCanvas.getContext("2d")
 
 	window.addEventListener("touchstart", touchHandler,false);
@@ -159,8 +158,8 @@ Use different browser.
 	var uiBrushPreviewAngle = 0;
 	var uiBrushTimeOut = 0 // show brush change image on screen.
 	//var uiBrushSliderPos=32;	// slider position of the brush size
+	var uiTabText = ["Size","Shape","..","..","Bright"];
 	
-
 	
 	var paletteCart01Brightness = [];
 	var paletteCart01 = []; //ammo-8
@@ -494,11 +493,11 @@ Use different browser.
 			//setColor(2);
 			//if(tab!=0)setColor(5);
 			if(tab!=uiActiveTab){
-				drawTabButton((x+x1),y,tabWidth+20,tabHeight,depth=.5,ps=3,0.67,true);
+				drawTabButton(tab,(x+x1),y,tabWidth+20,tabHeight,depth=.5,ps=3,0.67,true);
 				touchCollision.push({x:x+x1,y:y,w:tabWidth+20,h:tabHeight,id:6,data:tab});				
 			}
 		}
-		drawTabButton(x+(uiActiveTab*tabWidth),y,tabWidth+20,tabHeight,depth=.5,ps=3,1,false);	
+		drawTabButton(uiActiveTab,x+(uiActiveTab*tabWidth),y,tabWidth+20,tabHeight,depth=.5,ps=3,1,false);	
 		touchCollision.push({x:x+(uiActiveTab*tabWidth),y:y,w:tabWidth+20,h:tabHeight,id:6,data:uiActiveTab});
 
 
@@ -524,7 +523,8 @@ Use different browser.
 //
 	// Draw a horizontal or vertical slider for brush size.
 	//
-	function drawTabButton(x,y,w,h,depth=.2,ps=3,intensity=1.0,drawBottom=true){
+	function drawTabButton(tab,x,y,w,h,depth=.2,ps=3,intensity=1.0,drawBottom=true){
+
 		//drawRect2(x,y,w,h,0);
 		if(depth>.5)depth=.5;
 		setColor(0);
@@ -590,6 +590,7 @@ Use different browser.
 			
 		}	
 		//top+=h/10;
+		
 		if(drawBottom){
 			// bottom area
 			texLine(left+ps,top+ps,(w/(ps*2)),[3,8,7],intensity);
@@ -608,6 +609,26 @@ Use different browser.
 				ctx2.fillRect(left+ps,top+ps*3,w-ps*2,ps);
 				top+=ps;
 			}while(top+(ps*3)<bottom);
+			drawTxt();
+		}else{
+			drawTxt();			
+		}
+		
+		function drawTxt(){
+			if(tab==-1)return;
+			//ctx2.fillStyle="#FFFFFF";
+			//ctx2.fillRect(x+10,y,10,10);
+			setColorI(1);
+			if(drawBottom)setColorI(1,0.7);
+			var sz=window.innerWidth/60;
+			if(window.innerHeight>window.innerWidth)sz*=2;
+			var s=uiTabText[tab];
+
+			ctx2.font = "bold "+sz+"px serif";				
+			//const metrics = ctx.measureText(s);
+			var q=0;
+			if(window.innerWidth<window.innerHeight)q=-h/8;
+			ctx2.fillText(s,x+w/5,(y+h/1.6)+q);								
 		}
 		function texLine(x,y,stp,tx,intensity){
 		//var tx = [2,8,1];
@@ -636,9 +657,11 @@ Use different browser.
 //		}		
 //		ctx.globalAlpha = 1;
 	}	
+	
+	
 	// set the fillstyle color of palette(c)
 	function setColorI(c,intensity=1.0){
-		ctx2.fillStyle = "rgb("+(palette[c].r*intensity)+","+(palette[c].g*intensity)+","+(palette[c].b*intensity)+","+palette[c].a+")";
+		ctx2.fillStyle = "rgb("+(Math.floor(palette[c].r*intensity))+","+(Math.floor(palette[c].g*intensity))+","+(Math.floor(palette[c].b*intensity))+","+palette[c].a+")";
 	}
 	
 	
