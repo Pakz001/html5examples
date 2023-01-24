@@ -2229,87 +2229,9 @@ Use different browser.
 			//
 
 				
-			if(e.changedTouches.length==1 && uiActiveTime==0){			
-				if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
-//	var brushPushTime = 0; //if at the same spot long then increase this
-					brushActive = true;
-					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
-					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
-
-					//console.log(brushPointX);
-					//var brushPositionHistory = []; // holds the previous x positions of brush
-					if(brushPositionHistory.length==0)brushPositionHistory.unshift({x:uiTouchLastX,y:uiTouchLastY});
-					if(brushPositionHistory[0].x != uiTouchLastX && brushPositionHistory[0].y!=uiTouchLastY){
-						brushPositionHistory.unshift({x:uiTouchLastX,y:uiTouchLastY});
-					}
-					
-					// get distance of last 4 steps..
-					var cnt=0;
-					var d=0;
-					if(brushPositionHistory.length>5){
-					for(var i=0;i<brushPositionHistory.length-1;i++){
-						d+=Math.hypot(brushPositionHistory[i].y-brushPositionHistory[i+1].y,brushPositionHistory[i].x-brushPositionHistory[i+1].x);
-						cnt++;
-						if(cnt>4)break;
-					}
-					//console.log(d);
-					}
-					// method 1
-					var angle = brushLastAngle;
-					if(brushPositionHistory.length>2){
-						var x1 = brushPositionHistory[2].x;
-						var y1 = brushPositionHistory[2].y
-						angle = Math.atan2(uiTouchLastY-y1, uiTouchLastX-x1);						
-						smudgeHillBrush(brushPointX,brushPointY,angle);	
-						
-					}	
-					/*				
-					// method 2 - push ahead more if moving slowly.
-					var angle = 0;
-					if(brushPositionHistory.length>2){
-						var x1 = brushPositionHistory[2].x;
-						var y1 = brushPositionHistory[2].y
-						angle = Math.atan2(uiTouchLastY-y1, uiTouchLastX-x1);
-						if(d==0){
-							smudgeHillBrush(brushPointX,brushPointY,angle);	
-						}else{
-						if(d<15){
-						smudgeHillBrush(brushPointX+Math.cos(angle)*(d/8),brushPointY+Math.sin(angle)*(d/8),angle);	
-						}else{
-							smudgeHillBrush(brushPointX,brushPointY,angle);	
-						}}
-					}
-					*/
-					if(surfaceBuffer==1){
-						ctx.drawImage(surfaceImage,0,0);
-						ctx.drawImage(oldSurfaceImage,0,0);		
-						//surfaceBuffer=0;
-					}else{
-						ctx.drawImage(oldSurfaceImage,0,0);
-						ctx.drawImage(surfaceImage,0,0);
-						//surfaceBuffer=1
-					}
-					ctx.drawImage(uiCanvas, 0, 0);
-					/*
-					drawPaletteBar(activePalette);
-					drawPaletteCart(uiPaletteCard);
-					drawTabWindow();
-					drawBrushSizeSlider();
-					drawBrushFXSlider1();
-					drawColorBar();
-					drawToolBar();
-					*/					
-					
-					//var brushLastAngle = 0;	
-					brushLastAngle = angle;
-					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
-					
-					//if(Math.random()<.05)updateSurface = true;
-					
-					updateSurface=true;
-					
-					
-				}
+			if(e.changedTouches.length==1 && uiActiveTime==0){		
+				uiHandleBrushes(e,uiTouchLastX,uiTouchLastY);	
+				
 				
 			}
 	
@@ -2318,87 +2240,12 @@ Use different browser.
 			// Brush move
 			//
 			if(e.changedTouches.length===1 && uiActiveTime==0){			
-				if(brushMode==1 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
-					var z=0;
-					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
-					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
-					if(uiPaletteCartActive>0 && uiPaletteCard==2)z=uiPaletteCartActive+27;
-					if(uiPaletteCartActive>0 && uiPaletteCard==3)z=uiPaletteCartActive+36;					
-					
-					brushActive = true;
-					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
-					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
-					//console.log(brushPointX);
-					for(var y1=0;y1<brush.length;y1++){
-					for(var x1=0;x1<brush.length;x1++){
-						var val = brush[x1][y1];
-						if(val==0)continue;
-						var x2 = Math.floor((brushPointX+x1)-brushRoundSize/2);
-						var y2 = Math.floor((brushPointY+y1)-brushRoundSize/2);
-						
-						if(x2>=0 && x2<surfaceWidth && y2>=0 && y2<surfaceHeight){
-						//surface[brushPointX][brushPointY]=activePalette;
-							if(z==0){
-								surface[x2][y2] = activePalette;
-							}else{
-								surface[x2][y2] = z;
-							}
-						
-							//surface[x2][y2] = activePalette;
-
-						}
-					}
-					}
-					if(surfaceBuffer==1){
-						ctx.drawImage(surfaceImage,0,0);
-						ctx.drawImage(oldSurfaceImage,0,0);		
-						//surfaceBuffer=0;
-					}else{
-						ctx.drawImage(oldSurfaceImage,0,0);
-						ctx.drawImage(surfaceImage,0,0);
-						//surfaceBuffer=1
-					}
-					ctx.drawImage(uiCanvas, 0, 0);		
-					/*
-					drawPaletteBar(activePalette);
-					drawPaletteCart(uiPaletteCard);
-					drawTabWindow();
-					drawBrushSizeSlider();
-					drawBrushFXSlider1();
-					drawColorBar();
-					drawToolBar();
-					*/					
-					//var brushLastAngle = 0;	
-					brushLastAngle = angle;
-					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
-					
-					//if(Math.random()<.05)updateSurface = true;
-					
-					updateSurface=true;
-				}
+				uiHandleBrushes(e,uiTouchLastX,uiTouchLastY);				
 			}			
 			// plot pixel
-			if(brushMode==0 && pinchDragCoolDown>20 && uiActiveTime==0){//plot
-				if(e.changedTouches.length==1){
-					var z=0;
-					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
-					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
-					if(uiPaletteCartActive>0 && uiPaletteCard==2)z=uiPaletteCartActive+27;					
-					if(uiPaletteCartActive>0 && uiPaletteCard==3)z=uiPaletteCartActive+36;
-					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
-					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
-					//console.log(brushPointX);
-					if(brushPointX>=0 && brushPointX<surfaceWidth && brushPointY>=0 && brushPointY<surfaceHeight){
-						//surface[brushPointX][brushPointY]=activePalette;
-						if(z==0){
-							surface[brushPointX][brushPointY] = activePalette;
-						}else{
-							surface[brushPointX][brushPointY] = z;
-						}
-						
-						updateSurface = true;
-					}
-				}
+			if(e.changedTouches.length==1){
+				
+				uiHandleBrushes(e,uiTouchLastX,uiTouchLastY);				
 			}
 			
 			
@@ -2786,11 +2633,16 @@ Use different browser.
 			}
 			//
 			// TAB SLIDERS
-			
-			uiHandleSliders(uiTouchLastX,uiTouchLastY)
-			
+			if(e.changedTouches.length==1){
+				pinchDragCoolDown=0;
+				surfacePinchStart=false;
+				uiHandleBrushes(e,uiTouchLastX,uiTouchLastY);
 
+			}
+			
+/*
 			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY && uiActiveTime==0){
+		
 			if(brushMode==2 && uiTouchLastY<window.innerHeight*.8){//plot
 				
 				//console.log(pinchDragCoolDown);
@@ -2804,13 +2656,16 @@ Use different browser.
 				}
 					updateSurface = true;
 				
-			}}			
+			}
+		}	
+		
 			// plot brush
 			//var brush = [];
 			//var brushRoundSize = 32;
 			if(uiTouchLastX==uiTouchStartX && uiTouchLastY==uiTouchStartY && uiActiveTime==0){
-			if(brushMode==1 && uiTouchLastY<window.innerHeight*.8){//plot
-				
+				uiHandleBrushes(uiTouchLastX,uiTouchLastY)
+				/*
+			if(brushMode==1 && uiTouchLastY<window.innerHeight*.8){//plot				
 				//console.log(pinchDragCoolDown);
 				if(e.changedTouches.length==1){
 					var z=0;
@@ -2841,8 +2696,10 @@ Use different browser.
 					}}
 					updateSurface = true;
 				}
-			}}
-			
+			}
+			*/
+			//}
+			/*
 			// plot pixel
 			if(brushMode==0 && uiActiveTime==0 &&uiActiveTime==0){//plot
 				if(e.changedTouches.length==1){
@@ -2867,12 +2724,191 @@ Use different browser.
 					}
 				}
 			}
-			
+			*/
 		updateUiCanvas();			
 			
 		e.preventDefault();	
 		}		
 		
+	}
+	function uiHandleBrushes(e,uiTouchLastX,uiTouchLastY){
+			//console.log("a"+brushMode+","+pinchDragCoolDown+","+surfacePinchStart+","+uiTouchLastY);
+//			if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
+	pinchDragCoolDown=40;
+if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot				
+//	var brushPushTime = 0; //if at the same spot long then increase this
+					brushActive = true;
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+
+					//console.log(brushPointX);
+					//var brushPositionHistory = []; // holds the previous x positions of brush
+					if(brushPositionHistory.length==0)brushPositionHistory.unshift({x:uiTouchLastX,y:uiTouchLastY});
+					if(brushPositionHistory[0].x != uiTouchLastX && brushPositionHistory[0].y!=uiTouchLastY){
+						brushPositionHistory.unshift({x:uiTouchLastX,y:uiTouchLastY});
+					}
+					
+					// get distance of last 4 steps..
+					var cnt=0;
+					var d=0;
+					if(brushPositionHistory.length>5){
+					for(var i=0;i<brushPositionHistory.length-1;i++){
+						d+=Math.hypot(brushPositionHistory[i].y-brushPositionHistory[i+1].y,brushPositionHistory[i].x-brushPositionHistory[i+1].x);
+						cnt++;
+						if(cnt>4)break;
+					}
+					//console.log(d);
+					}
+
+					// method 1
+					var angle = brushLastAngle;
+					if(brushPositionHistory.length>2){
+						var x1 = brushPositionHistory[2].x;
+						var y1 = brushPositionHistory[2].y
+						angle = Math.atan2(uiTouchLastY-y1, uiTouchLastX-x1);						
+						smudgeHillBrush(brushPointX,brushPointY,angle);	
+						
+					}	
+					if(brushPositionHistory.length==1 && e.changedTouches.length==1){
+						smudgeHillBrush(brushPointX,brushPointY,angle);							
+					}	
+					
+					/*				
+					// method 2 - push ahead more if moving slowly.
+					var angle = 0;
+					if(brushPositionHistory.length>2){
+						var x1 = brushPositionHistory[2].x;
+						var y1 = brushPositionHistory[2].y
+						angle = Math.atan2(uiTouchLastY-y1, uiTouchLastX-x1);
+						if(d==0){
+							smudgeHillBrush(brushPointX,brushPointY,angle);	
+						}else{
+						if(d<15){
+						smudgeHillBrush(brushPointX+Math.cos(angle)*(d/8),brushPointY+Math.sin(angle)*(d/8),angle);	
+						}else{
+							smudgeHillBrush(brushPointX,brushPointY,angle);	
+						}}
+					}
+					*/
+					if(surfaceBuffer==1){
+						ctx.drawImage(surfaceImage,0,0);
+						ctx.drawImage(oldSurfaceImage,0,0);		
+						//surfaceBuffer=0;
+					}else{
+						ctx.drawImage(oldSurfaceImage,0,0);
+						ctx.drawImage(surfaceImage,0,0);
+						//surfaceBuffer=1
+					}
+					ctx.drawImage(uiCanvas, 0, 0);
+					/*
+					drawPaletteBar(activePalette);
+					drawPaletteCart(uiPaletteCard);
+					drawTabWindow();
+					drawBrushSizeSlider();
+					drawBrushFXSlider1();
+					drawColorBar();
+					drawToolBar();
+					*/					
+					
+					//var brushLastAngle = 0;	
+					brushLastAngle = angle;
+					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
+					
+					//if(Math.random()<.05)updateSurface = true;
+					
+					updateSurface=true;
+					
+					
+				}	
+				//
+				// Oval brush
+				//
+				//
+				//
+				if(brushMode==1 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLastY<window.innerHeight*.8){//plot
+					var z=0;
+					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
+					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
+					if(uiPaletteCartActive>0 && uiPaletteCard==2)z=uiPaletteCartActive+27;
+					if(uiPaletteCartActive>0 && uiPaletteCard==3)z=uiPaletteCartActive+36;					
+					
+					brushActive = true;
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+					//console.log(brushPointX);
+					for(var y1=0;y1<brush.length;y1++){
+					for(var x1=0;x1<brush.length;x1++){
+						var val = brush[x1][y1];
+						if(val==0)continue;
+						var x2 = Math.floor((brushPointX+x1)-brushRoundSize/2);
+						var y2 = Math.floor((brushPointY+y1)-brushRoundSize/2);
+						
+						if(x2>=0 && x2<surfaceWidth && y2>=0 && y2<surfaceHeight){
+						//surface[brushPointX][brushPointY]=activePalette;
+							if(z==0){
+								surface[x2][y2] = activePalette;
+							}else{
+								surface[x2][y2] = z;
+							}
+						
+							//surface[x2][y2] = activePalette;
+
+						}
+					}
+					}
+					if(surfaceBuffer==1){
+						ctx.drawImage(surfaceImage,0,0);
+						ctx.drawImage(oldSurfaceImage,0,0);		
+						//surfaceBuffer=0;
+					}else{
+						ctx.drawImage(oldSurfaceImage,0,0);
+						ctx.drawImage(surfaceImage,0,0);
+						//surfaceBuffer=1
+					}
+					ctx.drawImage(uiCanvas, 0, 0);		
+					/*
+					drawPaletteBar(activePalette);
+					drawPaletteCart(uiPaletteCard);
+					drawTabWindow();
+					drawBrushSizeSlider();
+					drawBrushFXSlider1();
+					drawColorBar();
+					drawToolBar();
+					*/					
+					//var brushLastAngle = 0;	
+					brushLastAngle = angle;
+					//smudgeHillBrush(brushPointX+Math.cos(angle)*3,brushPointY+Math.sin(angle)*3,angle);
+					
+					//if(Math.random()<.05)updateSurface = true;
+					
+					updateSurface=true;
+				}				
+		
+				//
+				// Pixel brush
+				//
+				//
+				if(brushMode==0 && pinchDragCoolDown>20 && uiActiveTime==0){//plot
+					var z=0;
+					if(uiPaletteCartActive>0 && uiPaletteCard==0)z=uiPaletteCartActive+9;
+					if(uiPaletteCartActive>0 && uiPaletteCard==1)z=uiPaletteCartActive+18;						
+					if(uiPaletteCartActive>0 && uiPaletteCard==2)z=uiPaletteCartActive+27;					
+					if(uiPaletteCartActive>0 && uiPaletteCard==3)z=uiPaletteCartActive+36;
+					brushPointX = Math.floor((uiTouchLastX+surfaceCameraX)/surfaceScale);
+					brushPointY = Math.floor((uiTouchLastY+surfaceCameraY)/surfaceScale);
+					//console.log(brushPointX);
+					if(brushPointX>=0 && brushPointX<surfaceWidth && brushPointY>=0 && brushPointY<surfaceHeight){
+						//surface[brushPointX][brushPointY]=activePalette;
+						if(z==0){
+							surface[brushPointX][brushPointY] = activePalette;
+						}else{
+							surface[brushPointX][brushPointY] = z;
+						}
+						
+						updateSurface = true;
+					}
+				}					
+				
 	}
 	function uiHandleSliders(uiTouchLastX,uiTouchLastY){
 		for(var i = 0;i<classSliders.length;i++){
