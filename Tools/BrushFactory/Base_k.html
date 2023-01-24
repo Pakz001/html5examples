@@ -95,11 +95,18 @@ Use different browser.
 		// Update the slider... Takes input as point x,y
 		//
 		update(uiTouchLastX,uiTouchLastY){
+			
 			if(this.active==false)return;
 			
+			if(uiActiveSlider==this.id){								
+				if(uiTouchLastX<this.x)uiTouchLastX=this.x;
+				if(uiTouchLastX>this.x+this.w+24)uiTouchLastX=this.x+this.w+24;
+				uiTouchLastY = this.y+1;
+			}
 
 			// Collision check finger and user interface element.
 			if(uiTouchLastX>this.x && uiTouchLastY>this.y && uiTouchLastX<this.x+this.w-24 && uiTouchLastY<this.y+this.h+6){
+				//if(Math.random()<.01)console.log("a");
 				// If we press left side go back in list 
 				this.sliderPos = uiTouchLastX-this.x;
 				if(this.sliderPos>this.w){
@@ -118,7 +125,7 @@ Use different browser.
 				uiActiveTime=30;
 				return true;					
 			}	
-					
+			return false;		
 			
 		}
 		updatePosition(x,y,w,h){
@@ -141,7 +148,7 @@ Use different browser.
 	var uiSliderRId = 5;
 	var uiSliderGId = 6;
 	var uiSliderBId = 7;
-	
+	var uiActiveSlider = -1;
 	
 	classSliders.push(new classSlider(0,0,0,0,uiSlider1Id));//brush size
 	classSliders.push(new classSlider(0,0,0,0,uiSlider2Id));//brushFX1
@@ -447,7 +454,15 @@ Use different browser.
 			drawBrush(window.innerWidth/2-brushRoundSize/2,window.innerHeight/3-brushRoundSize/2);
 			uiBrushTimeOut-=1;
 		}
-		
+
+		for(var i = 0;i<classSliders.length;i++){
+
+
+			// Brush size slider>>
+			if(classSliders[i].update(uiTouchLastX,uiTouchLastY)==true){
+				updateUiCanvas();
+			}
+		}		
 		
 		ctx.drawImage(uiCanvas, 0, 0);		
 		/*
@@ -2274,7 +2289,7 @@ Use different browser.
 			uiTouchLastAverageX = -1;
 			uiTouchLastAverageY = -1;
 			brushActive = false;
-
+			currentActiveSlider = -1;
 							//uiTouchStartX = x;
 				//uiTouchStartY = y;				
 				//uiTouchLastX = x;
@@ -2726,7 +2741,7 @@ Use different browser.
 			}
 			*/
 		updateUiCanvas();			
-			
+		uiActiveSlider=-1;
 		e.preventDefault();	
 		}		
 		
@@ -2911,7 +2926,10 @@ if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLa
 				
 	}
 	function uiHandleSliders(uiTouchLastX,uiTouchLastY){
+
+		
 		for(var i = 0;i<classSliders.length;i++){
+
 
 			// Brush size slider>>
 			if(i==uiSlider1Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
@@ -2921,7 +2939,8 @@ if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLa
 					makeRoundBrush(brushRoundSize)
 					uiBrushTimeOut=30;	
 					updateUiCanvas();
-					uiActiveTime=30;		
+					uiActiveTime=30;	
+					uiActiveSlider = uiSlider1Id;	
 					
 			}
 			// Brush FX slider 1
@@ -2937,7 +2956,8 @@ if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLa
 					//console.log(brushFX1);
 					uiBrushTimeOut=30;	
 					updateUiCanvas();						
-					uiActiveTime=30;					
+					uiActiveTime=30;
+					uiActiveSlider = uiSlider2Id;
 			}
 			// Brush FX slider 2
 			if(i==uiSlider3Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){		
@@ -2954,7 +2974,8 @@ if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLa
 					brushFX2 = (classSliders[i].value);						
 					uiBrushTimeOut=30;	//brush preview enable												
 					updateUiCanvas();						
-					uiActiveTime=30;					
+					uiActiveTime=30;	
+					uiActiveSlider = uiSlider3Id;				
 			}
 			// Brush FX slider 3
 			if(i==uiSlider4Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){		
@@ -2971,7 +2992,8 @@ if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLa
 					brushFX3 = (classSliders[i].value);						
 					uiBrushTimeOut=30;	//brush preview enable		
 					updateUiCanvas();						
-					uiActiveTime=30;					
+					uiActiveTime=30;	
+					uiActiveSlider = uiSlider4Id;				
 			}					
 			//
 			// Palette Cart! brightness
@@ -2981,6 +3003,7 @@ if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLa
 					a-=.5;
 					a*=2;
 					a*=255;
+					uiActiveSlider = uiSliderColorBrightnessId;
 					// change color brightness from palette cart
 					if(uiPaletteCard==0 && uiPaletteCartActive>0){
 						//console.log(uiPaletteCartActive);
@@ -3039,7 +3062,7 @@ if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLa
 			//
 			if(i==uiSliderRId || i==uiSliderGId || i==uiSliderBId){
 			if(classSliders[i].update(uiTouchLastX,uiTouchLastY)){
-
+					uiActiveSlider = i;
 					var r = (classSliders[uiSliderRId].value);
 					var g = (classSliders[uiSliderGId].value);
 					var b = (classSliders[uiSliderBId].value);
