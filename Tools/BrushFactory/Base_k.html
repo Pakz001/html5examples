@@ -98,12 +98,7 @@ Use different browser.
 			
 			if(this.active==false)return;
 			
-			if(uiActiveSlider==this.id){								
-				if(uiTouchLastX<this.x)uiTouchLastX=this.x;
-				if(uiTouchLastX>this.x+this.w+24)uiTouchLastX=this.x+this.w+24;
-				uiTouchLastY = this.y+1;
-			}
-
+			
 			// Collision check finger and user interface element.
 			if(uiTouchLastX>this.x && uiTouchLastY>this.y && uiTouchLastX<this.x+this.w-24 && uiTouchLastY<this.y+this.h+6){
 				//if(Math.random()<.01)console.log("a");
@@ -455,14 +450,7 @@ Use different browser.
 			uiBrushTimeOut-=1;
 		}
 
-		for(var i = 0;i<classSliders.length;i++){
-
-
-			// Brush size slider>>
-			if(classSliders[i].update(uiTouchLastX,uiTouchLastY)==true){
-				updateUiCanvas();
-			}
-		}		
+		
 		
 		ctx.drawImage(uiCanvas, 0, 0);		
 		/*
@@ -2927,10 +2915,20 @@ if(brushMode==2 && pinchDragCoolDown>12	&& surfacePinchStart==false && uiTouchLa
 	}
 	function uiHandleSliders(uiTouchLastX,uiTouchLastY){
 
+		if(uiActiveSlider>-1){
+			for(var i=0;i<classSliders.length;i++){
+				if(i==uiActiveSlider){
+
+				if(uiTouchLastX<classSliders[i].x)uiTouchLastX=classSliders[i].x+1;
+				if(uiTouchLastX>classSliders[i].x+classSliders[i].w-24)uiTouchLastX=classSliders[i].x+classSliders[i].w-24;
+				uiTouchLastY = classSliders[i].y+5;
+				}
+			}
+		}
+			
 		
 		for(var i = 0;i<classSliders.length;i++){
-
-
+			
 			// Brush size slider>>
 			if(i==uiSlider1Id && classSliders[i].update(uiTouchLastX,uiTouchLastY)){
 				
