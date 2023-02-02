@@ -18,7 +18,7 @@ update:checked every file and removed references to a unused css file. gfx now i
 (tablet / phone Browser Touch voxel engine)(book files chapter 1..x)<br>
 <img src="3D/threeTest/Test/Media/4ACEC619-2702-465D-912C-B3C9FCB2B23E.png" width="60%"><br><br>
 Tools/BrushFactory.<br>
-<img src="Tools/BrushFactory/Media/6AADF1B5-CB6E-425B-A82D-CA270D749F70.png" width="60%"><br><br>
+<img src="Media/6B3127F3-029B-40E2-B0F4-C072647B62D3.png" width="60%"><br><br>
 
 
 Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
