@@ -30,6 +30,8 @@ edge at the top. Or drawn or round texture.<br>
 * Brushes per image element category. Tree Branch brush: Tree Stump Brush: Leaf Brush: Grass Brush: Water Brush: (Pixel art referenced constructed)<br> 
 <br>
 
+* spray trigger
+
 * lock anchor. touch position brush tip is aimed* rotated at anchor. this for tunnel like effects. note: make brush tios x<br>
 
 * add alias brush. read area and place pixels<br>
