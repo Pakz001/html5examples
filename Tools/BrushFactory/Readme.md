@@ -55,7 +55,7 @@ edge at the top. Or drawn or round texture.<br>
 <br><br>
 AngleEdgeColorRampBrush_x.html
 <br>
-
+<img src="Media/CAA218CA-E255-4908-A84F-E7032C7A28E1.png" width="60%"><br>
 <img src="Media/6AADF1B5-CB6E-425B-A82D-CA270D749F70.png" width="60%"><br>
 <img src="Media/0581894F-C5D0-4F27-8652-A5DEC9D73256.png" width="60%"><br>
 <img src="Media/4E1651F4-87DA-4FD7-9E5E-24B67695F1DB.png" width="60%"><br>
