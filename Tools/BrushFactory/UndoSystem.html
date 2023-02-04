@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+//
+// anim = [] - 	Holds all the undo data. the current screen width and height multiplied
+//				together is one frame.
+//				So - w*h*frame1 = position of frame 1
+//				So - w*h*frame3 = position of frame 3
+// grid = [] - 	Holds the current screen grid contents. This the width and height multiplied.
+//
+// You push anim with a new screen space. This being the amount of numbers enough to cover
+// the screen. w*h.
+// With a undo you read the last w*h added and restore the screen with it. 
+//
+// See my Populous code for a more indepth undo redo system.
+
+	
+	
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");	
+
+var gridWidth = 10;
+var gridHeight = 10;
+var cellWidth=cellHeight = 0;
+
+myCanvas.width = window.innerWidth-32;
+myCanvas.height = window.innerHeight-32;
+
+cellWidth = Math.ceil(myCanvas.width/gridWidth);
+cellHeight = Math.ceil(myCanvas.height/(gridHeight+1));
+
+var grid = [];// the current screen space
+
+// frame of the screen space
+var anim = [];
+
+//setGridIndex(grid,9,9,1);
+//setGridIndex(grid,8,8,1);
+
+for(var i=0;i<10;i++){
+	grid = Array(gridWidth*gridHeight).fill(0);
+	for(var y=0;y<10;y++){
+		setGridIndex(grid,i,y,1);
+	}
+	for(var j=0;j<gridWidth*gridHeight;j++){
+		anim.push(grid[j]);
+	}
+}
+
+gameloop=setInterval(doGameLoop,90);
+
+var frame=0;
+var direction = 1;
+function doGameLoop(){
+	// get the grid section from the anim array.
+	grid = anim.slice(frame*(gridWidth*gridHeight));
+	// draw the current screen space
+	drawGrid();
+	//
+	// Ping pong the anim screens on the canvas
+	if(direction==1 && frame<9){
+		frame+=1;
+	}else{
+		direction=0;
+	}
+	if(direction==0 && frame>0){
+		frame-=1;
+	}else{
+		direction=1;
+	}
+}
+
+// get the current screen space array x,y
+function getGridIndex(array,x,y,val){
+	var index = gridHeight*y+x;
+	return array[index];
+}
+// set the current screen space array x,y to val
+function setGridIndex(array,x,y,val){
+	var index = gridHeight*y+x;
+	array[index] = val;
+}
+// Draw the current grid(screen) to the canvas
+function drawGrid(){
+	var index=0;
+	for(var y=0;y<gridHeight;y++){
+		for(var x=0;x<gridWidth;x++){
+			if(grid[index]==1){
+				ctx.fillStyle="#ffffff";
+			}else{
+				ctx.fillStyle="#000000";
+			}
+			ctx.fillRect(x*cellWidth,y*cellHeight,cellWidth,cellHeight);
+			index++;
+		}
+	}
+}	
+</script>
+</body>
+</html>	
