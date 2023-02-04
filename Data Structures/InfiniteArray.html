@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	// 
+	// Infinite world map array . enlarge multi dimensional array function\
+	// values do not get destroyed when creating a space inside the array.
+	// undefined
+	// 
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	var world = [];
+	var x1=y1=0;
+	var x2=y2=5;
+	setIndex(world,0,0,1,10);
+	setIndex(world,3,3,1,20);
+	//expandArray(world,0,0,5,5);
+	//world[0][0]=100;
+	//world[1][0]=100;
+	//expandArray(world,-3,-3,5,5);
+	//world[-3][-3]=100;
+	
+	gameloop=setInterval(doGameLoop,1000);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		for(var x=-3;x<5;x++){
+			for(var y=-3;y<5;y++){
+				if(checkIndex(world,x,y,1)==true){
+					ctx.fillText(world[x][y][1],x*50+250,y*30+150)
+				}
+			}
+		}
+	}
+	function setIndex(arr,x,y,z,val){
+		expandArray(arr,x,y,z,x+1,y+1,z+1,val);
+	}
+	function checkIndex(arr, index1,index2,index3) {
+			if(arr[index1] === undefined){
+				return false;
+			}
+			if(arr[index1][index2] === undefined){
+				return false;
+			}
+			if(arr[index1][index2][index3]===undefined){
+				return false;
+			}
+			return true;
+		}
+	function expandArray(arr,x1,y1,z1,x2,y2,z2,val=0){
+		for (x=x1; x<x2; x++){
+			if(arr[x]===undefined)arr[x] = new Array();
+		 	for (y=y1; y<y2; y++){
+				if(arr[x][y]===undefined)arr[x][y] = new Array();
+					for(var z=z1;z<z2;z++){
+						if(arr[x][y][z]===undefined)arr[x][y][z]=val;
+					}
+			  }
+		}
+	}
+</script>
+</body>
+</html>
+
+
+
+
+
