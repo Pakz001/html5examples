@@ -66,10 +66,11 @@ for(var i=0;i<10;i++){
 	}
 }
 
-gameloop=setInterval(doGameLoop,90);
+gameloop=setInterval(doGameLoop,60);
 
 var frame=0;
 var direction = 1;
+var z=0;
 function doGameLoop(){
 	// get the grid section from the anim array.
 	grid = anim.slice(frame*(gridWidth*gridHeight));
@@ -77,16 +78,11 @@ function doGameLoop(){
 	drawGrid();
 	//
 	// Ping pong the anim screens on the canvas
-	if(direction==1 && frame<9){
-		frame+=1;
-	}else{
-		direction=0;
-	}
-	if(direction==0 && frame>0){
-		frame-=1;
-	}else{
-		direction=1;
-	}
+	if(direction==1)frame+=1;
+	if(direction==0)frame-=1;
+	if(frame==0)direction=1;
+	if(frame==9)direction=0;
+		
 }
 
 // get the current screen space array x,y
