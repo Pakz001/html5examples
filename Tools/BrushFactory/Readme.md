@@ -19,6 +19,8 @@ notes:(Messy notes)<br>
 
 Ideas:
 
+* Generative brushes. pattern generators. brick/rock/wavy sin grids. line thickness sliders. (fill with generative pattern)
+
 * screen anchor icon for setting light direction used for placing lighter and darker tones(angle) - make range function returning when point is inside radian range -pi , pi
 
 * edge color darkerst of current brush color when touching color outside of palette range(lighter too) - or with light angle or anchor.<br>
