@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+
+	
+	
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");	
+
+
+myCanvas.width = window.innerWidth-32;
+myCanvas.height = window.innerHeight-32;
+
+ctx.fillStyle="#FFFFFF";
+ctx.fillRect(0,0,myCanvas.width,myCanvas.height);
+
+var x = 0;
+var y = 0;
+var width = 1700;
+var height = 320;
+//diabloRect(x,y,width,height);
+for(var i=0;i<25;i++){
+	x=Math.random()*myCanvas.width;
+	y=Math.random()*myCanvas.height;
+	width=(Math.random()*320)+20;
+	height=(Math.random()*240)+20;
+	x-=width;
+	y-=height;
+	diabloRect(x,y,width,height);
+	
+	}
+
+
+function diabloRect(x,y,width,height){
+	ctx.globalAlpha=1.0;
+	ctx.fillStyle = "#000000";
+	ctx.fillRect(x-5,y-5,width+10,height);
+	
+	// top bevel
+	ctx.fillStyle="#ff0000";
+	ctx.fillRect(x,y,width,5);
+	y+=5;
+	ctx.fillStyle="#ff4444";
+	ctx.fillRect(x,y,width,5);
+	y+=5;
+	ctx.fillStyle="#ff9999";
+	ctx.fillRect(x,y,width,5);
+	y+=5;
+	ctx.fillStyle="#880000";
+	ctx.fillRect(x,y,width,5);
+	y+=5
+	
+	//center
+	ctx.fillStyle = "#aa0000";
+	ctx.fillRect(x,y,width,height-40);
+	
+	y+=height-45;
+	
+	
+	
+	
+	
+	
+	
+	// bottom bevel
+	ctx.fillStyle="#880000";
+	ctx.fillRect(x,y,width,5);
+	y+=5;
+	ctx.fillStyle="#ff9999";
+	ctx.fillRect(x,y,width,5);
+	y+=5;
+	ctx.fillStyle="#ff4444";
+	ctx.fillRect(x,y,width,5);
+	y+=5;
+	ctx.fillStyle="#440000";
+	ctx.fillRect(x,y,width,5);
+	y+=5;
+	
+	
+	y-=height;
+	
+	for(var i=0;i<((width*height)/20);i++){
+	ctx.fillStyle="#000000";
+	if(Math.random()<.5){
+	ctx.fillStyle="#ff9999";
+	}
+	var  a=0;
+		an=(0+45)*(Math.PI/180);
+		
+	//an=Math.PI/1.5;
+	if(Math.random()<.5){
+		an=(90+45)*(Math.PI/180);
+		
+		}
+	//an=2;
+	var x1 = (x-10)+Math.random()*(width+20);
+	var y1 = (y-10)+Math.random()*(height+10);
+	var len = (Math.random()*30);
+	var stp = 0.05/(len/2);
+	if(i>width/2)stp/=2;
+	for(var j=0;j<len;j++){
+		var s=2;
+		if(j<len/2)a+=stp;
+		if(j>len/2)a-=stp;
+		if(j>(len/2)-5 && j<(len/2)-5){
+			s+=1;
+		}
+		ctx.globalAlpha = a;
+		x1+=Math.cos(an);
+		y1+=Math.sin(an);
+		ctx.fillRect(x1,y1,s,s);
+	}
+	
+	}
+	
+	ctx.globalAlpha = 1.0;
+	
+	
+	for(var i=0;i<(width+height)/3;i++){
+		var x1 = (x+width/2);
+		var y1 = y;
+		ctx.globalAlpha = Math.random()/35;
+		var ax1 = (Math.random()*width)-(width/2);
+		var ay1 = (Math.random()*height)-20;
+		var col = "#ffffff";
+		var r = (Math.random()*(width+height)/25)+10;
+		if(x1+ax1>x+50 && x1+ax1<x+(width-50)){
+			ax1/=1.5;
+		}else{
+			col = "#000000";
+			r*=2;
+			ctx.globalAlpha = Math.random()/30;
+		
+		}
+		x1+=ax1;
+		y1+=ay1;
+	
+		fillCircle(x1,y1,r,col);
+	}
+	
+	//ctx.globalAlpha = 0.1;
+	//ctx.fillStyle="#ffffff";
+	//ctx.fillRect(x+50,y,320-100,100);
+	
+	function fillCircle(x, y, radius, color) {
+	
+	    ctx.fillStyle = color;
+	
+	    ctx.beginPath();
+	    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+	    ctx.fill();
+	}
+}	
+
+</script>
+</body>
+</html>	
