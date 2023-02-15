@@ -20,7 +20,11 @@ user-select:none;
 Use different browser.
 </canvas>
 <script>
-
+//
+// Code painted Buttons based on the ones in the Diablo Immortal game. Based on a screenshot from that game.
+//
+// Uses rect,oval, alpha.
+//
 	
 	
 var c=document.getElementById("myCanvas");
@@ -30,7 +34,7 @@ var ctx=c.getContext("2d");
 myCanvas.width = window.innerWidth-32;
 myCanvas.height = window.innerHeight-32;
 
-ctx.fillStyle="#FFFFFF";
+ctx.fillStyle="#444444";
 ctx.fillRect(0,0,myCanvas.width,myCanvas.height);
 
 var x = 0;
@@ -38,7 +42,7 @@ var y = 0;
 var width = 1700;
 var height = 320;
 //diabloRect(x,y,width,height);
-for(var i=0;i<25;i++){
+for(var i=0;i<45;i++){
 	x=Math.random()*myCanvas.width;
 	y=Math.random()*myCanvas.height;
 	width=(Math.random()*320)+20;
@@ -51,52 +55,14 @@ for(var i=0;i<25;i++){
 
 
 function diabloRect(x,y,width,height){
+	var oy = y;
 	ctx.globalAlpha=1.0;
 	ctx.fillStyle = "#000000";
 	ctx.fillRect(x-5,y-5,width+10,height);
 	
-	// top bevel
-	ctx.fillStyle="#ff0000";
-	ctx.fillRect(x,y,width,5);
-	y+=5;
-	ctx.fillStyle="#ff4444";
-	ctx.fillRect(x,y,width,5);
-	y+=5;
-	ctx.fillStyle="#ff9999";
-	ctx.fillRect(x,y,width,5);
-	y+=5;
-	ctx.fillStyle="#880000";
-	ctx.fillRect(x,y,width,5);
-	y+=5
-	
-	//center
 	ctx.fillStyle = "#aa0000";
-	ctx.fillRect(x,y,width,height-40);
+	ctx.fillRect(x,y,width,height-10);
 	
-	y+=height-45;
-	
-	
-	
-	
-	
-	
-	
-	// bottom bevel
-	ctx.fillStyle="#880000";
-	ctx.fillRect(x,y,width,5);
-	y+=5;
-	ctx.fillStyle="#ff9999";
-	ctx.fillRect(x,y,width,5);
-	y+=5;
-	ctx.fillStyle="#ff4444";
-	ctx.fillRect(x,y,width,5);
-	y+=5;
-	ctx.fillStyle="#440000";
-	ctx.fillRect(x,y,width,5);
-	y+=5;
-	
-	
-	y-=height;
 	
 	for(var i=0;i<((width*height)/20);i++){
 	ctx.fillStyle="#000000";
@@ -156,7 +122,72 @@ function diabloRect(x,y,width,height){
 	
 		fillCircle(x1,y1,r,col);
 	}
+
+	sc = [5,3,2];
+	if(height<48){
+		sc = [1,1,1];
+	}
 	
+	ctx.globalAlpha=0.5;
+	// top bevel
+	ctx.fillStyle="#ff0000";
+	ctx.fillRect(x,y,width,sc[1]);
+	y+=sc[1];
+	ctx.fillStyle="#ff1111";
+	ctx.fillRect(x,y,width,sc[2]);
+	y+=sc[2];
+	
+	
+	ctx.fillStyle="#ff4444";
+	ctx.fillRect(x,y,width,sc[1]);
+	y+=sc[1];
+	ctx.fillStyle="#ff6666";
+	ctx.fillRect(x,y,width,sc[2]);
+	y+=sc[2];
+	
+	ctx.fillStyle="#ff9999";
+	ctx.fillRect(x,y,width,sc[0]);
+	y+=sc[0];
+	ctx.fillStyle="#880000";
+	ctx.fillRect(x,y,width,sc[0]);
+	y+=sc[0];
+	
+	//center
+	//ctx.fillStyle = "#aa0000";
+	//ctx.fillRect(x,y,width,height-40);
+	var a = sc[0]+sc[0]+sc[2]+sc[1]+sc[1]+sc[2]+10;
+
+	y=oy+(height-a);
+	
+	
+	
+	
+	
+	
+	
+	// bottom bevel
+	ctx.fillStyle="#880000";
+	ctx.fillRect(x,y,width,sc[0]);
+	y+=sc[0];
+	ctx.fillStyle="#ff9999";
+	ctx.fillRect(x,y,width,sc[0]);
+	y+=sc[0];
+	ctx.fillStyle="#ff6666";
+	ctx.fillRect(x,y,width,sc[2]);
+	y+=sc[2];
+	ctx.fillStyle="#ff4444";
+	ctx.fillRect(x,y,width,sc[1]);
+	y+=sc[1];
+	
+	ctx.fillStyle="#772222";
+	ctx.fillRect(x,y,width,sc[2]);
+	y+=sc[2];
+	ctx.fillStyle="#440000";
+	ctx.fillRect(x,y,width,sc[1]);
+	y+=sc[1];
+	
+	
+	//y-=height;	
 	//ctx.globalAlpha = 0.1;
 	//ctx.fillStyle="#ffffff";
 	//ctx.fillRect(x+50,y,320-100,100);
