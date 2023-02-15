@@ -1,1 +1,2 @@
-<img src="Procgen/Media/C45FEA0A-71B9-4A6A-9BC9-B4EAE511A2F3.jpeg" width="60%"><br>
+Diablo buttons <br>
+<img src="Media/A8D1E9EC-7987-47BC-A510-8EE84A3C1A08.jpeg" width="60%"><br>
