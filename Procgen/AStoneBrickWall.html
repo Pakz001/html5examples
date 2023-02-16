@@ -34,7 +34,7 @@ var ctx=c.getContext("2d");
 myCanvas.width = window.innerWidth-32;
 myCanvas.height = window.innerHeight-32;
 
-ctx.fillStyle="#444444";
+ctx.fillStyle="#000000";
 ctx.fillRect(0,0,myCanvas.width,myCanvas.height);
 
 var x = 50;
@@ -42,7 +42,7 @@ var y = 40;
 var width = 80;
 var height = 14;
 
-ctx.scale(5,5);
+ctx.scale(3,3);
 
 for(var y=0;y<myCanvas.height;y+=height){
 height=Math.random()*8+8;
@@ -50,17 +50,21 @@ height=Math.random()*8+8;
 	for(var x=-width;x<myCanvas.width;x+=width){
 width=Math.random()*16+16;
 
-		aStone(x,y,width,height+1);
-
+		//aStone(x,y,width,height+1,["#000000","#444444","#666666","#777777"]);
+		aStone(x,y,width,height+1,["#222222","#444455","#666677","#777788"]);
 }
 }
 
 
-function aStone(x,y,width,height){
-	
-	ctx.fillStyle = "#000000";
+function aStone(x,y,width,height,col){
+			ctx.globalAlpha = Math.random()/2+.5;
+			if(Math.random()<.6)ctx.globalAlpha=1;
+			
+	ctx.fillStyle = col[0];
 	ctx.fillRect(x,y,width,height);
-	ctx.fillStyle = "#666666";
+	
+	
+	ctx.fillStyle = col[2];
 	ctx.fillRect(x+1,y+1,width-2,height-2);
 	
 	x+=1;
@@ -68,33 +72,33 @@ function aStone(x,y,width,height){
 	width-=2;
 	height-=2;
 	
-	texLine(x,y,4,["#000000","#444444","#777777","#777777"]);//top left 
+	texLine(x,y,4,[col[0],col[1],col[3],col[3]]);//top left 
 	
 	
 	//center top
-	texLine(x+2,y,width-3,["#777777"]);
-	texLine(x+width-1,y,1,["#444444"]);
+	texLine(x+2,y,width-3,[col[3]]);
+	texLine(x+width-1,y,1,[col[1]]);
 	
 	//right side
-	texLine(x+width-1,y+1,1,["#777777"]);
+	texLine(x+width-1,y+1,1,[col[3]]);
 	for(var i=2;i<height-4;i++){
-		texLine(x+width-1,y+i,1,["#444444"]);
+		texLine(x+width-1,y+i,1,[col[1]]);
 	}
 	for(var i=height-4;i<height;i++){
-		texLine(x+width-1,y+i,1,["#000000"]);
+		texLine(x+width-1,y+i,1,[col[0]]);
 	}
-	texLine(x+width-2,y+height-1,1,"#000000");
+	texLine(x+width-2,y+height-1,1,col[0]);
 	
 	//left side
-	texLine(x,y+1,1,["#444444"]);
+	texLine(x,y+1,1,[col[1]]);
 	for(var i=2;i<height-3;i++){
-		texLine(x,y+i,1,["#777777"]);
+		texLine(x,y+i,1,[col[3]]);
 	}
-	texLine(x,y+height-3,1,["#444444"]);
+	texLine(x,y+height-3,1,[col[1]]);
 	//bottom
-	texLine(x,y+height-2,1,["#000000"]);
-	texLine(x,y+height-1,3,["#000000"]);
-	texLine(x+3,y+height-1,width-5,["#444444"]);
+	texLine(x,y+height-2,1,[col[0]]);
+	texLine(x,y+height-1,3,[col[0]]);
+	texLine(x+3,y+height-1,width-5,[col[1]]);
 	
 	
 	for(var a=0;a<width;a++){
@@ -103,27 +107,27 @@ function aStone(x,y,width,height){
 				crack2(x+a,y);
 			}else{
 				//crack top
-				texLine(x+a,y,4,["#000000","#000000","#444444","#777777","#777777"]);
-				texLine(x+a,y+1,3,["#444444","#000000","#777777"]);
+				texLine(x+a,y,4,[col[0],col[0],col[1],col[3],col[3]]);
+				texLine(x+a,y+1,3,[col[1],col[0],col[3]]);
 			}
 		}
 	}
 	
 	function crack2(x,y){
 	//crack 2
-	texLine(x,y,4,["#444444"]);
-	texLine(x,y+1,4,["#777777"]);
+	texLine(x,y,4,[col[1]]);
+	texLine(x,y+1,4,[col[3]]);
 	var z=0;
 	x++;
 	var mh=(Math.random()*height/2)+2;
 	for(var h=0;h<mh;h++){
 		if(h>1 && Math.random()<.4){
-			texLine(x+z,y+h,1,["#444444"]);
+			texLine(x+z,y+h,1,[col[1]]);
 			z+=1;
 		}
 		if(h>4 && Math.random()<.5)h+=1;
 		
-		texLine(x+z,y+h,1,["#000000"]);
+		texLine(x+z,y+h,1,[col[0]]);
 	}
 	}
 	
