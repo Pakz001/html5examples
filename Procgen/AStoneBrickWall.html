@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+//
+// Random scribble - a function that draws a stone (castle) brick..
+// 
+//
+//
+	
+	
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");	
+
+
+myCanvas.width = window.innerWidth-32;
+myCanvas.height = window.innerHeight-32;
+
+ctx.fillStyle="#444444";
+ctx.fillRect(0,0,myCanvas.width,myCanvas.height);
+
+var x = 50;
+var y = 40;
+var width = 80;
+var height = 14;
+
+ctx.scale(5,5);
+
+for(var y=0;y<myCanvas.height;y+=height){
+height=Math.random()*8+8;
+
+	for(var x=-width;x<myCanvas.width;x+=width){
+width=Math.random()*16+16;
+
+		aStone(x,y,width,height+1);
+
+}
+}
+
+
+function aStone(x,y,width,height){
+	
+	ctx.fillStyle = "#000000";
+	ctx.fillRect(x,y,width,height);
+	ctx.fillStyle = "#666666";
+	ctx.fillRect(x+1,y+1,width-2,height-2);
+	
+	x+=1;
+	y+=1;
+	width-=2;
+	height-=2;
+	
+	texLine(x,y,4,["#000000","#444444","#777777","#777777"]);//top left 
+	
+	
+	//center top
+	texLine(x+2,y,width-3,["#777777"]);
+	texLine(x+width-1,y,1,["#444444"]);
+	
+	//right side
+	texLine(x+width-1,y+1,1,["#777777"]);
+	for(var i=2;i<height-4;i++){
+		texLine(x+width-1,y+i,1,["#444444"]);
+	}
+	for(var i=height-4;i<height;i++){
+		texLine(x+width-1,y+i,1,["#000000"]);
+	}
+	texLine(x+width-2,y+height-1,1,"#000000");
+	
+	//left side
+	texLine(x,y+1,1,["#444444"]);
+	for(var i=2;i<height-3;i++){
+		texLine(x,y+i,1,["#777777"]);
+	}
+	texLine(x,y+height-3,1,["#444444"]);
+	//bottom
+	texLine(x,y+height-2,1,["#000000"]);
+	texLine(x,y+height-1,3,["#000000"]);
+	texLine(x+3,y+height-1,width-5,["#444444"]);
+	
+	
+	for(var a=0;a<width;a++){
+		if(Math.random()<.05){
+			if(Math.random()<.5){
+				crack2(x+a,y);
+			}else{
+				//crack top
+				texLine(x+a,y,4,["#000000","#000000","#444444","#777777","#777777"]);
+				texLine(x+a,y+1,3,["#444444","#000000","#777777"]);
+			}
+		}
+	}
+	
+	function crack2(x,y){
+	//crack 2
+	texLine(x,y,4,["#444444"]);
+	texLine(x,y+1,4,["#777777"]);
+	var z=0;
+	x++;
+	var mh=(Math.random()*height/2)+2;
+	for(var h=0;h<mh;h++){
+		if(h>1 && Math.random()<.4){
+			texLine(x+z,y+h,1,["#444444"]);
+			z+=1;
+		}
+		if(h>4 && Math.random()<.5)h+=1;
+		
+		texLine(x+z,y+h,1,["#000000"]);
+	}
+	}
+	
+	
+	function texLine(x,y,stp,tx){
+	//var tx = [2,8,1];
+	//var y = top+6;
+	//var x = left+6;
+	//var stp = 10;
+	var direc = 1;
+	if(stp<0)direc=-1;
+	var x1 = x;
+	var n = 0;
+	var e=0;
+	do{
+		ctx.fillStyle = tx[n];
+		ctx.fillRect(x1,y,1,1);
+		x1+=(direc);
+		n++;
+		if(n>=tx.length)n=tx.length-1;
+		e++;
+		
+	}while(e<Math.abs(stp));
+	
+	}	
+}	
+
+</script>
+</body>
+</html>	
