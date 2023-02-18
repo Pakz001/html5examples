@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<title>My first three.js app</title>
 		<style>
-			body {background-color:#000000;}
+		body {background-color:#000000;}
 			body { margin: 0; }
 			body {touch-action: none;
 			-webkit-touch-callout:none;
@@ -26,12 +26,12 @@
 const scene = new THREE.Scene();
 scene.backgroundColor = new THREE.Color(0x000000);
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-const renderer = new THREE.WebGLRenderer({alpha:true,antialias:true});
+const renderer = new THREE.WebGLRenderer({alpha:true,antialias:false});
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 camera.position.z = 60;
 
-const sceneOrtho = new THREE.Scene({alpha:true,antialias:true});
+const sceneOrtho = new THREE.Scene({alpha:true,antialias:false});
 sceneOrtho.backgroundColor = new THREE.Color(0x000000);
 var width = window.innerWidth;
 var height = window.innerHeight;
@@ -40,10 +40,11 @@ const cameraOrtho = new THREE.OrthographicCamera( 0,window.innerWidth,window.inn
 //cameraOrtho.position.z=60;
 
 
-const material = new THREE.SpriteMaterial({vertexColors:true,color:0xff0000,transparent:false,map:ghostTexture()});
+//const material = new THREE.SpriteMaterial({vertexColors:true,color:0xff0000,transparent:true,map:ghostTexture()});
+const material = new THREE.SpriteMaterial({vertexColors:true,color:0xff0000,transparent:true,map:ghostTexture()});
 material.depthTest = false;
 const sprite = new THREE.Sprite(material);
-sprite.scale.set(150,150);
+sprite.scale.set(320,240);
 //sprite.position.copy(new THREE.Vector3(50,150,-10));
 sprite.position.set(window.innerWidth/2,window.innerHeight/2,0);
 
@@ -64,6 +65,7 @@ scene.add( cube );
 	renderer.autoClear = false;
 	
 renderer.setClearColor( 0xffff00, 0 );
+//renderer.setPixelRatio(window.devicePixelRatio);
 function animate() {
 	requestAnimationFrame(animate);
 	renderer.clear();
@@ -84,13 +86,13 @@ animate();
 
 function ghostTexture(){
 const canvas = document.createElement('canvas')
-  canvas.width = 32
+canvas.imageSmoothingEnabled=false;
+canvas.width = 32
   canvas.height = 32
-
   const ctx = canvas.getContext('2d')
+
   // the body
   ctx.translate(-81, -84)
-
   ctx.fillStyle = 'orange'
   ctx.beginPath()
   ctx.moveTo(83, 116)
@@ -131,6 +133,9 @@ const canvas = document.createElement('canvas')
   ctx.fill()
 
   const texture = new THREE.Texture(canvas)
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.LinearMipMapLinearFilter;
+
   texture.needsUpdate = true
   return texture
 }
