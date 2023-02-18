@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			body {touch-action: none;
+			-webkit-touch-callout:none;
+			-webkit-user-select:none;
+			-khtml-user-select:none;
+			-moz-user-select:none;
+			-ms-user-select:none;
+			user-select:none;
+			-webkit-tap-highlight-color:rgba(0,0,0,0);
+		</style>
+	</head>
+	<body>
+<script src="js/three.js"></script>
+<script>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+camera.position.z = 60;
+
+const size = 1;
+const amount = 250000;
+const range = 20;
+const mat = new THREE.MeshNormalMaterial();
+mat.opacity = 0.1;
+mat.transparent = true;
+mat.blending = THREE.NormalBlending;
+const g = new THREE.BoxGeometry(size,size,size);
+const mesh = new THREE.InstancedMesh(g,mat,amount);
+for(var i=0;i<amount;i++){
+	const x = Math.random() * range-range/2;
+	const y = Math.random() * range-range/2;
+	const z = Math.random() * range-range/2;
+	const matrix = new THREE.Matrix4();
+	matrix.makeTranslation(x,y,z);
+	mesh.setMatrixAt(i,matrix);
+}
+
+scene.add(mesh);
+
+
+var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+scene.add( ambient );
+function animate() {
+	requestAnimationFrame(animate);
+	mesh.rotation.x += .025;
+	mesh.rotation.y += .025;
+	mesh.rotation.z += .025;
+	renderer.render( scene, camera );
+}
+animate();
+
+
+</script>
+</body>
+</html>
