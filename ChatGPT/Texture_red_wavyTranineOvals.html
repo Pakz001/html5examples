@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Draw Wavy Lines on a Black Canvas</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+      canvas {
+        background-color: red;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+      const canvas = document.getElementById("myCanvas");
+      const context = canvas.getContext("2d");
+      
+      const lineCount = 65550; // Number of lines to draw
+      const lineWidthRange = [1, 4]; // Range of line widths to use
+      const lineLengthRange = [20, 140]; // Range of line lengths to use
+      const amplitude = 15; // Amplitude of the wave
+      const frequency = 0.05; // Frequency of the wave
+      const maxDistance = 32; // Maximum distance from start point for end point
+      const ovalCount = 300; // Number of ovals to draw
+      const ovalColor = [0,0,0]; // RGB color of the ovals
+      
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      // Draw lines
+      for (let i = 0; i < lineCount; i++) {
+        // Generate random line parameters
+        const lineWidth = getRandomNumberInRange(lineWidthRange[0], lineWidthRange[1]);
+        const startX = getRandomNumberInRange(0, canvas.width);
+        const startY = getRandomNumberInRange(0, canvas.height);
+        const endX = startX + getRandomNumberInRange(-maxDistance, maxDistance);
+        const endY = startY + getRandomNumberInRange(-maxDistance, maxDistance);
+        const lineLength = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)); // Compute the line length
+        
+        // Set line style
+        context.lineWidth = lineWidth;
+        context.strokeStyle = `rgba(0, 0, 0, ${Math.random()/5})`;
+        
+        // Draw line with wave effect
+        context.beginPath();
+        context.moveTo(startX, startY);
+        for (let x = startX; x <= endX; x++) {
+          const y = startY + (endY - startY) * (x - startX) / (endX - startX) + amplitude * Math.sin(x * frequency);
+          const progress = (x - startX) / (endX - startX);
+          const segmentLength = lineLength * progress;
+          context.lineTo(startX + segmentLength, y);
+        }
+        context.stroke();
+      }
+      
+      // Draw ovals
+      for (let i = 0; i < ovalCount; i++) {
+        var x = Math.random()*canvas.width*2//getRandomNumberInRange(-50, canvas.width+100);
+				x-=canvas.width/2;
+        var y = Math.random()*canvas.height*2//getRandomNumberInRange(-100, canvas.height+100);
+				y-=canvas.height/2;
+        const width = getRandomNumberInRange(50, canvas.width*2);
+        const height = getRandomNumberInRange(50, canvas.width*2);
+				ovalColor[0]=Math.random()*255;
+				ovalColor[1]=0;
+        context.fillStyle = `rgba(${ovalColor[0]}, ${ovalColor[1]}, ${ovalColor[1]},${Math.random()/50})`;
+        context.beginPath();
+        context.ellipse(x, y, width, height, 0, 0, Math.PI * 2);
+        context.fill();
+      }
+      
+      function getRandomNumberInRange(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+}
+</script>
+
+  </body>
+	</html>
+				
