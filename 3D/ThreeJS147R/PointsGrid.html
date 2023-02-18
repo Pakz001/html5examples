@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			body {touch-action: none;
+			-webkit-touch-callout:none;
+			-webkit-user-select:none;
+			-khtml-user-select:none;
+			-moz-user-select:none;
+			-ms-user-select:none;
+			user-select:none;
+			-webkit-tap-highlight-color:rgba(0,0,0,0);
+		</style>
+	</head>
+	<body>
+<script src="js/three.js"></script>
+<script>
+	//
+	// From the book Learn Three.js from packt publishing...
+	//
+	//
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+camera.position.z = 60;
+
+
+function createPoints(){
+  const points = []
+
+  for (let x = -15; x < 15; x++) {
+    for (let y = -10; y < 10; y++) {
+      let point = new THREE.Vector3(x / 4, y / 4, 0)
+      points.push(point)
+    }
+  }
+
+  const colors = new Float32Array(points.length * 3)
+  points.forEach((e, i) => {
+    const c = new THREE.Color(Math.random() * 0xffffff)
+    colors[i * 3] = c.r
+    colors[i * 3 + 1] = c.g
+    colors[i * 3 + 2] = c.b
+  })
+
+  const geom = new THREE.BufferGeometry().setFromPoints(points)
+  geom.setAttribute('color', new THREE.BufferAttribute(colors, 3, true))
+
+  return geom
+}
+
+const material = new THREE.PointsMaterial({size:2.0,vertexColors:true,color:0xFFFFFF});
+const points = new THREE.Points(createPoints(),material);
+points.scale.set(8,8);
+
+scene.add(points);
+
+
+var ambient = new THREE.AmbientLight( 0xffffff, 2 );
+scene.add( ambient );
+function animate() {
+	//requestAnimationFrame(animate);
+	renderer.render( scene, camera );
+}
+animate();
+
+
+</script>
+</body>
+</html>
