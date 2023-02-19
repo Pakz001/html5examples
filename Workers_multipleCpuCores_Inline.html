@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<script id="worker1" type="javascript/worker">
+  // This script won't be parsed by JS engines because its type is javascript/worker.
+  self.onmessage = function(e) {
+    self.postMessage('msg from worker');
+  };
+  // Rest of your worker code goes here.
+</script>
+<script>
+	//
+	// Use multiple cpu cores using workers. This example from
+	// stack overflow shows how to do this 'inline' where
+	// the worker is inside the main html file.
+	//
+  var blob = new Blob([
+    document.querySelector('#worker1').textContent
+  ], { type: "text/javascript" })
+
+  // Note: window.webkitURL.createObjectURL() in Chrome 10+.
+  var worker = new Worker(window.URL.createObjectURL(blob));
+  worker.onmessage = function(e) {
+    console.log("Received: " + e.data);
+  }
+  worker.postMessage("hello"); // Start the worker.
+</script>
