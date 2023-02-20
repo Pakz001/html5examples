@@ -18,9 +18,12 @@ update:checked every file and removed references to a unused css file. gfx now i
 (tablet / phone Browser Touch voxel engine)(book files chapter 1..x)<br>
 <img src="3D/threeTest/Test/Media/4ACEC619-2702-465D-912C-B3C9FCB2B23E.png" width="60%"><br>
 <br>Voxel Game Progress video -<br>Youtube link below--<br>
-<a href="[http://www.youtube.com/watch?feature=player_embedded&v=4RCbTE9Z_4A]" target="_blank">
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=4RCbTE9Z_4A" target="_blank">
  <img src="http://img.youtube.com/vi/4RCbTE9Z_4A/mqdefault.jpg" alt="Watch the video" width="60%" border="10" />
 <br>
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=v65tQsJGKE0" target="_blank">
+ <img src="http://img.youtube.com/vi/v65tQsJGKE0/mqdefault.jpg" alt="Watch the video" width="60%" border="10" />
 Tools/BrushFactory.<br>
 <img src="Media/6B3127F3-029B-40E2-B0F4-C072647B62D3.png" width="60%"><br><br>
 
