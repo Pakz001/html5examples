@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+		//
+		// random poly rock asteroid shape(red)
+		//
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	myCanvas.width = window.innerWidth;
+	myCanvas.height = window.innerHeight;
+
+	
+	
+	for(var i=0;i<64;i++){
+	var x=Math.random()*myCanvas.width;
+	var y = Math.random()*myCanvas.height;
+	var s = (Math.random()*32)+16;
+	rock(x,y,s);
+	}
+	
+	function rock(x,y,s){
+ctx.fillStyle = '#f00';
+ctx.beginPath();
+ctx.moveTo(x,y);
+var stp=(Math.PI*2)/((Math.random()*5)+16);
+var rad,x1,y1;
+for(var a=0;a<(Math.PI*2);a+=stp){
+	rad = (Math.random()*8)+s;
+ 	x1=rad*Math.cos(a);
+	y1=rad*Math.sin(a);
+	ctx.lineTo(x+x1,y+y1);
+}
+rad = (Math.random()*8)+s;
+x1=rad*Math.cos(0);
+y1=rad*Math.sin(0);
+ctx.lineTo(x+x1,y+y1);
+ctx.closePath();
+ctx.fill();
+}
+
+</script>
+</body>
+</html>
