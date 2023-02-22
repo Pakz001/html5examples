@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	var col4 = "#bbbb66";
+	var col3 = "#555511";
+	var col2 = "#aaaa55";
+	var col1 = "#ffff55";
+	
+	c.width = window.innerWidth;
+	c.height = window.innerHeight;
+	//gameloop=setInterval(doGameLoop,16);
+	ctx.fillStyle = col2;
+	ctx.fillRect(0,0,c.width,c.height);
+
+	var w,h;
+	for(var y=0;y<window.innerHeight;y+=h){
+		w=Math.random()*32+8;
+	for(var x=0;x<window.innerWidth;x+=w){
+		ctx.fillStyle="#ffffff";
+		ctx.globalAlpha = 0.2;
+		ctx.fillRect(x,y,w,h);
+		ctx.globalAlpha = 1.0;
+		if(Math.random()<.025){
+			if(Math.random()<.5){	
+				crater(x,y,w);
+			}else{
+				bump(x,y,w);
+			}
+		}
+	}
+	h=Math.random()*32;
+	}
+	
+		
+	function bump(x,y,s){
+		roundBrush(x,y,s,col1);
+		//roundBrush(x+4,y+4,s,col3);
+		//roundBrush(x+2,y+2,s/1.05,col2);
+		roundBrush(x+s/5,y+s/5,s,col3);
+		roundBrush(x+s/10,y+s/10,s,col4);
+	}
+	
+	function crater(x,y,s){
+		roundBrush(x,y,s,col3);
+		//roundBrush(x+4,y+4,s,col3);
+		//roundBrush(x+2,y+2,s/1.05,col2);
+		roundBrush(x+s/5,y+s/5,s,col1);
+		roundBrush(x+s/10,y+s/10,s,col2);
+	}
+	
+	function roundBrush(x,y,r,col){
+		ctx.fillStyle = col;
+		ctx.beginPath();
+		ctx.arc(x,y,r,0,Math.PI*2);
+		ctx.fill();
+	}
+	
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+	}
+	
+
+</script>
+</body>
+</html>
