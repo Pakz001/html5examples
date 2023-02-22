@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Fullscreen Black Canvas</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      var NUM_SHAPES = 5000;
+      var SHAPE_SIZE = 8;
+      var ALPHA = 0.1;
+
+      ctx.fillStyle = "white";
+      for (let i = 0; i < NUM_SHAPES; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.random()*SHAPE_SIZE, 0, 2 * Math.PI);
+        ctx.globalAlpha = Math.random()*ALPHA;
+        ctx.fill();
+      }
+			ALPHA/=5;
+			SHAPE_SIZE/=2;
+			NUM_SHAPES*=100;
+			ctx.fillStyle = "white";
+      for (let i = 0; i < NUM_SHAPES; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        ctx.beginPath();
+        ctx.arc(x, y, Math.random()*SHAPE_SIZE, 0, 2 * Math.PI);
+        ctx.globalAlpha = Math.random()*ALPHA;
+        ctx.fill();
+      }
+    </script>
+  </body>
+</html>
