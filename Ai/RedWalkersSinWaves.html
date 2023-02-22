@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	
+	var debug;
+	var dy2 = [];
+	var dx = [];
+	var dy = [];
+	var da = [];
+	var ds = [];
+	var dcountDown = [];
+	var speed;
+	var x;
+	var y;
+	var y2;
+	var a;
+	var oldx,oldy;
+	var countDown;
+	var amplitude = 2;
+	
+	// Create 50 dots
+	for(var i=0;i<100;i++){
+		dx.push(Math.random()*window.innerWidth);
+		dy.push(Math.random()*window.innerHeight);
+		da.push(Math.random()*Math.PI*2);
+		dcountDown.push(Math.random()*50+50);
+		dy2.push(0);
+		ds.push(Math.random()*2+.2);
+	}
+	
+	// initiate the game loop.
+	gameloop=setInterval(doGameLoop,16);
+	
+	// main game loop
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example."+debug,10,10); 
+		
+		// Update the dots
+		for(var i=0;i<da.length;i++){
+			// Read working variables
+			x = dx[i];
+			y = dy[i];
+			a = da[i];
+			y2 = dy2[i];
+			countDown = dcountDown[i];
+			speed = ds[i]
+			
+			// draw color
+			ctx.fillStyle="#ffff00";
+	
+			// Draw the dot
+			ctx.globalAlpha=1.0;
+			//ctx.fillRect(x-5,y+y2-5,10,10);
+			ctx.beginPath();
+			ctx.arc(x,y+y2,5,0,Math.PI*2);
+			ctx.fill();
+			
+			ctx.fillStyle="#ff0000";
+			for(var j=16;j<64;j+=8){
+			ctx.beginPath();
+			ctx.globalAlpha = 0.1;
+			ctx.arc(x,y,j,0,Math.PI*2);
+			ctx.fill();
+			}
+			
+			oldx = x;
+			oldy = y;
+			
+			// Move the dot
+			x+=Math.cos(a)*speed;
+			y+=Math.sin(a)*speed;    
+		
+			// If change direction
+			countDown-=1;
+			if(Math.random()<.01 && countDown<0){
+				a=Math.random()*Math.PI*2;
+				countDown=100;
+			}
+			
+			// Shake effect
+			if(Math.abs(oldx-x)>Math.abs(oldy-y)){
+				y2 = (amplitude*(speed/2))*Math.sin(x*0.5);
+			}else{
+				y2 = (amplitude*(speed)/2)*Math.sin(y*0.5);			
+			}
+			
+			// if at edge then pop up other side
+			if(x<0)x=c.width;
+			if(x>c.width)x=0;
+			if(y<0)y=c.height;
+			if(y>c.height)y=0;
+			
+			// Store working  variables..
+			dx[i] = x;
+			dy[i] = y;
+			da[i] = a;
+			dy2[i] = y2;
+			dcountDown[i] = countDown;
+		}
+		
+	}
+	
+	
+</script>
+</body>
+</html>
