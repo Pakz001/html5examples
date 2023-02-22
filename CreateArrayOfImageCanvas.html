@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	
+<script>
+		//
+		// random poly rock asteroid shape(red)
+		//
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	
+	var q=[];
+
+	for(var i=0;i<64;i++){
+		var s = (Math.random()*32)+16;
+		q.push(rock(s));
+			//ctx.drawImage(img,Math.random()*c.width,Math.random()*c.height);
+		
+			//ctx.fillStyle="#ffffff";
+			//ctx.fillRect(Math.random()*c.width,Math.random()*c.height,10,10);
+		//ctx.drawImage(img,100,100);
+
+	}
+gameloop=setInterval(doGameLoop,333);	
+function doGameLoop(){
+myCanvas.width = window.innerWidth;
+myCanvas.height = window.innerHeight-32;
+myCanvas.width = window.innerWidth-32;
+ctx.fillStyle="rgb(100,0,0)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="rgb(255,255,255)";
+ctx.fillText("Drawing a tilemap example.",10,10); 
+for(var i=0;i<q.length;i++){
+ctx.drawImage(q[i],Math.random()*c.width,Math.random()*c.height);
+}
+}
+	
+	
+	
+	function rock(s){
+		var x = s;
+		var y = s;
+		const offscreenCanvas = document.getElementById("myCanvas");
+	 	offscreenCanvas.width = s*4;
+	    offscreenCanvas.height = s*4;
+		const offscreenCtx = offscreenCanvas.getContext("2d");
+	
+	  	canvasAsImage = new Image(s,s);
+//		offscreenCtx.fillStyle = '#000000';
+//		offscreenCtx.fillRect(0,0,s,s);
+		
+		offscreenCtx.fillStyle = '#ffffff';
+		offscreenCtx.beginPath();
+		offscreenCtx.moveTo(x,y);
+		var stp=(Math.PI*2)/((Math.random()*5)+16);
+		var rad,x1,y1;
+		for(var a=0;a<(Math.PI*2);a+=stp){
+			rad = (Math.random()*8)+s;
+		 	x1=rad*Math.cos(a);
+			y1=rad*Math.sin(a);
+			offscreenCtx.lineTo(x+x1,y+y1);
+		}
+		rad = (Math.random()*8)+s;
+		x1=rad*Math.cos(0);
+		y1=rad*Math.sin(0);
+		offscreenCtx.lineTo(x+x1,y+y1);
+		offscreenCtx.closePath();
+		offscreenCtx.fill();
+		
+		canvasAsImage.src = offscreenCanvas.toDataURL();
+		 offscreenCanvas.width = 1;
+	    offscreenCanvas.height = 1;
+		
+		return canvasAsImage;		
+	}
+
+</script>
+</body>
+</html>
