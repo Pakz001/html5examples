@@ -21,9 +21,10 @@ update:checked every file and removed references to a unused css file. gfx now i
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=4RCbTE9Z_4A" target="_blank">
  <img src="http://img.youtube.com/vi/4RCbTE9Z_4A/mqdefault.jpg" alt="Watch the video" width="60%" border="10" />
 <br></a>
-
-Tools/BrushFactory.<br>
+<br>
+Tools/BrushFactory. - phone(landscape/portait mode) - tablet (portrait/landscape mode)<br>
 <img src="Media/6B3127F3-029B-40E2-B0F4-C072647B62D3.png" width="60%"><br><br>
+
 
 
 Copy paste (edit) and run. ( each html file is stand alone and requires no clunky installing. just open it with a browser )
