@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	//gameloop=setInterval(doGameLoop,16);
+//	ctx.scale(2,2);
+	myCanvas.height = window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+		
+	var x = 250;
+	var y = 250;
+	var a = 0;
+	var a2 = 0;
+	var rad = 32;
+	//mcShape(250,250,0,32);
+	
+	function mcShape(x,y,a,rad,col){
+		ctx.fillStyle = col;
+		ctx.beginPath();
+		
+		var stp = (Math.PI*2)/((Math.random()*16)+16);
+		var ex,ey; // start and end of line to.
+		var t=false;		
+		for(var i=0;i<(Math.PI*2);i+=stp){
+			var z1 = (Math.random()*rad)+rad;
+			var z2 = (Math.random()*rad)+rad;
+			var x2 = x+(Math.cos(i)*z1);
+			var y2 = y+(Math.sin(i)*z2);
+			if(t==false){
+				t=true;
+				ctx.moveTo(x2,y2);
+			}else{
+				ctx.lineTo(x2,y2);
+			}
+			if(i<Math.PI){
+				x+=Math.cos(a)*16;
+				y+=Math.sin(a)*16;
+			}else{
+				x-=Math.cos(a)*16;
+				y-=Math.sin(a)*16;		
+			}
+			
+		}	
+		//ctx.lineTo(ex,ey);
+		ctx.fill();
+	}		
+	function mcCountry(x,y,a,rad,col){
+		ctx.fillStyle = col;
+		ctx.beginPath();
+		
+		var stp = (Math.PI*2)/32;
+		var ex,ey; // start and end of line to.
+		var t=false;		
+		for(var i=0;i<(Math.PI*2);i+=stp){
+			stp=(Math.random()*Math.PI)/5;
+			var z1 = (Math.random()*rad)+rad;
+			var z2 = (Math.random()*rad)+rad;
+			var x2 = x+(Math.cos(i)*z1);
+			var y2 = y+(Math.sin(i)*z2);
+			if(t==false){
+				t=true;
+				ctx.moveTo(x2,y2);
+			}else{
+				ctx.lineTo(x2,y2);
+			}
+			if(i<Math.PI){
+				x+=Math.cos(a)*16;
+				y+=Math.sin(a)*16;
+			}else{
+				x-=Math.cos(a)*16;
+				y-=Math.sin(a)*16;		
+			}
+			
+		}	
+		//ctx.lineTo(ex,ey);
+		ctx.fill();
+	}	
+	function mcShape2(x,y,a,rad,col){
+		ctx.fillStyle = col;
+		ctx.beginPath();
+		
+		var stp = (Math.PI*2)/32;
+		var ex,ey; // start and end of line to.
+		var t=false;		
+		for(var i=0;i<(Math.PI*2);i+=stp){
+			var z1 = (Math.random()*rad)+rad;
+			var z2 = (Math.random()*rad)+rad;
+			var x2 = x+(Math.cos(i)*z1);
+			var y2 = y+(Math.sin(i)*z2);
+			if(t==false){
+				t=true;
+				ctx.moveTo(x2,y2);
+			}else{
+				ctx.lineTo(x2,y2);
+			}
+			if(i<Math.PI){
+				x+=Math.cos(a)*16;
+				y+=Math.sin(a)*16;
+			}else{
+				x-=Math.cos(a)*16;
+				y-=Math.sin(a)*16;		
+			}
+			
+		}	
+		//ctx.lineTo(ex,ey);
+		ctx.fill();
+	}
+	
+	gameloop=setInterval(doGameLoop,800);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10);
+		for(var y=0;y<myCanvas.height;y+=128){
+			for(var x=0;x<myCanvas.width;x+=256){
+				var q=Math.random();
+				var c1,c2;
+				c1 = "#00aa00";
+				c2 = "#2255aa";
+				if(Math.random()<.5){
+					c1 = "#ff0000";
+					c2 = "#880000";
+				}
+				if(q<.33){
+				var r = ((Math.random()*5)+5);
+				mcShape(x,y,0,r,c1);
+				mcShape(x,y+5,0,r,c2);
+				}
+				if(q>=.33 && q<.66){
+				mcCountry(x,y,0,20,c1);
+				mcCountry(x,y+5,0,20,c2);
+				}
+				if(q>=.66){
+				mcShape2(x,y,0,20,"#ffffff");
+				}
+				
+			}
+		}
+	
+	}
+	
+	
+
+</script>
+</body>
+</html>
