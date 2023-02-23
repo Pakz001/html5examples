@@ -19,6 +19,8 @@ notes:(Messy notes)<br>
 
 Ideas:
 
+* The brush rotation system. to rotate anything below on the canvas with the brush. around, (rotate)outside inwards, (rotate)inwards outwards.
+
 * Generative brushes. pattern generators. brick/rock/wavy sin grids. line thickness sliders. (fill with generative pattern)
 
 * screen anchor icon for setting light direction used for placing lighter and darker tones(angle) - make range function returning when point is inside radian range -pi , pi
