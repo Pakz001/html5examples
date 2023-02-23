@@ -19,7 +19,7 @@ notes:(Messy notes)<br>
 
 Ideas:
 
-* The brush rotation system. to rotate anything below on the canvas with the brush. around, (rotate)outside inwards, (rotate)inwards outwards.
+* The brush rotation system. to rotate anything below on the canvas with the brush. around, (rotate)outside inwards, (rotate)inwards outwards. full area, or sparks.
 
 * Generative brushes. pattern generators. brick/rock/wavy sin grids. line thickness sliders. (fill with generative pattern)
 
