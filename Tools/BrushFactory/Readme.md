@@ -19,7 +19,9 @@ notes:(Messy notes)<br>
 
 Ideas:
 
-* a line tool. the thickness is settable. there is a rainbow editor that can be used to color each individual line in the thick line. + dither. quick save preset and quick menu. test on how to draw a pixel art sword and lighted and shaded pillar.
+* Line tool - editor (tab) for setting color start to end of line. a,b,c-repeat,b,a (design) This for texturing purposes. (bresenham)
+
+* a line tool. the thickness is settable. there is a rainbow editor that can be used to color each individual line in the thick line. + dither. quick save preset and quick menu. test on how to draw a pixel art sword and lighted and shaded pillar. (bresenham)
 
 * The brush rotation system. to rotate anything below on the canvas with the brush. around, (rotate)outside inwards, (rotate)inwards outwards. full area, or sparks.
 
