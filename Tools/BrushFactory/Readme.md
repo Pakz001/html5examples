@@ -19,6 +19,8 @@ notes:(Messy notes)<br>
 
 Ideas:
 
+* a line tool. the thickness is settable. there is a rainbow editor that can be used to color each individual line in the thick line. + dither. quick save preset and quick menu.
+
 * The brush rotation system. to rotate anything below on the canvas with the brush. around, (rotate)outside inwards, (rotate)inwards outwards. full area, or sparks.
 
 * Generative brushes. pattern generators. brick/rock/wavy sin grids. line thickness sliders. (fill with generative pattern)
