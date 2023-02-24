@@ -1,0 +1,46 @@
+note : temp file - need to turn it into a html+canvas version. - socoder - gotojse.
+rotate a grid 2d array or tile (pixels) - for brushfactory sprite editor.
+
+
+// Rotation of an Array
+// by Jayenkai (That rhymes!)
+// Created 2021/7/22
+
+Symbol 0,"04_8/989!A89!A89!A89!A89!A89!A9A/";
+Symbol 1,"05_Q/PQP!NQP!NQP!NQP!NQP!NQP!NPN/";
+Symbol 2,"06_N/ONO!PNO!POP/N/ONO!PNO!POP/";
+
+Dim Tiles(32,32)
+Dim Rotated(32,32)
+for x=0 to 31
+for y=0 to 31
+	Tiles(x,y)=Rand(0,2)
+	if Abs(x-16)<3 then Tiles(x,y)=2
+	if Abs(y-4)<3 then Tiles(x,y)=1
+next
+next
+
+Border 30,30,80
+Graphics 1024,1024,1
+Repeat
+
+ango=1024/360
+angle=Floor(MouseX()/ango)
+
+for x=0 to 31
+for y=0 to 31
+	x2=Floor((cos(angle)*(x-16) - sin(angle)*(y-16)))+16
+	y2=Floor((sin(angle)*(x-16) + cos(angle)*(y-16)))+16
+	x2=Limit(x2,0,31)
+	y2=Limit(y2,0,31)
+
+	Rotated(x,y)=Tiles(x2,y2)
+	if MouseDown then Rotated(x,y)=Tiles(x,y)
+	DrawImg x*32+16,y*32+16,Rotated(x,y)
+next
+next
+
+Text 32,32,angle,1
+
+Flip
+Forever
