@@ -19,6 +19,8 @@ notes:(Messy notes)<br>
 
 Ideas:
 
+* Blob brush. each touch up a different 1 color random shape as a brush. this for bush and clouds and such. size/sharpness.
+
 * Line tool - editor (tab) for setting color start to end of line. a,b,c-repeat,b,a (design) This for texturing purposes. (bresenham)
 
 * a line tool. the thickness is settable. there is a rainbow editor that can be used to color each individual line in the thick line. + dither. quick save preset and quick menu. test on how to draw a pixel art sword and lighted and shaded pillar. (bresenham)
