@@ -1,0 +1,148 @@
+Sure! Here's an implementation that should do the trick:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Solar System Simulation</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+      // Get the canvas element and its context
+      var canvas = document.getElementById("canvas");
+      var ctx = canvas.getContext("2d");
+      
+      // Define the variables
+      var sunRadius = 40;
+      var sunMass = 10000;
+      var numPlanets = 6;
+      var planetRadii = [10, 15, 20, 25, 30, 35];
+      var planetMasses = [10, 20, 30, 40, 50, 60];
+      var planetDistances = [100, 150, 200, 250, 300, 350];
+      var planetSpeeds = [0.03, 0.025, 0.02, 0.015, 0.01, 0.005];
+      var planets = [];
+      
+      // Define the Planet class
+      function Planet(radius, mass, distance, speed) {
+		this.r = Math.floor(Math.random()*255);
+		this.g = Math.floor(Math.random()*255);
+		this.b = Math.floor(Math.random()*255);
+        this.radius = radius;
+        this.mass = mass;
+        this.distance = distance;
+        this.speed = speed;
+        this.angle = Math.random() * Math.PI * 2;
+        this.x = canvas.width / 2 + distance * Math.cos(this.angle);
+        this.y = canvas.height / 2 + distance * Math.sin(this.angle);
+        this.dx = -speed * Math.sin(this.angle);
+        this.dy = speed * Math.cos(this.angle);
+        
+        this.draw = function() {
+			
+			drawColorCircle(this.r,this.g,this.b,this.x,this.y,this.radius,this.radius);
+		return;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(0,0,0,1)';
+          ctx.fill();
+          ctx.closePath();
+        }
+        
+        this.move = function() {
+          this.angle += this.speed;
+          this.x = canvas.width / 2 + this.distance * Math.cos(this.angle);
+          this.y = canvas.height / 2 + this.distance * Math.sin(this.angle);
+        }
+        
+        this.attract = function(other) {
+          var distanceToOther = Math.sqrt((other.x - this.x) * (other.x - this.x) +
+                                           (other.y - this.y) * (other.y - this.y));
+          var force = (this.mass * other.mass) / (distanceToOther * distanceToOther);
+          var angleToOther = Math.atan2(other.y - this.y, other.x - this.x);
+          var fx = force * Math.cos(angleToOther);
+          var fy = force * Math.sin(angleToOther);
+          this.dx += fx / this.mass;
+          this.dy += fy / this.mass;
+        }
+        
+        this.updateVelocity = function() {
+          this.x += this.dx;
+          this.y += this.dy;
+        }
+      }
+      
+      // Create the sun
+      var sun = new Planet(sunRadius, sunMass, 0, 0);
+      
+      // Create the planets
+      for (var i = 0; i < numPlanets; i++) {
+        var planet = new Planet(planetRadii[i], planetMasses[i], planetDistances[i], planetSpeeds[i]);
+        planets.push(planet);
+      }
+      
+      // Define the animation loop
+      function animate() {
+        // Clear the canvas
+		ctx.fillStyle ="#000000";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Move and draw the sun
+        sun.draw();
+        
+        // Move and draw the planets
+        for (var i = 0; i < planets.length; i++) {
+          var planet = planets[i];
+          planet.move();
+          planet.attract(sun);
+          for (var j = 0; j < planets.length; j++) {
+            if (j != i) {
+              planet.attract(planets[j]);
+            }
+          }
+          planet.updateVelocity();
+          planet.draw();
+        }
+        
+        // Repeat the animation
+        requestAnimationFrame(animate);
+      }
+      
+      // Start the animation loop
+      animate();
+	  
+	  
+	  
+	  
+function drawColorCircle(r,g,b, x,y,width,height) {
+	
+
+
+  const maxRadius = Math.min(width, height) / 2;
+  let radius = maxRadius;
+  while (radius > 4) {
+    const brightness = Math.floor((radius / maxRadius) * 255);
+	//if(Math.random()<.001)console.log(brightness)
+    ctx.beginPath();
+	
+    //ctx.fillStyle = `rgba(${r},${g},${b},${brightness})`;
+	ctx.fillStyle = 'rgb('+r+','+g+','+b+')';
+	ctx.globalAlpha = 1-(brightness/255);
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    radius -= 1;
+  }
+}
+
+
+
+	  
+	  
+	  
+    </script>
+  </body>
+</html>
+```
+
+This code generates a canvas with a sun at the center, and several planets that orbit around it. The variables at the top of the script control the number, size, mass, distance, and speed of the planets. You can adjust these variables to create different solar system simulations.
