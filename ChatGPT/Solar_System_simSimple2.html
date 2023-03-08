@@ -1,19 +1,22 @@
-Sure! Here's an implementation that should do the trick:
-
-```html
+	  
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
     <title>Solar System Simulation</title>
   </head>
-  <body>
-    <canvas id="canvas" width="800" height="600"></canvas>
+  <body bgcolor="#000000">
+    <canvas id="canvas" width="800" height="600" ></canvas>
     <script>
       // Get the canvas element and its context
       var canvas = document.getElementById("canvas");
       var ctx = canvas.getContext("2d");
+	  canvas.width = window.innerWidth;
+	  canvas.height = window.innerHeight;
       
+	  var alphaAnim = 1;
+	  var alphaAnimDir =0;
+	  var sun = false;
       // Define the variables
       var sunRadius = 40;
       var sunMass = 10000;
@@ -29,6 +32,12 @@ Sure! Here's an implementation that should do the trick:
 		this.r = Math.floor(Math.random()*255);
 		this.g = Math.floor(Math.random()*255);
 		this.b = Math.floor(Math.random()*255);
+		if(sun==false){
+			this.r = 255;
+			this.g = 255;
+			this.b = 0;
+			sun = true;
+		}
         this.radius = radius;
         this.mass = mass;
         this.distance = distance;
@@ -84,6 +93,15 @@ Sure! Here's an implementation that should do the trick:
       
       // Define the animation loop
       function animate() {
+		  
+		if(alphaAnimDir==0){
+			alphaAnim-=.005;
+			if(alphaAnim<0)alphaAnimDir=1;
+		}
+		if(alphaAnimDir==1){
+			alphaAnim+=.005;
+			if(alphaAnim>.5)alphaAnimDir=0;
+		}  
         // Clear the canvas
 		ctx.fillStyle ="#000000";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -123,9 +141,7 @@ function drawColorCircle(r,g,b, x,y,width,height) {
   let radius = maxRadius;
   while (radius > 4) {
     const brightness = Math.floor((radius / maxRadius) * 255);
-	//if(Math.random()<.001)console.log(brightness)
     ctx.beginPath();
-	
     //ctx.fillStyle = `rgba(${r},${g},${b},${brightness})`;
 	ctx.fillStyle = 'rgb('+r+','+g+','+b+')';
 	ctx.globalAlpha = 1-(brightness/255);
@@ -133,6 +149,17 @@ function drawColorCircle(r,g,b, x,y,width,height) {
     ctx.fill();
     radius -= 1;
   }
+    while (radius < maxRadius) {
+    const brightness = Math.floor((radius / maxRadius) * 255);
+    ctx.beginPath();
+    //ctx.fillStyle = `rgba(${r},${g},${b},${brightness})`;
+	ctx.fillStyle = 'rgb('+255+','+255+','+255+')';
+	ctx.globalAlpha =( 1.0-(brightness/255))/6;
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    radius += 1;
+}
+ctx.globalAlpha=alphaAnim;
 }
 
 
@@ -143,6 +170,3 @@ function drawColorCircle(r,g,b, x,y,width,height) {
     </script>
   </body>
 </html>
-```
-
-This code generates a canvas with a sun at the center, and several planets that orbit around it. The variables at the top of the script control the number, size, mass, distance, and speed of the planets. You can adjust these variables to create different solar system simulations.
