@@ -35,9 +35,15 @@ Use different browser.
 	var ctx=c.getContext("2d");
 
 
+	// the tile map size and binary string length(w*h)
+	const w=h=3;
 	
-	
-	var a = "0000000000000000";
+	// Create our binary string in variable a
+	var a = "";// "0000000000000000";
+	// Create our iniiial binary string contents
+	for(var i=0;i<w*h;i++){
+		a+="0";
+	}
 	
 	gameloop=setInterval(doGameLoop,16);
 	
@@ -55,14 +61,23 @@ Use different browser.
 		ctx.fillStyle="rgb(255,255,255)";
 		ctx.fillText("Javascript Html canvas example.",10,10); 
 		
-		if(a.length>16){
-			a="0000000000000000";
+		// If filled then restart
+		if(a.length>w*h){
+			a="";
+			for(var i=0;i<w*h;i++){
+				a+="0";
+			}
 		}
+		
+		// increase a binary string
 		a = binaryStringIncrement(a);
 		
+		// draw a tile map on teh canvas
+		// with the a binary string. 0's are
+		// blue/ 1's are white
 		var x = 0;
 		var y = 0;
-		for(var i=0;i<16;i++){
+		for(var i=0;i<w*h;i++){
 			if(a[i]==0){
 			ctx.fillStyle="#0000AA";
 			}else{
@@ -70,7 +85,7 @@ Use different browser.
 			}
 			ctx.fillRect(x*32,y*32,32,32);
 			x+=1;
-			if(x>3){
+			if(x>w-1){
 				y+=1;
 				x=0;
 			}
