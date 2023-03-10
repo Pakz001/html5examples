@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	//
+	// Create a small 4x4 tile map from a binary string. There is
+	// a function that adds up a inputted binary string. Now we
+	// can create every possible combination inside the tile map
+	// with 2 colors.
+	// This for pattern creation. In this case I wanted
+	// to isolate every pattern that is of one connected(flooded 8way)
+	// piece for drawing brush creation.(vegitation and such)
+	//
+	
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+
+	
+	
+	var a = "0000000000000000";
+	
+	gameloop=setInterval(doGameLoop,16);
+	
+	//var a = "0000";
+	//while(a.length<16){
+	//	a = binaryStringIncrement(a);
+	//}
+	
+	//doGameLoop();
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		if(a.length>16){
+			a="0000000000000000";
+		}
+		a = binaryStringIncrement(a);
+		
+		var x = 0;
+		var y = 0;
+		for(var i=0;i<16;i++){
+			if(a[i]==0){
+			ctx.fillStyle="#0000AA";
+			}else{
+			ctx.fillStyle="#FFFFFF";
+			}
+			ctx.fillRect(x*32,y*32,32,32);
+			x+=1;
+			if(x>3){
+				y+=1;
+				x=0;
+			}
+		}
+		
+	}
+
+	// Poe chat - Sage function
+	function binaryStringIncrement(binaryString) {
+	  let carry = 1;
+	  let result = '';
+	  for (let i = binaryString.length - 1; i >= 0; i--) {
+	    if (binaryString[i] === '0' && carry === 1) {
+	      result = '1' + result;
+	      carry = 0;
+	    } else if (binaryString[i] === '1' && carry === 1) {
+	      result = '0' + result;
+	    } else {
+	      result = binaryString[i] + result;
+	    }
+	  }
+	  if (carry === 1) {
+	    result = '1' + result;
+	  }
+	  return result;
+	}
+
+</script>
+</body>
+</html>
