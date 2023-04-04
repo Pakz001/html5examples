@@ -19,6 +19,8 @@ notes:(Messy notes)<br>
 
 Ideas:
 
+* Edge wall trace routine - fill/tool that hugs edges(4 - 8 way) a sort of create a outline around a line. Stops at no more of hugging color.
+
 * Blob brush. each touch up a different 1 color random shape as a brush. this for bush and clouds and such. size/sharpness.
 
 * Line tool - editor (tab) for setting color start to end of line. a,b,c-repeat,b,a (design) This for texturing purposes. (bresenham)
