@@ -19,6 +19,8 @@ notes:(Messy notes)<br>
 
 Ideas:
 
+* default shaded shapes - maybe in tab window with color objects - objects like oval, rect, triangle(3d object editor! paste to canvas and/or transparancy )
+
 * Edge wall trace routine - fill/tool that hugs edges(4 - 8 way) a sort of create a outline around a line. Stops at no more of hugging color.
 
 * Blob brush. each touch up a different 1 color random shape as a brush. this for bush and clouds and such. size/sharpness.
