@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+    <style>
+        #myCanvas {touch-action: none;
+        -webkit-touch-callout:none;
+        -webkit-user-select:none;
+        -khtml-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select:none;
+        -webkit-tap-highlight-color:rgba(0,0,0,0);
+        }
+    </style>
+<canvas id="myCanvas" width="640" height="480" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    //
+    //
+    //
+    //
+    //
+    // Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
+    //
+    // When it gets around 5000 lines it should be close to converted.
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+    var img = new Image();
+
+    // Add event listeners for reading keydown and keyup events from the keyboard..
+    //
+    window.addEventListener("keydown",kd,true);
+    window.addEventListener("keyup",ku,true);
+
+    //
+    // With this we can read the controller status. In this example
+    // we use the keyboard to set these flags..
+    //
+    var Controller = {
+        Right:false,
+        Left:false,
+        Up:false,
+        Down:false,
+        ShotGun:false,
+        LaserWall:false,
+        Grenade:false,
+        Jump:false,
+    } 
+
+    var mapwidth=320;
+    var mapheight=240;
+    var screenwidth=800;
+    var screenheight=600;
+    var tilewidth=20;
+    var tileheight=20;
+
+    // our player
+    class player{
+        constructor(x,y){
+            // Variable initialisation
+            this.x=x;
+            this.y=y;
+            this.hp=100;
+            this.hpmax=100;
+            this.playeritemnames=["Gold","Coal","Metal","Rock","Shotgun Round","Grenade","Sticky Grenade","Monster Tail","Monster Tooth","Egg Shell"];
+            this.playeritem = [];
+            this.regularmode=true;
+            this.jump=false;
+            this.incy=0;
+            this.movespeed;
+            this.px;
+            this.py;
+            this.pmx,this.pmy;
+            this.ptx,this.pty;
+            this.mox,this.moy;
+            this.pw,this.ph;	
+            this.mcx,this.mcy,this.mpx,this.mpy; // scroll coordinates
+            this.maptileswidth,this.maptilesheight;
+            this.tw=tilewidth;
+            this.th=tileheight;
+            this.facing="right";
+            this.gtkd=false; //grenade thrown key down
+            this.sfkd=false; //shogun fire key down
+            this.minedelay;
+            //
+            // Set variables and further initialisation
+            this.movespeed = 1;
+            this.px = tilewidth*20;
+            this.py = tileheight*14;
+            this.pw = tilewidth;
+            this.ph = tileheight;
+            this.maptileswidth = screenwidth / tw;
+            this.maptilesheight = screenheight / th;
+            this.mcx=0;
+            this.mcy=0;
+            this.playeritem = create2DArray(this.playeritemnames.length,2);
+            this.createrandominventory();
+        }
+        createrandominventory(){
+		    for(var i=0;i<this.playeritemnames.length;i++){
+			    this.playeritem[i,0] = i;
+			    this.playeritem[i,1] = Math.floor(Math.random()*65);
+            }
+        }
+        updateplayercontrols(){
+            this.pmx = this.px-(this.mcx*this.tw);
+            this.pmy = this.py-(this.mcy*this.th);
+            this.ptx = this.px/this.tw;
+            this.pty = this.py/this.th;
+            if(playerladdercollision(this.px,this.py)){
+                this.jump=false;
+                this.laddermode();
+                this.movespeed = 1;			
+                }else{
+                for(var i=0;i<2;i++){
+                    this.playergravity();
+                }
+            }
+
+            this.movespeed +=.1;
+            if(this.movespeed > 4)this.movespeed = 4;
+            
+            // If no movement left and right up and down then slow down
+            //movement
+            if(Controller.Right==false){//Keyboard.KeyDown(Key.Right) = False
+                if(Controller.Left==false){//Keyboard.KeyDown(Key.Left) = False			
+                    if(Controller.Up==false){//Keyboard.KeyDown(Key.Up) = False
+                        if(Controller.Down==false){//Keyboard.KeyDown(Key.Down) = False			
+                            this.movespeed = 1;
+                        }
+                   }
+                }
+            }
+                            
+            for(var i=0;i<Math.ceil(this.movespeed);i++){
+                if(Controller.Right==true){//Keyboard.KeyDown(Key.Right)
+                    if(this.playertilecollision(this.px+1,this.py) == false){
+                        this.px+=1;
+                        this.scrollmap(1,0);
+                    }
+                }
+                if(Controller.Left==true){//Keyboard.KeyDown(Key.Left)
+                    if(this.playertilecollision(this.px-1,this.py) == false){
+                        this.px-=1;
+                        this.scrollmap(-1,0);
+                    }
+                }			
+            }
+            if(Controller.Left==true)this.facing="left";//Keyboard.KeyDown(Key.Left) Then facing="left"
+            if(Controller.Right==true)this.facing="right";//Keyboard.KeyDown(Key.Right) Then facing="right"
+            if(Controller.Up==true)this.facing="up";//Keyboard.KeyDown(Key.Up) Then facing="up"
+            if(Controller.Down==true)this.facing="down";//Keyboard.KeyDown(Key.Down) Then facing="down"
+
+            // throw grenade
+            if(Controller.Grenade==false)this.gtkd=false;//If Keyboard.KeyDown(Key.G) = False Then gtkd = False
+            if(this.gtkd == false && Controller.Grenade==true){//Keyboard.KeyDown(Key.G)
+                this.gtkd = true;			
+                var pcx=this.px+(this.pw/2);
+                var pcy=this.py+(this.ph/2);						
+                //mygrenade.AddLast(New grenade(this.pcx,this.pcy,this.facing));
+            }
+            
+            // Fire shotgun
+            if(Controller.ShotGun==false)this.sfkd=false;//Keyboard.KeyDown(Key.S) = False Then sfkd = False
+            if(this.sfkd == false && Controller.ShotGun==true){//Keyboard.KeyDown(Key.S)
+                this.sfkd = true;	
+                //this.fireshotgun();					
+            }
+
+            // Mine left or right
+            if(this.minedelay > 0)this.minedelay -= 1;
+            if(Controller.Mine==true && this.minedelay<=0){//Keyboard.KeyDown(Key.M) And minedelay <=0
+                this.minedelay = 30;
+                //this.mine();
+            }
+
+            if(Controller.LaserWall==true){//If Keyboard.KeyReleased(Key.L)
+                Controller.LaserWall=false;
+                //mylaserwall.Add(New laserwall(px,py+ph))
+            }
+        }
+        playerladdercollision(x,y){
+            var cx=x/this.tw;
+            var cy=y/this.th;
+            for(var y2=cy-1;y2<cy+2;y2++){
+                for(var x2=cx-1;x2<cx+2;x2++){
+                    if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){	            		        
+                        if(mymap.mapladder[x2][y2] == 1){	                	                     
+                            if(this.rectsoverlap(x,y,this.pw,this.ph,x2*this.tw,y2*this.th,this.tw,this.th) == true){                                    	                    
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        
+            return false;
+        }
+	    playertilecollision(x,y){
+            var cx=x/this.tw;
+            var cy=y/this.th;
+            for(var y2=cy-1;y2<cy+2;y2++){
+                for(var x2=cx-1;x2<cx+2;x2++){
+                    if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){	            		        
+                        if(mymap.mapfinal[x2][y2] != mymap.tileempty){// 'Or mymap.mapfinal[x2,y2] = mymap.tilemineable           
+                                                    
+                            if(rectsoverlap(x,y,this.pw,this.ph,x2*this.tw,
+                                            y2*this.th,this.tw,this.th) == true){;                                    	                    
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+    
+            return false;
+        }
+        laddermode(){
+            for(var i=0;i<Math.ceil(this.movespeed);i++){
+                if(Controller.Right==true){;//Keyboard.KeyDown(Key.Right)
+                    if(this.playertilecollision(px+1,py) == false){
+                        if(this.playerladdercollision(px+1,py) == true){
+                            px+=1;
+                            this.scrollmap(1,0);
+                        }
+                  }
+                }
+                if(Controller.Left == true){ //Keyboard.KeyDown(Key.Left)			
+                    if(this.playertilecollision(px-1,py) == false){
+                        if(this.playerladdercollision(px-1,py) == true){
+                            px-=1;
+                            this.scrollmap(-1,0);
+                        }
+                    }
+                }			
+                if(Controller.Up == true){//Keyboard.KeyDown(Key.Up)			
+                    if(this.playertilecollision(px,py-1) == false){
+                        if(this.playerladdercollision(px,py-1) == true){
+                            py-=1;
+                            this.scrollmap(0,-1);
+                        }
+                    }
+                }			
+                if(Controller.Down == true){//Keyboard.KeyDown(Key.Down)			
+                    if(this.playertilecollision(px,py+1) == false){
+                        if(this.playerladdercollision(px,py+1) == true){			
+                            py+=1;
+                            this.scrollmap(0,1);
+                        }
+                    }
+                }					  			  	
+            }
+        }
+        scrollmap(x,y){
+            if(x==-1)this.mox+=1;
+            if(x==1)this.mox-=1;
+            if(y==-1)this.moy+=1;
+            if(y==1)this.moy-=1;
+            if(this.mox>this.tw-1){
+                this.mcx-=1;
+                this.mox=0;
+            }
+            if(this.mox<-(this.tw-1)){
+                this.mcx+=1;
+                this.mox=0;
+            }
+            if(this.moy>this.th-1){
+                this.mcy-=1;
+                this.moy=0;
+            }
+            if(this.moy<-(this.th-1)){
+                this.mcy+=1;
+                this.moy=0;
+            }
+        }
+        playergravity(){
+            if(this.jump == false && playertilecollision(px,py+1) == false){ 
+                this.jump = true;
+                this.incy = 0;
+            }
+            if(this.jump == false && Controller.Jump==true){//Keyboard.KeyDown(Key.Space) = True            
+                this.incy = -5;
+                this.jump = true;
+            }
+            //If the player is in the jump
+            if(jump == true){
+                this.incy += 0.1;
+                //if the player is going up
+                if(this.incy <=0){
+                    for(var i= 0;i<Math.abs(this.incy);i++){                
+                        this.py -= 1;
+                        this.scrollmap(0,-1);
+                        if(playertilecollision(this.px,this.py-1) == true){
+                            this.incy = 0;
+                            break;
+                        }
+                    }
+                }
+                // if the player if going down
+                if(this.incy > 0){
+                    for(var i= 0;i< this.incy;i++){
+                        this.py += 1;
+                        this.scrollmap(0,1);
+                        //if the player touches the ground
+                        if(this.playertilecollision(px,py+1) == true){
+                            this.jump = false;                        
+                            break;
+                        }
+                    }
+                    if(this.incy>4)this.incy=4;
+                }
+            }
+        }
+        rectsoverlap(x1,y1,w1,h1,x2,y2,w2,h2){
+            if( x1 >= (x2 + w2) || (x1 + w1) <= x2)return false;
+            if( y1 >= (y2 + h2) || (y1 + h1) <= y2)return false;
+            return true;
+        }
+    }
+
+    var myc=new player();
+
+    
+
+    img.src="data:image/png;base64,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";
+    
+
+
+    c.addEventListener("touchend", touchHandler);
+    c.addEventListener("touchstart", touchHandler);
+    
+    var map = [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,0,0,2,0,0,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ]
+
+    var tilemap = [];
+
+    // Copy an array and make it a copy
+    // that you can modify without modifying\
+    // the original.
+    for (var i = 0; i < map.length; i++)
+    tilemap[i] = map[i].slice();
+
+
+    for(y=0;y<map.length;y++){
+        for(x=0;x<map[0].length;x++){
+            if(map[y][x]==1 && tilemap[y][x]==1){
+                if(Math.random()<.25 && x+1<map[0].length && map[y][x+1]==1){
+                    tilemap[y][x]=4;
+                    tilemap[y][x+1]=5;
+                }else{
+                    tilemap[y][x]=Math.floor(Math.random()*3)+1;
+                }
+            }
+            if(map[y][x]==2){
+                if(map[y-1][x]==1){
+                    tilemap[y][x]=6;
+                    //map[y][x]=0;
+                }
+                if(map[y+1][x]==0){
+                    tilemap[y][x]=7;
+                }
+                if(map[y-1][x]==2 && map[y+1][x]==2){
+                    tilemap[y][x]=8;
+                }
+            }
+        }
+    }
+
+    var [colx,coly,colw,colh] = [80,80,50,50];
+    var debug;
+    var lasttouchx,lasttouchy;
+    var autoscroll=false;
+    var tw,th;
+    var [camx,camy] = [0,0];
+
+    gameloop=setInterval(doGameLoop,16);
+
+    function doGameLoop(){
+        myCanvas.height = window.innerHeight-32;
+        myCanvas.width = window.innerWidth-32;
+        tw = Math.floor(myCanvas.width/map[0].length); 	th = Math.floor(myCanvas.height/map.length);
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.fillStyle="rgb(0,0,0)";
+        ctx.fillRect(0,0,c.width,c.height);
+
+
+        // Draw the tile map..
+        tw = 32;
+        th = 32;
+        // using the camx and camy variables.
+        // get the tile left and top and bottom and right
+        // of the screen. Draw between these tiles from the map.
+        var lt = Math.floor(-camx / tw);
+        var tt = Math.floor(-camy / th);
+        var rt = Math.floor((-camx / tw)+((myCanvas.width/tw)))+1;
+        var bt = Math.floor((-camy / th)+((myCanvas.height/th)))+1;
+        for(var y = tt; y < bt; ++y) {
+            for(var x = lt; x < rt; ++x) {
+                if(x>=0 && y>=0 && x<map[0].length && y<map.length){
+                    var dx = (x*tw)+camx;
+                    var dy = (y*th)+camy;
+
+                    if(tilemap[y][x]==1){
+                            ctx.drawImage(img,32,0,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==2){
+                        ctx.drawImage(img,32,16,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==3){
+                        ctx.drawImage(img,56,16,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==4){
+                        ctx.drawImage(img,56,0,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==5){
+                        ctx.drawImage(img,72,0,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==6){
+                        ctx.drawImage(img,0,0,24,16,dx-tw/4,dy,tw+tw/2,th);
+                    }
+                    if(tilemap[y][x]==7){
+                        ctx.drawImage(img,8,32,16,16,dx+tw/4,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==8){
+                        ctx.drawImage(img,8,16,16,16,dx+tw/4,dy,tw,th);
+                    }
+
+                    if(tilemap[y][x]==0){
+                        ctx.fillStyle = 'rgb(10,4,1)';
+                        ctx.fillRect(dx,dy,tw,th);
+                    }
+                }
+            }
+        }
+        autoscr();
+
+        var z = rectmapcollide(colx,coly,colw,colh,0,0);
+        ctx.globalAlpha = .5;
+        if(z===false){
+            ctx.fillStyle='yellow';
+        }
+        if(z===true){
+            ctx.fillStyle='red';
+        }
+
+        ctx.fillRect(colx,coly,colw,colh);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle="rgb(255,255,255)";
+        ctx.fillText("Drawing a tilemap example."+debug,10,10); 
+
+    }
+
+
+
+
+
+    function touchHandler(e){
+        if(e.type=="touchstart" && e.touches) {
+            var x = e.changedTouches[0].clientX;
+            var y = e.changedTouches[0].clientY;
+            lasttouchx = x;
+            lasttouchy = y;
+            autoscroll = true;
+            colx = x-colw/2;
+            coly = y-colh/2;
+            //myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+            e.preventDefault();
+        }
+        if(e.type=="touchend" && e.touches) {
+            var x = e.changedTouches[0].clientX;
+            var y = e.changedTouches[0].clientY;
+            autoscroll = false;
+        
+            //myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+            e.preventDefault();
+        }
+
+    }
+
+    //
+    // Scroll the map and
+    // keep the edges of the map
+    // as the limit.
+    //
+    function autoscr(){
+        if(autoscroll==false)return;
+        var x = lasttouchx;
+        var y = lasttouchy;
+        
+        if(	x<myCanvas.width/2 && 
+                y>myCanvas.height/4 && 
+                y<myCanvas.height-myCanvas.height/4){
+            if(camx<=0)camx+=16;
+        }
+        
+        if(	x>myCanvas.width/2 &&
+                y>myCanvas.height/4 && 
+                y<myCanvas.height-myCanvas.width/4){
+            
+            if(camx>-((map[0].length*tw)-myCanvas.width)){
+            camx-=16;
+            }
+        }
+        
+        if(	y<myCanvas.height/4 ){
+            
+            if(camy<0)camy+=16;
+        }
+        
+        if(	y>myCanvas.height/4+myCanvas.height/2 ){
+        
+            if(camy>-((map.length*th)-myCanvas.height))camy-=16;
+        }
+
+    }
+
+    function rectmapcollide(x,y,w,h,offsetx,offsety){
+
+        var cx=Math.floor((x-camx)/tw);
+        var cy=Math.floor((y-camy)/th);
+
+        for(var y2=cy-1;y2<cy+3;y2++){
+        for(var x2=cx-1;x2<cx+3;x2++){	
+            if(x2>=0 && x2<map[0].length && y2>=0 && y2<map.length){
+                if(map[y2][x2] == 1){
+                    var x3 = ((x2)*tw)+camx;
+                    var y3 = ((y2)*th)+camy;
+                    if(rectsoverlap(x+offsetx,y+offsety,w,h,x3,y3,tw,th)==true){
+                        return true;
+                    }
+                }
+            }
+        }
+        }
+        return false;
+    }
+
+    function rectsoverlap(r1x1,r1y1,r1w,r1h,r2x1,r2y1,r2w,r2h){
+        var r1x2 = r1x1+r1w;
+        var r1y2 = r1y1+r1h;
+        var r2x2 = r2x1+r2w;
+        var r2y2 = r2y1+r2h;
+        
+        return (r1x1 < r2x2 && r1x2 > r2x1 && r1y1 < r2y2 && r1y2 > r2y1);
+
+    }
+    function create2DArray(rows,columns) {
+        var x = new Array(rows);
+        for (var i = 0; i < rows; i++) {
+            x[i] = new Array(columns);
+        }
+        return x;
+    }
+    // keyboard key down events
+    function kd(evt){
+        console.log(evt.keyCode);
+        if(evt.keyCode==37){//cursor left
+            Controller.Left = true;
+        }
+        if(evt.keyCode==39){//cursor right
+            Controller.Right = true;
+        }
+        if(evt.keyCode==38){//cursor up
+            Controller.Up = true;
+        }
+        if(evt.keyCode==40){//cursor down
+            Controller.Down = true;
+        }
+        if(evt.keyCode==90){ // z
+            Controller.ShotGun = true;
+        }
+        if(evt.keyCode==88){ //x
+            Controller.Grenade = true;
+        }
+        //
+        if(evt.keyCode==67){ //c
+            //Controller.LaserWall = true;
+        }
+        if(evt.keyCode==32){ //space
+            Controller.Jump = true;
+        }
+
+    }
+    //
+    // Keyboard events Key Up
+    function ku(evt){
+        if(evt.keyCode==37){
+            Controller.Left = false;
+        }
+        if(evt.keyCode==39){
+            Controller.Right = false;
+        }
+        if(evt.keyCode==38){
+            Controller.Up = false;
+        }
+        if(evt.keyCode==40){
+            Controller.Down = false;
+        }
+        if(evt.keyCode==90){ // z
+            Controller.ShotGun = false;
+        }
+        if(evt.keyCode==88){ //x
+            Controller.Grenade = false;
+        }
+        // Only trigger once..
+        if(evt.keyCode==67){ //c
+            Controller.LaserWall = true;
+        }
+        if(evt.keyCode==32){ //space
+            Controller.Jump = false;
+        }
+    }
+</script>
+</body>
+</html>
