@@ -789,8 +789,8 @@ Use different browser.
             
             this.mmw = mw;
             this.mmh = mh;
-            this.mw = mw/3;
-            this.mh = mh/3;		
+            this.mw = Math.floor(mw/3);
+            this.mh = Math.floor(mh/3);		
             this.sw = sw;
             this.sh = sh;
             //mapimage = New Image(sw,sh)
@@ -800,24 +800,25 @@ Use different browser.
             this.maptilevariation = create2DArray(mapwidth,mapheight);//New Int[mapwidth,mapheight]
             for(var y=0;y<mapheight;y++){
                 for(var x=0;x<mapwidth;x++){
-                    maptilevariation[x][y] = Math.floor(Math.random()*4);
+                    this.maptilevariation[x][y] = Math.floor(Math.random()*4);
                 }
             }
             this.tw = this.sw/this.mmw;
             this.th = this.sh/this.mmh;
             //map = New Int[mw,mh]
-            this.map = create2DArray(mw,mh); 
-            this.mapfinal = create2DArray(mmw,mmh);
-            this.mapladder = create2DArray(mmw,mmh);
-            this.mapdoor = create2DArray(mmw,mmh);
+            this.map = create2DArray(this.mmw,this.mmh); 
+            this.mapfinal = create2DArray(this.mmw,this.mmh);
+
+            this.mapladder = create2DArray(this.mmw,this.mmh);
+            this.mapdoor = create2DArray(this.mmw,this.mmh);
             //mapfinal = New Int[mmw,mmh]
             //mapladder = New Int[mmw,mmh]
             //mapdoor = New Int[mmw,mmh]
             this.makemap();
             this.finalizemap();
             for(var i=0;i<1000;i++){
-                var x=randomRange(2,mmw-4);
-                var y=randomRange(17,mmh-4);
+                var x=randomRange(2,this.mmw-4);
+                var y=randomRange(17,this.mmh-4);
                 if(this.mapfinal[x][y] == 1){
                     if(this.mapfinal[x][y+1] == 0){
                         this.mapfinal[x][y] = 3;
@@ -825,9 +826,9 @@ Use different browser.
                 }
             }	
             //NOTE:
-            //this.createfinalmineable();
-            //this.updateladderimage(mapladdercanvas);
-            //this.updateimage(mapcanvas);
+            this.createfinalmineable();
+            this.updateladderimage();
+            this.updateimage();
 
 
         }
@@ -840,14 +841,14 @@ Use different browser.
                 for(var x1=3;x1<this.mmw-3;x1++){
                     // Find suitable spot
                     if (this.mapfinal[x1][y1] != this.tilesolid) continue;
-                    if (this.mapfinal[x1+1][y1] != tileempty) continue;
+                    if (this.mapfinal[x1+1][y1] != this.tileempty) continue;
                     if (this.mapfinal[x1][y1+1] != this.tilesolid) continue;
                     if (this.mapfinal[x1][y1+2] != this.tilesolid) continue;
                     if (this.mapfinal[x1][y1+3] != this.tilesolid) continue;
                     if (this.mapfinal[x1+1][y1+4] != this.tilesolid) continue;
-                    if (this.mapfinal[x1+1][y1+1] != tileempty) continue;
-                    if (this.mapfinal[x1+1][y1+2] != tileempty) continue;
-                    if (this.mapfinal[x1+1][y1+3] != tileempty) continue;
+                    if (this.mapfinal[x1+1][y1+1] != this.tileempty) continue;
+                    if (this.mapfinal[x1+1][y1+2] != this.tileempty) continue;
+                    if (this.mapfinal[x1+1][y1+3] != this.tileempty) continue;
                     // See how far left we can go
                     var len=0;			
                     for(var x2=x1;x2<3;x2-=1){
@@ -872,7 +873,7 @@ Use different browser.
             //
             // 3 high mineable mineshafts left to right
             for(var y1=15;y1<this.mmh-10;y1++){
-                for(var x1=3;x1<mmw-3;x1++){
+                for(var x1=3;x1<this.mmw-3;x1++){
                     // Find suitable spot
                     if(this.mapfinal[x1][y1] != this.tilesolid)continue;
                     if(this.mapfinal[x1-1][y1] != this.tileempty)continue;
@@ -886,11 +887,11 @@ Use different browser.
                     // See how far left we can go
                     var len=0;			
                     for(var x2=x1;x2<this.mmw-4;x2++){
-                        if(this.mapfinal[x2][y1] != this.tilesolid)exit;
-                        if(this.mapfinal[x2][y1+1] != this.tilesolid)exit;
-                        if(this.mapfinal[x2][y1+2] != this.tilesolid)exit;
-                        if(this.mapfinal[x2][y1+3] != this.tilesolid)exit;
-                        if(this.mapfinal[x2][y1+4] != this.tilesolid)exit;
+                        if(this.mapfinal[x2][y1] != this.tilesolid)break;
+                        if(this.mapfinal[x2][y1+1] != this.tilesolid)break;
+                        if(this.mapfinal[x2][y1+2] != this.tilesolid)break;
+                        if(this.mapfinal[x2][y1+3] != this.tilesolid)break;
+                        if(this.mapfinal[x2][y1+4] != this.tilesolid)break;
                         len+=1
                     }
                     // If we can go deep enough then prepare mineshaft
@@ -924,7 +925,7 @@ Use different browser.
             for(var y=0;y<this.mh;y++){
                 for(var x=0;x<this.mw;x++){
                     if(this.map[x][y] == 1){
-                        if(this.map[x-1][y] == 0){
+                        if(x-1>=0 && this.map[x-1][y] == 0){
                             if(this.map[x+1][y] == 0){			
                                 var y2=y;
                                 while(this.map[x][y2] != 0){				
@@ -947,8 +948,8 @@ Use different browser.
             }
             // make doors
             for(var i=0;i<this.mmw*this.mmh/2;i++){
-                var x=randomRange(2,this.mmw-4);
-                var y=randomRange(2,this.mmh-2);
+                var x=randomRange(3,this.mmw-4);
+                var y=randomRange(3,this.mmh-2);
                 // door right side of tunnel
         //'		if(Math.rnd()<0){
                 if(this.mapfinal[x][y] == 0){
@@ -1008,6 +1009,7 @@ Use different browser.
         }
         
         makemap(){
+            
             for(var y=1;y<6;y++){
                 for(var x=1;x<this.mw-1;x++){
                     this.map[x][y] = 1;
@@ -1020,22 +1022,24 @@ Use different browser.
             for(var i=0;i<(this.mw*this.mh)*6;i++){
                 var x=randomRange(2,this.mw-4);
                 var y=randomRange(2,this.mh-4);
-                if(map[x][y] == 1){					
+                if(this.map[x][y] == 1){					
                     var v=randomRange(0,2);
                     //Select v
                     if(v==0){
                         //    Case 0'go left or right										
-                        if(map[x-1][y] == 0){
-                            if(map[x+1][y] == 0){									
-                                makeside(x,y,Rnd(0,2))
+                        if(this.map[x-1][y] == 0){
+
+                            if(this.map[x-1][y] == 0){
+                                if(this.map[x+1][y] == 0){										
+                                    this.makeside(x,y,randomRange(0,2));
+                                } 
                             }
                         }
                     }
                     if(v==1){
-                        //Case 1'go down Or up
-                        if(map[x][y-1]==0){
-                            if(map[x][y+1]==0){
-                                makevert(x,y,Rnd(0,2))
+    					if(this.map[x][y-1]==0){
+	    				    if(this.map[x][y+1]==0){
+		    			        this.makevert(x,y,randomRange(0,2));
                             }
                         }
                     }
@@ -1075,7 +1079,7 @@ Use different browser.
         makevert(x,y,side){
             var l=randomRange(4,20);
             if(y<22)return;
-            if(y>mw-22)return;
+            if(y>this.mh-22)return;
             if(side ==  0){//down		
                 if(this.overlap(x-4,y+1,x+4,y+l+2) == false){
                     for(var y2=y;y2<=y+l;y2++){
@@ -1094,10 +1098,12 @@ Use different browser.
         }
 
         makeside(x,y,side){		
+            
             var l=randomRange(4,20);		
             if(x<22)return;
             if(x>this.mw-22)return;				
-            if(side==0){// 'left				
+            if(side==0){// 'left			
+
                 if(this.overlap((x-l)-2,y-5,x,y+5) == false){				
                     for(var x2=x-l;x2<x;x2++){
                         this.map[x2][y] = 1;
@@ -1113,6 +1119,7 @@ Use different browser.
             }	
         }
         overlap(x1,y1,x2,y2){
+            //return rectsoverlap(x1,y1,x2,y2);
             for(var y=y1;y<y2;y++){
                 for(var x=x1;x<x2;x++){
                     if(x>0 && x<this.mw && y>0 && y<this.mh){
@@ -1213,7 +1220,7 @@ Use different browser.
             //canvas.BlendMode = BlendMode.Opaque
             for(var y=0;y<this.mmh;y++){
                 for(var x=0;x<this.mmw;x++){
-                    var a = this.mapfinal[x,y];
+                    var a = this.mapfinal[x][y];
                     if(a==this.tilesolid){
                         ctx.globalAlpha = 1;
                         ctx.fillStyle = 'brown';
@@ -1447,8 +1454,23 @@ Use different browser.
     var tw,th;
     var [camx,camy] = [0,0];
 
-    gameloop=setInterval(doGameLoop,16);
 
+    var mymap=new map(screenwidth,screenwidth,mapwidth,mapheight);
+
+    gameloop=setInterval(doGameLoop2,1);
+    function doGameLoop2(){
+        myCanvas.height = window.innerHeight-32;
+        myCanvas.width = window.innerWidth-32;
+        //tw = Math.floor(myCanvas.width,tmap[0].length); 	
+        //th = Math.floor(myCanvas.height,tmap.length);
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.fillStyle="rgb(0,0,0)";
+        ctx.fillRect(0,0,c.width,c.height);
+
+        //mymap.draw();
+        mymap.updateimage();    
+        mymap.drawladder();
+    }
     function doGameLoop(){
         myCanvas.height = window.innerHeight-32;
         myCanvas.width = window.innerWidth-32;
@@ -1620,10 +1642,18 @@ Use different browser.
 
     }
     function create2DArray(rows,columns) {
-        var x = new Array(rows);
-        for (var i = 0; i < rows; i++) {
-            x[i] = new Array(columns);
-        }
+        //var x = new Array(rows);
+        //for (var i = 0; i < rows; i++) {
+        //    x[i] = new Array(columns);
+        //}
+        //return x;
+	    var x = [];
+	    for(var i=0;i<rows;i++){
+		    x[i] = new Array();
+		    for(var j=0;j<columns;j++){
+			    x[i][j]=0;
+		    }
+	    }
         return x;
     }
     // keyboard key down events
