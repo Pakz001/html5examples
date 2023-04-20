@@ -3,6 +3,16 @@
 
 the voxel engine is in folder 3d/threetest/test/<br><br>
 
+update:<br>
+I decided to start using a Windows laptop again after a time of only using a iPad. I discovered the free Visual Studio in the microsoft store.<br>
+I wil start to slowly add keyboard controls to older things. My laptop has touch screen too.<br>
+<br>
+I might get a bit distracted with pygame as this was a breeze to install.<br><br>
+I was working on a platformer game project a number of years ago. This might get ported to Javascript. It is around 5000 lines in the Monkey2 language.<br>
+I am drawing gfx (including animations) for it now.<br>
+(old browser version / emscripten)<br>
+https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html<br><br>
+
 
 
 <br><br>
@@ -10,7 +20,6 @@ the voxel engine is in folder 3d/threetest/test/<br><br>
 <a href="https://cromdesi.home.xs4all.nl/html5examples/">Visit the repo site - run and view examples - update december</a><br>
 <br>
 
-update:checked every file and removed references to a unused css file. gfx now included by base64(toDataUrl())
 
 (Gamedev) - Snippets / templates / functions / prototypes
 
