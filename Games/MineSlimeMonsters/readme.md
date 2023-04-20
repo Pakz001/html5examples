@@ -1,5 +1,5 @@
 
-<img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gifg" width="60%"><br><br>
+<img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="60%"><br><br>
 //
     //
     //
