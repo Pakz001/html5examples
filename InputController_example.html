@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+    <style>
+        #myCanvas {touch-action: none;
+        -webkit-touch-callout:none;
+        -webkit-user-select:none;
+        -khtml-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select:none;
+        -webkit-tap-highlight-color:rgba(0,0,0,0);
+        }
+    </style>
+<canvas id="myCanvas" width="640" height="480" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+    // Add event listeners for reading keydown and keyup events from the keyboard..
+    //
+    window.addEventListener("keydown",kd,true);
+    window.addEventListener("keyup",ku,true);
+
+    //
+    // With this we can read the controller status. In this example
+    // we use the keyboard to set these flags..
+    //
+    var Controller = {
+        Right:false,
+        Left:false,
+        Up:false,
+        Down:false,
+        Gun:false,
+        LaserWall:false,
+        Grenade:false,
+    } 
+
+    gameloop=setInterval(doGameLoop,16);
+    
+    function doGameLoop(){
+        myCanvas.height = window.innerHeight-32;
+        myCanvas.width = window.innerWidth-32;
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.fillStyle="rgb(50,50,50)";
+        ctx.fillRect(0,0,c.width,c.height);
+
+        ctx.scale(2,2);
+        ctx.fillStyle='yellow';
+        ctx.fillText("Cursor l/r/u/d - z/x/c",100,80);
+        ctx.fillStyle='red';
+        ctx.fillText("Left : "+Controller.Left,100,100);
+        ctx.fillText("Right : "+Controller.Right,100,120);
+        ctx.fillText("Up : "+Controller.Up,100,140);
+        ctx.fillText("Down : "+Controller.Down,100,160);
+        ctx.fillText("Grenade : "+Controller.Grenade,100,180);
+        ctx.fillText("Gun : "+Controller.Gun,100,200);
+        ctx.fillText("LaserWall : "+Controller.LaserWall,100,220);
+        ctx.scale(1,1);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle="rgb(255,255,255)";
+
+    }
+
+    // keyboard key down events
+    function kd(evt){
+        console.log(evt.keyCode);
+        if(evt.keyCode==37){//cursor left
+            Controller.Left = true;
+        }
+        if(evt.keyCode==39){//cursor right
+            Controller.Right = true;
+        }
+        if(evt.keyCode==38){//cursor up
+            Controller.Up = true;
+        }
+        if(evt.keyCode==40){//cursor down
+            Controller.Down = true;
+        }
+        if(evt.keyCode==90){ // z
+            Controller.Gun = true;
+        }
+        if(evt.keyCode==88){ //x
+            Controller.Grenade = true;
+        }
+        if(evt.keyCode==67){ //c
+            Controller.LaserWall = true;
+        }
+
+
+    }
+    //
+    // Keyboard events Key Up
+    function ku(evt){
+        if(evt.keyCode==37){
+            Controller.Left = false;
+        }
+        if(evt.keyCode==39){
+            Controller.Right = false;
+        }
+        if(evt.keyCode==38){
+            Controller.Up = false;
+        }
+        if(evt.keyCode==40){
+            Controller.Down = false;
+        }
+        if(evt.keyCode==90){ // z
+            Controller.Gun = false;
+        }
+        if(evt.keyCode==88){ //x
+            Controller.Grenade = false;
+        }
+        if(evt.keyCode==67){ //c
+            Controller.LaserWall = false;
+        }
+
+    }
+</script>
+</body>
+</html>
