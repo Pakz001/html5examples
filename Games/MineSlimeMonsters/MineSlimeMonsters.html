@@ -67,12 +67,13 @@ Use different browser.
         Grenade:false,
         Mine:false,
         Jump:false,
+        MiniMap:false,
     } 
 
     var mapwidth=320;
     var mapheight=240;
-    var screenwidth=800;
-    var screenheight=600;
+    var screenwidth=window.innerWidth+48;
+    var screenheight=window.innerHeight+48;
     var tilewidth=20;
     var tileheight=20;
 
@@ -94,7 +95,7 @@ Use different browser.
             this.py;
             this.pmx,this.pmy;
             this.ptx,this.pty;
-            this.mox,this.moy;
+            this.mox=0,this.moy=0;
             this.pw,this.ph;	
             this.mcx,this.mcy,this.mpx,this.mpy; // scroll coordinates
             this.maptileswidth,this.maptilesheight;
@@ -111,8 +112,9 @@ Use different browser.
             this.py = tileheight*14;
             this.pw = tilewidth;
             this.ph = tileheight;
-            this.maptileswidth = screenwidth / tw;
-            this.maptilesheight = screenheight / th;
+            this.maptileswidth = Math.floor(screenwidth / this.tw);
+            this.maptilesheight = Math.floor(screenheight / this.th);
+
             this.mcx=0;
             this.mcy=0;
             this.playeritem = create2DArray(this.playeritemnames.length,2);
@@ -129,7 +131,7 @@ Use different browser.
             this.pmy = this.py-(this.mcy*this.th);
             this.ptx = this.px/this.tw;
             this.pty = this.py/this.th;
-            if(playerladdercollision(this.px,this.py)){
+            if(this.playerladdercollision(this.px,this.py)){
                 this.jump=false;
                 this.laddermode();
                 this.movespeed = 1;			
@@ -268,12 +270,12 @@ Use different browser.
             }
 	    }
         playerladdercollision(x,y){
-            var cx=x/this.tw;
-            var cy=y/this.th;
+            var cx=Math.floor(x/this.tw);
+            var cy=Math.floor(y/this.th);
             for(var y2=cy-1;y2<cy+2;y2++){
                 for(var x2=cx-1;x2<cx+2;x2++){
                     if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){	            		        
-                        if(mymap.mapladder[x2][y2] == 1){	                	                     
+                        if(mymap.mapladder[Math.floor(x2)][Math.floor(y2)] == 1){	                	                     
                             if(this.rectsoverlap(x,y,this.pw,this.ph,x2*this.tw,y2*this.th,this.tw,this.th) == true){                                    	                    
                                 return true;
                             }
@@ -285,12 +287,12 @@ Use different browser.
             return false;
         }
 	    playertilecollision(x,y){
-            var cx=x/this.tw;
-            var cy=y/this.th;
+            var cx=Math.floor(x/this.tw);
+            var cy=Math.floor(y/this.th);
             for(var y2=cy-1;y2<cy+2;y2++){
                 for(var x2=cx-1;x2<cx+2;x2++){
                     if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){	            		        
-                        if(mymap.mapfinal[x2][y2] != mymap.tileempty){// 'Or mymap.mapfinal[x2,y2] = mymap.tilemineable           
+                        if(mymap.mapfinal[Math.floor(x2)][Math.floor(y2)] != mymap.tileempty){// 'Or mymap.mapfinal[x2,y2] = mymap.tilemineable           
                                                     
                             if(rectsoverlap(x,y,this.pw,this.ph,x2*this.tw,
                                             y2*this.th,this.tw,this.th) == true){;                                    	                    
@@ -306,40 +308,40 @@ Use different browser.
         laddermode(){
             for(var i=0;i<Math.ceil(this.movespeed);i++){
                 if(Controller.Right==true){;//Keyboard.KeyDown(Key.Right)
-                    if(this.playertilecollision(px+1,py) == false){
-                        if(this.playerladdercollision(px+1,py) == true){
-                            px+=1;
+                    if(this.playertilecollision(this.px+1,this.py) == false){
+                        if(this.playerladdercollision(this.px+1,this.py) == true){
+                            this.px+=1;
                             this.scrollmap(1,0);
                         }
                   }
                 }
                 if(Controller.Left == true){ //Keyboard.KeyDown(Key.Left)			
-                    if(this.playertilecollision(px-1,py) == false){
-                        if(this.playerladdercollision(px-1,py) == true){
-                            px-=1;
+                    if(this.playertilecollision(this.px-1,this.py) == false){
+                        if(this.playerladdercollision(this.px-1,this.py) == true){
+                            this.px-=1;
                             this.scrollmap(-1,0);
                         }
                     }
                 }			
                 if(Controller.Up == true){//Keyboard.KeyDown(Key.Up)			
-                    if(this.playertilecollision(px,py-1) == false){
-                        if(this.playerladdercollision(px,py-1) == true){
-                            py-=1;
+                    if(this.playertilecollision(this.px,this.py-1) == false){
+                        if(this.playerladdercollision(this.px,this.py-1) == true){
+                            this.py-=1;
                             this.scrollmap(0,-1);
                         }
                     }
                 }			
                 if(Controller.Down == true){//Keyboard.KeyDown(Key.Down)			
-                    if(this.playertilecollision(px,py+1) == false){
-                        if(this.playerladdercollision(px,py+1) == true){			
-                            py+=1;
+                    if(this.playertilecollision(this.px,this.py+1) == false){
+                        if(this.playerladdercollision(this.px,this.py+1) == true){			
+                            this.py+=1;
                             this.scrollmap(0,1);
                         }
                     }
                 }					  			  	
             }
         }
-        scrollmap(x,y){
+        scrollmap(x,y){ 
             if(x==-1)this.mox+=1;
             if(x==1)this.mox-=1;
             if(y==-1)this.moy+=1;
@@ -362,7 +364,7 @@ Use different browser.
             }
         }
         playergravity(){
-            if(this.jump == false && playertilecollision(px,py+1) == false){ 
+            if(this.jump == false && this.playertilecollision(this.px,this.py+1) == false){ 
                 this.jump = true;
                 this.incy = 0;
             }
@@ -371,14 +373,14 @@ Use different browser.
                 this.jump = true;
             }
             //If the player is in the jump
-            if(jump == true){
+            if(this.jump == true){
                 this.incy += 0.1;
                 //if the player is going up
                 if(this.incy <=0){
                     for(var i= 0;i<Math.abs(this.incy);i++){                
                         this.py -= 1;
                         this.scrollmap(0,-1);
-                        if(playertilecollision(this.px,this.py-1) == true){
+                        if(this.playertilecollision(this.px,this.py-1) == true){
                             this.incy = 0;
                             break;
                         }
@@ -390,7 +392,7 @@ Use different browser.
                         this.py += 1;
                         this.scrollmap(0,1);
                         //if the player touches the ground
-                        if(this.playertilecollision(px,py+1) == true){
+                        if(this.playertilecollision(this.px,this.py+1) == true){
                             this.jump = false;                        
                             break;
                         }
@@ -400,15 +402,23 @@ Use different browser.
             }
         }
 	    draw(){
+            ctx.globalAlpha = 1;
             //canvas.Scissor = New Recti(32,32,screenwidth-32,screenheight-64)
             //draw the map
+            //ctx.fillStyle='rgb(90,90,200)';
+            //ctx.fillRect(0,0,50,50);
+
             //canvas.BlendMode = BlendMode.Opaque
-            for(var y=0;y<this.maptilesheight;y++){
-                for(var x=0;x<this.maptileswidth;x++){
+            for(var y=-1;y<this.maptilesheight;y++){
+
+                for(var x=-1;x<this.maptileswidth;x++){
                     var x2=this.mcx+x;
                     var y2=this.mcy+y;
+                    
                     var x3=(x*this.tw)+this.mox;
                     var y3=(y*this.th)+this.moy;
+                    
+                    //if(Math.random()<0.01)console.log(this.mox);
                     if(x2<0 || x2>=mapwidth || y2<0 || y2>=mapheight)continue;				
                     
                     // NOTE : Gradient background.
@@ -416,62 +426,64 @@ Use different browser.
                     if(y2<17){
                         //canvas.Color = Color.White
                         //canvas.DrawImage(mygradienttile.image[y2],x3,y3)
-                        ctx.fillStyle = 'white';
+                        ctx.fillStyle='rgb(90,90,200)';
                         ctx.fillRect(x3,y3,screenwidth,screenheight);
                     }
                     
                     // mymap.mapfinal[x2,y2]
-                        if(mymap.mapfinal[x2][y2]== mymap.tileempty){
-                            if(y2>16){
-                                //canvas.Color = Color.White
-                                //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],0],x3,y3)
-                                ctx.fillStyle = 'brown';
-                                ctx.fillRect(x3,y3,this.tw,this.th);
-                            }
-                            //canvas.Color = Color.Brown
-                            //canvas.DrawRect(x3,y3,tw,th)
-                        }
-                        if(mymap.mapfinal[x2][y2]== mymap.tilesolid){
-                            if(y2>16){
-                                //canvas.Color = Color.White
-                                //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],1],x3,y3)
-                                ctx.fillStyle = 'Black';
-                                ctx.fillRect(x3,y3,this.tw,this.th);
-                            }
-        				    //canvas.Color = Color.Black
-        				    //canvas.DrawRect(x3,y3,tw,th)
-                        }
-                        if(mymap.mapfinal[x2][y2] == mymap.tileegg){
-                            //canvas.OutlineMode=OutlineMode.Solid
-                            //canvas.OutlineColor = Color.White
-                            //canvas.OutlineWidth = 1						
-                            //canvas.Color = Color.Yellow
-                            //canvas.DrawRect(x3,y3,tw,th)
-                            //canvas.OutlineMode=OutlineMode.None
-                            ctx.fillStyle = 'yellow';
-                            ctx.fillRect(x3,y3,this.tw,this.th);
-                        }
-                        if(mymap.mapfinal[x2][y2]== mymap.tileturret){
-                            //canvas.OutlineMode=OutlineMode.Solid
-                            //canvas.OutlineColor = Color.Black
-                            //canvas.OutlineWidth = 1						
-                            //canvas.Color = Color.Grey
-                            //canvas.DrawRect(x3,y3,tw,th)	
-                            //canvas.OutlineMode=OutlineMode.None
-                            ctx.fillStyle = 'grey';
-                            ctx.fillRect(x3,y3,this.tw,this.th);
-                        }
-                        if(mymap.mapfinal[x2][y2]==mymap.tilemineable){
+                    if(mymap.mapfinal[x2][y2]== mymap.tileempty){
+                        if(y2>16){
                             //canvas.Color = Color.White
-                            //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],2],x3,y3)
-        				    //canvas.Color = Color.Brown.Blend(Color.Yellow,.2)
-        				    //canvas.DrawRect(x3,y3,tw,th)
-                            ctx.fillStyle = 'yellow';
+                            //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],0],x3,y3)
+                            ctx.fillStyle = 'rgb(80,35,20)';
+                            ctx.fillRect(x3,y3,this.tw,this.th);
+                            
+                            
+                        }
+                        //canvas.Color = Color.Brown
+                        //canvas.DrawRect(x3,y3,tw,th)
+                    }
+                    if(mymap.mapfinal[x2][y2]== mymap.tilesolid){
+                        if(y2>16){
+                            //canvas.Color = Color.White
+                            //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],1],x3,y3)
+                            ctx.fillStyle = 'rgb(100,40,20)';
                             ctx.fillRect(x3,y3,this.tw,this.th);
                         }
+                        //canvas.Color = Color.Black
+                        //canvas.DrawRect(x3,y3,tw,th)
+                    }
+                    if(mymap.mapfinal[x2][y2] == mymap.tileegg){
+                        //canvas.OutlineMode=OutlineMode.Solid
+                        //canvas.OutlineColor = Color.White
+                        //canvas.OutlineWidth = 1						
+                        //canvas.Color = Color.Yellow
+                        //canvas.DrawRect(x3,y3,tw,th)
+                        //canvas.OutlineMode=OutlineMode.None
+                        ctx.fillStyle = 'yellow';
+                        ctx.fillRect(x3,y3,this.tw,this.th);
+                    }
+                    if(mymap.mapfinal[x2][y2]== mymap.tileturret){
+                        //canvas.OutlineMode=OutlineMode.Solid
+                        //canvas.OutlineColor = Color.Black
+                        //canvas.OutlineWidth = 1						
+                        //canvas.Color = Color.Grey
+                        //canvas.DrawRect(x3,y3,tw,th)	
+                        //canvas.OutlineMode=OutlineMode.None
+                        ctx.fillStyle = 'grey';
+                        ctx.fillRect(x3,y3,this.tw,this.th);
+                    }
+                    if(mymap.mapfinal[x2][y2]==mymap.tilemineable){
+                        //canvas.Color = Color.White
+                        //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],2],x3,y3)
+                        //canvas.Color = Color.Brown.Blend(Color.Yellow,.2)
+                        //canvas.DrawRect(x3,y3,tw,th)
+                        ctx.fillStyle = 'yellow';
+                        ctx.fillRect(x3,y3,this.tw,this.th);
+                    }
                     //End Select	
 
-
+                    /*
                     //draw the slime			
                     for(var y4=0;y2< 2;y4++){
                         for(var x4=0;x4< 2;x4++){
@@ -483,6 +495,7 @@ Use different browser.
                              }
                         }
                     }
+                    */
 
                 }
             }
@@ -498,8 +511,8 @@ Use different browser.
 
 
             //Draw the ladders		
-            for(var y=0;y<this.maptilesheight;y++){
-                for(var x=0;x<this.maptileswidth;x++){
+            for(var y=-1;y<this.maptilesheight;y++){
+                for(var x=-1;x<this.maptileswidth;x++){
                     var x2=this.mcx+x;
                     var y2=this.mcy+y;
                     var x3=(x*this.tw)+this.mox;
@@ -513,7 +526,7 @@ Use different browser.
                             ctx.fillStyle = 'brown';
                             ctx.fillRect(x3,y3,this.tw,this.th);
                             ctx.fillStyle = 'red';
-                            ctx.fillRect(x3,y3,this.tw/4,this.th/3);
+                            ctx.fillRect(x3+this.tw/6,y3,this.tw/4,this.th/3);
 
                         }
                     }
@@ -578,7 +591,7 @@ Use different browser.
             //canvas.DrawRect(pmx,pmy,pw,ph)
             ctx.fillStyle = 'white';
             ctx.fillRect(this.pmx,this.pmy,this.pw,this.ph);
-            drawpowerbar(canvas,pmx,pmy,hp,hpmax);
+            this.drawpowerbar(this.pmx,this.pmy,this.hp,this.hpmax);
 
             /*
             //draw flying monsters	
@@ -1466,31 +1479,45 @@ Use different browser.
     var [camx,camy] = [0,0];
 
 
-    var mymap=new map(screenwidth,screenwidth,mapwidth,mapheight);
+    var mymap = new map(screenwidth,screenwidth,mapwidth,mapheight);
+    //console.log("here say"+mymap.mapfinal[0][0]);
+    var myplayer=new player();
 
 
-
-    gameloop=setInterval(doGameLoop2,1);
+    gameloop=setInterval(doGameLoop2,16);
     function doGameLoop2(){
         myCanvas.height = window.innerHeight-32;
         myCanvas.width = window.innerWidth-32;
         //tw = Math.floor(myCanvas.width,tmap[0].length); 	
         //th = Math.floor(myCanvas.height,tmap.length);
         ctx.clearRect(0,0,c.width,c.height);
-        ctx.fillStyle="rgb(110,0,0)";
+        ctx.fillStyle="rgb(0,0,0)";
         ctx.fillRect(0,0,c.width,c.height);
 
         //mymap.draw();
-        offscreenCanvas.width=window.innerWidth-32;
-		offscreenCanvas.height=window.innerHeight-32;
+		if(Controller.MiniMap==false){
+			var tp=false;
+			//If Keyboard.KeyDown(Key.LeftControl) 
+			//	myplayer.userscrollmap()
+			//	tp=True
+			//End If
+			if(tp==false){
+				myplayer.updateplayercontrols()
+            }
+			//canvas.Clear(Color.Black)
+			myplayer.draw()
+        }
+        if(Controller.MiniMap==true){
+            offscreenCanvas.width=window.innerWidth-32;
+            offscreenCanvas.height=window.innerHeight-32;
 
-        mymap.updateimage();    
-        mymap.drawladder();
-        ctx2.globalAlpha=1;
-		//ctx2.fillStyle="#FFFF00";
-		//ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
-
-        ctx.drawImage(offscreenCanvas,0,0);
+            mymap.updateimage();    
+            mymap.drawladder();
+            ctx2.globalAlpha=1;
+            //ctx2.fillStyle="#FFFF00";
+            //ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
+            ctx.drawImage(offscreenCanvas,0,0);
+        }
     }
     function doGameLoop(){
         myCanvas.height = window.innerHeight-32;
@@ -1679,7 +1706,7 @@ Use different browser.
     }
     // keyboard key down events
     function kd(evt){
-        console.log(evt.keyCode);
+        //console.log(evt.keyCode);
         if(evt.keyCode==37){//cursor left
             Controller.Left = true;
         }
@@ -1709,7 +1736,9 @@ Use different browser.
         if(evt.keyCode==32){ //space
             Controller.Jump = true;
         }
-
+        if(evt.keyCode==16){ //left shift
+            Controller.MiniMap = true;
+        }
     }
     //
     // Keyboard events Key Up
@@ -1741,6 +1770,9 @@ Use different browser.
         }
         if(evt.keyCode==32){ //space
             Controller.Jump = false;
+        }
+        if(evt.keyCode==16){ //left shift
+            Controller.MiniMap = false;
         }
     }
     function drawLine(x1,y1,x2,y2,stroke = 'black', width = 1) {
