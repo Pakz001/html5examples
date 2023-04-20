@@ -823,224 +823,189 @@ Use different browser.
                         this.mapfinal[x][y] = 3;
                     }
                 }
-            }		
-            this.createfinalmineable();
-            this.updateladderimage(mapladdercanvas);
-            this.updateimage(mapcanvas);
+            }	
+            //NOTE:
+            //this.createfinalmineable();
+            //this.updateladderimage(mapladdercanvas);
+            //this.updateimage(mapcanvas);
 
 
         }
-        Method New(sw:float,sh:Float,mw:Float,mh:Float)
-            Self.mmw = mw
-            Self.mmh = mh
-            Self.mw = mw/3
-            Self.mh = mh/3		
-            Self.sw = sw
-            Self.sh = sh
-            mapimage = New Image(sw,sh)
-            mapcanvas = New Canvas(mapimage)
-            mapladderimage = New Image(sw,sh)
-            mapladdercanvas = New Canvas(mapladderimage)
-            maptilevariation = New Int[mapwidth,mapheight]
-            For Local y:Int=0 Until mapheight
-            For Local x:Int=0 Until mapwidth
-                maptilevariation[x,y] = Rnd(4)
+        
+        // Here we create the parts on the mapfinal that can be mined
+        // by the player (like in minecraft/digger) tilemineable
+        createfinalmineable(){
+            // 3 high mineable mineshafts right to left
+            for(var y1=15;y1<this.mmh-10;y1++){
+                for(var x1=3;x1<this.mmw-3;x1++){
+                    // Find suitable spot
+                    if (this.mapfinal[x1][y1] != this.tilesolid) continue;
+                    if (this.mapfinal[x1+1][y1] != tileempty) continue;
+                    if (this.mapfinal[x1][y1+1] != this.tilesolid) continue;
+                    if (this.mapfinal[x1][y1+2] != this.tilesolid) continue;
+                    if (this.mapfinal[x1][y1+3] != this.tilesolid) continue;
+                    if (this.mapfinal[x1+1][y1+4] != this.tilesolid) continue;
+                    if (this.mapfinal[x1+1][y1+1] != tileempty) continue;
+                    if (this.mapfinal[x1+1][y1+2] != tileempty) continue;
+                    if (this.mapfinal[x1+1][y1+3] != tileempty) continue;
+                    // See how far left we can go
+                    var len=0;			
+                    for(var x2=x1;x2<3;x2-=1){
+                        if (this.mapfinal[x2][y1] != this.tilesolid)break;
+                        if (this.mapfinal[x2][y1+1] != this.tilesolid)break;
+                        if (this.mapfinal[x2][y1+2] != this.tilesolid)break;
+                        if (this.mapfinal[x2][y1+3] != this.tilesolid)break;
+                        if (this.mapfinal[x2][y1+4] != this.tilesolid)break;
+                        len+=1;
+                    }
+                    // If we can go deep enough then prepare mineshaft
+                    if(len<=10)continue;
+                    len = randomRange(7,len);
+                    for(var x2=x1;x2<x1-(len-3);x2-=1){
+                        for(var y2=y1+1;y2<y1+4;y2++){ 
+                            this.mapfinal[x2][y2] = this.tilemineable;
+                        }
+                    }
+                }
+            }
+            //
+            //
+            // 3 high mineable mineshafts left to right
+            for(var y1=15;y1<this.mmh-10;y1++){
+                for(var x1=3;x1<mmw-3;x1++){
+                    // Find suitable spot
+                    if(this.mapfinal[x1][y1] != this.tilesolid)continue;
+                    if(this.mapfinal[x1-1][y1] != this.tileempty)continue;
+                    if(this.mapfinal[x1][y1+1] != this.tilesolid)continue;
+                    if(this.mapfinal[x1][y1+2] != this.tilesolid)continue;
+                    if(this.mapfinal[x1][y1+3] != this.tilesolid)continue;
+                    if(this.mapfinal[x1-1][y1+4] != this.tilesolid)continue;
+                    if(this.mapfinal[x1-1][y1+1] != this.tileempty)continue;
+                    if(this.mapfinal[x1-1][y1+2] != this.tileempty)continue;
+                    if(this.mapfinal[x1-1][y1+3] != this.tileempty)continue;
+                    // See how far left we can go
+                    var len=0;			
+                    for(var x2=x1;x2<this.mmw-4;x2++){
+                        if(this.mapfinal[x2][y1] != this.tilesolid)exit;
+                        if(this.mapfinal[x2][y1+1] != this.tilesolid)exit;
+                        if(this.mapfinal[x2][y1+2] != this.tilesolid)exit;
+                        if(this.mapfinal[x2][y1+3] != this.tilesolid)exit;
+                        if(this.mapfinal[x2][y1+4] != this.tilesolid)exit;
+                        len+=1
+                    }
+                    // If we can go deep enough then prepare mineshaft
+                    if(len<=10)continue;
+                    len = randomRange(7,len);
+                    for(var x2=x1;x2<x1+(len-3);x2++){
+                        for(var y2=y1+1;y2<y1+4;y2++){ 
+                            this.mapfinal[x2][y2] = this.tilemineable;
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+
+        finalizemap(){
+            for(var y=1;y<this.mh-1;y++){
+                for(var x=1;x<this.mw-1;x++){
+                    if(this.map[x][y] == this.tileempty){
+                        for(var y2=-1;y2<=1;y2++){
+                            for(var x2=-1;x2<=1;x2++){
+                                this.mapfinal[(x*3)+x2][(y*3)+y2] = this.tileempty;
+                            }
+                        }			
+                    }
+                }
+            }
+            // make ladders/vines
+            for(var y=0;y<this.mh;y++){
+            for(var x=0;x<this.mw;x++){
+                If map[x,y] = 1
+                If map[x-1,y] = 0
+                If map[x+1,y] = 0			
+                    Local y2:Int=y
+                    While map[x,y2] <> 0				
+                        mapladder[(x*3),y2*3] = 1
+                        mapladder[(x*3),y2*3-1] = 1
+                        mapladder[(x*3),y2*3+1] = 1				
+                        y2-=1
+                    Wend
+                    y2=y
+                    While map[x,y2] <> 0				
+                        mapladder[(x*3),y2*3] = 1
+                        mapladder[(x*3),y2*3-1] = 1
+                        mapladder[(x*3),y2*3+1] = 1
+                        y2+=1
+                    Wend			
+                End If
+                End If 
+                End If
             Next
             Next
-            tw = sw/mmw
-            th = sh/mmh
-            map = New Int[mw,mh]
-            mapfinal = New Int[mmw,mmh]
-            mapladder = New Int[mmw,mmh]
-            mapdoor = New Int[mmw,mmh]
-            makemap()
-            finalizemap()
-            For Local i:=0 Until 1000
-                Local x:Int=Rnd(2,mmw-4)
-                Local y:Int=Rnd(17,mmh-4)
-                If mapfinal[x,y] = 1
-                If mapfinal[x,y+1] = 0
-                mapfinal[x,y] = 3
+            ' make doors
+            for(var  i:=0 Until mmw*mmh/2
+                Local x:=Rnd(2,mmw-4)
+                Local y:=Rnd(2,mmh-2)
+                ' door right side of tunnel
+        '		If Rnd()<0
+                If mapfinal[x,y] = 0
+                If mapfinal[x+1,y] = 0
+                If mapfinal[x-1,y] = 0
+                If mapfinal[x-2,y] = 0
+                If mapfinal[x-3,y] = 1
+                If mapfinal[x,y+1] = 1
+                If mapfinal[x,y+2]= 1
+                If mapfinal[x,y+3] = 1
+                If mapfinal[x,y+4] = 0
+                    mapfinal[x,y+1] = 1
+                    mapfinal[x,y+2] = 1
+                    mapfinal[x,y+3] = 1
+                    mapdoor[x,y+1 ] = 1
+                    mapdoor[x,y+2 ] = 1
+                    mapdoor[x,y+3 ] = 1
+                End If 
+                End If
+                End If 
+                End If 
+                End If
+                End If 
                 End If
                 End If
-            Next		
-            createfinalmineable()
-            updateladderimage(mapladdercanvas)
-            updateimage(mapcanvas)
-            
-        End Method 
-        ' Here we create the parts on the mapfinal that can be mined
-        ' by the player (like in minecraft/digger) tilemineable
-        Method createfinalmineable()
-            ' 3 high mineable mineshafts right to left
-            For Local y1:Int=15 Until mmh-10
-            For Local x1:Int=3 Until mmw-3
-                ' Find suitable spot
-                If mapfinal[x1,y1] <> tilesolid Then Continue
-                If mapfinal[x1+1,y1] <> tileempty Then Continue
-                If mapfinal[x1,y1+1] <> tilesolid Then Continue
-                If mapfinal[x1,y1+2] <> tilesolid Then Continue
-                If mapfinal[x1,y1+3] <> tilesolid Then Continue
-                If mapfinal[x1+1,y1+4] <> tilesolid Then Continue
-                If mapfinal[x1+1,y1+1] <> tileempty Then Continue
-                If mapfinal[x1+1,y1+2] <> tileempty Then Continue
-                If mapfinal[x1+1,y1+3] <> tileempty Then Continue
-                ' See how far left we can go
-                Local len:Int=0			
-                For Local x2:Int=x1 Until 3 Step -1
-                    If mapfinal[x2,y1] <> tilesolid Then Exit
-                    If mapfinal[x2,y1+1] <> tilesolid Then Exit
-                    If mapfinal[x2,y1+2] <> tilesolid Then Exit
-                    If mapfinal[x2,y1+3] <> tilesolid Then Exit
-                    If mapfinal[x2,y1+4] <> tilesolid Then Exit
-                    len+=1
-                Next
-                ' If we can go deep enough then prepare mineshaft
-                If len<=10 Then Continue
-                len = Rnd(7,len)
-                For Local x2:Int=x1 Until x1-(len-3) Step -1
-                For Local y2:Int=y1+1 Until y1+4 
-                    mapfinal[x2,y2] = tilemineable
-                Next
-                Next
-            Next
-            Next
-            '
-            '
-            ' 3 high mineable mineshafts left to right
-            For Local y1:Int=15 Until mmh-10
-            For Local x1:Int=3 Until mmw-3
-                ' Find suitable spot
-                If mapfinal[x1,y1] <> tilesolid Then Continue
-                If mapfinal[x1-1,y1] <> tileempty Then Continue
-                If mapfinal[x1,y1+1] <> tilesolid Then Continue
-                If mapfinal[x1,y1+2] <> tilesolid Then Continue
-                If mapfinal[x1,y1+3] <> tilesolid Then Continue
-                If mapfinal[x1-1,y1+4] <> tilesolid Then Continue
-                If mapfinal[x1-1,y1+1] <> tileempty Then Continue
-                If mapfinal[x1-1,y1+2] <> tileempty Then Continue
-                If mapfinal[x1-1,y1+3] <> tileempty Then Continue
-                ' See how far left we can go
-                Local len:Int=0			
-                For Local x2:Int=x1 Until mmw-4
-                    If mapfinal[x2,y1] <> tilesolid Then Exit
-                    If mapfinal[x2,y1+1] <> tilesolid Then Exit
-                    If mapfinal[x2,y1+2] <> tilesolid Then Exit
-                    If mapfinal[x2,y1+3] <> tilesolid Then Exit
-                    If mapfinal[x2,y1+4] <> tilesolid Then Exit
-                    len+=1
-                Next
-                ' If we can go deep enough then prepare mineshaft
-                If len<=10 Then Continue
-                len = Rnd(7,len)
-                For Local x2:Int=x1 Until x1+(len-3)
-                For Local y2:Int=y1+1 Until y1+4 
-                    mapfinal[x2,y2] = tilemineable
-                Next
-                Next
-            Next
-            Next
+                End If
+        '		End If
+                ' door left side of tunnel
+                If mapfinal[x-1,y-1] = 0
+                If mapfinal[x,y] = 0
+                If mapfinal[x-1,y] = 0
+                If mapfinal[x+1,y] = 0
+                If mapfinal[x+2,y] = 0
+                If mapfinal[x+3,y] = 1
+                If mapfinal[x,y+1] = 1
+                If mapfinal[x,y+2]= 1
+                If mapfinal[x,y+3] = 1
+                If mapfinal[x,y+4] = 0
+                    mapfinal[x,y+1] = 1
+                    mapfinal[x,y+2] = 1
+                    mapfinal[x,y+3] = 1
+                    mapdoor[x,y+1 ] = 1
+                    mapdoor[x,y+2 ] = 1
+                    mapdoor[x,y+3 ] = 1
+                End If 
+                End If
+                End If 
+                End If 
+                End If 
+                End If
+                End If 
+                End If
+                End If
+                End If
 
-
-        End Method
-        Method finalizemap()
-        For Local y:=1 Until mh-1
-        For Local x:=1 Until mw-1
-            If map[x,y] = tileempty
-                For Local y2:=-1 To 1
-                For Local x2:=-1 To 1
-                    mapfinal[(x*3)+x2,(y*3)+y2] = tileempty
-                Next
-                Next			
-            End If
-        Next
-        Next
-        ' make ladders/vines
-        For Local y:=0 Until mh
-        For Local x:=0 Until mw
-            If map[x,y] = 1
-            If map[x-1,y] = 0
-            If map[x+1,y] = 0			
-                Local y2:Int=y
-                While map[x,y2] <> 0				
-                    mapladder[(x*3),y2*3] = 1
-                    mapladder[(x*3),y2*3-1] = 1
-                    mapladder[(x*3),y2*3+1] = 1				
-                    y2-=1
-                Wend
-                y2=y
-                While map[x,y2] <> 0				
-                    mapladder[(x*3),y2*3] = 1
-                    mapladder[(x*3),y2*3-1] = 1
-                    mapladder[(x*3),y2*3+1] = 1
-                    y2+=1
-                Wend			
-            End If
-            End If 
-            End If
-        Next
-        Next
-        ' make doors
-        For Local i:=0 Until mmw*mmh/2
-            Local x:=Rnd(2,mmw-4)
-            Local y:=Rnd(2,mmh-2)
-            ' door right side of tunnel
-    '		If Rnd()<0
-            If mapfinal[x,y] = 0
-            If mapfinal[x+1,y] = 0
-            If mapfinal[x-1,y] = 0
-            If mapfinal[x-2,y] = 0
-            If mapfinal[x-3,y] = 1
-            If mapfinal[x,y+1] = 1
-            If mapfinal[x,y+2]= 1
-            If mapfinal[x,y+3] = 1
-            If mapfinal[x,y+4] = 0
-                mapfinal[x,y+1] = 1
-                mapfinal[x,y+2] = 1
-                mapfinal[x,y+3] = 1
-                mapdoor[x,y+1 ] = 1
-                mapdoor[x,y+2 ] = 1
-                mapdoor[x,y+3 ] = 1
-            End If 
-            End If
-            End If 
-            End If 
-            End If
-            End If 
-            End If
-            End If
-            End If
-    '		End If
-            ' door left side of tunnel
-            If mapfinal[x-1,y-1] = 0
-            If mapfinal[x,y] = 0
-            If mapfinal[x-1,y] = 0
-            If mapfinal[x+1,y] = 0
-            If mapfinal[x+2,y] = 0
-            If mapfinal[x+3,y] = 1
-            If mapfinal[x,y+1] = 1
-            If mapfinal[x,y+2]= 1
-            If mapfinal[x,y+3] = 1
-            If mapfinal[x,y+4] = 0
-                mapfinal[x,y+1] = 1
-                mapfinal[x,y+2] = 1
-                mapfinal[x,y+3] = 1
-                mapdoor[x,y+1 ] = 1
-                mapdoor[x,y+2 ] = 1
-                mapdoor[x,y+3 ] = 1
-            End If 
-            End If
-            End If 
-            End If 
-            End If 
-            End If
-            End If 
-            End If
-            End If
-            End If
-
-        Next
-        End Method
+            Next
+        }
         Method makemap()
             For Local y:=1 Until 6
             For Local x:=1 Until mw-1
