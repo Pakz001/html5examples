@@ -19,7 +19,7 @@
     //
     // Todo : touch / Controller<br>
     <br>Old Version : (Emscripten)<br>
-    <a href = "https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html">Play game in browser(old / keyboard only)</a><br>
+    <a href = "https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html">Play game in browser - old / keyboard only - </a>
     
     <br>
     <br>
