@@ -427,7 +427,7 @@ Use different browser.
                         //canvas.Color = Color.White
                         //canvas.DrawImage(mygradienttile.image[y2],x3,y3)
                         ctx.fillStyle='rgb(90,90,200)';
-                        ctx.fillRect(x3,y3,screenwidth,screenheight);
+                        ctx.fillRect(x3,y3,this.tw,this.th);
                     }
                     
                     // mymap.mapfinal[x2,y2]
@@ -1241,8 +1241,8 @@ Use different browser.
             //canvas.BlendMode = BlendMode.Opaque	
             //canvas.Clear(Color.Black)
             //canvas.BlendMode = BlendMode.Opaque
-            for(var y=0;y<this.mmh;y++){
-                for(var x=0;x<this.mmw;x++){
+            for(var y=2;y<this.mmh;y++){
+                for(var x=2;x<this.mmw;x++){
                     var a = this.mapfinal[x][y];
                     if(a==this.tilesolid){
                         ctx2.globalAlpha = 1;
@@ -1479,7 +1479,7 @@ Use different browser.
     var [camx,camy] = [0,0];
 
 
-    var mymap = new map(screenwidth,screenwidth,mapwidth,mapheight);
+    var mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
     //console.log("here say"+mymap.mapfinal[0][0]);
     var myplayer=new player();
 
@@ -1506,6 +1506,12 @@ Use different browser.
             }
 			//canvas.Clear(Color.Black)
 			myplayer.draw()
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0,0,360,38);
+            ctx.fillStyle = 'white';
+		    ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
+		    ctx.fillText("Cursors(move), s(shotgun), g(grenade), m(mine) space(jump) l(laserwall)..",0,30);
+
         }
         if(Controller.MiniMap==true){
             offscreenCanvas.width=window.innerWidth-32;
