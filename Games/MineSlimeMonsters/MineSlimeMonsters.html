@@ -467,7 +467,7 @@ Use different browser.
                     //draw the slime			
                     for(var y4=0;y2< 2;y4++){
                         for(var x4=0;x4< 2;x4++){
-                            if(mygrowslime.map[(x2*2)+x4][(y2*2)+y4] == 10){
+                            if(mygrowslime.map[Math.floor((x2*2)+x4)][Math.floor((y2*2)+y4)] == 10){
                                 //canvas.Color = Color.Green
                                 //canvas.DrawRect(x3+(x4*(mygrowslime.tw)),y3+(y4*(mygrowslime.th)),mygrowslime.tw,mygrowslime.th)
                                 ctx.fillStyle = 'green';
@@ -914,7 +914,7 @@ Use different browser.
                     if(this.map[x][y] == this.tileempty){
                         for(var y2=-1;y2<=1;y2++){
                             for(var x2=-1;x2<=1;x2++){
-                                this.mapfinal[(x*3)+x2][(y*3)+y2] = this.tileempty;
+                                this.mapfinal[Math.floor((x*3)+x2)][Math.floor((y*3)+y2)] = this.tileempty;
                             }
                         }			
                     }
@@ -922,256 +922,291 @@ Use different browser.
             }
             // make ladders/vines
             for(var y=0;y<this.mh;y++){
-            for(var x=0;x<this.mw;x++){
-                If map[x,y] = 1
-                If map[x-1,y] = 0
-                If map[x+1,y] = 0			
-                    Local y2:Int=y
-                    While map[x,y2] <> 0				
-                        mapladder[(x*3),y2*3] = 1
-                        mapladder[(x*3),y2*3-1] = 1
-                        mapladder[(x*3),y2*3+1] = 1				
-                        y2-=1
-                    Wend
-                    y2=y
-                    While map[x,y2] <> 0				
-                        mapladder[(x*3),y2*3] = 1
-                        mapladder[(x*3),y2*3-1] = 1
-                        mapladder[(x*3),y2*3+1] = 1
-                        y2+=1
-                    Wend			
-                End If
-                End If 
-                End If
-            Next
-            Next
-            ' make doors
-            for(var  i:=0 Until mmw*mmh/2
-                Local x:=Rnd(2,mmw-4)
-                Local y:=Rnd(2,mmh-2)
-                ' door right side of tunnel
-        '		If Rnd()<0
-                If mapfinal[x,y] = 0
-                If mapfinal[x+1,y] = 0
-                If mapfinal[x-1,y] = 0
-                If mapfinal[x-2,y] = 0
-                If mapfinal[x-3,y] = 1
-                If mapfinal[x,y+1] = 1
-                If mapfinal[x,y+2]= 1
-                If mapfinal[x,y+3] = 1
-                If mapfinal[x,y+4] = 0
-                    mapfinal[x,y+1] = 1
-                    mapfinal[x,y+2] = 1
-                    mapfinal[x,y+3] = 1
-                    mapdoor[x,y+1 ] = 1
-                    mapdoor[x,y+2 ] = 1
-                    mapdoor[x,y+3 ] = 1
-                End If 
-                End If
-                End If 
-                End If 
-                End If
-                End If 
-                End If
-                End If
-                End If
-        '		End If
-                ' door left side of tunnel
-                If mapfinal[x-1,y-1] = 0
-                If mapfinal[x,y] = 0
-                If mapfinal[x-1,y] = 0
-                If mapfinal[x+1,y] = 0
-                If mapfinal[x+2,y] = 0
-                If mapfinal[x+3,y] = 1
-                If mapfinal[x,y+1] = 1
-                If mapfinal[x,y+2]= 1
-                If mapfinal[x,y+3] = 1
-                If mapfinal[x,y+4] = 0
-                    mapfinal[x,y+1] = 1
-                    mapfinal[x,y+2] = 1
-                    mapfinal[x,y+3] = 1
-                    mapdoor[x,y+1 ] = 1
-                    mapdoor[x,y+2 ] = 1
-                    mapdoor[x,y+3 ] = 1
-                End If 
-                End If
-                End If 
-                End If 
-                End If 
-                End If
-                End If 
-                End If
-                End If
-                End If
+                for(var x=0;x<this.mw;x++){
+                    if(this.map[x][y] == 1){
+                        if(this.map[x-1][y] == 0){
+                            if(this.map[x+1][y] == 0){			
+                                var y2=y;
+                                while(this.map[x][y2] != 0){				
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3)] = 1;
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3-1)] = 1;
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3+1)] = 1;				
+                                    y2-=1;
+                                }
+                                y2=y;
+                                while(this.map[x][y2] != 0){				
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3)] = 1;
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3-1)] = 1;
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3+1)] = 1;
+                                    y2+=1;
+                                }
+                            }
+                        } 
+                    }
+                }
+            }
+            // make doors
+            for(var i=0;i<this.mmw*this.mmh/2;i++){
+                var x=randomRange(2,this.mmw-4);
+                var y=randomRange(2,this.mmh-2);
+                // door right side of tunnel
+        //'		if(Math.rnd()<0){
+                if(this.mapfinal[x][y] == 0){
+                if(this.mapfinal[x+1][y] == 0){
+                if(this.mapfinal[x-1][y] == 0){
+                if(this.mapfinal[x-2][y] == 0){
+                if(this.mapfinal[x-3][y] == 1){
+                if(this.mapfinal[x][y+1] == 1){
+                if(this.mapfinal[x][y+2] == 1){
+                if(this.mapfinal[x][y+3] == 1){
+                if(this.mapfinal[x][y+4] == 0){
+                    this.mapfinal[x][y+1] = 1;
+                    this.mapfinal[x][y+2] = 1;
+                    this.mapfinal[x][y+3] = 1;
+                    this.mapdoor[x][y+1 ] = 1;
+                    this.mapdoor[x][y+2 ] = 1;
+                    this.mapdoor[x][y+3 ] = 1;
+                } 
+                }
+                } 
+                } 
+                }
+                } 
+                }
+                }
+                }
+        //'		End If
+                // door left side of tunnel
+                if(this.mapfinal[x-1][y-1] == 0){
+                if(this.mapfinal[x][y] == 0){
+                if(this.mapfinal[x-1][y] == 0){
+                if(this.mapfinal[x+1][y] == 0){
+                if(this.mapfinal[x+2][y] == 0){
+                if(this.mapfinal[x+3][y] == 1){
+                if(this.mapfinal[x][y+1] == 1){
+                if(this.mapfinal[x][y+2] == 1){
+                if(this.mapfinal[x][y+3] == 1){
+                if(this.mapfinal[x][y+4] == 0){
+                    this.mapfinal[x][y+1] = 1;
+                    this.mapfinal[x][y+2] = 1;
+                    this.mapfinal[x][y+3] = 1;
+                    this.mapdoor[x][y+1 ] = 1;
+                    this.mapdoor[x][y+2 ] = 1;
+                    this.mapdoor[x][y+3 ] = 1;
+                } 
+                }
+                } 
+                } 
+                } 
+                }
+                } 
+                }
+                }
+                }
 
-            Next
+            }
         }
-        Method makemap()
-            For Local y:=1 Until 6
-            For Local x:=1 Until mw-1
-                map[x,y] = 1
-            Next
-            Next
-            Local minedownx:Int=5+Rnd(mw-15)
-            For Local y:=5 Until mh/2+10
-                map[mw/2,y] = 1
-            Next
-            For Local i:=0 Until (mw*mh)*6
-                Local x:Int=Rnd(2,mw-4)
-                Local y:Int=Rnd(2,mh-4)
-                If map[x,y] = 1					
-                    Local v:Int=Rnd(0,2)
-                    Select v
-                        Case 0'go left or right										
-                        If map[x-1,y] = 0
-                        If map[x+1,y] = 0										
-                        makeside(x,y,Rnd(0,2))
-                        End If 
-                        End If
-                        Case 1'go down Or up
-                        If map[x,y-1]=0
-                        If map[x,y+1]=0
-                        makevert(x,y,Rnd(0,2))
-                        End If
-                        End If
-                    End Select
-                End If
-            Next
-            widenhorizontal()
-        End Method
-        Method widenhorizontal()
-            For Local i:=0 Until mw*mh/2
-                Local x:Int=Rnd(2,mw-2)
-                Local y:Int=Rnd(2,mh-2)
-                If map[x,y] = 1 And map[x,y-1] = 0 And map[x,y+1] = 0				
-                    Local w:Int=0
-                    Local x2:Int=x
-                    Local exitloop:Bool=False
-                    While exitloop = False
-                        If map[x2,y] = 0 Then exitloop = true 
-                        If map[x2,y-1] = 1 Then exitloop = True
-                        If map[x2,y+1] = 1 Then exitloop = True				
-                        x2+=1
-                        w+=1
-                    Wend
-                    '
-                    
-                    If w-2>3					
-                        For Local x2:Int=x To x+w-2
-                            map[x2,y-1] = 1
-                            map[x2,y+1] = 1
-                            If x2>x+2 And w>6 And x2<(x+5)
-                                map[x2,y+2] = 1
-                            End If
-                        Next
-                    End If
-                End If
-            Next
-        End Method
-        Method makevert(x:Int,y:Int,side:Int)
-            Local l:Int=Rnd(4,20)
-            If y<22 Then Return
-            If y>mw-22 Then Return
-            If side =  0'down		
-                If overlap(x-4,y+1,x+4,y+l+2) = False
-                    For Local y2:=y To y+l
-                        map[x,y2] = 1
-                    Next
-                End If
-            End If
-            If side =  1'up
-                If overlap(x-4,(y-l)-3,x+4,y-1) = False
-                    For Local y2:=y-l To y
-                        map[x,y2] = 1
-                    Next
-                End If
-            End If
-
-        End Method
-        Method makeside(x:Int,y:Int,side:Int)		
-            Local l:Int=Rnd(4,20)		
-            If x<22 Then Return
-            If x>mw-22 Then Return				
-            If side=0 Then 'left				
-                If overlap((x-l)-2,y-5,x,y+5) = False				
-                    For Local x2:=x-l Until x
-                        map[x2,y] = 1
-                    Next
-                End If
-            End If
-            If side=1 Then 'right		
-                If overlap(x+1,y-5,x+l+2,y+5) = False								
-                    For Local x2:=x Until x+l
-                        map[x2,y] = 1
-                    Next
-                End If			
-            end If		
-        End Method
-        Method overlap:bool(x1:Int,y1:Int,x2:Int,y2:int)
-            For Local y:=y1 Until y2
-            For Local x:=x1 Until x2
-                If x>0 And x<mw And y>0 And y<mh
-                    If map[x,y] = 1 Then Return True
-                End If
-            Next
-            Next
-            Return False
-        End Method
-        Method drawladder(canvas:Canvas)						
-            For Local y:=0 Until mmh
-            For Local x:=0 Until mmw
-                Select mapladder[x,y]				
-                    Case 0
-                    'canvas.Color = Color.None
-                    'canvas.DrawRect(x*tw,y*th,tw,th)
-                    Case 1				
-                    canvas.Color = New Color(0.4,0,0)
-                    canvas.DrawRect(x*tw,y*th,tw,th)
-                    'canvas.DrawRect(0,0,100,100)
-                    canvas.Color = New Color(0.7,0.7,0)
-                    canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
-                End Select			
-            Next
-            Next		
-        End Method 	
-
-        Method updateladderimage(canvas:Canvas)				
         
-            canvas.BlendMode = BlendMode.Opaque
-            'canvas.Clear(New Color(0,0,0,.5))
-            For Local y:=0 Until mmh
-            For Local x:=0 Until mmw
-                Select mapladder[x,y]				
-                    Case 0
-                    canvas.Color = Color.None
-                    canvas.DrawRect(x*tw,y*th,tw,th)
-                    Case 1								
-                    canvas.Color = Color.Red
-                    canvas.Alpha = 0.5
-                    canvas.DrawRect(x*tw,y*th,tw,th)
-                    canvas.Color = Color.Yellow
-                    canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
-                End Select			
-            Next
-            Next
-            canvas.Flush()
-        End Method 	
-        Method draw(canvas:Canvas)		
-            For Local y:=0 Until mmh
-            For Local x:=0 Until mmw
-                Select mapfinal[x,y]
-                    Case tilesolid
-                    canvas.Color = Color.Black
-                    Case tileempty
-                    canvas.Color = Color.White
-                    canvas.DrawRect(x*tw,y*th,tw,th)
-                    Case tileegg			
-                    canvas.Color = Color.Yellow
-                    canvas.DrawRect(x*tw,y*th,tw,th)
-                End Select	
-            Next
-            Next		
-        End Method 
+        makemap(){
+            for(var y=1;y<6;y++){
+                for(var x=1;x<this.mw-1;x++){
+                    this.map[x][y] = 1;
+                }
+            }
+            var minedownx=5+(Math.floor(Math.random()*this.mw)-15);
+            for(var y=5;y<(this.mh/2)+10;y++){
+                this.map[Math.floor(this.mw/2)][y] = 1;
+            }
+            for(var i=0;i<(this.mw*this.mh)*6;i++){
+                var x=randomRange(2,this.mw-4);
+                var y=randomRange(2,this.mh-4);
+                if(map[x][y] == 1){					
+                    var v=randomRange(0,2);
+                    //Select v
+                    if(v==0){
+                        //    Case 0'go left or right										
+                        if(map[x-1][y] == 0){
+                            if(map[x+1][y] == 0){									
+                                makeside(x,y,Rnd(0,2))
+                            }
+                        }
+                    }
+                    if(v==1){
+                        //Case 1'go down Or up
+                        if(map[x][y-1]==0){
+                            if(map[x][y+1]==0){
+                                makevert(x,y,Rnd(0,2))
+                            }
+                        }
+                    }
+                }
+            }
+            this.widenhorizontal();
+        }
+        widenhorizontal(){
+            for(var i=0;i<this.mw*this.mh/2;i++){
+                var x=randomRange(2,this.mw-2);
+                var y=randomRange(2,this.mh-2);
+                if(this.map[x][y] == 1 && this.map[x][y-1] == 0 && this.map[x][y+1] == 0){				
+                    var w=0;
+                    var x2=x;
+                    var exitloop=false;
+                    while(exitloop == false){
+                        if(this.map[x2][y] == 0) exitloop = true; 
+                        if(this.map[x2][y-1] == 1) exitloop = true;
+                        if(this.map[x2][y+1] == 1) exitloop = true;				
+                        x2+=1;
+                        w+=1;
+                    }
+                    //
+                    
+                    if(w-2>3){					
+                        for(var x2=x;x2<=x+w-2;x2++){
+                            this.map[x2][y-1] = 1;
+                            this.map[x2][y+1] = 1;
+                            if(x2>x+2 && w>6 && x2<(x+5)){
+                                this.map[x2][y+2] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        makevert(x,y,side){
+            var l=randomRange(4,20);
+            if(y<22)return;
+            if(y>mw-22)return;
+            if(side ==  0){//down		
+                if(this.overlap(x-4,y+1,x+4,y+l+2) == false){
+                    for(var y2=y;y2<=y+l;y2++){
+                        this.map[x][y2] = 1;
+                    }
+                }
+            }
+            if(side ==  1){//up
+                if(this.overlap(x-4,(y-l)-3,x+4,y-1) == false){
+                    for(var y2=y-l;y2<=y;y2++){
+                        this.map[x][y2] = 1;
+                    }
+                }
+            }
+
+        }
+
+        makeside(x,y,side){		
+            var l=randomRange(4,20);		
+            if(x<22)return;
+            if(x>this.mw-22)return;				
+            if(side==0){// 'left				
+                if(this.overlap((x-l)-2,y-5,x,y+5) == false){				
+                    for(var x2=x-l;x2<x;x2++){
+                        this.map[x2][y] = 1;
+                    }
+                }
+            }
+            if(side==1){// 'right		
+                if(this.overlap(x+1,y-5,x+l+2,y+5) == false){								
+                    for(var x2=x;x2<x+l;x2++){
+                        this.map[x2][y] = 1;
+                    }
+                }			
+            }	
+        }
+        overlap(x1,y1,x2,y2){
+            for(var y=y1;y<y2;y++){
+                for(var x=x1;x<x2;x++){
+                    if(x>0 && x<this.mw && y>0 && y<this.mh){
+                        if(this.map[x][y] == 1)return true;
+                    }
+                }
+            }
+            return false;
+        }
+        drawladder(){						
+            for(var y=0;y<this.mmh;y++){
+                for(var x=0;x<this.mmw;x++){
+                    //Select mapladder[x,y]				
+                    if(this.mapladder[x][y]==0){
+                        //'canvas.Color = Color.None
+                        //'canvas.DrawRect(x*tw,y*th,tw,th)
+                    }
+                    if(this.mapladder[x][y]==1){	
+                        //canvas.Color = New Color(0.4,0,0)
+                        //canvas.DrawRect(x*tw,y*th,tw,th)
+                        //'canvas.DrawRect(0,0,100,100)
+                        //canvas.Color = New Color(0.7,0.7,0)
+                        //canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
+                        ctx.fillStyle = 'rgb(20,0,0)';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx.fillStyle = 'rgb(160,160,0)';
+                        drawLine(x*this.tw,y*this.th,x*this.tw,y*this.th+this.th-2,'rgb(160,160,0)');
+                    }
+                    //End Select			
+                }
+            }		
+        }
+
+        updateladderimage(){				
+        
+            //canvas.BlendMode = BlendMode.Opaque
+            //canvas.Clear(New Color(0,0,0,.5))
+            for(var y=0;y<this.mmh;y++){// Until mmh
+                for(var x=0;x<this.mmw;x++){
+                    if(this.mapladder[x][y]==0){
+                    }
+                    if(this.mapladder[x][y]==1){
+                        ctx.fillStyle = 'red';
+                        ctx.globalAlpha = 0.5;
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx.fillStyle = 'yellow';
+                        drawLine(x*this.tw,y*this.th,x*this.tw,y*this.th+this.th-2);
+                        ctx.globalAlpha = 1;
+                    }
+                    /*
+                    Select mapladder[x,y]				
+                        Case 0
+                        canvas.Color = Color.None
+                        canvas.DrawRect(x*tw,y*th,tw,th)
+                        Case 1								
+                        canvas.Color = Color.Red
+                        canvas.Alpha = 0.5
+                        canvas.DrawRect(x*tw,y*th,tw,th)
+                        canvas.Color = Color.Yellow
+                        canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
+                    End Select
+                    */
+                }
+            }
+            //canvas.Flush()
+        }	
+        draw(){		
+            for(var y=0;y<this.mmh;y++){
+                for(var x=0;x<this.mmw;x++){
+                    if(this.mapfinal[x][y]==this.tilesolid){
+                        ctx.fillStyle = 'black';
+                    }
+                    if(this.mapfinal[x][y]==this.tileempty){
+                        ctx.fillStyle = 'white';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                    if(this.mapfinal[x][y]==this.tileegg){
+                        ctx.fillStyle = 'yellow';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+
+                    //Select mapfinal[x,y]
+                        //Case tilesolid
+                        //canvas.Color = Color.Black
+                        //Case tileempty
+                        //canvas.Color = Color.White
+                        //canvas.DrawRect(x*tw,y*th,tw,th)
+                        //Case tileegg			
+                       // canvas.Color = Color.Yellow
+                        //canvas.DrawRect(x*tw,y*th,tw,th)
+                    //End Select	
+                }
+            }		
+        }
         Method updateimage(canvas:Canvas)			
             'canvas.BlendMode = BlendMode.Opaque	
             canvas.Clear(Color.Black)
@@ -1204,145 +1239,146 @@ Use different browser.
             Next
             canvas.Flush()
         End Method 
-        Method mapmineablecollide:Bool(x:Int,y:Int,w:Int,h:Int,remove:Bool,kind:String)
-            Local mmw:Int=mymap.mmw
-            Local mmh:Int=mymap.mmh
-            Local lefttopx:Int		=((x)/tilewidth)
-            Local lefttopy:Int		=((y)/tileheight)
-            Local righttopx:Int		=((x+w)/tilewidth)
-            Local righttopy:Int		=((y)/tileheight)
-            Local leftbottomx:Int	=((x)/tilewidth)
-            Local leftbottomy:Int	=((y+h)/tileheight)
-            Local rightbottomx:Int	=((x+w)/tilewidth)												
-            Local rightbottomy:Int	=((y+h)/tileheight)
-            If lefttopx < 0 Or lefttopx >= mmw Then Return True
-            If lefttopy < 0 Or lefttopy >= mmh Then Return True
-            If righttopx < 0 Or righttopx >= mmw Then Return True
-            If righttopy < 0 Or righttopy >= mmh Then Return True
-            If leftbottomx < 0 Or leftbottomx >= mmw Then Return True
-            If leftbottomy < 0 Or leftbottomy >= mmh Then Return True
-            If rightbottomx < 0 Or rightbottomx >= mmw Then Return True
-            If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
+        mapmineablecollide(x,y,w,h,remove,kind){
+            var mmw=mymap.mmw;
+            var mmh=mymap.mmh;
+            var lefttopx		=((x)/tilewidth);
+            var lefttopy		=((y)/tileheight);
+            var righttopx		=((x+w)/tilewidth);
+            var righttopy		=((y)/tileheight);
+            var leftbottomx 	=((x)/tilewidth);
+            var leftbottomy 	=((y+h)/tileheight);
+            var rightbottomx	=((x+w)/tilewidth);												
+            var rightbottomy	=((y+h)/tileheight);
+            if(lefttopx < 0 || lefttopx >= this.mmw)return true;
+            if(lefttopy < 0 || lefttopy >= this.mmh)return true;
+            if(righttopx < 0 || righttopx >= this.mmw)return true;
+            if(righttopy < 0 || righttopy >= this.mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= this.mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= this.mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= this.mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= this.mmh)return true;
             
-            If mymap.mapfinal[lefttopx,lefttopy] = mymap.tilemineable Then 
-                If remove=True
-                    removemineable(lefttopx,lefttopy,kind)
-                End If
-                Return True
-            End If
-            If mymap.mapfinal[righttopx,righttopy] = mymap.tilemineable Then 
-                If remove=True
-                    removemineable(righttopx,righttopy,kind)
-                End If
-                Return True
-            End if
-            If mymap.mapfinal[leftbottomx,leftbottomy] = mymap.tilemineable Then 
-                If remove=True
-                    removemineable(leftbottomx,leftbottomy,kind)
-                End If
-                Return True
-            End If
-            If mymap.mapfinal[rightbottomx,rightbottomy] = mymap.tilemineable Then 
-                If remove=True
-                    removemineable(rightbottomx,rightbottomy,kind)
-                End If
-                Return True						
-            End If
-            Return False
-        End Method	
+            if(mymap.mapfinal[lefttopx][lefttopy] == mymap.tilemineable){ 
+                if(remove==true){
+                    this.removemineable(lefttopx,lefttopy,kind);
+                }
+                return true;
+            }
+            if(mymap.mapfinal[righttopx][righttopy] == mymap.tilemineable){ 
+                if(remove==true){
+                    this.removemineable(righttopx,righttopy,kind);
+                }
+                return true;
+            }
+            if(mymap.mapfinal[leftbottomx][leftbottomy] == mymap.tilemineable){ 
+                if(remove==true){
+                    this.removemineable(leftbottomx,leftbottomy,kind);
+                }
+                return true;
+            }
+            if(mymap.mapfinal[rightbottomx][rightbottomy] = mymap.tilemineable){
+                if(remove==true){
+                    this.removemineable(rightbottomx,rightbottomy,kind);
+                }
+                return true;						
+            }
+            return false;
+        }
 
-        ' Every now and then remove mineable tile
-        ' and add item
-        '
-        Method removemineable(x:Int,y:Int,kind:String)
-            Local chance:Int=10
-            If kind="gun" Then chance=50 
-            If kind="frag" Then chance = 10
-            If Rnd(chance) < 2 Then
-                mymap.mapfinal[x,y] = mymap.tileempty
-                myitem.Add(New item((x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"))
-            End If
-        End Method
+        // Every now and then remove mineable tile
+        // and add item
+        //
+        removemineable(x,y,kind){
+            var chance=10;
+            if(kind=="gun")chance=50; 
+            if(kind=="frag")chance = 10;
+            if(randomRange(0,chance) < 2){
+                mymap.mapfinal[x][y] = mymap.tileempty;
+                //NOTE:;;
+                //myitem.Add(New item((x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"))
+            }
+        }
             
-        Method tilecollide:Bool(x:Int,y:Int,w:Int,h:Int,tile:Int)
-            Local lefttopx:Int		=((x)/tilewidth)
-            Local lefttopy:Int		=((y)/tileheight)
-            Local righttopx:Int		=((x+w)/tilewidth)
-            Local righttopy:Int		=((y)/tileheight)
-            Local leftbottomx:Int	=((x)/tilewidth)
-            Local leftbottomy:Int	=((y+h)/tileheight)
-            Local rightbottomx:Int	=((x+w)/tilewidth)												
-            Local rightbottomy:Int	=((y+h)/tileheight)
-            If lefttopx < 0 Or lefttopx >= mmw Then Return False
-            If lefttopy < 0 Or lefttopy >= mmh Then Return false
-            If righttopx < 0 Or righttopx >= mmw Then Return false
-            If righttopy < 0 Or righttopy >= mmh Then Return false
-            If leftbottomx < 0 Or leftbottomx >= mmw Then Return false
-            If leftbottomy < 0 Or leftbottomy >= mmh Then Return false
-            If rightbottomx < 0 Or rightbottomx >= mmw Then Return false
-            If rightbottomy < 0 Or rightbottomy >= mmh Then Return false
+        tilecollide(x,y,w,h,tile){
+            var lefttopx		=((x)/tilewidth);
+            var lefttopy		=((y)/tileheight);
+            var righttopx		=((x+w)/tilewidth);
+            var righttopy		=((y)/tileheight);
+            var leftbottomx 	=((x)/tilewidth);
+            var leftbottomy 	=((y+h)/tileheight);
+            var rightbottomx	=((x+w)/tilewidth);												
+            var rightbottomy	=((y+h)/tileheight);
+            if(lefttopx < 0 || lefttopx >= this.mmw)return  false;
+            if(lefttopy < 0 || lefttopy >= this.mmh)return  false;
+            if(righttopx < 0 || righttopx >= this.mmw)return  false;
+            if(righttopy < 0 || righttopy >= this.mmh)return  false;
+            if(leftbottomx < 0 || leftbottomx >= this.mmw)return  false;
+            if(leftbottomy < 0 || leftbottomy >= this.mmh)return  false;
+            if(rightbottomx < 0 || rightbottomx >= this.mmw)return  false;
+            if(rightbottomy < 0 || rightbottomy >= this.mmh)return  false;
             
-            If mapfinal[lefttopx,lefttopy] = tile Then Return True
-            If mapfinal[righttopx,righttopy] = tile Then Return True
-            If mapfinal[leftbottomx,leftbottomy] = tile Then Return True
-            If mapfinal[rightbottomx,rightbottomy] = tile Then Return True						
-            Return False
-        End Method	
-        Method mapcollide:Bool(x:Int,y:Int,w:Int,h:Int)
-            Local lefttopx:Int		=((x)/tilewidth)
-            Local lefttopy:Int		=((y)/tileheight)
-            Local righttopx:Int		=((x+w)/tilewidth)
-            Local righttopy:Int		=((y)/tileheight)
-            Local leftbottomx:Int	=((x)/tilewidth)
-            Local leftbottomy:Int	=((y+h)/tileheight)
-            Local rightbottomx:Int	=((x+w)/tilewidth)												
-            Local rightbottomy:Int	=((y+h)/tileheight)
-            If lefttopx < 0 Or lefttopx >= mmw Then Return True
-            If lefttopy < 0 Or lefttopy >= mmh Then Return True
-            If righttopx < 0 Or righttopx >= mmw Then Return True
-            If righttopy < 0 Or righttopy >= mmh Then Return True
-            If leftbottomx < 0 Or leftbottomx >= mmw Then Return True
-            If leftbottomy < 0 Or leftbottomy >= mmh Then Return True
-            If rightbottomx < 0 Or rightbottomx >= mmw Then Return True
-            If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
+            if(this.mapfinal[lefttopx][lefttopy] == tile)return  true;
+            if(this.mapfinal[righttopx][righttopy] == tile)return  true;
+            if(this.mapfinal[leftbottomx][leftbottomy] == tile)return  true;
+            if(this.mapfinal[rightbottomx][rightbottomy] == tile)return  true;						
+            return false;
+        }
+        mapcollide(x,y,w,h){
+            var lefttopx		=((x)/tilewidth);
+            var lefttopy		=((y)/tileheight);
+            var righttopx		=((x+w)/tilewidth);
+            var righttopy		=((y)/tileheight);
+            var leftbottomx 	=((x)/tilewidth);
+            var leftbottomy 	=((y+h)/tileheight);
+            var rightbottomx	=((x+w)/tilewidth);												
+            var rightbottomy	=((y+h)/tileheight);
+            if(lefttopx < 0 || lefttopx >= this.mmw)return true;
+            if(lefttopy < 0 || lefttopy >= this.mmh)return true;
+            if(righttopx < 0 || righttopx >= this.mmw)return true;
+            if(righttopy < 0 || righttopy >= this.mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= this.mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= this.mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= this.mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= this.mmh)return true;
             
-            If mapfinal[lefttopx,lefttopy] <> mymap.tileempty Then Return True
-            If mapfinal[righttopx,righttopy] <> mymap.tileempty Then Return True
-            If mapfinal[leftbottomx,leftbottomy] <> mymap.tileempty Then Return True
-            If mapfinal[rightbottomx,rightbottomy] <> mymap.tileempty Then Return True						
-            Return False
-        End Method	
-        ' Collide with solid and mineable
-        Method mapcollide2:Bool(x:Int,y:Int,w:Int,h:Int)
-            Local lefttopx:Int		=((x)/tilewidth)
-            Local lefttopy:Int		=((y)/tileheight)
-            Local righttopx:Int		=((x+w)/tilewidth)
-            Local righttopy:Int		=((y)/tileheight)
-            Local leftbottomx:Int	=((x)/tilewidth)
-            Local leftbottomy:Int	=((y+h)/tileheight)
-            Local rightbottomx:Int	=((x+w)/tilewidth)												
-            Local rightbottomy:Int	=((y+h)/tileheight)
-            If lefttopx < 0 Or lefttopx >= mmw Then Return True
-            If lefttopy < 0 Or lefttopy >= mmh Then Return True
-            If righttopx < 0 Or righttopx >= mmw Then Return True
-            If righttopy < 0 Or righttopy >= mmh Then Return True
-            If leftbottomx < 0 Or leftbottomx >= mmw Then Return True
-            If leftbottomy < 0 Or leftbottomy >= mmh Then Return True
-            If rightbottomx < 0 Or rightbottomx >= mmw Then Return True
-            If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
+            if(this.mapfinal[lefttopx][lefttopy] != mymap.tileempty) return  true;
+            if(this.mapfinal[righttopx][righttopy] != mymap.tileempty) return  true;
+            if(this.mapfinal[leftbottomx][leftbottomy] != mymap.tileempty) return  true;
+            if(this.mapfinal[rightbottomx][rightbottomy] != mymap.tileempty) return  true;						
+            return false;
+        }
+        //Collide with solid and mineable
+        mapcollide2(x,y,w,h){
+            var lefttopx		=((x)/tilewidth);
+            var lefttopy		=((y)/tileheight);
+            var righttopx		=((x+w)/tilewidth);
+            var righttopy		=((y)/tileheight);
+            var leftbottomx 	=((x)/tilewidth);
+            var leftbottomy 	=((y+h)/tileheight);
+            var rightbottomx	=((x+w)/tilewidth);												
+            var rightbottomy	=((y+h)/tileheight);
+            if(lefttopx < 0 || lefttopx >= this.mmw)return true;
+            if(lefttopy < 0 || lefttopy >= this.mmh)return true;
+            if(righttopx < 0 || righttopx >= this.mmw)return true;
+            if(righttopy < 0 || righttopy >= this.mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= this.mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= this.mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= this.mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= this.mmh)return true;
             
-            If mapfinal[lefttopx,lefttopy] = mymap.tilesolid Then Return True
-            If mapfinal[righttopx,righttopy] = mymap.tilesolid Then Return True
-            If mapfinal[leftbottomx,leftbottomy] = mymap.tilesolid Then Return True
-            If mapfinal[rightbottomx,rightbottomy] = mymap.tilesolid Then Return True						
+            if(this.mapfinal[lefttopx][lefttopy] == mymap.tilesolid)return true;
+            if(this.mapfinal[righttopx][righttopy] == mymap.tilesolid) return  true;
+            if(this.mapfinal[leftbottomx][leftbottomy] == mymap.tilesolid) return  true;
+            if(this.mapfinal[rightbottomx][rightbottomy] == mymap.tilesolid) return  true;						
 
-            If mapfinal[lefttopx,lefttopy] = mymap.tilemineable Then Return True
-            If mapfinal[righttopx,righttopy] = mymap.tilemineable Then Return True
-            If mapfinal[leftbottomx,leftbottomy] = mymap.tilemineable Then Return True
-            If mapfinal[rightbottomx,rightbottomy] = mymap.tilemineable Then Return True						
+            if(this.mapfinal[lefttopx][lefttopy] == mymap.tilemineable) return  true;
+            if(this.mapfinal[righttopx][righttopy] == mymap.tilemineable) return  true;
+            if(this.mapfinal[leftbottomx][leftbottomy] == mymap.tilemineable) return  true;
+            if(this.mapfinal[rightbottomx][rightbottomy] == mymap.tilemineable) return  true;						
 
-            Return False
-        End Method	
+            return false;
+        }
 
     }
 
