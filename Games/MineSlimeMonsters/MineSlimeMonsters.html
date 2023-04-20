@@ -57,6 +57,7 @@ Use different browser.
         ShotGun:false,
         LaserWall:false,
         Grenade:false,
+        Mine:false,
         Jump:false,
     } 
 
@@ -184,7 +185,7 @@ Use different browser.
             if(this.minedelay > 0)this.minedelay -= 1;
             if(Controller.Mine==true && this.minedelay<=0){//Keyboard.KeyDown(Key.M) And minedelay <=0
                 this.minedelay = 30;
-                //this.mine();
+                this.mine();
             }
 
             if(Controller.LaserWall==true){//If Keyboard.KeyReleased(Key.L)
@@ -192,6 +193,72 @@ Use different browser.
                 //mylaserwall.Add(New laserwall(px,py+ph))
             }
         }
+        //
+        // Mine a block up or down or left or right(key v) drops loot
+        //
+	    mine(){
+            if(this.facing == "left"){
+                for(var x=this.px;x>this.px-this.tilewidth;i-=1){// Step -1
+                    var x2 = x / tilewidth;
+                    var y2 = this.py / tileheight;
+                    if(mymap.mapfinal[x2][y2] == mymap.tilemineable){
+                        mymap.mapfinal[x2][y2] = mymap.tileempty;
+                        this.createmineitem(x2,y2);
+                        return;
+                    }
+                }
+            }
+            if(this.facing == "right"){
+                for(var x=this.px;x<this.px+(tilewidth*2);i++){
+                    var x2 = x / tilewidth;
+                    var y2 = this.py / tileheight;
+                    if(mymap.mapfinal[x2][y2] == mymap.tilemineable){
+                        mymap.mapfinal[x2][y2] = mymap.tileempty;
+                        this.createmineitem(x2,y2);
+                        return;
+                    }
+                }
+            }
+            if(this.facing == "up"){
+                for(var y=this.py;y>this.py-(tileheight*2);y-=1){// Step -1
+                    var x2 = this.px / tilewidth;
+                    var y2 = y / tileheight;
+                    if(mymap.mapfinal[x2][y2] == mymap.tilemineable){
+                        mymap.mapfinal[x2][y2] = mymap.tileempty;
+                        this.createmineitem(x2,y2);
+                        return
+                    }
+                }
+            }	
+            if(this.facing == "down"){
+                for(var y=this.py;y<this.py+tileheight;y++){
+                    var x2= this.px / tilewidth;
+                    var y2= y / tileheight;
+                    if(mymap.mapfinal[x2][y2] == mymap.tilemineable){
+                        mymap.mapfinal[x2][y2] = mymap.tileempty;
+                        this.createmineitem(x2,y2);
+                        return
+                    }
+                }
+            }	
+        }
+	    createmineitem(x2,y2){		
+            x2 *= this.tw;
+            y2 *= this.th;
+            x2 += this.tw/2;
+            y2 += this.th/2;
+            for(var i=0;i<Math.floor(Math.random()*3);i++){		
+                var item;
+                var num=Math.Floor(Math.random()*10);
+                if(num>=8)item="Gold"; 
+                if(num<8){
+                    item="Coal";
+                 }else{
+                    item="Rock";
+                 }		
+                //myitem.Add(New item(x2+Rnd(-tw/3,th/3),y2+Rnd(th/3,th/3),item))
+            }
+	    }
         playerladdercollision(x,y){
             var cx=x/this.tw;
             var cy=y/this.th;
@@ -323,6 +390,332 @@ Use different browser.
                     if(this.incy>4)this.incy=4;
                 }
             }
+        }
+	    draw(){
+            //canvas.Scissor = New Recti(32,32,screenwidth-32,screenheight-64)
+            //draw the map
+            //canvas.BlendMode = BlendMode.Opaque
+            for(var y=0;y<this.maptilesheight;y++){
+                for(var x=0;x<this.maptileswidth;x++){
+                    var x2=this.mcx+x;
+                    var y2=this.mcy+y;
+                    var x3=(x*this.tw)+this.mox;
+                    var y3=(y*this.th)+this.moy;
+                    if(x2<0 || x2>=mapwidth || y2<0 || y2>=mapheight)continue;				
+                    
+                    // NOTE : Gradient background.
+                    //
+                    if(y2<17){
+                        //canvas.Color = Color.White
+                        //canvas.DrawImage(mygradienttile.image[y2],x3,y3)
+                        ctx.fillStyle = 'white';
+                        ctx.fillRect(x3,y3,screenwidth,screenheight);
+                    }
+                    
+                    // mymap.mapfinal[x2,y2]
+                        if(mymap.mapfinal[x2][y2]== mymap.tileempty){
+                            if(y2>16){
+                                //canvas.Color = Color.White
+                                //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],0],x3,y3)
+                                ctx.fillStyle = 'brown';
+                                ctx.fillRect(x3,y3,this.tw,this.th);
+                            }
+                            //canvas.Color = Color.Brown
+                            //canvas.DrawRect(x3,y3,tw,th)
+                        }
+                        if(mymap.mapfinal[x2][y2]== mymap.tilesolid){
+                            if(y2>16){
+                                //canvas.Color = Color.White
+                                //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],1],x3,y3)
+                                ctx.fillStyle = 'Black';
+                                ctx.fillRect(x3,y3,this.tw,this.th);
+                            }
+        				    //canvas.Color = Color.Black
+        				    //canvas.DrawRect(x3,y3,tw,th)
+                        }
+                        if(mymap.mapfinal[x2][y2] == mymap.tileegg){
+                            //canvas.OutlineMode=OutlineMode.Solid
+                            //canvas.OutlineColor = Color.White
+                            //canvas.OutlineWidth = 1						
+                            //canvas.Color = Color.Yellow
+                            //canvas.DrawRect(x3,y3,tw,th)
+                            //canvas.OutlineMode=OutlineMode.None
+                            ctx.fillStyle = 'yellow';
+                            ctx.fillRect(x3,y3,this.tw,this.th);
+                        }
+                        if(mymap.mapfinal[x2][y2]== mymap.tileturret){
+                            //canvas.OutlineMode=OutlineMode.Solid
+                            //canvas.OutlineColor = Color.Black
+                            //canvas.OutlineWidth = 1						
+                            //canvas.Color = Color.Grey
+                            //canvas.DrawRect(x3,y3,tw,th)	
+                            //canvas.OutlineMode=OutlineMode.None
+                            ctx.fillStyle = 'grey';
+                            ctx.fillRect(x3,y3,this.tw,this.th);
+                        }
+                        if(mymap.mapfinal[x2][y2]==mymap.tilemineable){
+                            //canvas.Color = Color.White
+                            //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],2],x3,y3)
+        				    //canvas.Color = Color.Brown.Blend(Color.Yellow,.2)
+        				    //canvas.DrawRect(x3,y3,tw,th)
+                            ctx.fillStyle = 'yellow';
+                            ctx.fillRect(x3,y3,this.tw,this.th);
+                        }
+                    //End Select	
+
+
+                    //draw the slime			
+                    for(var y4=0;y2< 2;y4++){
+                        for(var x4=0;x4< 2;x4++){
+                            if(mygrowslime.map[(x2*2)+x4][(y2*2)+y4] == 10){
+                                //canvas.Color = Color.Green
+                                //canvas.DrawRect(x3+(x4*(mygrowslime.tw)),y3+(y4*(mygrowslime.th)),mygrowslime.tw,mygrowslime.th)
+                                ctx.fillStyle = 'green';
+                                ctx.fillRect(x3+(x4*(mygrowslime.tw)),y3+(y4*(mygrowslime.th)),mygrowslime.tw,mygrowslime.th);
+                             }
+                        }
+                    }
+
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+            //Draw the ladders		
+            for(var y=0;y<this.maptilesheight;y++){
+                for(var x=0;x<this.maptileswidth;x++){
+                    var x2=this.mcx+x;
+                    var y2=this.mcy+y;
+                    var x3=(x*this.tw)+this.mox;
+                    var y3=(y*this.th)+this.moy;
+                    if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){
+                        if(mymap.mapladder[x2][y2] == 1){
+                            //canvas.Color = Color.Brown
+                            //canvas.DrawRect(x3,y3,tw,th)
+                            //canvas.Color = Color.Red
+                            //canvas.DrawRect(x3,y3,tw/4,th/3)
+                            ctx.fillStyle = 'brown';
+                            ctx.fillRect(x3,y3,this.tw,this.th);
+                            ctx.fillStyle = 'red';
+                            ctx.fillRect(x3,y3,this.tw/4,this.th/3);
+
+                        }
+                    }
+                }
+            }
+
+            /*
+            '
+            ''Draw the trees
+            '
+            canvas.Color = Color.White		
+            For Local i:=Eachin mytree
+                'If Rnd(100)<10 Then Print Millisecs()
+                Local x2:Int=i.px-mcx*tw+mox
+                Local y2:Int=i.py-mcy*th+moy
+                'i.draw(canvas,x2,y2)
+                canvas.DrawImage(i.image,x2,y2)
+                'canvas.Color = i.col
+                'canvas.DrawText(i.number,x2,y2)
+            Next
+                    
+            '
+            ''Draw the buildings
+            '
+            canvas.Color = Color.White
+            For Local i:=Eachin mybuilding
+                Local x2:Int=i.px-mcx*tw+mox
+                Local y2:Int=i.py-mcy*th+moy
+                i.draw(canvas,x2,y2)
+                'canvas.Color = i.col
+                'canvas.DrawText(i.number,x2,y2)
+            Next
+
+            'draw towns people
+            For Local i:=Eachin mytownperson
+                Local x1:Int=i.px
+                Local y1:Int=i.py
+                Local x2:Int=(x1-(mcx*tw))+mox
+                Local y2:Int=(y1-(mcy*th))+moy
+                canvas.OutlineMode=OutlineMode.Solid
+                canvas.OutlineColor = Color.Black
+                canvas.OutlineWidth = 1				
+                canvas.Color = Color.Green
+                canvas.DrawRect(x2,y2,tw,th)
+                canvas.OutlineMode = OutlineMode.None
+                drawpowerbar(canvas,x2,y2,i.hp,i.hpmax)
+                'canvas.Color = Color.White
+                'canvas.DrawText(i.state,x2,y2)
+                'canvas.DrawText(i.substate,x2,y2+12)
+                'canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                'canvas.DrawText(i.px+","+i.py,x2,y2+37)
+                
+                
+                
+            Next
+            */
+
+            // Draw the player
+            this.pmx = (this.px-(this.mcx*this.tw))+this.mox;
+            this.pmy = (this.py-(this.mcy*this.th))+this.moy;
+            //canvas.Color = Color.White
+            //canvas.DrawRect(pmx,pmy,pw,ph)
+            ctx.fillStyle = 'white';
+            ctx.fillRect(this.pmx,this.pmy,this.pw,this.ph);
+            drawpowerbar(canvas,pmx,pmy,hp,hpmax);
+
+            //draw flying monsters		
+            For Local i:=Eachin myflyingmonster
+                Local x1:Int=i.px
+                Local y1:Int=i.py
+                Local x2:Int=(x1-(mcx*tw))+mox
+                Local y2:Int=(y1-(mcy*th))+moy
+                canvas.Color = Color.Red
+                canvas.DrawRect(x2,y2,tw,th)
+                drawpowerbar(canvas,x2,y2,i.hp,i.hpmax)
+                'canvas.Color = Color.White
+                'canvas.DrawText(i.state,x2,y2)
+                'canvas.DrawText(i.substate,x2,y2+12)
+                'canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                'canvas.DrawText(i.px+","+i.py,x2,y2+37)
+                
+                
+                
+            Next
+
+            'draw walking monsters		
+            For Local i:=Eachin mywalkingmonster
+                Local x1:Int=i.px
+                Local y1:Int=i.py
+                Local x2:Int=(x1-(mcx*tw))+mox
+                Local y2:Int=(y1-(mcy*th))+moy
+                canvas.Color = Color.Red
+                canvas.DrawRect(x2,y2,tw,th)
+                drawpowerbar(canvas,x2,y2,i.hp,i.hpmax)			
+                canvas.Color = Color.White
+                canvas.DrawText(i.state,x2,y2)
+                canvas.DrawText(i.substate,x2,y2+12)
+                'canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                'canvas.DrawText(i.px+","+i.py,x2,y2+37)
+                
+                
+                
+            Next
+            
+            ' Draw the bullets
+            '
+            canvas.OutlineMode=OutlineMode.Solid
+            canvas.OutlineColor = Color.Grey
+            canvas.OutlineWidth = 1					
+            canvas.Color = Color.Yellow
+            For Local i:=Eachin mybullet
+                Local x2:Int=i.px-mcx*tw+mox
+                Local y2:Int=i.py-mcy*th+moy
+                canvas.DrawCircle(x2,y2,i.w)
+            Next
+            ' Draw the grenades
+            '
+            canvas.Color = Color.Titanium
+            For Local i:=Eachin mygrenade
+                Local x2:Int=i.px-mcx*tw+mox
+                Local y2:Int=i.py-mcy*th+moy
+                canvas.DrawCircle(x2,y2,4)
+            Next
+            ' Draw the fragmentation 
+            '
+            canvas.Color = Color.Gold
+            For Local i:=Eachin myfrag
+                Local x2:Int=i.px-mcx*tw+mox
+                Local y2:Int=i.py-mcy*th+moy
+                canvas.DrawCircle(x2,y2,3)
+            Next		
+            ' Draw the items
+            '
+            canvas.Color = Color.Red
+            For Local i:=Eachin myitem
+                Local x2:Int=i.px-mcx*tw+mox
+                Local y2:Int=i.py-mcy*th+moy			
+                canvas.DrawCircle(x2,y2,3)
+            Next
+            '
+            ' Draw the tentacles 
+            '
+            
+            For Local i:=Eachin mytentacle
+                Local x1:Int=i.basex-mcx*tw+mox
+                Local y1:Int=i.basey-mcy*th+moy			
+                Local x2:Int=i.topx-mcx*tw+mox
+                Local y2:Int=i.topy-mcy*th+moy			
+                canvas.Color = Color.Green
+                For Local y3:Int=-1 To 1
+                For Local x3:Int=-1 To 1
+                    canvas.DrawLine(x1+x3,y1+y3,x2+x3,y2+y3)
+                Next
+                Next
+                If i.grabbed = True
+                    canvas.Color = Color.Red
+                    canvas.DrawRect(x2-(tilewidth/2),y2-(tileheight/2),tilewidth,tileheight)
+                End If
+            Next
+            canvas.OutlineMode=OutlineMode.None	
+            '
+            
+            '
+            ' Draw the laser walls
+            
+            For Local i:=Eachin mylaserwall
+                Local x2:Int=i.tx-mcx*tw+mox
+                Local y2:Int=i.ty-mcy*th+moy
+                Local h:Int=i.by-i.ty
+                canvas.Color = Color.Yellow
+                canvas.DrawRect(x2-2,y2,4,h)
+                canvas.Color = Color.Red
+                canvas.DrawRect(x2-4,y2,8,4)
+                canvas.DrawRect(x2-4,y2+h-4,8,4)
+            Next
+
+            '
+            ' Draw the falling numbers
+            '
+            For Local i:=Eachin mynumberfall
+                Local x2:Int=i.px-mcx*tw+mox
+                Local y2:Int=i.py-mcy*th+moy
+                canvas.Color = i.col
+                canvas.DrawText(i.number,x2,y2)
+            Next
+            
+            
+
+            
+        }
+
+	    drawpowerbar(x,y,hp,hpmax){
+            var powerbarlen=this.pw;
+            var cpos=(powerbarlen/hpmax)*hp;
+            //canvas.Color = Color.Black
+            //canvas.DrawRect(x,y,powerbarlen,5)
+            ctx.fillStyle='black';
+            ctx.fillRect(x,y,powerbarlen,5);
+            if(hp >= hpmax/2){
+                //canvas.Color = Color.Green
+                ctx.fillStyle = 'green';
+            }else if(hp<hpmax/2 && hp>hpmax/4){
+                //canvas.Color = Color.Yellow
+                ctx.fillStyle = 'yellow';
+            }else{
+                //canvas.Color = Color.Red
+                ctx.fillStyle = 'red';
+            }
+            //canvas.DrawRect(x+1,y+1,cpos,3)
+            ctx.fillRect(x+1,y+1,cpos,3);
         }
         rectsoverlap(x1,y1,w1,h1,x2,y2,w2,h2){
             if( x1 >= (x2 + w2) || (x1 + w1) <= x2)return false;
@@ -603,6 +996,10 @@ Use different browser.
         if(evt.keyCode==67){ //c
             //Controller.LaserWall = true;
         }
+        //86
+        if(evt.keyCode==86){ //v
+            Controller.Mine = true;
+        }
         if(evt.keyCode==32){ //space
             Controller.Jump = true;
         }
@@ -632,6 +1029,9 @@ Use different browser.
         // Only trigger once..
         if(evt.keyCode==67){ //c
             Controller.LaserWall = true;
+        }
+        if(evt.keyCode==86){ //v
+            Controller.Mine = false;
         }
         if(evt.keyCode==32){ //space
             Controller.Jump = false;
