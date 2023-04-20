@@ -572,126 +572,164 @@ Use different browser.
             ctx.fillRect(this.pmx,this.pmy,this.pw,this.ph);
             drawpowerbar(canvas,pmx,pmy,hp,hpmax);
 
-            //draw flying monsters		
-            For Local i:=Eachin myflyingmonster
-                Local x1:Int=i.px
-                Local y1:Int=i.py
-                Local x2:Int=(x1-(mcx*tw))+mox
-                Local y2:Int=(y1-(mcy*th))+moy
-                canvas.Color = Color.Red
-                canvas.DrawRect(x2,y2,tw,th)
-                drawpowerbar(canvas,x2,y2,i.hp,i.hpmax)
-                'canvas.Color = Color.White
-                'canvas.DrawText(i.state,x2,y2)
-                'canvas.DrawText(i.substate,x2,y2+12)
-                'canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
-                'canvas.DrawText(i.px+","+i.py,x2,y2+37)
-                
-                
-                
-            Next
+            /*
+            //draw flying monsters	
+            for(var i=0;i<myflyingmonster.length;i++){
+                var x1=myflyingmonster[i].px;
+                var y1=myflyingmonster[i].py;
+                var x2=(x1-(this.mcx*this.tw))+this.mox;
+                var y2=(y1-(this.mcy*this.th))+this.moy;
+                //canvas.Color = Color.Red
+                //canvas.DrawRect(x2,y2,tw,th)
+                ctx.fillStyle = 'red';
+                ctx.fillRect(x2,y2,this.tw,this.th);
+                drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
+                //canvas.Color = Color.White
+                //canvas.DrawText(i.state,x2,y2)
+                //canvas.DrawText(i.substate,x2,y2+12)
+                //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
+            }
+            */
 
-            'draw walking monsters		
-            For Local i:=Eachin mywalkingmonster
-                Local x1:Int=i.px
-                Local y1:Int=i.py
-                Local x2:Int=(x1-(mcx*tw))+mox
-                Local y2:Int=(y1-(mcy*th))+moy
-                canvas.Color = Color.Red
-                canvas.DrawRect(x2,y2,tw,th)
-                drawpowerbar(canvas,x2,y2,i.hp,i.hpmax)			
-                canvas.Color = Color.White
-                canvas.DrawText(i.state,x2,y2)
-                canvas.DrawText(i.substate,x2,y2+12)
-                'canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
-                'canvas.DrawText(i.px+","+i.py,x2,y2+37)
-                
-                
-                
-            Next
+            /*
+            //draw walking monsters		
+            for(var i=0;i<mywalkingmonster.length;i++){
+                var x1=mywalkingmonster[i].px;
+                var y1=mywalkingmonster[i].py;
+                var x2=(x1-(this.mcx*this.tw))+this.mox;
+                var y2=(y1-(this.mcy*this.th))+this.moy;
+                //canvas.Color = Color.Red
+                //canvas.DrawRect(x2,y2,tw,th)
+                ctx.fillStyle = 'red';
+                ctx.fillRect(x2,y2,this.tw,this.th);
+                drawpowerbar(x2,y2,mywalkingmonster[i].hp,mywalkingmonster[i].hpmax);			
+                //canvas.Color = Color.White
+                //canvas.DrawText(i.state,x2,y2)
+                //canvas.DrawText(i.substate,x2,y2+12)
+                //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
+            }
+            */
             
-            ' Draw the bullets
-            '
-            canvas.OutlineMode=OutlineMode.Solid
-            canvas.OutlineColor = Color.Grey
-            canvas.OutlineWidth = 1					
-            canvas.Color = Color.Yellow
-            For Local i:=Eachin mybullet
-                Local x2:Int=i.px-mcx*tw+mox
-                Local y2:Int=i.py-mcy*th+moy
-                canvas.DrawCircle(x2,y2,i.w)
-            Next
-            ' Draw the grenades
-            '
-            canvas.Color = Color.Titanium
-            For Local i:=Eachin mygrenade
-                Local x2:Int=i.px-mcx*tw+mox
-                Local y2:Int=i.py-mcy*th+moy
-                canvas.DrawCircle(x2,y2,4)
-            Next
-            ' Draw the fragmentation 
-            '
-            canvas.Color = Color.Gold
-            For Local i:=Eachin myfrag
-                Local x2:Int=i.px-mcx*tw+mox
-                Local y2:Int=i.py-mcy*th+moy
-                canvas.DrawCircle(x2,y2,3)
-            Next		
-            ' Draw the items
-            '
-            canvas.Color = Color.Red
-            For Local i:=Eachin myitem
-                Local x2:Int=i.px-mcx*tw+mox
-                Local y2:Int=i.py-mcy*th+moy			
-                canvas.DrawCircle(x2,y2,3)
-            Next
-            '
-            ' Draw the tentacles 
-            '
-            
-            For Local i:=Eachin mytentacle
-                Local x1:Int=i.basex-mcx*tw+mox
-                Local y1:Int=i.basey-mcy*th+moy			
-                Local x2:Int=i.topx-mcx*tw+mox
-                Local y2:Int=i.topy-mcy*th+moy			
-                canvas.Color = Color.Green
-                For Local y3:Int=-1 To 1
-                For Local x3:Int=-1 To 1
-                    canvas.DrawLine(x1+x3,y1+y3,x2+x3,y2+y3)
-                Next
-                Next
-                If i.grabbed = True
-                    canvas.Color = Color.Red
-                    canvas.DrawRect(x2-(tilewidth/2),y2-(tileheight/2),tilewidth,tileheight)
-                End If
-            Next
-            canvas.OutlineMode=OutlineMode.None	
-            '
-            
-            '
-            ' Draw the laser walls
-            
-            For Local i:=Eachin mylaserwall
-                Local x2:Int=i.tx-mcx*tw+mox
-                Local y2:Int=i.ty-mcy*th+moy
-                Local h:Int=i.by-i.ty
-                canvas.Color = Color.Yellow
-                canvas.DrawRect(x2-2,y2,4,h)
-                canvas.Color = Color.Red
-                canvas.DrawRect(x2-4,y2,8,4)
-                canvas.DrawRect(x2-4,y2+h-4,8,4)
-            Next
+            /*
+            // Draw the bullets
+            //
+            //canvas.OutlineMode=OutlineMode.Solid
+            //canvas.OutlineColor = Color.Grey
+            //canvas.OutlineWidth = 1					
+            //canvas.Color = Color.Yellow
+            ctx.fillStyle = 'yellow';
+            //For Local i:=Eachin mybullet
+            for(var i=0;i<mybullet.length;i++){
+                var x2=mybullet[i].px-this.mcx*this.tw+this.mox;
+                var y2=mybullet[i].py-this.mcy*this.th+this.moy;
+                //canvas.DrawCircle(x2,y2,i.w)
+                ctx.fillRect(x2,y2,mybullet[i].w,mybullet[i].w);
+            }
+            */
 
-            '
-            ' Draw the falling numbers
-            '
-            For Local i:=Eachin mynumberfall
-                Local x2:Int=i.px-mcx*tw+mox
-                Local y2:Int=i.py-mcy*th+moy
-                canvas.Color = i.col
-                canvas.DrawText(i.number,x2,y2)
-            Next
+            /*
+            // Draw the grenades
+            //
+            //canvas.Color = Color.Titanium
+            ctx.fillStyle = 'titanium';
+            //For Local i:=Eachin mygrenade
+            for(var i=0;i<mygrenade.length;i++){
+                var x2=mygrenade[i].px-this.mcx*this.tw+this.mox;
+                var y2=mygrenade[i].py-this.mcy*this.th+this.moy;
+                //canvas.DrawCircle(x2,y2,4)
+                ctx.fillRect(x2,y2,4,4);
+            }
+            */
+
+            /*
+            // Draw the fragmentation 
+            //
+            //canvas.Color = Color.Gold
+            ctx.fillStyle = 'gold';
+            //For Local i:=Eachin myfrag
+            for(var i=0;i<myfrag.length;i++){
+                var x2=myfrag[i].px-this.mcx*this.tw+this.mox;
+                var y2=myfrag[i].py-this.mcy*this.th+this.moy;
+                //canvas.DrawCircle(x2,y2,3)
+                ctx.fillRect(x2,y2,3);
+            }
+            */
+
+            /*
+            // Draw the items
+            //
+            //canvas.Color = Color.Red
+            ctx.fillStyle = 'red';
+            //For Local i:=Eachin myitem
+            for(var i=0;i<myitem.length;i++){
+                var x2=myitem[i].px-this.mcx*this.tw+this.mox;
+                var y2=myitem[i].py-this.mcy*this.th+this.moy;			
+                //canvas.DrawCircle(x2,y2,3)
+                ctx.fillRect(x2,y2,3);
+            }
+            */
+
+            /*
+            //
+            //Draw the tentacles 
+            //
+            //For Local i:=Eachin mytentacle
+            for(var i=0;i<mytentacle.length;i++){
+                var x1=mytentacle[i].basex-this.mcx*this.tw+this.mox;
+                var y1=mytentacle[i].basey-this.mcy*this.th+this.moy;			
+                var x2=mytentacle[i].topx-this.mcx*this.tw+this.mox;
+                var y2=mytentacle[i].topy-this.mcy*this.th+this.moy;			
+                //canvas.Color = Color.Green
+                
+                //canvas.DrawLine(x1+x3,y1+y3,x2+x3,y2+y3)
+                drawLine(x1+x3,y1+y3,x2+x3,y2+y3,'green',4);
+                if(mytentacle[i].grabbed == true){
+                    //canvas.Color = Color.Red
+                    //canvas.DrawRect(x2-(tilewidth/2),y2-(tileheight/2),tilewidth,tileheight)
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(x2-(tilewidth/2),y2-(tileheight/2),tilewidth,tileheight);
+                }
+            }
+            */
+            //canvas.OutlineMode=OutlineMode.None	
             
+            
+            /*
+            // Draw the laser walls
+            
+            //For Local i:=Eachin mylaserwall
+            for(var i=0;i<mylaserwall.length;i++){
+                var x2=mylaserwall[i].tx-this.mcx*this.tw+this.mox;
+                var y2=mylaserwall[i].ty-this.mcy*this.th+this.moy;
+                var h=mylaserwall[i].by-mylaserwall[i].ty
+                //canvas.Color = Color.Yellow
+                //canvas.DrawRect(x2-2,y2,4,h)
+                //canvas.Color = Color.Red
+                //canvas.DrawRect(x2-4,y2,8,4)
+                //canvas.DrawRect(x2-4,y2+h-4,8,4)
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(x2-2,y2,4,h);
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(x2-4,y2,8,4);
+                ctx.fillRect(x2-4,y2+h-4,8,4);
+            }
+            */
+
+            /*
+            //
+            //Draw the falling numbers
+            //
+            for(var i=0;i<mynumberfall.length;i++){
+                var x2=mynumberfall[i].px-this.mcx*this.tw+this.mox;
+                var y2=mynumberfall[i].py-this.mcy*this.th+this.moy;
+                //canvas.Color = i.col
+                //canvas.DrawText(i.number,x2,y2)
+                ctx.fillStyle = 'red';
+                ctx.fillText(mynumberfall[i].number,x2,y2);
+            }
+            */
             
 
             
@@ -726,7 +764,623 @@ Use different browser.
 
     var myc=new player();
 
-    
+
+    class map{
+
+        constructor(sw,sh,mw,mh){
+            this.tw,this.th;
+            this.mw,this.mh;
+            this.sw,this.sh,this.mmh,this.mmw//'mmh is actual finalmap size
+            this.map=[];//New Int[1,1]
+            this.mapfinal=[];//New Int[1,1]
+            this.mapladder=[];//New Int[1,1]
+            //this.mapimage:Image
+            //this.mapcanvas:Canvas
+            //this.mapladderimage:Image
+            //this.mapladdercanvas:Canvas
+            this.mapdoor=[];//New Int[1,1]
+            this.maptilevariation=[];//New Int[1,1]
+            this.tilesolid=0;
+            this.tileempty=1;
+            this.tileegg=3;
+            this.tileturret=4;
+            this.tileslime=10;
+            this.tilemineable=50;
+            
+            this.mmw = mw;
+            this.mmh = mh;
+            this.mw = mw/3;
+            this.mh = mh/3;		
+            this.sw = sw;
+            this.sh = sh;
+            //mapimage = New Image(sw,sh)
+            //mapcanvas = New Canvas(mapimage)
+            //mapladderimage = New Image(sw,sh)
+            //mapladdercanvas = New Canvas(mapladderimage)
+            this.maptilevariation = create2DArray(mapwidth,mapheight);//New Int[mapwidth,mapheight]
+            for(var y=0;y<mapheight;y++){
+                for(var x=0;x<mapwidth;x++){
+                    maptilevariation[x][y] = Math.floor(Math.random()*4);
+                }
+            }
+            this.tw = this.sw/this.mmw;
+            this.th = this.sh/this.mmh;
+            //map = New Int[mw,mh]
+            this.map = create2DArray(mw,mh); 
+            this.mapfinal = create2DArray(mmw,mmh);
+            this.mapladder = create2DArray(mmw,mmh);
+            this.mapdoor = create2DArray(mmw,mmh);
+            //mapfinal = New Int[mmw,mmh]
+            //mapladder = New Int[mmw,mmh]
+            //mapdoor = New Int[mmw,mmh]
+            this.makemap();
+            this.finalizemap();
+            for(var i=0;i<1000;i++){
+                var x=randomRange(2,mmw-4);
+                var y=randomRange(17,mmh-4);
+                if(this.mapfinal[x][y] == 1){
+                    if(this.mapfinal[x][y+1] == 0){
+                        this.mapfinal[x][y] = 3;
+                    }
+                }
+            }		
+            this.createfinalmineable();
+            this.updateladderimage(mapladdercanvas);
+            this.updateimage(mapcanvas);
+
+
+        }
+        Method New(sw:float,sh:Float,mw:Float,mh:Float)
+            Self.mmw = mw
+            Self.mmh = mh
+            Self.mw = mw/3
+            Self.mh = mh/3		
+            Self.sw = sw
+            Self.sh = sh
+            mapimage = New Image(sw,sh)
+            mapcanvas = New Canvas(mapimage)
+            mapladderimage = New Image(sw,sh)
+            mapladdercanvas = New Canvas(mapladderimage)
+            maptilevariation = New Int[mapwidth,mapheight]
+            For Local y:Int=0 Until mapheight
+            For Local x:Int=0 Until mapwidth
+                maptilevariation[x,y] = Rnd(4)
+            Next
+            Next
+            tw = sw/mmw
+            th = sh/mmh
+            map = New Int[mw,mh]
+            mapfinal = New Int[mmw,mmh]
+            mapladder = New Int[mmw,mmh]
+            mapdoor = New Int[mmw,mmh]
+            makemap()
+            finalizemap()
+            For Local i:=0 Until 1000
+                Local x:Int=Rnd(2,mmw-4)
+                Local y:Int=Rnd(17,mmh-4)
+                If mapfinal[x,y] = 1
+                If mapfinal[x,y+1] = 0
+                mapfinal[x,y] = 3
+                End If
+                End If
+            Next		
+            createfinalmineable()
+            updateladderimage(mapladdercanvas)
+            updateimage(mapcanvas)
+            
+        End Method 
+        ' Here we create the parts on the mapfinal that can be mined
+        ' by the player (like in minecraft/digger) tilemineable
+        Method createfinalmineable()
+            ' 3 high mineable mineshafts right to left
+            For Local y1:Int=15 Until mmh-10
+            For Local x1:Int=3 Until mmw-3
+                ' Find suitable spot
+                If mapfinal[x1,y1] <> tilesolid Then Continue
+                If mapfinal[x1+1,y1] <> tileempty Then Continue
+                If mapfinal[x1,y1+1] <> tilesolid Then Continue
+                If mapfinal[x1,y1+2] <> tilesolid Then Continue
+                If mapfinal[x1,y1+3] <> tilesolid Then Continue
+                If mapfinal[x1+1,y1+4] <> tilesolid Then Continue
+                If mapfinal[x1+1,y1+1] <> tileempty Then Continue
+                If mapfinal[x1+1,y1+2] <> tileempty Then Continue
+                If mapfinal[x1+1,y1+3] <> tileempty Then Continue
+                ' See how far left we can go
+                Local len:Int=0			
+                For Local x2:Int=x1 Until 3 Step -1
+                    If mapfinal[x2,y1] <> tilesolid Then Exit
+                    If mapfinal[x2,y1+1] <> tilesolid Then Exit
+                    If mapfinal[x2,y1+2] <> tilesolid Then Exit
+                    If mapfinal[x2,y1+3] <> tilesolid Then Exit
+                    If mapfinal[x2,y1+4] <> tilesolid Then Exit
+                    len+=1
+                Next
+                ' If we can go deep enough then prepare mineshaft
+                If len<=10 Then Continue
+                len = Rnd(7,len)
+                For Local x2:Int=x1 Until x1-(len-3) Step -1
+                For Local y2:Int=y1+1 Until y1+4 
+                    mapfinal[x2,y2] = tilemineable
+                Next
+                Next
+            Next
+            Next
+            '
+            '
+            ' 3 high mineable mineshafts left to right
+            For Local y1:Int=15 Until mmh-10
+            For Local x1:Int=3 Until mmw-3
+                ' Find suitable spot
+                If mapfinal[x1,y1] <> tilesolid Then Continue
+                If mapfinal[x1-1,y1] <> tileempty Then Continue
+                If mapfinal[x1,y1+1] <> tilesolid Then Continue
+                If mapfinal[x1,y1+2] <> tilesolid Then Continue
+                If mapfinal[x1,y1+3] <> tilesolid Then Continue
+                If mapfinal[x1-1,y1+4] <> tilesolid Then Continue
+                If mapfinal[x1-1,y1+1] <> tileempty Then Continue
+                If mapfinal[x1-1,y1+2] <> tileempty Then Continue
+                If mapfinal[x1-1,y1+3] <> tileempty Then Continue
+                ' See how far left we can go
+                Local len:Int=0			
+                For Local x2:Int=x1 Until mmw-4
+                    If mapfinal[x2,y1] <> tilesolid Then Exit
+                    If mapfinal[x2,y1+1] <> tilesolid Then Exit
+                    If mapfinal[x2,y1+2] <> tilesolid Then Exit
+                    If mapfinal[x2,y1+3] <> tilesolid Then Exit
+                    If mapfinal[x2,y1+4] <> tilesolid Then Exit
+                    len+=1
+                Next
+                ' If we can go deep enough then prepare mineshaft
+                If len<=10 Then Continue
+                len = Rnd(7,len)
+                For Local x2:Int=x1 Until x1+(len-3)
+                For Local y2:Int=y1+1 Until y1+4 
+                    mapfinal[x2,y2] = tilemineable
+                Next
+                Next
+            Next
+            Next
+
+
+        End Method
+        Method finalizemap()
+        For Local y:=1 Until mh-1
+        For Local x:=1 Until mw-1
+            If map[x,y] = tileempty
+                For Local y2:=-1 To 1
+                For Local x2:=-1 To 1
+                    mapfinal[(x*3)+x2,(y*3)+y2] = tileempty
+                Next
+                Next			
+            End If
+        Next
+        Next
+        ' make ladders/vines
+        For Local y:=0 Until mh
+        For Local x:=0 Until mw
+            If map[x,y] = 1
+            If map[x-1,y] = 0
+            If map[x+1,y] = 0			
+                Local y2:Int=y
+                While map[x,y2] <> 0				
+                    mapladder[(x*3),y2*3] = 1
+                    mapladder[(x*3),y2*3-1] = 1
+                    mapladder[(x*3),y2*3+1] = 1				
+                    y2-=1
+                Wend
+                y2=y
+                While map[x,y2] <> 0				
+                    mapladder[(x*3),y2*3] = 1
+                    mapladder[(x*3),y2*3-1] = 1
+                    mapladder[(x*3),y2*3+1] = 1
+                    y2+=1
+                Wend			
+            End If
+            End If 
+            End If
+        Next
+        Next
+        ' make doors
+        For Local i:=0 Until mmw*mmh/2
+            Local x:=Rnd(2,mmw-4)
+            Local y:=Rnd(2,mmh-2)
+            ' door right side of tunnel
+    '		If Rnd()<0
+            If mapfinal[x,y] = 0
+            If mapfinal[x+1,y] = 0
+            If mapfinal[x-1,y] = 0
+            If mapfinal[x-2,y] = 0
+            If mapfinal[x-3,y] = 1
+            If mapfinal[x,y+1] = 1
+            If mapfinal[x,y+2]= 1
+            If mapfinal[x,y+3] = 1
+            If mapfinal[x,y+4] = 0
+                mapfinal[x,y+1] = 1
+                mapfinal[x,y+2] = 1
+                mapfinal[x,y+3] = 1
+                mapdoor[x,y+1 ] = 1
+                mapdoor[x,y+2 ] = 1
+                mapdoor[x,y+3 ] = 1
+            End If 
+            End If
+            End If 
+            End If 
+            End If
+            End If 
+            End If
+            End If
+            End If
+    '		End If
+            ' door left side of tunnel
+            If mapfinal[x-1,y-1] = 0
+            If mapfinal[x,y] = 0
+            If mapfinal[x-1,y] = 0
+            If mapfinal[x+1,y] = 0
+            If mapfinal[x+2,y] = 0
+            If mapfinal[x+3,y] = 1
+            If mapfinal[x,y+1] = 1
+            If mapfinal[x,y+2]= 1
+            If mapfinal[x,y+3] = 1
+            If mapfinal[x,y+4] = 0
+                mapfinal[x,y+1] = 1
+                mapfinal[x,y+2] = 1
+                mapfinal[x,y+3] = 1
+                mapdoor[x,y+1 ] = 1
+                mapdoor[x,y+2 ] = 1
+                mapdoor[x,y+3 ] = 1
+            End If 
+            End If
+            End If 
+            End If 
+            End If 
+            End If
+            End If 
+            End If
+            End If
+            End If
+
+        Next
+        End Method
+        Method makemap()
+            For Local y:=1 Until 6
+            For Local x:=1 Until mw-1
+                map[x,y] = 1
+            Next
+            Next
+            Local minedownx:Int=5+Rnd(mw-15)
+            For Local y:=5 Until mh/2+10
+                map[mw/2,y] = 1
+            Next
+            For Local i:=0 Until (mw*mh)*6
+                Local x:Int=Rnd(2,mw-4)
+                Local y:Int=Rnd(2,mh-4)
+                If map[x,y] = 1					
+                    Local v:Int=Rnd(0,2)
+                    Select v
+                        Case 0'go left or right										
+                        If map[x-1,y] = 0
+                        If map[x+1,y] = 0										
+                        makeside(x,y,Rnd(0,2))
+                        End If 
+                        End If
+                        Case 1'go down Or up
+                        If map[x,y-1]=0
+                        If map[x,y+1]=0
+                        makevert(x,y,Rnd(0,2))
+                        End If
+                        End If
+                    End Select
+                End If
+            Next
+            widenhorizontal()
+        End Method
+        Method widenhorizontal()
+            For Local i:=0 Until mw*mh/2
+                Local x:Int=Rnd(2,mw-2)
+                Local y:Int=Rnd(2,mh-2)
+                If map[x,y] = 1 And map[x,y-1] = 0 And map[x,y+1] = 0				
+                    Local w:Int=0
+                    Local x2:Int=x
+                    Local exitloop:Bool=False
+                    While exitloop = False
+                        If map[x2,y] = 0 Then exitloop = true 
+                        If map[x2,y-1] = 1 Then exitloop = True
+                        If map[x2,y+1] = 1 Then exitloop = True				
+                        x2+=1
+                        w+=1
+                    Wend
+                    '
+                    
+                    If w-2>3					
+                        For Local x2:Int=x To x+w-2
+                            map[x2,y-1] = 1
+                            map[x2,y+1] = 1
+                            If x2>x+2 And w>6 And x2<(x+5)
+                                map[x2,y+2] = 1
+                            End If
+                        Next
+                    End If
+                End If
+            Next
+        End Method
+        Method makevert(x:Int,y:Int,side:Int)
+            Local l:Int=Rnd(4,20)
+            If y<22 Then Return
+            If y>mw-22 Then Return
+            If side =  0'down		
+                If overlap(x-4,y+1,x+4,y+l+2) = False
+                    For Local y2:=y To y+l
+                        map[x,y2] = 1
+                    Next
+                End If
+            End If
+            If side =  1'up
+                If overlap(x-4,(y-l)-3,x+4,y-1) = False
+                    For Local y2:=y-l To y
+                        map[x,y2] = 1
+                    Next
+                End If
+            End If
+
+        End Method
+        Method makeside(x:Int,y:Int,side:Int)		
+            Local l:Int=Rnd(4,20)		
+            If x<22 Then Return
+            If x>mw-22 Then Return				
+            If side=0 Then 'left				
+                If overlap((x-l)-2,y-5,x,y+5) = False				
+                    For Local x2:=x-l Until x
+                        map[x2,y] = 1
+                    Next
+                End If
+            End If
+            If side=1 Then 'right		
+                If overlap(x+1,y-5,x+l+2,y+5) = False								
+                    For Local x2:=x Until x+l
+                        map[x2,y] = 1
+                    Next
+                End If			
+            end If		
+        End Method
+        Method overlap:bool(x1:Int,y1:Int,x2:Int,y2:int)
+            For Local y:=y1 Until y2
+            For Local x:=x1 Until x2
+                If x>0 And x<mw And y>0 And y<mh
+                    If map[x,y] = 1 Then Return True
+                End If
+            Next
+            Next
+            Return False
+        End Method
+        Method drawladder(canvas:Canvas)						
+            For Local y:=0 Until mmh
+            For Local x:=0 Until mmw
+                Select mapladder[x,y]				
+                    Case 0
+                    'canvas.Color = Color.None
+                    'canvas.DrawRect(x*tw,y*th,tw,th)
+                    Case 1				
+                    canvas.Color = New Color(0.4,0,0)
+                    canvas.DrawRect(x*tw,y*th,tw,th)
+                    'canvas.DrawRect(0,0,100,100)
+                    canvas.Color = New Color(0.7,0.7,0)
+                    canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
+                End Select			
+            Next
+            Next		
+        End Method 	
+
+        Method updateladderimage(canvas:Canvas)				
+        
+            canvas.BlendMode = BlendMode.Opaque
+            'canvas.Clear(New Color(0,0,0,.5))
+            For Local y:=0 Until mmh
+            For Local x:=0 Until mmw
+                Select mapladder[x,y]				
+                    Case 0
+                    canvas.Color = Color.None
+                    canvas.DrawRect(x*tw,y*th,tw,th)
+                    Case 1								
+                    canvas.Color = Color.Red
+                    canvas.Alpha = 0.5
+                    canvas.DrawRect(x*tw,y*th,tw,th)
+                    canvas.Color = Color.Yellow
+                    canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
+                End Select			
+            Next
+            Next
+            canvas.Flush()
+        End Method 	
+        Method draw(canvas:Canvas)		
+            For Local y:=0 Until mmh
+            For Local x:=0 Until mmw
+                Select mapfinal[x,y]
+                    Case tilesolid
+                    canvas.Color = Color.Black
+                    Case tileempty
+                    canvas.Color = Color.White
+                    canvas.DrawRect(x*tw,y*th,tw,th)
+                    Case tileegg			
+                    canvas.Color = Color.Yellow
+                    canvas.DrawRect(x*tw,y*th,tw,th)
+                End Select	
+            Next
+            Next		
+        End Method 
+        Method updateimage(canvas:Canvas)			
+            'canvas.BlendMode = BlendMode.Opaque	
+            canvas.Clear(Color.Black)
+            canvas.BlendMode = BlendMode.Opaque
+            For Local y:=0 Until mmh
+            For Local x:=0 Until mmw
+                Select mapfinal[x,y]
+                    Case tilesolid
+                    'canvas.Alpha = 1
+                    canvas.Color = Color.Brown
+                    canvas.DrawRect(x*tw,y*th,tw,th)
+                    'Case tilesolid
+                    'canvas.Alpha = 0.5
+                    'canvas.Color = Color.None'New Color(0,0,0,.8)
+                    'canvas.DrawRect(x*tw,y*th,tw,th)
+                    Case tileegg		
+                    canvas.Alpha = 0.8	
+                    canvas.Color = Color.Yellow
+                    canvas.DrawRect(x*tw,y*th,tw,th)
+                    Case tileturret
+                    canvas.Alpha = 0.8	
+                    canvas.Color = Color.Grey
+                    canvas.DrawRect(x*tw,y*th,tw,th)				
+                    Case tilemineable
+                    canvas.Alpha = 0.8	
+                    canvas.Color = Color.Brown.Blend(Color.Yellow,.2)
+                    canvas.DrawRect(x*tw,y*th,tw,th)
+                End Select						
+            Next
+            Next
+            canvas.Flush()
+        End Method 
+        Method mapmineablecollide:Bool(x:Int,y:Int,w:Int,h:Int,remove:Bool,kind:String)
+            Local mmw:Int=mymap.mmw
+            Local mmh:Int=mymap.mmh
+            Local lefttopx:Int		=((x)/tilewidth)
+            Local lefttopy:Int		=((y)/tileheight)
+            Local righttopx:Int		=((x+w)/tilewidth)
+            Local righttopy:Int		=((y)/tileheight)
+            Local leftbottomx:Int	=((x)/tilewidth)
+            Local leftbottomy:Int	=((y+h)/tileheight)
+            Local rightbottomx:Int	=((x+w)/tilewidth)												
+            Local rightbottomy:Int	=((y+h)/tileheight)
+            If lefttopx < 0 Or lefttopx >= mmw Then Return True
+            If lefttopy < 0 Or lefttopy >= mmh Then Return True
+            If righttopx < 0 Or righttopx >= mmw Then Return True
+            If righttopy < 0 Or righttopy >= mmh Then Return True
+            If leftbottomx < 0 Or leftbottomx >= mmw Then Return True
+            If leftbottomy < 0 Or leftbottomy >= mmh Then Return True
+            If rightbottomx < 0 Or rightbottomx >= mmw Then Return True
+            If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
+            
+            If mymap.mapfinal[lefttopx,lefttopy] = mymap.tilemineable Then 
+                If remove=True
+                    removemineable(lefttopx,lefttopy,kind)
+                End If
+                Return True
+            End If
+            If mymap.mapfinal[righttopx,righttopy] = mymap.tilemineable Then 
+                If remove=True
+                    removemineable(righttopx,righttopy,kind)
+                End If
+                Return True
+            End if
+            If mymap.mapfinal[leftbottomx,leftbottomy] = mymap.tilemineable Then 
+                If remove=True
+                    removemineable(leftbottomx,leftbottomy,kind)
+                End If
+                Return True
+            End If
+            If mymap.mapfinal[rightbottomx,rightbottomy] = mymap.tilemineable Then 
+                If remove=True
+                    removemineable(rightbottomx,rightbottomy,kind)
+                End If
+                Return True						
+            End If
+            Return False
+        End Method	
+
+        ' Every now and then remove mineable tile
+        ' and add item
+        '
+        Method removemineable(x:Int,y:Int,kind:String)
+            Local chance:Int=10
+            If kind="gun" Then chance=50 
+            If kind="frag" Then chance = 10
+            If Rnd(chance) < 2 Then
+                mymap.mapfinal[x,y] = mymap.tileempty
+                myitem.Add(New item((x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"))
+            End If
+        End Method
+            
+        Method tilecollide:Bool(x:Int,y:Int,w:Int,h:Int,tile:Int)
+            Local lefttopx:Int		=((x)/tilewidth)
+            Local lefttopy:Int		=((y)/tileheight)
+            Local righttopx:Int		=((x+w)/tilewidth)
+            Local righttopy:Int		=((y)/tileheight)
+            Local leftbottomx:Int	=((x)/tilewidth)
+            Local leftbottomy:Int	=((y+h)/tileheight)
+            Local rightbottomx:Int	=((x+w)/tilewidth)												
+            Local rightbottomy:Int	=((y+h)/tileheight)
+            If lefttopx < 0 Or lefttopx >= mmw Then Return False
+            If lefttopy < 0 Or lefttopy >= mmh Then Return false
+            If righttopx < 0 Or righttopx >= mmw Then Return false
+            If righttopy < 0 Or righttopy >= mmh Then Return false
+            If leftbottomx < 0 Or leftbottomx >= mmw Then Return false
+            If leftbottomy < 0 Or leftbottomy >= mmh Then Return false
+            If rightbottomx < 0 Or rightbottomx >= mmw Then Return false
+            If rightbottomy < 0 Or rightbottomy >= mmh Then Return false
+            
+            If mapfinal[lefttopx,lefttopy] = tile Then Return True
+            If mapfinal[righttopx,righttopy] = tile Then Return True
+            If mapfinal[leftbottomx,leftbottomy] = tile Then Return True
+            If mapfinal[rightbottomx,rightbottomy] = tile Then Return True						
+            Return False
+        End Method	
+        Method mapcollide:Bool(x:Int,y:Int,w:Int,h:Int)
+            Local lefttopx:Int		=((x)/tilewidth)
+            Local lefttopy:Int		=((y)/tileheight)
+            Local righttopx:Int		=((x+w)/tilewidth)
+            Local righttopy:Int		=((y)/tileheight)
+            Local leftbottomx:Int	=((x)/tilewidth)
+            Local leftbottomy:Int	=((y+h)/tileheight)
+            Local rightbottomx:Int	=((x+w)/tilewidth)												
+            Local rightbottomy:Int	=((y+h)/tileheight)
+            If lefttopx < 0 Or lefttopx >= mmw Then Return True
+            If lefttopy < 0 Or lefttopy >= mmh Then Return True
+            If righttopx < 0 Or righttopx >= mmw Then Return True
+            If righttopy < 0 Or righttopy >= mmh Then Return True
+            If leftbottomx < 0 Or leftbottomx >= mmw Then Return True
+            If leftbottomy < 0 Or leftbottomy >= mmh Then Return True
+            If rightbottomx < 0 Or rightbottomx >= mmw Then Return True
+            If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
+            
+            If mapfinal[lefttopx,lefttopy] <> mymap.tileempty Then Return True
+            If mapfinal[righttopx,righttopy] <> mymap.tileempty Then Return True
+            If mapfinal[leftbottomx,leftbottomy] <> mymap.tileempty Then Return True
+            If mapfinal[rightbottomx,rightbottomy] <> mymap.tileempty Then Return True						
+            Return False
+        End Method	
+        ' Collide with solid and mineable
+        Method mapcollide2:Bool(x:Int,y:Int,w:Int,h:Int)
+            Local lefttopx:Int		=((x)/tilewidth)
+            Local lefttopy:Int		=((y)/tileheight)
+            Local righttopx:Int		=((x+w)/tilewidth)
+            Local righttopy:Int		=((y)/tileheight)
+            Local leftbottomx:Int	=((x)/tilewidth)
+            Local leftbottomy:Int	=((y+h)/tileheight)
+            Local rightbottomx:Int	=((x+w)/tilewidth)												
+            Local rightbottomy:Int	=((y+h)/tileheight)
+            If lefttopx < 0 Or lefttopx >= mmw Then Return True
+            If lefttopy < 0 Or lefttopy >= mmh Then Return True
+            If righttopx < 0 Or righttopx >= mmw Then Return True
+            If righttopy < 0 Or righttopy >= mmh Then Return True
+            If leftbottomx < 0 Or leftbottomx >= mmw Then Return True
+            If leftbottomy < 0 Or leftbottomy >= mmh Then Return True
+            If rightbottomx < 0 Or rightbottomx >= mmw Then Return True
+            If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
+            
+            If mapfinal[lefttopx,lefttopy] = mymap.tilesolid Then Return True
+            If mapfinal[righttopx,righttopy] = mymap.tilesolid Then Return True
+            If mapfinal[leftbottomx,leftbottomy] = mymap.tilesolid Then Return True
+            If mapfinal[rightbottomx,rightbottomy] = mymap.tilesolid Then Return True						
+
+            If mapfinal[lefttopx,lefttopy] = mymap.tilemineable Then Return True
+            If mapfinal[righttopx,righttopy] = mymap.tilemineable Then Return True
+            If mapfinal[leftbottomx,leftbottomy] = mymap.tilemineable Then Return True
+            If mapfinal[rightbottomx,rightbottomy] = mymap.tilemineable Then Return True						
+
+            Return False
+        End Method	
+
+    }
+
 
     img.src="data:image/png;base64,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";
     
@@ -1036,6 +1690,23 @@ Use different browser.
         if(evt.keyCode==32){ //space
             Controller.Jump = false;
         }
+    }
+    function drawLine(x1,y1,x2,y2,stroke = 'black', width = 1) {
+        if (stroke) {
+            ctx.strokeStyle = stroke;
+        }
+
+        if (width) {
+            ctx.lineWidth = width;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(x1,y1);
+        ctx.lineTo(x2,y2);
+        ctx.stroke();
+    }
+    function randomRange(min, max) {
+        return Math.floor(Math.random() * (max - min) + min);
     }
 </script>
 </body>
