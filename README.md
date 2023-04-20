@@ -10,7 +10,7 @@ I wil start to slowly add keyboard controls to older things. My laptop has touch
 I might get a bit distracted with pygame as this was a breeze to install.<br><br>
 I was working on a platformer game project a number of years ago. This might get ported to Javascript. It is around 5000 lines in the Monkey2 language.<br>
 I am drawing gfx (including animations) for it now.<br>
-(old browser version / emscripten)<br>
+(old browser version / emscripten / keyboard only)<br>
 https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html<br><br>
 
 
