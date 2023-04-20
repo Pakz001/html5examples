@@ -15,7 +15,9 @@
         user-select:none;
         -webkit-tap-highlight-color:rgba(0,0,0,0);
         }
+
     </style>
+
 <canvas id="myCanvas" width="640" height="480" style="border:0px solid #d3d3d3;">
 Use different browser.
 </canvas>
@@ -37,6 +39,12 @@ Use different browser.
     //
     var c=document.getElementById("myCanvas");
     var ctx=c.getContext("2d");
+
+	var offscreenCanvas = document.createElement("canvas");
+
+	var ctx2 = offscreenCanvas.getContext("2d")
+
+
 
     var img = new Image();
 
@@ -1143,9 +1151,9 @@ Use different browser.
                         //'canvas.DrawRect(0,0,100,100)
                         //canvas.Color = New Color(0.7,0.7,0)
                         //canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
-                        ctx.fillStyle = 'rgb(20,0,0)';
-                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
-                        ctx.fillStyle = 'rgb(160,160,0)';
+                        ctx2.fillStyle = 'rgb(20,0,0)';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.fillStyle = 'rgb(160,160,0)';
                         drawLine(x*this.tw,y*this.th,x*this.tw,y*this.th+this.th-2,'rgb(160,160,0)');
                     }
                     //End Select			
@@ -1214,7 +1222,9 @@ Use different browser.
                 }
             }		
         }
-        updateimage(){			
+        updateimage(){
+            		
+            
             //canvas.BlendMode = BlendMode.Opaque	
             //canvas.Clear(Color.Black)
             //canvas.BlendMode = BlendMode.Opaque
@@ -1222,28 +1232,29 @@ Use different browser.
                 for(var x=0;x<this.mmw;x++){
                     var a = this.mapfinal[x][y];
                     if(a==this.tilesolid){
-                        ctx.globalAlpha = 1;
-                        ctx.fillStyle = 'brown';
-                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.globalAlpha = 1;
+                        ctx2.fillStyle = 'brown';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
                     }
                     if(a==this.tileegg){
-                        ctx.globalAlpha = 0.8;
-                        ctx.fillStyle = 'yellow';
-                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.globalAlpha = 0.8;
+                        ctx2.fillStyle = 'yellow';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
                     }
                     if(a==this.tileturret){
-                        ctx.globalAlpha = 0.8;
-                        ctx.fillStyle = 'grey';
-                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.globalAlpha = 0.8;
+                        ctx2.fillStyle = 'grey';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
                     }
                     if(a==this.tileminable){
-                        ctx.globalAlpha = 0.8;
-                        ctx.fillStyle = 'rgb(140,80,30)';
-                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.globalAlpha = 0.8;
+                        ctx2.fillStyle = 'rgb(140,80,30)';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
                     }
                 }
             }
             //canvas.Flush()
+            //ctx=c.getContext("2d");{
         } 
         mapmineablecollide(x,y,w,h,remove,kind){
             var mmw=mymap.mmw;
@@ -1457,6 +1468,8 @@ Use different browser.
 
     var mymap=new map(screenwidth,screenwidth,mapwidth,mapheight);
 
+
+
     gameloop=setInterval(doGameLoop2,1);
     function doGameLoop2(){
         myCanvas.height = window.innerHeight-32;
@@ -1464,12 +1477,20 @@ Use different browser.
         //tw = Math.floor(myCanvas.width,tmap[0].length); 	
         //th = Math.floor(myCanvas.height,tmap.length);
         ctx.clearRect(0,0,c.width,c.height);
-        ctx.fillStyle="rgb(0,0,0)";
+        ctx.fillStyle="rgb(110,0,0)";
         ctx.fillRect(0,0,c.width,c.height);
 
         //mymap.draw();
+        offscreenCanvas.width=window.innerWidth-32;
+		offscreenCanvas.height=window.innerHeight-32;
+
         mymap.updateimage();    
         mymap.drawladder();
+        ctx2.globalAlpha=1;
+		//ctx2.fillStyle="#FFFF00";
+		//ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
+
+        ctx.drawImage(offscreenCanvas,0,0);
     }
     function doGameLoop(){
         myCanvas.height = window.innerHeight-32;
