@@ -1207,38 +1207,37 @@ Use different browser.
                 }
             }		
         }
-        Method updateimage(canvas:Canvas)			
-            'canvas.BlendMode = BlendMode.Opaque	
-            canvas.Clear(Color.Black)
-            canvas.BlendMode = BlendMode.Opaque
-            For Local y:=0 Until mmh
-            For Local x:=0 Until mmw
-                Select mapfinal[x,y]
-                    Case tilesolid
-                    'canvas.Alpha = 1
-                    canvas.Color = Color.Brown
-                    canvas.DrawRect(x*tw,y*th,tw,th)
-                    'Case tilesolid
-                    'canvas.Alpha = 0.5
-                    'canvas.Color = Color.None'New Color(0,0,0,.8)
-                    'canvas.DrawRect(x*tw,y*th,tw,th)
-                    Case tileegg		
-                    canvas.Alpha = 0.8	
-                    canvas.Color = Color.Yellow
-                    canvas.DrawRect(x*tw,y*th,tw,th)
-                    Case tileturret
-                    canvas.Alpha = 0.8	
-                    canvas.Color = Color.Grey
-                    canvas.DrawRect(x*tw,y*th,tw,th)				
-                    Case tilemineable
-                    canvas.Alpha = 0.8	
-                    canvas.Color = Color.Brown.Blend(Color.Yellow,.2)
-                    canvas.DrawRect(x*tw,y*th,tw,th)
-                End Select						
-            Next
-            Next
-            canvas.Flush()
-        End Method 
+        updateimage(){			
+            //canvas.BlendMode = BlendMode.Opaque	
+            //canvas.Clear(Color.Black)
+            //canvas.BlendMode = BlendMode.Opaque
+            for(var y=0;y<this.mmh;y++){
+                for(var x=0;x<this.mmw;x++){
+                    var a = this.mapfinal[x,y];
+                    if(a==this.tilesolid){
+                        ctx.globalAlpha = 1;
+                        ctx.fillStyle = 'brown';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                    if(a==this.tileegg){
+                        ctx.globalAlpha = 0.8;
+                        ctx.fillStyle = 'yellow';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                    if(a==this.tileturret){
+                        ctx.globalAlpha = 0.8;
+                        ctx.fillStyle = 'grey';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                    if(a==this.tileminable){
+                        ctx.globalAlpha = 0.8;
+                        ctx.fillStyle = 'rgb(140,80,30)';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                }
+            }
+            //canvas.Flush()
+        } 
         mapmineablecollide(x,y,w,h,remove,kind){
             var mmw=mymap.mmw;
             var mmh=mymap.mmh;
@@ -1390,7 +1389,7 @@ Use different browser.
     c.addEventListener("touchend", touchHandler);
     c.addEventListener("touchstart", touchHandler);
     
-    var map = [
+    var tmap = [
         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
         [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
@@ -1412,29 +1411,29 @@ Use different browser.
     // Copy an array and make it a copy
     // that you can modify without modifying\
     // the original.
-    for (var i = 0; i < map.length; i++)
-    tilemap[i] = map[i].slice();
+    for (var i = 0; i < tmap.length; i++)
+    tilemap[i] = tmap[i].slice();
 
 
-    for(y=0;y<map.length;y++){
-        for(x=0;x<map[0].length;x++){
-            if(map[y][x]==1 && tilemap[y][x]==1){
-                if(Math.random()<.25 && x+1<map[0].length && map[y][x+1]==1){
+    for(y=0;y<tmap.length;y++){
+        for(x=0;x<tmap[0].length;x++){
+            if(tmap[y][x]==1 && tilemap[y][x]==1){
+                if(Math.random()<.25 && x+1<tmap[0].length && tmap[y][x+1]==1){
                     tilemap[y][x]=4;
                     tilemap[y][x+1]=5;
                 }else{
                     tilemap[y][x]=Math.floor(Math.random()*3)+1;
                 }
             }
-            if(map[y][x]==2){
-                if(map[y-1][x]==1){
+            if(tmap[y][x]==2){
+                if(tmap[y-1][x]==1){
                     tilemap[y][x]=6;
                     //map[y][x]=0;
                 }
-                if(map[y+1][x]==0){
+                if(tmap[y+1][x]==0){
                     tilemap[y][x]=7;
                 }
-                if(map[y-1][x]==2 && map[y+1][x]==2){
+                if(tmap[y-1][x]==2 && tmap[y+1][x]==2){
                     tilemap[y][x]=8;
                 }
             }
@@ -1453,7 +1452,8 @@ Use different browser.
     function doGameLoop(){
         myCanvas.height = window.innerHeight-32;
         myCanvas.width = window.innerWidth-32;
-        tw = Math.floor(myCanvas.width/map[0].length); 	th = Math.floor(myCanvas.height/map.length);
+        tw = Math.floor(myCanvas.width,tmap[0].length); 	
+        th = Math.floor(myCanvas.height,tmap.length);
         ctx.clearRect(0,0,c.width,c.height);
         ctx.fillStyle="rgb(0,0,0)";
         ctx.fillRect(0,0,c.width,c.height);
@@ -1471,7 +1471,7 @@ Use different browser.
         var bt = Math.floor((-camy / th)+((myCanvas.height/th)))+1;
         for(var y = tt; y < bt; ++y) {
             for(var x = lt; x < rt; ++x) {
-                if(x>=0 && y>=0 && x<map[0].length && y<map.length){
+                if(x>=0 && y>=0 && x<tmap[0].length && y<tmap.length){
                     var dx = (x*tw)+camx;
                     var dy = (y*th)+camy;
 
@@ -1572,7 +1572,7 @@ Use different browser.
                 y>myCanvas.height/4 && 
                 y<myCanvas.height-myCanvas.width/4){
             
-            if(camx>-((map[0].length*tw)-myCanvas.width)){
+            if(camx>-((tmap[0].length*tw)-myCanvas.width)){
             camx-=16;
             }
         }
@@ -1584,7 +1584,7 @@ Use different browser.
         
         if(	y>myCanvas.height/4+myCanvas.height/2 ){
         
-            if(camy>-((map.length*th)-myCanvas.height))camy-=16;
+            if(camy>-((tmap.length*th)-myCanvas.height))camy-=16;
         }
 
     }
@@ -1596,8 +1596,8 @@ Use different browser.
 
         for(var y2=cy-1;y2<cy+3;y2++){
         for(var x2=cx-1;x2<cx+3;x2++){	
-            if(x2>=0 && x2<map[0].length && y2>=0 && y2<map.length){
-                if(map[y2][x2] == 1){
+            if(x2>=0 && x2<tmap[0].length && y2>=0 && y2<tmap.length){
+                if(tmap[y2][x2] == 1){
                     var x3 = ((x2)*tw)+camx;
                     var y3 = ((y2)*th)+camy;
                     if(rectsoverlap(x+offsetx,y+offsety,w,h,x3,y3,tw,th)==true){
