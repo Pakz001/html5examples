@@ -3,7 +3,10 @@
 
 <br><br>
 
-<img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="20%"></img><br>
+![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif)
+
+
+
 *(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)*
 <br>
 <br>
