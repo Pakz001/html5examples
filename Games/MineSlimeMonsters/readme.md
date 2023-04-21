@@ -3,7 +3,7 @@ Monkey2 to Javascript<br><br>
 <hr />
 
 <img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="20%"><br>
-(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)
+<i>(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)</i>
 <br>
 <br>
 <br>
