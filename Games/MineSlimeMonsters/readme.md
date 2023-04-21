@@ -21,7 +21,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 
 <b>Conversion :</b>
 * Added new controller code system. Should make joypad and touch control easier.
-* ..
+* Figure out what to do with resolution / window size changes.(pauze/rebuild?)
 
  <br><br>
 <b>Ideas :</b>
