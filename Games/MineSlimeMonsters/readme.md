@@ -44,6 +44,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 * Talk to villagers.
 * rescue villagers (mission?)
 * Lighting system?
+* Ladder rider - tool for going up and down ladders faster (store:levels)
 
 <br><br>
 **Adding Features later on :**
