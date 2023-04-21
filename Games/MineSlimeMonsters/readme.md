@@ -25,8 +25,8 @@
     <br>
     Conversion :<br>
     * Added new controller code system. Should make joypad and touch control easier.
+    * ..
     
-    <br><br><br>
     Ideas :<br>
     * Scientist say matter can form out of nothingness. Taking this a notch further, "the spawning of devil eggs".
     * infinite maps?
