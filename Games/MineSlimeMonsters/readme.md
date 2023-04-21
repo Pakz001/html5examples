@@ -1,5 +1,5 @@
-<h1>Porting code : 1800 of 5000.</h1><br><br>
-
+<h1>Porting code : 1800 of 5000.</h1><br>
+( Monkey2 to Javascript )<br><br>
 
 
 <img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="20%"><br>
@@ -22,9 +22,13 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 
 
 
-<b>Conversion :</b>
+<b>Conversion notes :</b>
 * Added new controller code system. Should make joypad and touch control easier.
 * Figure out what to do with resolution / window size changes.(pauze/rebuild?)
+* Still struggling with offscreen canvasses.
+* Need to fix a memory leak from old version.
+* Variables Ints in array -> pay attention. (fix : Math.floor(variable) )
+
 
  <br><br>
 <b>Ideas :</b>
@@ -38,6 +42,6 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 * Lighting system?
 
 <br><br>
-<b>Adding Features :</b>
+<b>Adding Features later on :</b>
 * Controller(xbox)
 * Touch screen controls(touch the screen and it displays a sliding menu to activate touch controls.)
