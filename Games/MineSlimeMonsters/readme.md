@@ -1,7 +1,6 @@
-<hr />
 <h1>Porting code : 1800 of 5000.</h1>
 Monkey2 to Javascript<br><br>
-<hr / >
+<hr />
 
 <img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="20%"><br>
 (sketch for the walking egg monsters. Wil get scarier and colored after tweaking)
