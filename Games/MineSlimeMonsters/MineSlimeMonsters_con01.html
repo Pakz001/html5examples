@@ -77,6 +77,196 @@ Use different browser.
     var tilewidth=20;
     var tileheight=20;
 
+    //fragmentation things
+    class frag{
+        constructor(x,y,owner){
+            this.px,this.py; //pixel x and y
+            this.owner;
+            this.angle;
+            this.w,this.h;
+            this.deleteme=false;
+            this.countdown;
+            this.mx;
+            this.my;
+            this.fragspeed;
+
+            this.owner = owner;
+            this.px = x;
+            this.py = y;
+            this.w = 3;
+            this.h = 3;
+            this.fragspeed = randomRange(4,7);
+            this.countdown = 100+randomRange(0,300);
+            this.angle = randomRangeFloat(0,Math.PI*2);
+            this.mx = Math.cos(this.angle);
+            this.my = Math.sin(this.angle);
+
+        }
+        update(){		
+            for(var ps=0;ps<this.fragspeed;ps+=1){  
+                this.countdown-=1;
+                if(this.countdown < 0){
+                    
+                    this.deleteme = true; 
+                    return;
+                }
+                
+                //Collision with mineable tiles
+                if(mymap.mapmineablecollide(this.px-4,this.py-4,this.w+8,this.h+8,true,"frag")==true){
+                    //this.deleteme = true;
+                }
+                
+                //Collision with the slime
+                //if(mygrowslime.slimecollide(this.px-2,this.py-2,this.w+4,this.h+4,true)==true){
+                //    this.deleteme = true;
+                //}
+                
+                
+                //bouncy vertical
+                if(mymap.mapcollide(this.px,this.py+2,1,this.h)==true){ 			
+                    this.my = -this.my*.8;//+Rnd(-.1,.1)
+                    var cnt=0;
+                    while(mymap.mapcollide(this.px,this.py+2,1,this.h)==true){
+                        this.py+=this.my;
+                        cnt+=1;
+                        if(cnt>100)break;
+                    }
+                    this.mx*=.8;
+                    this.my*=.8;
+                    if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                    if(this.my>0 && this.my<.2)this.my=.2;
+                    if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                    if(this.mx>0 && this.mx<.2)this.mx=.2;
+                    
+                }
+                //bounc ceiling
+                if(mymap.mapcollide(this.px,this.py-2,1,this.h)==true){		
+                    //slimed=slimecollide(px,py+2,1,h)
+                    //If slimed = true Then return
+                    this.my = -this.my*.8
+                    var cnt=0;
+                    while(mymap.mapcollide(this.px,this.py-2,1,this.h)==true){
+                        this.py+=this.my;
+                        cnt+=1;
+                        if(cnt>100)break;
+                    }
+                
+                    this.mx*=.8;
+                    this.my*=.8;
+                
+                    if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                    if(this.my>0 && this.my<.2)this.my=.2;
+                    if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                    if(this.mx>0 && this.mx<.2)this.mx=.2;
+                
+                }		
+                //bounce horizontally
+                if(mymap.mapcollide(this.px-this.w,this.py,this.w*2,1)==true){ 			
+                    this.mx = -this.mx*.8//+Rnd(-.1,.1)
+                    var cnt=0;
+                    while(mymap.mapcollide(this.px-this.w,this.py,this.w*2,1)==true){
+                        this.px+=this.mx;	
+                        cnt+=1;
+                        if(cnt>100)break;			
+                    }
+                    this.mx*=.8;
+                    this.my*=.8;
+                    if(this.my<0 && this.my>-0.2)this.my=-0.2
+                    if(this.my>0 && this.my<.2)this.my=.2
+                    if(this.mx<0 && this.mx>-0.2)this.mx=-0.2
+                    if(this.mx>0 && this.mx<.2)this.mx=.2
+                    
+                }
+                
+                this.px += this.mx;
+                this.py += this.my;
+                this.my+=.005;
+                
+
+
+
+                /*
+                // frag collision with walking monsters
+                for(var i=0;i<mywalkingmonster.length;i+=1){
+                    if(distance(i.px,i.py,px,py) < 10
+                        i.hp -= 5
+                        //mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,5,Color.Red))
+                        if(i.hp<=0
+                            i.deleteme = true
+                            myitem.Add(New item(i.px,i.py,"Monster Tail"))
+                        }
+                        this.deleteme = true
+                        return;
+                    }
+                }
+                */ 
+                /*
+                // frag collision with flying monsters
+                for(var i:=Eachin myflyingmonster
+                    if(distance(i.px,i.py,px,py) < 10
+                        i.hp -= 5
+                        //mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,5,Color.Red))
+                        if(i.hp<=0
+                            i.deleteme = true
+                            //myitem.Add(New item(i.px,i.py,"Monster Tooth"))
+                        }
+                        this.deleteme = true;
+                        return;
+                    }
+                }	
+                */
+                // frag collision with the eggs
+                if(this.eggcollide(this.px-1,this.py-1,this.w+2,this.h+2)==true){
+                    this.deleteme = true
+                    //myitem.Add(New item(px,py,"Egg Shell"))
+                    return;
+                }
+            }
+        }	
+
+    
+        eggcollide(x,y,w,h){
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            var x2=-1,y2=-1;
+            if(mymap.mapfinal[lefttopx][lefttopy] == mymap.tileegg){
+                x2=lefttopx;
+                y2=lefttopy;
+            }
+            if(mymap.mapfinal[righttopx][righttopy] == mymap.tileegg){
+                x2=righttopx;
+                y2=righttopy;
+            }
+            if(mymap.mapfinal[leftbottomx][leftbottomy] == mymap.tileegg){
+                x2=leftbottomx;
+                y2=leftbottomy;
+            }
+            if(mymap.mapfinal[rightbottomx][rightbottomy] == mymap.tileegg){
+                x2=rightbottomx;
+                y2=rightbottomy;
+            }
+            if( x2 != -1 ) {			
+                // destroy egg
+                if(randomRange(0,3)<1){
+                    mymap.mapfinal[x2][y2] = mymap.tileempty;
+                    //myitem.Add(New item(x2*tilewidth,y2*tileheight,"gold"))
+                    //mymap.updateimage(mymap.mapcanvas)
+                }
+                return true;
+            }
+            return false;
+        }    			
+
+    }
+
+
+
     class grenade{
         
         constructor(x,y,facing){
@@ -118,11 +308,20 @@ Use different browser.
                 //Life of frags	
                 this.countdown-=1;
                 if(this.countdown < 0){ 
+                    
                     this.deleteme = true;
                     var numfrags=randomRange(6,20);
                     for(var i=0;i<numfrags;i+=1){
+
                         // NOTE :
                         //myfrag.AddLast(New frag(px,py,"player"))
+                        
+                        myfrag.push(
+                            
+                            new frag(
+                                this.px,this.py,"player"
+                            )
+                        );
                     }
                     return;
                 }
@@ -958,6 +1157,7 @@ Use different browser.
                 //mybullet.AddLast(New bullet(px,py,angle+Rnd(-.1,.1),"player","shotgun"))
             }
         }
+        // player draw routine - all tile map game
 	    draw(){
             ctx.globalAlpha = 1;
             //canvas.Scissor = New Recti(32,32,screenwidth-32,screenheight-64)
@@ -1228,7 +1428,7 @@ Use different browser.
             }
             
 
-            /*
+            
             // Draw the fragmentation 
             //
             //canvas.Color = Color.Gold
@@ -1238,9 +1438,10 @@ Use different browser.
                 var x2=myfrag[i].px-this.mcx*this.tw+this.mox;
                 var y2=myfrag[i].py-this.mcy*this.th+this.moy;
                 //canvas.DrawCircle(x2,y2,3)
-                ctx.fillRect(x2,y2,3);
+                ctx.fillRect(x2,y2,3,3);
+                
             }
-            */
+            
 
             /*
             // Draw the items
@@ -1834,24 +2035,25 @@ Use different browser.
             //ctx=c.getContext("2d");{
         } 
         mapmineablecollide(x,y,w,h,remove,kind){
+            
             var mmw=mymap.mmw;
             var mmh=mymap.mmh;
-            var lefttopx		=((x)/tilewidth);
-            var lefttopy		=((y)/tileheight);
-            var righttopx		=((x+w)/tilewidth);
-            var righttopy		=((y)/tileheight);
-            var leftbottomx 	=((x)/tilewidth);
-            var leftbottomy 	=((y+h)/tileheight);
-            var rightbottomx	=((x+w)/tilewidth);												
-            var rightbottomy	=((y+h)/tileheight);
-            if(lefttopx < 0 || lefttopx >= this.mmw)return true;
-            if(lefttopy < 0 || lefttopy >= this.mmh)return true;
-            if(righttopx < 0 || righttopx >= this.mmw)return true;
-            if(righttopy < 0 || righttopy >= this.mmh)return true;
-            if(leftbottomx < 0 || leftbottomx >= this.mmw)return true;
-            if(leftbottomy < 0 || leftbottomy >= this.mmh)return true;
-            if(rightbottomx < 0 || rightbottomx >= this.mmw)return true;
-            if(rightbottomy < 0 || rightbottomy >= this.mmh)return true;
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            if(lefttopx < 0 || lefttopx >= mmw)return true;
+            if(lefttopy < 0 || lefttopy >= mmh)return true;
+            if(righttopx < 0 || righttopx >= mmw)return true;
+            if(righttopy < 0 || righttopy >= mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= mmh)return true;
             
             if(mymap.mapfinal[lefttopx][lefttopy] == mymap.tilemineable){ 
                 if(remove==true){
@@ -1861,7 +2063,7 @@ Use different browser.
             }
             if(mymap.mapfinal[righttopx][righttopy] == mymap.tilemineable){ 
                 if(remove==true){
-                    this.removemineable(righttopx,righttopy,kind);
+                   this.removemineable(righttopx,righttopy,kind);
                 }
                 return true;
             }
@@ -1871,7 +2073,7 @@ Use different browser.
                 }
                 return true;
             }
-            if(mymap.mapfinal[rightbottomx][rightbottomy] = mymap.tilemineable){
+            if(mymap.mapfinal[rightbottomx][rightbottomy] == mymap.tilemineable){
                 if(remove==true){
                     this.removemineable(rightbottomx,rightbottomy,kind);
                 }
@@ -1919,14 +2121,14 @@ Use different browser.
             return false;
         }
         mapcollide(x,y,w,h){
-            var lefttopx		=((x)/tilewidth);
-            var lefttopy		=((y)/tileheight);
-            var righttopx		=((x+w)/tilewidth);
-            var righttopy		=((y)/tileheight);
-            var leftbottomx 	=((x)/tilewidth);
-            var leftbottomy 	=((y+h)/tileheight);
-            var rightbottomx	=((x+w)/tilewidth);												
-            var rightbottomy	=((y+h)/tileheight);
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
             if(lefttopx < 0 || lefttopx >= this.mmw)return true;
             if(lefttopy < 0 || lefttopy >= this.mmh)return true;
             if(righttopx < 0 || righttopx >= this.mmw)return true;
@@ -2049,6 +2251,7 @@ Use different browser.
     var myplayer=new player();
     var mybullet = [];
     var mygrenade = [];
+    var myfrag = [];
 	//'
 	//' Create the towns people
 	//'
@@ -2086,6 +2289,7 @@ Use different browser.
 			mytownperson[i].update();
         }
 
+        // update the bullets
         if(mybullet.length>0){
             //Update the bullets
             for(var i=0;i<mybullet.length;i++){
@@ -2099,6 +2303,7 @@ Use different browser.
                 }
             }		
         }
+        // Update the grenades
         if(mygrenade.length>0){
             
             //Update the grenades
@@ -2111,6 +2316,22 @@ Use different browser.
             for(var i=mygrenade.length-1;i>=0;i-=1){
                 if(mygrenade[i].deleteme == true){
                     mygrenade.splice(i, 1);
+                }
+            }		
+        }
+        // Update the grenades
+        if(myfrag.length>0){
+            
+            //Update the frags
+            for(var i=0;i<myfrag.length;i++){
+                
+                myfrag[i].update();
+                
+            }
+            // remove grenade from list
+            for(var i=myfrag.length-1;i>=0;i-=1){
+                if(myfrag[i].deleteme == true){
+                    myfrag.splice(i, 1);
                 }
             }		
         }
@@ -2132,7 +2353,7 @@ Use different browser.
             ctx.fillStyle = 'white';
 		    ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
 		    ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
-            ctx.fillText(mybullet.length,320,15);//debug
+            ctx.fillText(myfrag.length,320,15);//debug
         }
         if(Controller.MiniMap==true){
             offscreenCanvas.width=window.innerWidth-32;
@@ -2416,10 +2637,10 @@ Use different browser.
         ctx.lineTo(x2,y2);
         ctx.stroke();
     }
-    function randomRange(min, max) {
+    function randomRange(min=0, max=1) {
         return Math.floor(Math.random() * (max - min) + min);
     }
-    function randomRangeFloat(min, max) {
+    function randomRangeFloat(min=0, max=1) {
         return (Math.random() * (max - min) + min);
     }
 
