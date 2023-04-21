@@ -3,7 +3,7 @@ Monkey2 to Javascript<br><br>
 <hr />
 
 <img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="20%"><br>
-<i>(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)</i>
+*(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)*
 <br>
 <br>
 <br>
@@ -22,7 +22,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 
 
 
-<b>Conversion notes :</b>
+**Conversion notes :**
 * Added new controller code system. Should make joypad and touch control easier.
 * Figure out what to do with resolution / window size changes.(pauze/rebuild?)
 * Still struggling with offscreen canvasses.
@@ -31,7 +31,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 
 
  <br><br>
-<b>Ideas :</b>
+**Ideas :**
 * Scientist say matter can form out of nothingness. Taking this a notch further, "the spawning of devil eggs".
 * infinite maps?
 * Shops to sell loot and buy loads of ammo and guns and equipment.
@@ -42,6 +42,6 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 * Lighting system?
 
 <br><br>
-<b>Adding Features later on :</b>
+**Adding Features later on :**
 * Controller(xbox)
 * Touch screen controls(touch the screen and it displays a sliding menu to activate touch controls.)
