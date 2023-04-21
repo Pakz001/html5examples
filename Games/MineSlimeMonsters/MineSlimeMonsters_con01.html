@@ -91,18 +91,21 @@ Use different browser.
             this.owner = owner;
             this.px = x;
             this.py = y;		
+         
             this.w = 2;
             this.h = 2;
             this.mx = 1;
             this.my = 1;
+            this.deleteme = false;
             if(this.kind="shotgun"){
                 this.w = 2;
                 this.h = 2;
                 this.mx = randomRangeFloat(.9,1);
                 this.my = randomRangeFloat(.9,1);
             }
-            this.countdown = 500;
-            this.angle = angle;		
+            this.countdown = 400+randomRange(0,100);
+            this.angle = angle;
+            	
         }
         update(){
             for(var bulletspeed=0;bulletspeed<5;bulletspeed++){
@@ -111,7 +114,8 @@ Use different browser.
                     this.deleteme = true;
                     return;
                 }
-                if(mymap.mapcollide2(this.px,this.py,this.w,this.h))this.deleteme = true;
+                
+                if(mymap.mapcollide2(this.px,this.py,this.w,this.h)==true)this.deleteme = true;
             
                 /*
                 // Collision with a mineable tile
@@ -181,40 +185,59 @@ Use different browser.
                 if(this.eggcollide(this.px,this.py,this.w,this.h)){ 						
                     this.deleteme = true;
                     //myitem.Add(New item(px,py,"Egg Shell"))
+                    /*
                     myitem.push(
                         new item(
                         this.px,this.py,"Egg Shell"    
                         ) 
                     );
+                    */
                     return;
                 }
+                
                 this.px += Math.cos(this.angle)*this.mx;
                 this.py += Math.sin(this.angle)*this.my;
+                
             }
         }
+        //
+        // NOTE : Eggs are randomly removed here if hit.
+        //
         eggcollide(x,y,w,h){
-            Local lefttopx		=((x)/tilewidth)
-            Local lefttopy		=((y)/tileheight)
-            Local righttopx		=((x+w)/tilewidth)
-            Local righttopy		=((y)/tileheight)
-            Local leftbottomx	=((x)/tilewidth)
-            Local leftbottomy	=((y+h)/tileheight)
-            Local rightbottomx	=((x+w)/tilewidth)												
-            Local rightbottomy	=((y+h)/tileheight)
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx	    =Math.floor(((x)/tilewidth));
+            var leftbottomy	    =Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));											
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
             
-            Local x2=-1,y2=-1
-            If mymap.mapfinal[lefttopx,lefttopy] = mymap.tileegg Then x2=lefttopx;y2=lefttopy
-            If mymap.mapfinal[righttopx,righttopy] = mymap.tileegg Then x2=righttopx;y2=righttopy
-            If mymap.mapfinal[leftbottomx,leftbottomy] = mymap.tileegg Then x2=leftbottomx;y2=leftbottomy
-            If mymap.mapfinal[rightbottomx,rightbottomy] = mymap.tileegg Then x2=rightbottomx;y2=rightbottomy
-            If x2<>-1			
-                If Rnd(7)<1 Then 
-                    mymap.mapfinal[x2,y2] = mymap.tileempty
-                    mymap.updateimage(mymap.mapcanvas)
-                }
-                Return True
+            var x2=-1,y2=-1;
+            if(mymap.mapfinal[lefttopx][lefttopy] == mymap.tileegg){
+                x2=lefttopx;
+                y2=lefttopy;
             }
-            Return False
+            if(mymap.mapfinal[righttopx][righttopy] == mymap.tileegg){
+                x2=righttopx;
+                y2=righttopy;
+            }
+            if(mymap.mapfinal[leftbottomx][leftbottomy] == mymap.tileegg){
+                x2=leftbottomx;
+                y2=leftbottomy;
+            }
+            if(mymap.mapfinal[rightbottomx][rightbottomy] == mymap.tileegg){
+                x2=rightbottomx;
+                y2=rightbottomy;
+            }
+            if(x2!=-1){			
+                if(randomRange(0,7)<1){ 
+                    mymap.mapfinal[x2][y2] = mymap.tileempty;
+                    //mymap.updateimage(mymap.mapcanvas)
+                }
+                return true;
+            }
+            return false;
         }			
     }
 
@@ -473,7 +496,7 @@ Use different browser.
             if(Controller.ShotGun==false)this.sfkd=false;//Keyboard.KeyDown(Key.S) = False Then sfkd = False
             if(this.sfkd == false && Controller.ShotGun==true){//Keyboard.KeyDown(Key.S)
                 this.sfkd = true;	
-                //this.fireshotgun();					
+                this.fireshotgun();					
             }
 
             // Mine left or right
@@ -686,6 +709,45 @@ Use different browser.
                 }
             }
         }
+        fireshotgun(){
+            var angle=0;
+            if(this.facing=="left"){
+                angle = Math.PI;
+            }
+            if(this.facing=="right"){
+                angle = 0;
+            }
+            if(this.facing=="up"){
+                angle = Math.PI*1.55+randomRangeFloat(-0.2,0.2);
+            }
+            if(this.facing=="down"){
+                angle = Math.PI/2+randomRangeFloat(-0.2,0.2);
+            }
+            
+            /*
+            Select facing
+                Case "left"
+                    angle=Pi
+                Case "right"
+                    angle=0
+                Case "up"
+                    'Print Pi*1.5
+                    angle=Pi*1.55+Rnd(-.2,.2)
+                    
+                Case "down"
+                    angle = Pi/2+Rnd(-.2,.2)
+            End Select
+            */
+            for(var i=0;i<7;i++){
+                mybullet.push(
+                    new bullet(
+                        this.px,this.py,angle+randomRangeFloat(-.1,.1),"player","shotgun"
+                        )
+                );
+                
+                //mybullet.AddLast(New bullet(px,py,angle+Rnd(-.1,.1),"player","shotgun"))
+            }
+        }
 	    draw(){
             ctx.globalAlpha = 1;
             //canvas.Scissor = New Recti(32,32,screenwidth-32,screenheight-64)
@@ -703,7 +765,7 @@ Use different browser.
                     var x3=(x*this.tw)+this.mox;
                     var y3=(y*this.th)+this.moy;
                     
-                    //if(Math.random()<0.01)console.log(this.mox);
+                    
                     if(x2<0 || x2>=mapwidth || y2<0 || y2>=mapheight)continue;				
                     
                     // NOTE : Gradient background.
@@ -921,7 +983,7 @@ Use different browser.
             }
             */
             
-            /*
+            
             // Draw the bullets
             //
             //canvas.OutlineMode=OutlineMode.Solid
@@ -936,7 +998,7 @@ Use different browser.
                 //canvas.DrawCircle(x2,y2,i.w)
                 ctx.fillRect(x2,y2,mybullet[i].w,mybullet[i].w);
             }
-            */
+            
 
             /*
             // Draw the grenades
@@ -1668,14 +1730,15 @@ Use different browser.
         }
         //Collide with solid and mineable
         mapcollide2(x,y,w,h){
-            var lefttopx		=((x)/tilewidth);
-            var lefttopy		=((y)/tileheight);
-            var righttopx		=((x+w)/tilewidth);
-            var righttopy		=((y)/tileheight);
-            var leftbottomx 	=((x)/tilewidth);
-            var leftbottomy 	=((y+h)/tileheight);
-            var rightbottomx	=((x+w)/tilewidth);												
-            var rightbottomy	=((y+h)/tileheight);
+            
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
             if(lefttopx < 0 || lefttopx >= this.mmw)return true;
             if(lefttopy < 0 || lefttopy >= this.mmh)return true;
             if(righttopx < 0 || righttopx >= this.mmw)return true;
@@ -1684,7 +1747,7 @@ Use different browser.
             if(leftbottomy < 0 || leftbottomy >= this.mmh)return true;
             if(rightbottomx < 0 || rightbottomx >= this.mmw)return true;
             if(rightbottomy < 0 || rightbottomy >= this.mmh)return true;
-            
+
             if(this.mapfinal[lefttopx][lefttopy] == mymap.tilesolid)return true;
             if(this.mapfinal[righttopx][righttopy] == mymap.tilesolid) return  true;
             if(this.mapfinal[leftbottomx][leftbottomy] == mymap.tilesolid) return  true;
@@ -1768,8 +1831,9 @@ Use different browser.
 
 
     var mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
-    //console.log("here say"+mymap.mapfinal[0][0]);
+    
     var myplayer=new player();
+    var mybullet = [];
 	//'
 	//' Create the towns people
 	//'
@@ -1806,7 +1870,18 @@ Use different browser.
 		for(i=0;i<mytownperson.length;i++){
 			mytownperson[i].update();
         }
-		
+        if(mybullet.length>0){
+		//Update the bullets
+		for(var i=0;i<mybullet.length;i++){
+			mybullet[i].update();
+        }
+        // remove bullet from list
+		for(var i=mybullet.length-1;i>=0;i-=1){
+			if(mybullet[i].deleteme == true){
+                mybullet.splice(i, 1);
+            }
+        }		
+        }
 
         //mymap.draw();
 		if(Controller.MiniMap==false){
@@ -1825,7 +1900,7 @@ Use different browser.
             ctx.fillStyle = 'white';
 		    ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
 		    ctx.fillText("Cursors(move), s(shotgun), g(grenade), m(mine) space(jump) l(laserwall)..",0,30);
-
+            ctx.fillText(mybullet.length,320,15);//debug
         }
         if(Controller.MiniMap==true){
             offscreenCanvas.width=window.innerWidth-32;
@@ -2026,7 +2101,7 @@ Use different browser.
     }
     // keyboard key down events
     function kd(evt){
-        //console.log(evt.keyCode);
+
         if(evt.keyCode==37){//cursor left
             Controller.Left = true;
         }
