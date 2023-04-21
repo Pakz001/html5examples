@@ -37,7 +37,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
  <br><br>
 **Ideas :**
 * Scientist say matter can form out of nothingness. Taking this a notch further, "the spawning of devil eggs".
-* infinite maps?
+* infinite sized maps? (Keep mining - save/load chunks)
 * Shops to sell loot and buy loads of ammo and guns and equipment.
 * Radio controlled drones. Machine gun drone and Explosive drone and flame thrower drone.
 * flame thrower..
