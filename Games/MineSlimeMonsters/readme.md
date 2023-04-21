@@ -31,7 +31,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 * Figure out what to do with resolution / window size changes.(pauze/rebuild?)
 * Still struggling with offscreen canvasses.
 * Need to fix a memory leak from old version.
-* Variables Ints in array -> pay attention. (fix : Math.floor(variable) ) - note - Look at wrong use of this.
+* Variables Ints in array -> pay attention. (fix : Math.floor(variable) ) - note - Look at wrong use of this. - look at random(x,y)
 
 
  <br><br>
