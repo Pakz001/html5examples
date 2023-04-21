@@ -77,8 +77,211 @@ Use different browser.
     var tilewidth=20;
     var tileheight=20;
 
+    class grenade{
+        
+        constructor(x,y,facing){
+            
+            this.px,this.py; //pixel x and y
+            this.slimed=false;
+            this.angle;
+            this.w,this.h;
+            this.deleteme;
+            this.countdown;
+            this.mx;
+            this.my;
+            this.px = x;
+            this.py = y;
+            this.w = 6;
+            this.h = 6;
+            this.countdown = 500;
+            if(facing=="left"){
+                this.angle=Math.PI+.3;
+            }
+            if(facing=="right"){
+                this.angle=0-.3;
+            }
+            if(facing=="up"){
+                this.angle=Math.PI*1.55 + randomRangeFloat(-.2,.2);
+            }
+            if(facing=="down"){
+                this.angle = Math.PI/2 + randomRangeFloat(-.2,.2);
+            }
+            
+            //this.angle = angle;
+            this.mx = Math.cos(this.angle);
+            this.my = Math.sin(this.angle);
+        }
+        update(){	
+            
+            for(var bulletspeed=0;bulletspeed<4;bulletspeed+=1){
+                
+                //Life of frags	
+                this.countdown-=1;
+                if(this.countdown < 0){ 
+                    this.deleteme = true;
+                    var numfrags=randomRange(6,20);
+                    for(var i=0;i<numfrags;i+=1){
+                        // NOTE :
+                        //myfrag.AddLast(New frag(px,py,"player"))
+                    }
+                    return;
+                }
+                                
+                if(this.slimed==false){ 
+                    
 
-     class bullet{
+                    //if(this.slimecollide(this.px-this.w,this.py-this.h,this.w*2.5,this.h*2.5)){
+                    //    this.slimed = true; 
+                    //    continue;
+                // }
+                    //bounce ceiling
+                    
+                    if(this.mapcollide(this.px,this.py-2,1,this.h)==true){ 			
+                        //slimed=slimecollide(px,py+2,1,h)
+                        //If slimed = True Then Return
+                        this.my = -this.my*.8;
+                        var cnt=0;
+                        while(this.mapcollide(this.px,this.py-2,1,this.h)==true){
+                            this.py+=this.my;
+                            cnt+=1;
+                            if(cnt>100)break;
+                        }
+                    
+                        this.mx*=.8;
+                        this.my*=.8;
+                    
+                        if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                        if(this.my>0 && this.my<.2)this.my=.2;
+                        if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                        if(this.mx>0 && this.mx<.2)this.mx=.2;
+                    
+                    }
+
+    
+                    //bouncy vertical
+                    if(this.mapcollide(this.px,this.py+2,1,this.h)==true){ 			
+                        //'slimed=slimecollide(px,py+2,1,h)
+                        //'If slimed = True Then Return
+                        this.my = -this.my*.8;//'-.1,.1)
+                        var cnt=0;
+                        while(this.mapcollide(this.px,this.py+2,1,this.h)==true){
+                            this.py+=this.my;
+                            cnt+=1;
+                            if(cnt>100)break;
+                        }
+                        
+                        this.mx*=.8;
+                        this.my*=.8;
+                        
+                        if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                        if(this.my>0 && this.my<.2)this.my=.2;
+                        if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                        if(this.mx>0 & this.mx<.2)this.mx=.2;
+                        
+                    }
+                    //'bounce horizontally
+                    if(this.mapcollide(this.px-this.w,this.py,this.w*2,1)==true){ 			
+                        //'slimed=mapcollide(px-w,py,w*2,1)
+                        //'If slimed Then Return
+                        this.mx = -this.mx*.8;//'+Rnd(-.1,.1)
+                        var cnt=0;
+                        while(this.mapcollide(this.px-this.w,this.py,this.w*2,1)==true){
+                            this.px+=this.mx;
+                            cnt+=1;
+                            if(cnt>100)break;			
+                        }
+                        this.mx*=.8;
+                        this.my*=.8;			
+                        if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                        if(this.my>0 && this.my<.2)this.my=.2;
+                        if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                        if(this.mx>0 && this.mx<.2)this.mx=.2;
+                        
+                    }
+            
+                    //' update the frag location
+                    this.px += this.mx;
+                    this.py += this.my;
+                    this.my+=.005;
+                    
+                }
+            
+            }
+        }
+        mapcollide(x,y,w,h){
+            
+            var mmw=mymap.mmw;
+            var mmh=mymap.mmh;
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            if(lefttopx < 0 || lefttopx >= mmw)return true;
+            if(lefttopy < 0 || lefttopy >= mmh)return true;
+            if(righttopx < 0 || righttopx >= mmw)return true;
+            if(righttopy < 0 || righttopy >= mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= mmh)return true;
+            
+
+
+   
+           
+            if(mymap.mapfinal[lefttopx][lefttopy] != mymap.tileempty)return true;
+            if(mymap.mapfinal[righttopx][righttopy] != mymap.tileempty)return true;
+            if(mymap.mapfinal[leftbottomx][leftbottomy] != mymap.tileempty)return true;
+            if(mymap.mapfinal[rightbottomx][rightbottomy] != mymap.tileempty)return true;						
+            //If mygrowslime.map[lefttopx*2,lefttopy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[righttopx*2,righttopy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[leftbottomx*2,leftbottomy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[rightbottomx*2,rightbottomy*2] = mymap.tileslime Then Return True						
+
+            return false;
+        }	
+        slimecollide(x,y,w,h){
+
+            var mmw=mymap.mmw;
+            var mmh=mymap.mmh;
+            var lefttopx		=((x)/tilewidth);
+            var lefttopy		=((y)/tileheight);
+            var righttopx		=((x+w)/tilewidth);
+            var righttopy		=((y)/tileheight);
+            var leftbottomx 	=((x)/tilewidth);
+            var leftbottomy 	=((y+h)/tileheight);
+            var rightbottomx	=((x+w)/tilewidth);												
+            var rightbottomy	=((y+h)/tileheight);
+
+            // '		If lefttopx < 0 Or lefttopx >= mmw Then Return True
+            //'		If lefttopy < 0 Or lefttopy >= mmh Then Return True
+            //'		If righttopx < 0 Or righttopx >= mmw Then Return True
+            //'		If righttopy < 0 Or righttopy >= mmh Then Return True
+            //'		If leftbottomx < 0 Or leftbottomx >= mmw Then Return True
+            //'		If leftbottomy < 0 Or leftbottomy >= mmh Then Return True
+            //'		If rightbottomx < 0 Or rightbottomx >= mmw Then Return True
+            //'		If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
+            //'	
+            
+            //If mygrowslime.map[lefttopx*2,lefttopy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[righttopx*2,righttopy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[leftbottomx*2,leftbottomy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[rightbottomx*2,rightbottomy*2] = mymap.tileslime Then Return True						
+        
+            return false;
+        }	
+        
+        
+		
+    }
+
+
+
+    class bullet{
         constructor(x,y,angle,owner,kind){
             this.px,this.py;
             this.mx,this.my;
@@ -487,9 +690,16 @@ Use different browser.
             if(Controller.Grenade==false)this.gtkd=false;//If Keyboard.KeyDown(Key.G) = False Then gtkd = False
             if(this.gtkd == false && Controller.Grenade==true){//Keyboard.KeyDown(Key.G)
                 this.gtkd = true;			
+                
                 var pcx=this.px+(this.pw/2);
                 var pcy=this.py+(this.ph/2);						
                 //mygrenade.AddLast(New grenade(this.pcx,this.pcy,this.facing));
+                
+                mygrenade.push(
+                    new grenade(
+                        pcx,pcy,this.facing
+                        )
+                );
             }
             
             // Fire shotgun
@@ -1000,19 +1210,23 @@ Use different browser.
             }
             
 
-            /*
+            
             // Draw the grenades
             //
             //canvas.Color = Color.Titanium
-            ctx.fillStyle = 'titanium';
+            
             //For Local i:=Eachin mygrenade
             for(var i=0;i<mygrenade.length;i++){
+                
                 var x2=mygrenade[i].px-this.mcx*this.tw+this.mox;
                 var y2=mygrenade[i].py-this.mcy*this.th+this.moy;
                 //canvas.DrawCircle(x2,y2,4)
+                ctx.fillStyle = 'rgb(250,250,250)';
                 ctx.fillRect(x2,y2,4,4);
+                ctx.fillStyle = 'rgb(50,50,50)';
+                ctx.fillRect(x2+1,y2+1,2,2);
             }
-            */
+            
 
             /*
             // Draw the fragmentation 
@@ -1834,6 +2048,7 @@ Use different browser.
     
     var myplayer=new player();
     var mybullet = [];
+    var mygrenade = [];
 	//'
 	//' Create the towns people
 	//'
@@ -1870,17 +2085,34 @@ Use different browser.
 		for(i=0;i<mytownperson.length;i++){
 			mytownperson[i].update();
         }
+
         if(mybullet.length>0){
-		//Update the bullets
-		for(var i=0;i<mybullet.length;i++){
-			mybullet[i].update();
-        }
-        // remove bullet from list
-		for(var i=mybullet.length-1;i>=0;i-=1){
-			if(mybullet[i].deleteme == true){
-                mybullet.splice(i, 1);
+            //Update the bullets
+            for(var i=0;i<mybullet.length;i++){
+                mybullet[i].update();
+            
             }
-        }		
+            // remove bullet from list
+            for(var i=mybullet.length-1;i>=0;i-=1){
+                if(mybullet[i].deleteme == true){
+                    mybullet.splice(i, 1);
+                }
+            }		
+        }
+        if(mygrenade.length>0){
+            
+            //Update the grenades
+            for(var i=0;i<mygrenade.length;i++){
+                
+                mygrenade[i].update();
+                
+            }
+            // remove grenade from list
+            for(var i=mygrenade.length-1;i>=0;i-=1){
+                if(mygrenade[i].deleteme == true){
+                    mygrenade.splice(i, 1);
+                }
+            }		
         }
 
         //mymap.draw();
