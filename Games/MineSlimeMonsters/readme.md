@@ -3,7 +3,7 @@
 
 <br><br>
 
-<img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="20%"><br>
+<img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="20%"></img><br>
 *(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)*
 <br>
 <br>
