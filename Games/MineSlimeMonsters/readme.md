@@ -19,7 +19,7 @@
     //
     // Todo : touch / Controller<br>
     <br>Old Version : (Emscripten)<br>
-    <img src="Media/oldversion.jpg" width="20%"><br>
+    <img src="Media/oldversion.jpg" width="20%"></img><br>
     [Play game in browser - old / keyboard only -](https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html)
     <br>
     <br>
