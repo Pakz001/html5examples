@@ -37,4 +37,4 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 <br><br>
 <b>Adding Features :</b>
 * Controller(xbox)
-* Touch screen controls(touch screen and display sliding menu to activate touch controls)
+* Touch screen controls(touch the screen and it displays a sliding menu to activate touch controls.)
