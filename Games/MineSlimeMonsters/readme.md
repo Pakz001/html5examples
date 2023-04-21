@@ -1,5 +1,5 @@
 <h1>Porting code : 1800 of 5000.</h1><br>
-( Monkey2 to Javascript )<br><br>
+Monkey2 to Javascript<br><br>
 
 
 <img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width="20%"><br>
