@@ -77,6 +77,96 @@ Use different browser.
     var tilewidth=20;
     var tileheight=20;
 
+    //
+    // Items that move towards the player and into his inventory
+    // by mining,
+    //
+    class item{
+        constructor(x,y,kind){
+            this.px,this.py;
+            this.w,this.h;
+            this.deleteme;
+            this.angle;
+            this.mx,this.my;
+            this.speed;
+            this.kind; //coal,metal,gold,rock	
+            this.removetime=2000;
+            this.time;
+
+            this.px = x;
+            this.py = y;
+            this.kind = kind;
+            this.mx = randomRangeFloat(-2,2);
+            this.my = 0;
+            this.w = 3;
+            this.h = 3;
+        }
+        update(){
+            
+            // if to long in game then remove
+            this.time+=1;
+            if(this.time>this.removetime)this.deleteme=true;
+            // get player center position
+            var pcx=myplayer.px + (myplayer.pw/2);
+            var pcy=myplayer.py + (myplayer.ph/2);
+            //if distance closest then add to player inventory		
+            if(distanceM(pcx,pcy,this.px,this.py) < 10){
+                // code to add to player inventory here...
+                this.addtoplayerinventory();	
+                this.deleteme = true;
+            }
+
+            // gravity
+            if(mymap.mapcollide(this.px,this.py+Math.ceil(this.my)+2,this.w,this.h) == false){ 			
+                if(this.my<3)this.my+=.1;
+            }else{
+                this.my=0;
+            }
+
+            // if in range then move to player
+            if(distanceM(pcx,pcy,this.px,this.py) < 150){ 			
+                this.angle = getangle(this.px,this.py,pcx,pcy);
+                this.mx = Math.cos(this.angle);
+                this.my = Math.sin(this.angle);			
+            }else{
+                if(this.mx > 0)this.mx-=.01;
+                if(this.mx < 0)this.mx+=.01;
+                if(this.mx<0.1 && this.mx>0)this.mx=0;
+                if(this.mx>-0.1 && this.mx<0)this.mx=0;
+                            
+            }
+
+            // floor collision
+            if(mymap.mapcollide(this.px,this.py+1,this.w,this.h) == true){ 						
+                    this.my=-1;
+            }
+
+            // ceiling collision
+            if(mymap.mapcollide(this.px,this.py-1,this.w,this.h) == true){ 						
+                    this.my=1;
+            }
+            // left side collision
+            if(mymap.mapcollide(this.px-1,this.py,this.w,this.h) == true){ 						
+                    this.mx=1;
+            }
+            // right side collision
+            if(mymap.mapcollide(this.px+1,this.py,this.w,this.h) == true){ 						
+                    this.mx=-1;
+            }
+            // move the item
+            this.px += this.mx;
+            this.py += this.my;		
+        }
+        addtoplayerinventory(){
+            for(var i=0;i<myplayer.playeritemnames.length;i+=1){
+                if(this.kind == myplayer.playeritemnames[i]){
+                    myplayer.playeritem[i,1] += 1;
+                    return;
+                }
+            }
+        }
+    }
+
     //fragmentation things
     class frag{
         constructor(x,y,owner){
@@ -519,13 +609,13 @@ Use different browser.
                 
                 if(mymap.mapcollide2(this.px,this.py,this.w,this.h)==true)this.deleteme = true;
             
-                /*
+                
                 // Collision with a mineable tile
                 if(mymap.mapmineablecollide(this.px-2,this.py-2,this.w+4,this.h+4,true,"gun")==true){
                     this.deleteme = true;
                     return;
                 }		
-                */
+                
                 /*
                 // Collision with the slime
                 if(mygrowslime.slimecollide(this.px-2,this.py-2,this.w+4,this.h+4,true)==true){
@@ -587,13 +677,13 @@ Use different browser.
                 if(this.eggcollide(this.px,this.py,this.w,this.h)){ 						
                     this.deleteme = true;
                     //myitem.Add(New item(px,py,"Egg Shell"))
-                    /*
+                    
                     myitem.push(
                         new item(
                         this.px,this.py,"Egg Shell"    
                         ) 
                     );
-                    */
+                    
                     return;
                 }
                 
@@ -818,14 +908,16 @@ Use different browser.
             //
             // Set variables and further initialisation
             this.movespeed = 1;
-            this.px = tilewidth*20;
+            this.px = tilewidth*mapwidth/2-64;
             this.py = tileheight*14;
+            
             this.pw = tilewidth;
             this.ph = tileheight;
             this.maptileswidth = Math.floor(screenwidth / this.tw);
             this.maptilesheight = Math.floor(screenheight / this.th);
 
-            this.mcx=0;
+            this.mcx=Math.floor((mapwidth/2)-((screenwidth/tilewidth)/2));
+            
             this.mcy=0;
             this.playeritem = create2DArray(this.playeritemnames.length,2);
             this.createrandominventory();
@@ -1295,10 +1387,10 @@ Use different browser.
             ''Draw the trees
             '
             canvas.Color = Color.White		
-            For Local i:=Eachin mytree
+            For var i:=Eachin mytree
                 'If Rnd(100)<10 Then Print Millisecs()
-                Local x2:Int=i.px-mcx*tw+mox
-                Local y2:Int=i.py-mcy*th+moy
+                var x2:Int=i.px-mcx*tw+mox
+                var y2:Int=i.py-mcy*th+moy
                 'i.draw(canvas,x2,y2)
                 canvas.DrawImage(i.image,x2,y2)
                 'canvas.Color = i.col
@@ -1443,7 +1535,7 @@ Use different browser.
             }
             
 
-            /*
+            
             // Draw the items
             //
             //canvas.Color = Color.Red
@@ -1453,9 +1545,9 @@ Use different browser.
                 var x2=myitem[i].px-this.mcx*this.tw+this.mox;
                 var y2=myitem[i].py-this.mcy*this.th+this.moy;			
                 //canvas.DrawCircle(x2,y2,3)
-                ctx.fillRect(x2,y2,3);
+                ctx.fillRect(x2,y2,3,3);
             }
-            */
+            
 
             /*
             //
@@ -2091,7 +2183,11 @@ Use different browser.
             if(kind=="frag")chance = 10;
             if(randomRange(0,chance) < 2){
                 mymap.mapfinal[x][y] = mymap.tileempty;
-                //NOTE:;;
+                myitem.push(
+                    new item(
+                        (x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"
+                        )
+                );                
                 //myitem.Add(New item((x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"))
             }
         }
@@ -2121,6 +2217,7 @@ Use different browser.
             return false;
         }
         mapcollide(x,y,w,h){
+            //console.log(x+","+y+","+w+","+h);
             var lefttopx		=Math.floor(((x)/tilewidth));
             var lefttopy		=Math.floor(((y)/tileheight));
             var righttopx		=Math.floor(((x+w)/tilewidth));
@@ -2137,6 +2234,7 @@ Use different browser.
             if(leftbottomy < 0 || leftbottomy >= this.mmh)return true;
             if(rightbottomx < 0 || rightbottomx >= this.mmw)return true;
             if(rightbottomy < 0 || rightbottomy >= this.mmh)return true;
+            
             
             if(this.mapfinal[lefttopx][lefttopy] != mymap.tileempty) return  true;
             if(this.mapfinal[righttopx][righttopy] != mymap.tileempty) return  true;
@@ -2252,6 +2350,7 @@ Use different browser.
     var mybullet = [];
     var mygrenade = [];
     var myfrag = [];
+    var myitem = [];
 	//'
 	//' Create the towns people
 	//'
@@ -2319,23 +2418,32 @@ Use different browser.
                 }
             }		
         }
-        // Update the grenades
-        if(myfrag.length>0){
-            
+        // Update the frag
+        if(myfrag.length>0){            
             //Update the frags
-            for(var i=0;i<myfrag.length;i++){
-                
-                myfrag[i].update();
-                
+            for(var i=0;i<myfrag.length;i++){                
+                myfrag[i].update();                
             }
-            // remove grenade from list
+            // remove frag from list
             for(var i=myfrag.length-1;i>=0;i-=1){
                 if(myfrag[i].deleteme == true){
                     myfrag.splice(i, 1);
                 }
             }		
         }
-
+        // Update the items
+        if(myitem.length>0){            
+            //Update the items
+            for(var i=0;i<myitem.length;i++){                
+                myitem[i].update();                
+            }
+            // remove item from list
+            for(var i=myitem.length-1;i>=0;i-=1){
+                if(myitem[i].deleteme == true){
+                    myitem.splice(i, 1);
+                }
+            }
+        }
         //mymap.draw();
 		if(Controller.MiniMap==false){
 			var tp=false;
