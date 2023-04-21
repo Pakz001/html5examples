@@ -24,15 +24,15 @@
     <br>
     <br>
     Conversion :<br>
-    + Added new controller code system. Should make joypad and touch control easier.
+    * Added new controller code system. Should make joypad and touch control easier.
     
     <br><br><br>
     Ideas :<br>
-    + Scientist say matter can form out of nothingness. Taking this a notch further, "the spawning of devil eggs".
-    + infinite maps?
-    + Shops to sell loot and buy loads of ammo and guns and equipment.
-    + Radio controlled drones. Machine gun drone and Explosive drone and flame thrower drone.
-    + flame thrower..
-    + Talk to villagers.
-    + rescue villagers (mission?)
-    + Lighting system?
+    * Scientist say matter can form out of nothingness. Taking this a notch further, "the spawning of devil eggs".
+    * infinite maps?
+    * Shops to sell loot and buy loads of ammo and guns and equipment.
+    * Radio controlled drones. Machine gun drone and Explosive drone and flame thrower drone.
+    * flame thrower..
+    * Talk to villagers.
+    * rescue villagers (mission?)
+    * Lighting system?
