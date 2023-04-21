@@ -19,12 +19,12 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 
 
 
-* Conversion :
+<b>Conversion :</b>
 * Added new controller code system. Should make joypad and touch control easier.
 * ..
 
  <br><br>
-* Ideas :
+<b>Ideas :</b>
 * Scientist say matter can form out of nothingness. Taking this a notch further, "the spawning of devil eggs".
 * infinite maps?
 * Shops to sell loot and buy loads of ammo and guns and equipment.
@@ -35,6 +35,6 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 * Lighting system?
 
 <br><br>
-* Adding Features :
+<b>Adding Features :</b>
 * Controller(xbox)
 * Touch screen controls(touch screen and display sliding menu to activate touch controls)
