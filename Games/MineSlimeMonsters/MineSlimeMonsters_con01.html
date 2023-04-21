@@ -78,7 +78,145 @@ Use different browser.
     var tileheight=20;
 
 
+     class bullet{
+        constructor(x,y,angle,owner,kind){
+            this.px,this.py;
+            this.mx,this.my;
+            this.angle;
+            this.w,this.h;
+            this.deleteme;
+            this.countdown;
+            this.owner;	
 
+            this.owner = owner;
+            this.px = x;
+            this.py = y;		
+            this.w = 2;
+            this.h = 2;
+            this.mx = 1;
+            this.my = 1;
+            if(this.kind="shotgun"){
+                this.w = 2;
+                this.h = 2;
+                this.mx = randomRangeFloat(.9,1);
+                this.my = randomRangeFloat(.9,1);
+            }
+            this.countdown = 500;
+            this.angle = angle;		
+        }
+        update(){
+            for(var bulletspeed=0;bulletspeed<5;bulletspeed++){
+                this.countdown-=1
+                if(this.countdown < 0){
+                    this.deleteme = true;
+                    return;
+                }
+                if(mymap.mapcollide2(this.px,this.py,this.w,this.h))this.deleteme = true;
+            
+                /*
+                // Collision with a mineable tile
+                if(mymap.mapmineablecollide(this.px-2,this.py-2,this.w+4,this.h+4,true,"gun")==true){
+                    this.deleteme = true;
+                    return;
+                }		
+                */
+                /*
+                // Collision with the slime
+                if(mygrowslime.slimecollide(this.px-2,this.py-2,this.w+4,this.h+4,true)==true){
+                    this.deleteme = true;
+                    return;
+                    //'Print Millisecs()
+                }		
+                */
+                /*
+                // Collision with bullet and walking monster
+                for(var i=0;i<mywalkingmonster.length;i++){
+                    if(distance(this.px,this.py,mywalkingmonster[i].px,mywalkingmonster[i].py) < tilewidth){ 
+                        mywalkingmonster[i].hp -= 1;
+                        //'mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,1,Color.Red))
+
+                        this.deleteme = true;		;		
+                        if(mywalkingmonster[i].hp <= 0){
+                            mywalkingmonster[i].deleteme = true;					
+                            //myitem.Add(New item(this.px,this.py,"Monster Tail"))
+                            mywalkingmonster.push(
+                                new walkingmonster(
+                                this.px,this.py,"Monster Tail"    
+                                ) 
+                            );
+                            return;
+                        }
+                        return;
+                    }
+                }
+                */
+                /*
+                // Collision with bullet and flying monster
+                for(var i=0;i<myflyingmonster.length;i++){
+                    if(distance(this.px,this.py,myflyingmonster[i].px,myflyingmonster[i].py) < tilewidth){
+                        myflyingmonster[i].hp -= 1
+                        //mynumberfall.Add(New numberfall(myflyingmonster[i].px+(myflyingmonster[i].w/2),myflyingmonster[i].py,1,'red'))
+                        mynumberfall.push(
+                            new numberfall(
+                            myflyingmonster[i].px+(myflyingmonster[i].w/2),myflyingmonster[i].py,1,'red' 
+                            ) 
+                        );
+
+                        this.deleteme = true;			
+                        if(myflyingmonster[i].hp <= 0){
+                            myflyingmonster[i].deleteme = true;					
+                            //myitem.Add(New item(px,py,"Monster Tooth"))
+                            myitem.push(
+                                new item(
+                                this.px,this.py,"Monster Tooth"    
+                                ) 
+                            );
+                            return;
+                        }
+                        return;
+                    }
+                }
+                */
+                // Collision with bullet and egg
+                if(this.eggcollide(this.px,this.py,this.w,this.h)){ 						
+                    this.deleteme = true;
+                    //myitem.Add(New item(px,py,"Egg Shell"))
+                    myitem.push(
+                        new item(
+                        this.px,this.py,"Egg Shell"    
+                        ) 
+                    );
+                    return;
+                }
+                this.px += Math.cos(this.angle)*this.mx;
+                this.py += Math.sin(this.angle)*this.my;
+            }
+        }
+        eggcollide(x,y,w,h){
+            Local lefttopx		=((x)/tilewidth)
+            Local lefttopy		=((y)/tileheight)
+            Local righttopx		=((x+w)/tilewidth)
+            Local righttopy		=((y)/tileheight)
+            Local leftbottomx	=((x)/tilewidth)
+            Local leftbottomy	=((y+h)/tileheight)
+            Local rightbottomx	=((x+w)/tilewidth)												
+            Local rightbottomy	=((y+h)/tileheight)
+            
+            Local x2=-1,y2=-1
+            If mymap.mapfinal[lefttopx,lefttopy] = mymap.tileegg Then x2=lefttopx;y2=lefttopy
+            If mymap.mapfinal[righttopx,righttopy] = mymap.tileegg Then x2=righttopx;y2=righttopy
+            If mymap.mapfinal[leftbottomx,leftbottomy] = mymap.tileegg Then x2=leftbottomx;y2=leftbottomy
+            If mymap.mapfinal[rightbottomx,rightbottomy] = mymap.tileegg Then x2=rightbottomx;y2=rightbottomy
+            If x2<>-1			
+                If Rnd(7)<1 Then 
+                    mymap.mapfinal[x2,y2] = mymap.tileempty
+                    mymap.updateimage(mymap.mapcanvas)
+                }
+                Return True
+            }
+            Return False
+        }			
+    }
 
 
     //
@@ -1974,6 +2112,10 @@ Use different browser.
     function randomRange(min, max) {
         return Math.floor(Math.random() * (max - min) + min);
     }
+    function randomRangeFloat(min, max) {
+        return (Math.random() * (max - min) + min);
+    }
+
     // Not floored.
     function getangle(x1,y1,x2,y2){
         return Math.atan2(y2-y1, x2-x1);
