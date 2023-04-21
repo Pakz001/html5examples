@@ -76,6 +76,337 @@ Use different browser.
     var screenheight=window.innerHeight+48;
     var tilewidth=20;
     var tileheight=20;
+    var developmode = false;
+
+    var egghatchspeed= 0.1 //how fast eggs hatch
+    var egglayingfreq = 0.1 // lay lots of eggs 1 lay less eggs 0 '0 to 1
+    var startingeggfreq = 0.2 //0 to 1 0 is none 1 is full
+    var maxflyingmonsters=30
+    var maxwalkingmonsters=30
+
+
+    class theflyingmonster{
+        constructor(x,y){
+            this.px,this.py //pixel position (0-width)
+            this.sx,this.sy //movement speed
+            this.x,this.y //tile x and y position
+            this.w,this.h
+            this.hp //hitpoints
+            this.hpmax
+            this.deleteme
+            this.state
+            this.substate
+
+            this.x = x
+            this.y = y
+            this.w = tilewidth
+            this.h = tileheight
+            this.px = x*this.w
+            this.py = y*this.h
+            this.hp = randomRange(10,30)
+            this.hpmax = this.hp
+            //set the movement speed
+            this.sx = randomRangeFloat(0.3,3)
+            this.sy = this.sx;
+            this.state="hatched"
+        }
+        update(){		
+    //		If laserwait>0 Then laserwait-=1
+            // Damage to player
+            if(developmode == false){
+                if(distanceM(myplayer.px+(myplayer.pw/2),myplayer.py+(myplayer.ph/2),this.px+(this.w/2),this.py+(this.h/2)) < tilewidth){
+                    myplayer.hp -= 2;
+                    // NOTE
+                    //mynumberfall.Add(New numberfall(myplayer.this.px+(myplayer.pw/2),myplayer.this.py,2,Color.Red))
+                    if(myplayer.hp < 0 )this.gamestate = "select";
+                }
+            }
+
+            
+            if(this.px < this.x*this.w)this.px += this.sx
+            if(this.px > this.x*this.w)this.px -= this.sx
+            if(this.py < this.y*this.h)this.py += this.sy
+            if(this.py > this.y*this.h)this.py -= this.sy
+            //if(laserwall()==true)changedirection()
+            if(distanceM(this.px,this.py,this.x*this.w,this.y*this.h) > 8)return
+            //Select state
+            if(this.state=="hatched"){
+                //Case "hatched"
+                this.state="takeoff"
+                //ty=3 //move distance
+            }
+            if(this.state=="takeoff"){
+            //Case "takeoff"
+                this.takeoff()
+            }
+            if(this.state=="attack"){
+            //Case "attack"
+                if(this.canattackplayer() == false){
+                    this.state = "roam"
+                    this.substate="up"
+                    return
+                }
+                    //Local angle:Float = getangle(this.px,this.py,myplayer.this.px,myplayer.this.py)
+                
+                this.x = myplayer.this.px / tilewidth
+                this.y = myplayer.this.py / tileheight
+            }
+            if(this.state=="roam"){
+                //Case "roam"								
+                
+                if(this.canattackplayer())this.state = "attack";
+                
+                //Select substate
+                if(this.substate=="left"){
+                //Case "left"
+                    this.x-=1						
+                    if(mymap.mapfinal[this.x-1][this.y]  != mymap.tileempty)this.substate="right"
+                    if(x<3)this.substate="right"
+                    // if flying on the ground level then move up 1 tile
+                    if(mymap.mapfinal[this.x][this.y+1]  != mymap.tileempty)this.y-=1
+                    if(mymap.mapfinal[this.x][this.y-1]  != mymap.tileempty)this.y+=1
+                }
+                if(this.substate=="right"){
+                //Case "right"
+                    this.x+=1
+                    if(mymap.mapfinal[this.x+1][this.y]  != mymap.tileempty)this.substate="left"
+                    if(this.x>mapwidth-3)this.substate="left"
+                    // if flying on the ground level then move up 1 tile						
+                    if(mymap.mapfinal[this.x][this.y+1]  != mymap.tileempty)this.y-=1
+                    if(mymap.mapfinal[this.x][this.y-1]  != mymap.tileempty)this.y+=1
+                }
+                if(this.substate=="up"){
+                // Case "up"
+                    this.y-=1
+					
+                    if(mymap.mapfinal[this.x][this.y-2]  != mymap.tileempty){
+                        
+                        if(Math.random()<.5){
+                            this.substate="left"
+                        }else{
+                            this.substate="right"
+                        }							
+                    }
+                    if(this.y<3){
+                        if(Math.random() < .5){
+                            this.substate="right"
+                        }else{
+                            this.substate="left"
+                        }
+                    }
+                }
+                if(this.substate=="down"){
+                    //Case "down"
+                    this.y+=1
+                    if(mymap.mapfinal[this.x][this.y+2] != mymap.tileempty){
+                        if(Math.random() < .5){
+                            this.substate="left"						
+                        }else{
+                            this.substate="right"
+                        }
+                    }
+                }
+                // Change direction to up or down if possible
+                // sometimes
+                                
+                this.gorandupordown()
+                this.gorandleftorright()
+                //change direction sometimes to left or right
+                this.landandlayegg()
+            }
+            if(this.state=="landlayegg"){
+            //Case "landlayegg"
+                y+=1
+                if(mymap.mapfinal[this.x][this.y+1]  != mymap.tileempty){
+                    this.state="layegg"
+                }
+            }
+            if(this.state=="layegg"){
+            //Case "layegg"
+                if(mymap.mapfinal[this.x,this.y] == mymap.tileempty && mymap.mapfinal[this.x,this.y+1] != mymap.tileegg){
+                    if(distanceM(myplayer.this.px,myplayer.this.py,this.px,this.py) < 100){
+                    }else{
+                        mymap.mapfinal[this.x][this.y] = 3
+                        //mymap.updateimage(mymap.mapcanvas)				
+                    }
+                }else{
+                
+                }
+            }
+            if(this.state=="roam"){
+            //    state="takeoff"
+            }
+        
+            //End Select
+        }
+        canattackplayer(){
+            if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 200)return false
+            var angle = getangle(this.px,this.py,myplayer.px,myplayer.py)
+            var clearpath=false;
+            var mx = Math.cos(angle)
+            var my = Math.sin(angle)
+            var monx = this.px
+            var mony = this.py
+            for(var i=0;i<200;i++){
+                monx += mx;
+                mony += my;
+                if(distanceM(monx,mony,myplayer.px,myplayer.py) < 20)return true
+                if(mymap.mapcollide(monx,mony,this.w,this.h) == true)return false;	
+                if(this.collidelaserwall(monx,mony,this.w,this.h))return false
+            }				
+            return true
+        }
+        collidelaserwall(x,y,w1,h1){
+            return false;
+            /*
+            for(var i=Eachin mylaserwall
+                If rectsoverlap((x-w1)+(Rnd(-w1,w1)),y-h1,w1*2,h1*2,i.tx-5,i.ty,10,i.by-i.ty)
+                    return True
+                } 
+            Next
+            return False
+            */
+        }
+        laserwall(){
+            return false;
+            /*
+            For var i:=Eachin mylaserwall
+                If rectsoverlap((this.px-w)+(Rnd(-w,w)),this.py-h,w*2,h*2,i.tx-5,i.ty,10,i.by-i.ty)
+                    return True
+                } 
+            Next
+            return False
+            */
+        }
+        changedirection(){
+            this.state = "roam"
+            if(this.substate == "left"){
+                this.substate="right" 
+                this.x += 2;		
+            }else{ 
+                this.substate="left"
+                this.x -= 2;
+            }
+        }
+        landandlayegg(){
+            // Sometimes land and lay egg
+            if(Math.random < (egglayingfreq/10)){
+                // Debug - So monster will not lay egg in player
+                
+                var exitloop=false
+                var y1=this.y
+                var egghere=false
+                while(exitloop == false){
+                    if(mymap.mapfinal[this.x][y1] == 3){
+                        return
+                    }
+                    if(mymap.mapladder[this.x][y1] == 1){
+                        return 
+                    }
+                    if(mymap.mapfinal[this.x][y1]  != mymap.tileempty)exitloop = true
+                    y1+=1;
+                }
+                var cnt=0;
+                for(var i=0;i<myflyingmonster.length;i++){
+                    cnt+=1
+                }
+                //if more then max monsters no lay egg
+                if(cnt<maxflyingmonsters){		
+                    this.state="landlayegg";
+                }
+            }	
+        }
+        gorandleftorright(){
+            if(this.substate =="up" || this.substate =="down"){
+                if(Math.random() < 0.1){
+                    var exitloop=false
+                    var x1=this.x
+                    var cnt=0
+                    while(exitloop == false){
+                        x1-=1
+                        cnt+=1
+                        if(mymap.mapfinal[x1][this.y] != mymap.tileempty || x1<3){
+                            exitloop = true;
+                        }
+                    }				
+                    if(cnt>8)this.substate = "left"
+                }
+                if(Math.random() < 0.1){
+                    var exitloop=false
+                    var x1=this.x
+                    var cnt=0
+                    while(exitloop == false){
+                        x1+=1
+                        cnt+=1
+                        if(mymap.mapfinal[x1][this.y] != mymap.tileempty || x1>mapwidth-3){
+                            exitloop = true
+                        }
+                    }			
+                    if(cnt>8)this.substate = "right"					
+                }
+            }			
+        }
+        gorandupordown(){
+            if(this.substate == "left" || this.substate == "right"){
+                if(Math.random() < .1){
+                    var exitloop=false
+                    var y1=this.y
+                    var cnt=0
+                    while(exitloop==false){
+                        y1-=1
+                        cnt+=1
+                        if(mymap.mapfinal[this.x][y1] != mymap.tileempty){
+                            exitloop = true
+                        }
+                        if(y1<3)exitloop = true
+                    }			
+                    if(cnt>8)this.substate="up"					
+                }
+                if(Math.random() < .13 && this.substate!="up"){					
+                    var exitloop=false
+                    var y1=this.y
+                    var cnt=0
+                    while(exitloop==false){
+                        y1+=1
+                        cnt+=1
+                        if(mymap.mapfinal[this.x][y1]  != mymap.tileempty){
+                            exitloop = true
+                        }
+                    }
+                    if(cnt>8)this.substate="down"
+                }
+            }	
+        }
+        takeoff(){
+            this.y-=1
+            if(mymap.mapfinal[this.x][this.y-1]  != mymap.tileempty){
+                this.state="roam"
+                if(randomRangeFloat(0,1) < 0.5){ 
+                    this.substate="left"
+                }else{
+                    this.substate="right"
+                }
+            }
+        }
+        draw(){
+            var x1=(screenwidth-48)/mapwidth*this.x
+            var y1=(screenheight-48)/mapheight*this.y
+            //canvas.Color = Color.White
+            //SetColor 255,255,255
+            ctx2.fillStyle = 'white'
+            ctx2.fillRect(x1,y1,3+2,3+2)
+            ctx2.fillStyle = 'red'
+            ctx2.fillRect(x1,y1,3,3)
+            //canvas.DrawRect(x1,y1,3+2,3+2)
+            //canvas.Color = Color.Red
+            //SetColor 255,0,0		
+            //canvas.DrawRect(x1+1,y1+1,3,3)
+
+        }
+   
+    }
+
+
 
     //
     // Items that move towards the player and into his inventory
@@ -449,8 +780,8 @@ Use different browser.
     
                     //bouncy vertical
                     if(this.mapcollide(this.px,this.py+2,1,this.h)==true){ 			
-                        //'slimed=slimecollide(px,py+2,1,h)
-                        //'If slimed = True Then Return
+                        ////slimed=slimecollide(px,py+2,1,h)
+                        ////If slimed = True Then Return
                         this.my = -this.my*.8;//'-.1,.1)
                         var cnt=0;
                         while(this.mapcollide(this.px,this.py+2,1,this.h)==true){
@@ -1445,7 +1776,7 @@ Use different browser.
             ctx.fillRect(this.pmx,this.pmy,this.pw,this.ph);
             this.drawpowerbar(this.pmx,this.pmy,this.hp,this.hpmax);
 
-            /*
+            
             //draw flying monsters	
             for(var i=0;i<myflyingmonster.length;i++){
                 var x1=myflyingmonster[i].px;
@@ -1456,14 +1787,14 @@ Use different browser.
                 //canvas.DrawRect(x2,y2,tw,th)
                 ctx.fillStyle = 'red';
                 ctx.fillRect(x2,y2,this.tw,this.th);
-                drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
+                this.drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
                 //canvas.Color = Color.White
                 //canvas.DrawText(i.state,x2,y2)
                 //canvas.DrawText(i.substate,x2,y2+12)
                 //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
                 //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
             }
-            */
+            
 
             /*
             //draw walking monsters		
@@ -2351,6 +2682,7 @@ Use different browser.
     var mygrenade = [];
     var myfrag = [];
     var myitem = [];
+    var myflyingmonster = [];
 	//'
 	//' Create the towns people
 	//'
@@ -2444,6 +2776,25 @@ Use different browser.
                 }
             }
         }
+        // Update the flying monster
+        if(myflyingmonster.length>0){            
+            //Update the flying monster
+            for(var i=0;i<myflyingmonster.length;i++){                
+                myflyingmonster[i].update();                
+            }
+            // remove flying monster from list
+            for(var i=myflyingmonster.length-1;i>=0;i-=1){
+                if(myflyingmonster[i].deleteme == true){
+                    myflyingmonster.splice(i, 1);
+                }
+            }
+        }
+        if(myflyingmonster.length<15){
+        for(var i=0;i<1500;i++){
+            addflyingmonster();
+        }
+        }
+
         //mymap.draw();
 		if(Controller.MiniMap==false){
 			var tp=false;
@@ -2461,7 +2812,7 @@ Use different browser.
             ctx.fillStyle = 'white';
 		    ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
 		    ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
-            ctx.fillText(myfrag.length,320,15);//debug
+            ctx.fillText(myflyingmonster.length,320,15);//debug
         }
         if(Controller.MiniMap==true){
             offscreenCanvas.width=window.innerWidth-32;
@@ -2469,6 +2820,9 @@ Use different browser.
 
             mymap.updateimage();    
             mymap.drawladder();
+            for(var i=0;i<myflyingmonster.length;i++){
+                myflyingmonster[i].draw();
+            }
             ctx2.globalAlpha=1;
             //ctx2.fillStyle="#FFFF00";
             //ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
@@ -2731,6 +3085,36 @@ Use different browser.
             Controller.MiniMap = false;
         }
     }
+
+    //
+    //This function adds a flying monster to the game
+    //
+    function addflyingmonster(){// 'hatch
+        var cnt=myflyingmonster.length;
+        //for(var i=0;i<myflyingmonster.length;i++){
+        //    cnt+=1
+        //}
+        if(cnt<maxflyingmonsters){
+            //'DebugLog (mapwidth+mapheight)/10
+            for(var i=0;i<(mapwidth+mapheight)/10;i++){
+                if(Math.random() < egghatchspeed){
+                    var x=randomRange(0,mapwidth);
+                    var y=randomRange(0,mapheight);
+                    if(mymap.mapfinal[x][y] == mymap.tileegg){
+                        mymap.mapfinal[x][y] = mymap.tileempty
+                        myflyingmonster.push(
+                                new theflyingmonster(
+                                x,y    
+                                )
+                            );
+                        //myflyingmonster.AddLast(New theflyingmonster(x,y))
+                        //mymap.updateimage(mymap.mapcanvas)
+                    }
+                }
+            }
+        }
+    }
+
     function drawLine(x1,y1,x2,y2,stroke = 'black', width = 1) {
         if (stroke) {
             ctx.strokeStyle = stroke;
