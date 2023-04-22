@@ -4,12 +4,13 @@
 <br><br>
 
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif)
-
-<img src="Media/IMG_2050.png" width=50% height=50%>
-
-
-
 *(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)*
+
+<img src="Media/IMG_2050.png" width=50% height=50%><br>
+*(some of the level graphics that wil be used in the early version..)*
+
+
+
 <br>
 <br>
 <br>
