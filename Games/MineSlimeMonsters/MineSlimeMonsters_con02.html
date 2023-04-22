@@ -23,8 +23,8 @@ Use different browser.
 </canvas>
 <script>
     //
-    // Added - collision bullet flyingmonster
-    // Added - collision frag(grenade explosion fragments)
+    //
+    //
     //
     //
     // Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
@@ -84,6 +84,98 @@ Use different browser.
     var maxflyingmonsters=30
     var maxwalkingmonsters=30
 
+    //uses myflyingmonster
+    class turret{
+        constructor(){
+            this.deleteme
+            this.mapx,this.mapy 
+            this.tw,this.th //'tilewidht and height
+            this.owner="town"
+            this.findstartposition()
+            this.tw = tilewidth
+            this.th = tileheight
+        }
+        update(){
+            if(myflyingmonster.length==0)return
+            if(randomRange(20)<10)return
+            for(var i=0;i<myflyingmonster.length;i++){		
+                //if(Math.random()<0.01)console.log(distanceM(this.mapx,this.mapy,myflyingmonster[i].x,myflyingmonster[i].y))
+                if(distanceM(this.mapx,this.mapy,myflyingmonster[i].x,myflyingmonster[i].y) > 15)continue
+                //'if distance is close by
+                if( this.clearshot(this.mapx*this.tw,this.mapy*this.th,
+                        getangle(this.mapx*this.tw,this.mapy*this.th,
+                        myflyingmonster[i].x*this.tw,myflyingmonster[i].y*this.th)+randomRangeFloat(-.2,.2))==true ){
+                    mybullet.push(
+                        new bullet(
+                            this.mapx*this.tw,this.mapy*this.th,
+                            getangle(this.mapx*this.tw,this.mapy*this.th,
+                                    myflyingmonster[i].x*this.tw,
+                                    myflyingmonster[i].y*this.th)+randomRangeFloat(-.2,.2),
+                            "town","turret"
+                            )
+                    );
+                    //mybullet.AddLast(New bullet(mapx*tw,mapy*th,getangle(mapx*tw,mapy*th,i.x*tw,i.y*th)+Rnd(-.2,.2),"town","turret"))
+                }
+            }
+
+            for(var i=0;i<myflyingmonster.length;i++){	
+                //if(Math.random()<0.01)console.log(distanceM(this.mapx,this.mapy,i.x,i.y))
+                if(distanceM(this.mapx,this.mapy,myflyingmonster[i].x,myflyingmonster[i].y) > 15)continue
+                //'if distance is close by
+                if(this.clearshot(this.mapx*this.tw,this.mapy*this.th,
+                        getangle(this.mapx*this.tw,this.mapy*this.th,
+                                myflyingmonster[i].x*this.tw,myflyingmonster[i].y*this.th)+randomRangeFloat(-.2,.2))){
+                   mybullet.push(
+                        new bullet(
+                            this.mapx*this.tw,this.mapy*this.th,
+                            getangle(this.mapx*this.tw,this.mapy*this.th,
+                                    myflyingmonster[i].x*this.tw,myflyingmonster[i].y*this.th)+randomRangeFloat(-.2,.2),
+                            "town","turret"
+                            )
+                    );
+                    //mybullet.AddLast(New bullet(mapx*tw,mapy*th,getangle(mapx*tw,mapy*th,i.x*tw,i.y*th)+Rnd(-.2,.2),"town","turret"))
+                }
+            }
+        }
+        //' Check if we are not recklessly shooting into a solid tile
+        clearshot(x,y,angle){
+            for(var i=0;i<100;i++){
+                x+=Math.cos(angle)
+                y+=Math.sin(angle)
+                if(mymap.mapcollide2(x,y,3,3))return false
+            }
+            return true
+        }
+        findstartposition(){
+            //' position on the left side
+            for(var y=2;y< mymap.mmh-2;y++){
+            for(var x=2;x< mymap.mmw-2;x++){
+                if(mymap.mapfinal[x][y] == mymap.tileempty){
+                if(mymap.mapfinal[x+1][y] == mymap.tileempty){
+                if(mymap.mapfinal[x+1][y+1] == mymap.tileempty){
+                if(mymap.mapfinal[x][y+1] == mymap.tilesolid){				
+                    if(mymap.mapfinal[x-1][y] == mymap.tileempty){					
+                        mymap.mapfinal[x-1][y] = mymap.tileturret
+                        this.mapx = x - 1
+                        this.mapy = y
+                        return
+                     }else if(mymap.mapfinal[x+5][y] == mymap.tileempty){
+                        mymap.mapfinal[x+5][y] = mymap.tileturret
+                        this.mapx = x + 5
+                        this.mapy = y
+                        return
+                     }else{ //' no place for turret
+                        this.deleteme = true					
+                        return
+                    }
+                }
+                }
+                }
+                }
+            }
+            }
+        }     
+    }
 
     class theflyingmonster{
         constructor(x,y){
@@ -1979,7 +2071,7 @@ Use different browser.
         }
     }
 
-    var myc=new player();
+    
 
     // Our map system inc overview map view
     class map{
@@ -2684,13 +2776,14 @@ Use different browser.
 
 
     var mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
-    
+    //var myc=new player();
     var myplayer=new player();
     var mybullet = [];
     var mygrenade = [];
     var myfrag = [];
     var myitem = [];
     var myflyingmonster = [];
+    var myturret = [];
 	//'
 	//' Create the towns people
 	//'
@@ -2710,6 +2803,15 @@ Use different browser.
 	    //mytownperson.Add(New townperson(Rnd(3,mapwidth/2-5),16))
 		//mytownperson.Add(New townperson(Rnd(mapwidth/2+5,mapwidth-5),16))
     }
+    //
+    // add turrets
+    myturret.push(
+        new turret() 
+    );
+    myturret.push(
+        new turret() 
+    );
+
 
     gameloop=setInterval(doGameLoop2,15);
     function doGameLoop2(){
@@ -2799,6 +2901,16 @@ Use different browser.
                 }
             }
         }
+        // Update the turret
+        if(myturret.length>0){            
+            //Update the turret
+            for(var i=0;i<myturret.length;i++){ 
+                for(var j=0;j<=1;j++){               
+                    myturret[i].update();
+                }              
+            }
+        }
+
         if(myflyingmonster.length<maxflyingmonsters){
         for(var i=0;i<=1;i++){
             addflyingmonster();
