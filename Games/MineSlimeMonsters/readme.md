@@ -8,7 +8,7 @@
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif)<br>
 *(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)*
 
-<img src="Media/IMG_2050.png" width=50% height=50%><br>
+<img src="Media/screenshot.png" width=50% height=50%><br>
 *(some of the level graphics that wil be used in the early version..)*
 
 
@@ -25,7 +25,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 <br>
     
 <br>Old Version : (Emscripten)<br>
-<img src="Media/screenshot.png" width="20%"></img><br>
+<img src="Media/oldversion.jpg" width="20%"></img><br>
 [Play game in browser - old / keyboard only -](https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html)
 <br><br>
 
