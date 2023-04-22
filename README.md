@@ -42,7 +42,7 @@ Copy paste (edit) and run. ( each html file is stand alone and requires no clunk
 
 <br>
 
-<img src="Media/IMG_2050.png" width=50% height=50%><br>
+<img src="Games/MineSlimeMosters/Media/IMG_2050.png" width=50% height=50%><br>
 *(some of the level graphics of 'Mine Slime and Monsters' (games folder) that wil be used in the early version..)*
 
 
