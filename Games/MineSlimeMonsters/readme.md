@@ -1,6 +1,7 @@
 # Porting code : 3583 of 5000.
 *(Monkey2 to Javascript)*
-<br>Working on gfx(see below) and slight hand injury break from the typing..<br>
+<br>Now with Game Controller(Xbox) Support)<br>
+<br>Working on gfx more(see below) and less typing because of numb hands..<br>
 
 
 <br><br>
