@@ -6,6 +6,9 @@
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif)
 
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](Media/IMG_2050.png | width=320)
+![](https://gyazo.com/eb5c5741b6a9a16c692170a41a49c858.png | width=100)
+
+
 
 *(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)*
 <br>
