@@ -40,8 +40,11 @@ Copy paste (edit) and run. ( each html file is stand alone and requires no clunk
 (three.js requires more work. media and .js includes and later worker threading files (3d))
 
 
-<br>From the procgen folder:(100% programmed graphics - random maps)<br>
-<img src="Procgen/Media/C45FEA0A-71B9-4A6A-9BC9-B4EAE511A2F3.jpeg" width="60%"><br>
+<br>
+
+<img src="Media/IMG_2050.png" width=50% height=50%><br>
+*(some of the level graphics of 'Mine Slime and Monsters' (games folder) that wil be used in the early version..)*
+
 
 <br><br>
 <img src="Media/A8B4083E-3FC8-47F8-A9FD-8F913AF3A322.jpeg" width="60%"><br>
