@@ -25,7 +25,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 <br>
     
 <br>Old Version : (Emscripten)<br>
-<img src="Media/oldversion.jpg" width="20%"></img><br>
+<img src="Media/screenshot.png" width="20%"></img><br>
 [Play game in browser - old / keyboard only -](https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html)
 <br><br>
 
