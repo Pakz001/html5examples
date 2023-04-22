@@ -1,0 +1,3687 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+    <style>
+        #myCanvas {touch-action: none;
+        -webkit-touch-callout:none;
+        -webkit-user-select:none;
+        -khtml-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select:none;
+        -webkit-tap-highlight-color:rgba(0,0,0,0);
+        }
+
+    </style>
+
+<canvas id="myCanvas" width="640" height="480" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    //
+    //
+    //
+    //
+    //
+    // Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
+    //
+    // When it gets around 5000 lines it should be close to converted.
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+	var offscreenCanvas = document.createElement("canvas");
+
+	var ctx2 = offscreenCanvas.getContext("2d")
+
+    // load the tiles..
+    var tileImage = new Image();
+    tileImage.src = 'Data/tiles.png';
+
+    
+    
+    
+
+    var img = new Image();
+
+    // Add event listeners for reading keydown and keyup events from the keyboard..
+    //
+    window.addEventListener("keydown",kd,true);
+    window.addEventListener("keyup",ku,true);
+ let gamepadIndex;
+window.addEventListener('gamepadconnected', (event) => {
+	gamepadIndex = event.gamepad.index;
+});
+var padCountDown=0;
+// now print the axes on the connected gamepad, for example: 
+setInterval(() => {
+	if(gamepadIndex !== undefined) {
+		// a gamepad is connected and has an index
+		const myGamepad = navigator.getGamepads()[gamepadIndex];
+		//console.log(`Left stick at (${myGamepad.axes[0]}, ${myGamepad.axes[1]})` );
+		//console.log(`Right stick at (${myGamepad.axes[2]}, ${myGamepad.axes[3]})` );
+        var a=-1
+        for(var i=0;i<16;i++){
+            if(myGamepad.buttons[i].pressed==true)a=i
+        }
+        if(a!=-1)console.log(a)
+        
+        Controller.Left = false
+        Controller.Right = false
+        Controller.Up = false
+        Controller.Down = false
+        Controller.Jump = false
+        Controller.ShotGun = false
+        Controller.Grenade = false
+        Controller.MiniMap = false
+        if(myGamepad.buttons[9].pressed==true){
+            Controller.MiniMap = true
+        }
+        if(myGamepad.buttons[3].pressed==true){
+            Controller.Grenade = true
+        }
+        if(myGamepad.buttons[2].pressed==true){
+            Controller.ShotGun = true
+        }
+        if(myGamepad.buttons[0].pressed==true){
+            Controller.Jump = true
+        }
+        if(myGamepad.buttons[14].pressed==true){
+            Controller.Left = true
+        }
+        if(myGamepad.buttons[12].pressed==true){
+            Controller.Up = true
+        }
+        if(myGamepad.buttons[15].pressed==true){
+            Controller.Right = true
+
+        } 
+        if(myGamepad.buttons[13].pressed==true){
+            Controller.Down = true
+        } 
+
+
+	}
+}, 10) // print axes 10 times per second
+
+    //
+    // With this we can read the controller status. In this example
+    // we use the keyboard to set these flags..
+    //
+    var Controller = {
+        Right:false,
+        Left:false,
+        Up:false,
+        Down:false,
+        ShotGun:false,
+        LaserWall:false,
+        Grenade:false,
+        Mine:false,
+        Jump:false,
+        MiniMap:false,
+    } 
+
+    var mapwidth=320;
+    var mapheight=240;
+    var screenwidth=window.innerWidth+48;
+    var screenheight=window.innerHeight+48;
+    var tilewidth=24;
+    var tileheight=24;
+    var developmode = false;
+
+    var egghatchspeed= 0.1 //how fast eggs hatch
+    var egglayingfreq = 0.1 // lay lots of eggs 1 lay less eggs 0 '0 to 1
+    var startingeggfreq = 0.2 //0 to 1 0 is none 1 is full
+    var maxflyingmonsters=30
+    var maxwalkingmonsters=30
+
+    //
+    // These are the walking monsters that
+    // hatch from the eggs. They do not lay eggs
+    // themselfs but guard the other nearby eggs.
+    //
+    class walkingmonster{
+ 
+        constructor(x,y){
+            this.px,this.py //pixel position (0-width)
+            this.sx,this.sy //movement speed
+            this.x,y //tile x and y position
+            this.w,this.h
+            this.hp //hitpoints
+            this.hpmax
+            this.deleteme
+            this.state
+            this.substate
+            this.jx
+            this.jy
+            this.oldpy //old py coordinate
+            this.x = x
+            this.y = y
+            this.w = tilewidth
+            this.h = tileheight
+            this.px = x*this.w
+            this.py = y*this.h
+            this.hp = randomRange(10,30)
+            this.hpmax = this.hp
+            //set the movement speed
+            this.sx = randomRangeFloat(0.3,3)
+            //sy = sx
+            this.state="hatched"
+        }
+        update(){		
+            //If laserwait>0 Then laserwait-=1
+        
+            // Damage to player
+            if(developmode == false){
+                if(distanceM(   myplayer.px+(myplayer.pw/2),myplayer.py+(myplayer.ph/2),
+                                this.px+(this.w/2),this.py+(this.h/2)) < tilewidth){
+                    myplayer.hp -= 2
+                    //mynumberfall.Add(New numberfall(myplayer.px+(myplayer.pw/2),myplayer.py,2,Color.Red))
+                    if(myplayer.hp < 0)this.gamestate = "select"
+                }
+            }
+            
+            if(this.state!="attack"){
+                //If Rnd(10)<1 Print Millisecs() + "sx : " + sx
+                if(this.px < this.x*this.w)this.px += this.sx
+                if(this.px > this.x*this.w)this.px -= this.sx
+                //		If py < y*h)py += sy
+                //		If py > y*h)py -= sy
+                if(this.laserwall())this.changedirection()
+                if(distanceM(this.px,this.py,this.x*this.w,this.y*this.h) > 8)return
+                }else{
+                if(this.substate == "jump"){
+                    if(mymap.mapcollide(this.px+this.jx,this.py,this.w,this.h) == false){
+                        this.px += this.jx
+                    }else{
+                        //substate = "finishjump"				
+                    }
+                    if(mymap.mapcollide(this.px,this.py+this.jy,this.w,this.h-1) == false){
+                        this.py += this.jy
+                    }else{
+                        this.x = myplayer.px / tilewidth
+                        this.y = myplayer.py / tileheight
+                        this.substate = "finishjump"
+                        return
+                    }
+                    this.jy += .1
+                    this.x = this.px / tilewidth
+                    this.y = this.py / tileheight
+                }
+            }
+            if(this.state=="hatched"){
+                //Case "hatched"
+                this.state="roam"
+                this.substate="left"
+            }
+            if(this.state=="attack"){
+                //Case "attack"
+ 
+
+                if(this.substate=="setjump"){
+                    //Case "setjump"
+                    if(myplayer.py < this.py)this.substate="finishjump"
+                    if(myplayer.py > this.py+3)this.substate="finishjump"
+                    var d=distanceM(myplayer.px,myplayer.py,this.px,this.py)
+                    if(this.px < myplayer.px){
+                        this.jx = d/35
+                        }else{
+                        this.jx = -d/35
+                    }
+                    
+                    if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 50)this.jy = -2
+                    this.substate = "jump"
+                    return
+                }
+                if(this.substate=="jump"){
+                    //Case "jump"
+                    //						
+                    var cnt=0
+                    for(var ppy=0;ppy<40;ppy+=1){
+                        if(mymap.mapcollide(this.px+(this.jx*10),this.py+ppy,this.w,this.h) == false)cnt+=1
+                    }
+                    if(cnt>30)this.jx=-this.jx
+                }
+                if(this.substate=="finishjump"){
+                    //Case "finishjump"
+                    this.state = "roam"
+                    this.x = this.px / tilewidth
+                    this.y = this.py / tileheight
+                    if(randomRange(0,2)< 1){
+                        this.substate == "left"
+                        }else{
+                        this.substate="right"	
+                    }					
+                }//End Select	
+
+            }
+            if(this.state=="roam"){
+                //Case "roam"								
+                if(this.canattackplayer()){
+                    this.state="attack"
+                    this.substate="setjump"
+                }
+                  
+                if(this.substate=="left"){
+                    //Case "left"
+                    this.x-=1
+                    //If Rnd(50) < 1 And mymap.mapfinal[x-1,y] = mymap.tileempty And mymap.mapfinal[x-1,y+1] <> mymap.tileempty Then substate="right"						
+                    //If Rnd(50) < 1 And cannotgohere(x+1,y) = false And cannotgohere(x+1,y+1)=true Then substate="right" 
+                    if(this.cannotgohere(this.x-1,this.y) == true)this.substate = "right"
+                    if(this.cannotgohere(this.x-1,this.y+1) == false)this.substate = "right"
+                    //If mymap.mapfinal[x-1,y]  <> mymap.tileempty Then substate="right"
+                    //If mymap.mapfinal[x-1,y+1] = mymap.tileempty Then substate="right"
+                    if(this.x<3)this.substate="right"
+                }
+                if(this.substate=="right"){        
+                    //Case "right"						
+                    this.x+=1
+                    //If Rnd(50) < 1 And cannotgohere(x-1,y) =  false And cannotgohere(x-1,y+1)=true Then substate="left"
+                    if(this.cannotgohere(this.x+1,this.y) == true)this.substate="left"
+                    if(this.cannotgohere(this.x+1,this.y+1) == false)this.substate="left"
+                    //If Rnd(50) < 1 And mymap.mapfinal[x+1,y] = mymap.tileempty And mymap.mapfinal[x+1,y+1] <> mymap.tileempty Then substate="left"						
+                    //If mymap.mapfinal[x+1,y]  <> mymap.tileempty Then substate="left"
+                    //If mymap.mapfinal[x+1,y+1] = mymap.tileempty Then substate="left"
+                    if(this.x>mapwidth-3)this.substate=="left"
+                }//End Select
+
+                    //gorandleftorright()
+            }
+        }
+
+
+        canattackplayer(){
+            
+            if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 150)return false
+            
+            if(myplayer.px < this.px){
+                for(var xx=this.px/tilewidth;xx>this.px/tilewidth-3;xx-=1){
+                    if(mymap.mapfinal[Math.floor(xx)][this.y+1] != mymap.tilesolid)return false
+                }
+            }else{
+                for(var xx=this.px/tilewidth;xx<this.px/tilewidth+3;xx+=1){
+                    if(mymap.mapfinal[Math.floor(xx)][this.y+1] != mymap.tilesolid)return false
+                }			
+            }
+            
+            var angle = getangle(this.px,this.py,myplayer.px,myplayer.py)
+            var clearpath=false
+            var mx = Math.cos(angle)
+            var my = Math.sin(angle)
+            var monx = this.px
+            var mony = this.py
+            for(var i=0;i<200;i+=1){
+                monx += mx
+                mony += my
+                if(distanceM(monx,mony,myplayer.px,myplayer.py) < 20)return true
+                if(mymap.mapcollide(monx,mony,this.w/2,this.h/2) == true)return false	
+                if(this.collidelaserwall(monx,mony,this.w,this.h))return false
+            }				
+            return true
+        }	
+        // for the walking monster Check if(tile on map is blocked
+        cannotgohere(x,y){
+            x = Math.floor(x)
+            y = Math.floor(y)
+            if(mymap.mapfinal[x][y] == mymap.tilesolid)return true
+            if(mymap.mapfinal[x][y] == mymap.tilemineable)return true
+            if(mymap.mapfinal[x][y] == mymap.tileturret)return true
+            return false
+
+        }
+        laserwall(){
+            /*
+            for(var i=0;i<mylaserwall.length;i+=1){
+                if(rectsoverlap((this.px-this.w)+(randomRange(-this.w,this.w)),this.py-this.h,this.w*2,this.h*2,mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
+                    return true
+                } 
+            }
+            */
+            return false
+        }
+        collidelaserwall(x,y,w1,h1){
+            /*
+            for(var i=0;i<mylaserwall.length;i+=1){
+                if(rectsoverlap((x-w1)+(randomRange(-w1,w1)),y-h1,w1*2,h1*2,mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
+                    return true
+                } 
+            }
+            */
+            return false
+            
+        }	
+        changedirection(){
+            this.state = "roam"
+            if(this.substate == "left"){
+                this.substate="right" 
+                this.x += 2		
+                }else{
+                substate="left"
+                this.x -= 2
+            }
+        }	
+        draw(){
+            var x1=(screenwidth-48)/mapwidth*this.x
+            var y1=(screenheight-48)/mapheight*this.y
+            ctx.fillStyle = 'white'
+            ctx.fillRect(x1,y1,3+2,3+2)
+            ctx.fillStyle = 'blue'
+            ctx.fillRect(x1+1,y1+1,3,3)
+            //canvas.Color = Color.White
+            //SetColor 255,255,255
+            //canvas.DrawRect(x1,y1,3+2,3+2)
+            //canvas.Color = Color.Red
+            //SetColor 255,0,0		
+            //canvas.DrawRect(x1+1,y1+1,3,3)
+        
+        }
+
+    }
+
+
+
+
+    //uses myflyingmonster
+    class turret{
+        constructor(){
+            this.deleteme
+            this.mapx,this.mapy 
+            this.tw,this.th //'tilewidht and height
+            this.owner="town"
+            this.findstartposition()
+            this.tw = tilewidth
+            this.th = tileheight
+        }
+        update(){
+            if(myflyingmonster.length==0)return
+            if(randomRange(20)<10)return
+            for(var i=0;i<myflyingmonster.length;i++){		
+                //if(Math.random()<0.01)console.log(distanceM(this.mapx,this.mapy,myflyingmonster[i].x,myflyingmonster[i].y))
+                if(distanceM(this.mapx,this.mapy,myflyingmonster[i].x,myflyingmonster[i].y) > 15)continue
+                //'if distance is close by
+                if( this.clearshot(this.mapx*this.tw,this.mapy*this.th,
+                        getangle(this.mapx*this.tw,this.mapy*this.th,
+                        myflyingmonster[i].x*this.tw,myflyingmonster[i].y*this.th)+randomRangeFloat(-.2,.2))==true ){
+                    mybullet.push(
+                        new bullet(
+                            this.mapx*this.tw,this.mapy*this.th,
+                            getangle(this.mapx*this.tw,this.mapy*this.th,
+                                    myflyingmonster[i].x*this.tw,
+                                    myflyingmonster[i].y*this.th)+randomRangeFloat(-.2,.2),
+                            "town","turret"
+                            )
+                    );
+                    //mybullet.AddLast(New bullet(mapx*tw,mapy*th,getangle(mapx*tw,mapy*th,i.x*tw,i.y*th)+Rnd(-.2,.2),"town","turret"))
+                }
+            }
+
+            for(var i=0;i<myflyingmonster.length;i++){	
+                //if(Math.random()<0.01)console.log(distanceM(this.mapx,this.mapy,i.x,i.y))
+                if(distanceM(this.mapx,this.mapy,myflyingmonster[i].x,myflyingmonster[i].y) > 15)continue
+                //'if distance is close by
+                if(this.clearshot(this.mapx*this.tw,this.mapy*this.th,
+                        getangle(this.mapx*this.tw,this.mapy*this.th,
+                                myflyingmonster[i].x*this.tw,myflyingmonster[i].y*this.th)+randomRangeFloat(-.2,.2))){
+                   mybullet.push(
+                        new bullet(
+                            this.mapx*this.tw,this.mapy*this.th,
+                            getangle(this.mapx*this.tw,this.mapy*this.th,
+                                    myflyingmonster[i].x*this.tw,myflyingmonster[i].y*this.th)+randomRangeFloat(-.2,.2),
+                            "town","turret"
+                            )
+                    );
+                    //mybullet.AddLast(New bullet(mapx*tw,mapy*th,getangle(mapx*tw,mapy*th,i.x*tw,i.y*th)+Rnd(-.2,.2),"town","turret"))
+                }
+            }
+        }
+        //' Check if we are not recklessly shooting into a solid tile
+        clearshot(x,y,angle){
+            for(var i=0;i<100;i++){
+                x+=Math.cos(angle)
+                y+=Math.sin(angle)
+                if(mymap.mapcollide2(x,y,3,3))return false
+            }
+            return true
+        }
+        findstartposition(){
+            //' position on the left side
+            for(var y=2;y< mymap.mmh-2;y++){
+            for(var x=2;x< mymap.mmw-2;x++){
+                if(mymap.mapfinal[x][y] == mymap.tileempty){
+                if(mymap.mapfinal[x+1][y] == mymap.tileempty){
+                if(mymap.mapfinal[x+1][y+1] == mymap.tileempty){
+                if(mymap.mapfinal[x][y+1] == mymap.tilesolid){				
+                    if(mymap.mapfinal[x-1][y] == mymap.tileempty){					
+                        mymap.mapfinal[x-1][y] = mymap.tileturret
+                        this.mapx = x - 1
+                        this.mapy = y
+                        return
+                     }else if(mymap.mapfinal[x+5][y] == mymap.tileempty){
+                        mymap.mapfinal[x+5][y] = mymap.tileturret
+                        this.mapx = x + 5
+                        this.mapy = y
+                        return
+                     }else{ //' no place for turret
+                        this.deleteme = true					
+                        return
+                    }
+                }
+                }
+                }
+                }
+            }
+            }
+        }     
+    }
+
+    class theflyingmonster{
+        constructor(x,y){
+            this.px,this.py //pixel position (0-width)
+            this.sx,this.sy //movement speed
+            this.x,this.y //tile x and y position
+            this.w,this.h
+            this.hp //hitpoints
+            this.hpmax
+            this.deleteme
+            this.state
+            this.substate
+
+            this.x = x
+            this.y = y
+            this.w = tilewidth
+            this.h = tileheight
+            this.px = x*this.w
+            this.py = y*this.h
+            this.hp = randomRange(10,30)
+            this.hpmax = this.hp
+            //set the movement speed
+            this.sx = randomRangeFloat(0.3,3)
+            this.sy = this.sx;
+            this.state="hatched"
+        }
+        update(){		
+    //		If laserwait>0)laserwait-=1
+            // Damage to player
+            if(developmode == false){
+                if(distanceM(myplayer.px+(myplayer.pw/2),myplayer.py+(myplayer.ph/2),this.px+(this.w/2),this.py+(this.h/2)) < tilewidth){
+                    myplayer.hp -= 2;
+                    // NOTE
+                    //mynumberfall.Add(New numberfall(myplayer.this.px+(myplayer.pw/2),myplayer.this.py,2,Color.Red))
+                    if(myplayer.hp < 0 )this.gamestate = "select";
+                }
+            }
+
+            
+            if(this.px < this.x*this.w)this.px += this.sx
+            if(this.px > this.x*this.w)this.px -= this.sx
+            if(this.py < this.y*this.h)this.py += this.sy
+            if(this.py > this.y*this.h)this.py -= this.sy
+            //if(laserwall()==true)changedirection()
+            if(distanceM(this.px,this.py,this.x*this.w,this.y*this.h) > 8)return
+            //Select state
+            if(this.state=="hatched"){
+                //Case "hatched"
+                this.state="takeoff"
+                //ty=3 //move distance
+            }
+            if(this.state=="takeoff"){
+            //Case "takeoff"
+                this.takeoff()
+            }
+            if(this.state=="attack"){
+            //Case "attack"
+                if(this.canattackplayer() == false){
+                    this.state = "roam"
+                    this.substate="up"
+                    return
+                }
+                    //Local angle = getangle(this.px,this.py,myplayer.this.px,myplayer.this.py)
+                
+                this.x = Math.floor(myplayer.px / tilewidth)
+                this.y = Math.floor(myplayer.py / tileheight)
+            }
+            if(this.state=="roam"){
+                //Case "roam"								
+                
+                if(this.canattackplayer())this.state = "attack";
+                
+                //Select substate
+                if(this.substate=="left"){
+                //Case "left"
+                    this.x-=1						
+                    if(mymap.mapfinal[this.x-1][this.y]  != mymap.tileempty)this.substate="right"
+                    if(x<3)this.substate="right"
+                    // if flying on the ground level)move up 1 tile
+                    if(mymap.mapfinal[this.x][this.y+1]  != mymap.tileempty)this.y-=1
+                    if(mymap.mapfinal[this.x][this.y-1]  != mymap.tileempty)this.y+=1
+                }
+                if(this.substate=="right"){
+                //Case "right"
+                    this.x+=1
+                    if(mymap.mapfinal[this.x+1][this.y]  != mymap.tileempty)this.substate="left"
+                    if(this.x>mapwidth-3)this.substate="left"
+                    // if flying on the ground level then move up 1 tile						
+                    if(mymap.mapfinal[this.x][this.y+1]  != mymap.tileempty)this.y-=1
+                    if(mymap.mapfinal[this.x][this.y-1]  != mymap.tileempty)this.y+=1
+                }
+                if(this.substate=="up"){
+                // Case "up"
+                    this.y-=1
+					//if(this.y<13)this.substate="down"
+                    if(mymap.mapfinal[this.x][this.y-2]  != mymap.tileempty) {
+                        
+                        if(Math.random()<.5){
+                            this.substate="left"
+                        }else{
+                            this.substate="right"
+                        }							
+                    }
+                    if(this.y<3){
+                        if(Math.random() < .5){
+                            this.substate="right"
+                        }else{
+                            this.substate="left"
+                        }
+                    }
+                }
+                if(this.substate=="down"){
+                    //Case "down"
+                    this.y+=1
+                    if(mymap.mapfinal[this.x][this.y+2] != mymap.tileempty){
+                        if(Math.random() < .5){
+                            this.substate="left"						
+                        }else{
+                            this.substate="right"
+                        }
+                    }
+                }
+                // Change direction to up or down if possible
+                // sometimes
+                                
+                this.gorandupordown()
+                this.gorandleftorright()
+                //change direction sometimes to left or right
+                this.landandlayegg()
+            }
+            if(this.state=="landlayegg"){
+            //Case "landlayegg"
+                
+                this.y+=1
+                if(mymap.mapfinal[this.x][this.y+1]  != mymap.tileempty){
+                    this.state="layegg"
+                }
+            }
+            if(this.state=="layegg"){
+
+            //Case "layegg"
+                if(mymap.mapfinal[this.x][this.y] == mymap.tileempty && mymap.mapfinal[this.x][this.y+1] != mymap.tileegg){
+                
+                    if(distanceM(myplayer.px,myplayer.py,this.px,this.py) < 100){
+                        }else{
+                        mymap.mapfinal[this.x][this.y] = 3
+                        
+                        //mymap.updateimage(mymap.mapcanvas)				
+                    }
+                }else{
+                
+                }
+                this.state="takeoff"
+            }
+            if(this.state=="roam"){
+            //    state="takeoff"
+            }
+        
+            //End Select
+        }
+        canattackplayer(){
+            if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 200)return false
+            var angle = getangle(this.px,this.py,myplayer.px,myplayer.py)
+            var clearpath=false;
+            var mx = Math.cos(angle)
+            var my = Math.sin(angle)
+            var monx = this.px
+            var mony = this.py
+            for(var i=0;i<200;i++){
+                monx += mx;
+                mony += my;
+                if(distanceM(monx,mony,myplayer.px,myplayer.py) < 20)return true
+                if(mymap.mapcollide(monx,mony,this.w,this.h) == true)return false;	
+                if(this.collidelaserwall(monx,mony,this.w,this.h))return false
+            }				
+            return true
+        }
+        collidelaserwall(x,y,w1,h1){
+            return false;
+            /*
+            for(var i=Eachin mylaserwall
+                If rectsoverlap((x-w1)+(Rnd(-w1,w1)),y-h1,w1*2,h1*2,i.tx-5,i.ty,10,i.by-i.ty)
+                    return True
+                } 
+            Next
+            return False
+            */
+        }
+        laserwall(){
+            return false;
+            /*
+            For var i:=Eachin mylaserwall
+                If rectsoverlap((this.px-w)+(Rnd(-w,w)),this.py-h,w*2,h*2,i.tx-5,i.ty,10,i.by-i.ty)
+                    return True
+                } 
+            Next
+            return False
+            */
+        }
+        changedirection(){
+            this.state = "roam"
+            if(this.substate == "left"){
+                this.substate="right" 
+                this.x += 2;		
+            }else{ 
+                this.substate="left"
+                this.x -= 2;
+            }
+        }
+        landandlayegg(){
+
+            // Sometimes land and lay egg
+            if(Math.random() < (egglayingfreq/10)){
+                // Debug - So monster will not lay egg in player
+                
+                var exitloop=false
+                var y1=this.y
+                var egghere=false
+                while(exitloop == false){
+                    if(mymap.mapfinal[this.x][y1] == 3){
+                        return
+                    }
+                    if(mymap.mapladder[this.x][y1] == 1){
+                        return 
+                    }
+                    if(mymap.mapfinal[this.x][y1]  != mymap.tileempty)exitloop = true
+                    y1+=1;
+                }
+                var cnt=0;
+                for(var i=0;i<myflyingmonster.length;i++){
+                    cnt+=1
+                }
+                //if more then max monsters no lay egg
+                if(cnt<maxflyingmonsters){		
+                    this.state="landlayegg";
+
+                }
+            }	
+        }
+        gorandleftorright(){
+            if(this.substate =="up" || this.substate =="down"){
+                if(Math.random() < 0.1){
+                    var exitloop=false
+                    var x1=this.x
+                    var cnt=0
+                    while(exitloop == false){
+                        x1-=1
+                        cnt+=1
+                        if(mymap.mapfinal[x1][this.y] != mymap.tileempty || x1<3){
+                            exitloop = true;
+                        }
+                    }				
+                    if(cnt>8)this.substate = "left"
+                }
+                if(Math.random() < 0.1){
+                    var exitloop=false
+                    var x1=this.x
+                    var cnt=0
+                    while(exitloop == false){
+                        x1+=1
+                        cnt+=1
+                        if(mymap.mapfinal[x1][this.y] != mymap.tileempty || x1>mapwidth-3){
+                            exitloop = true
+                        }
+                    }			
+                    if(cnt>8)this.substate = "right"					
+                }
+            }			
+        }
+        gorandupordown(){
+            if(this.substate == "left" || this.substate == "right"){
+                if(Math.random() < .1){
+                    var exitloop=false
+                    var y1=this.y
+                    var cnt=0
+                    while(exitloop==false){
+                        y1-=1
+                        cnt+=1
+                        if(mymap.mapfinal[this.x][y1] != mymap.tileempty){
+                            exitloop = true
+                        }
+                        if(y1<3)exitloop = true
+                    }			
+                    if(cnt>8)this.substate="up"					
+                }
+                if(Math.random() < .13 && this.substate!="up"){					
+                    var exitloop=false
+                    var y1=this.y
+                    var cnt=0
+                    while(exitloop==false){
+                        y1+=1
+                        cnt+=1
+                        if(mymap.mapfinal[this.x][y1]  != mymap.tileempty){
+                            exitloop = true
+                        }
+                    }
+                    if(cnt>8)this.substate="down"
+                }
+            }	
+        }
+        takeoff(){
+            this.y-=1
+            if(mymap.mapfinal[this.x][this.y-1]  != mymap.tileempty){
+                this.state="roam"
+                if(randomRangeFloat(0,1) < 0.5){ 
+                    this.substate="left"
+                }else{
+                    this.substate="right"
+                }
+            }
+        }
+        draw(){
+            var x1=(screenwidth-48)/mapwidth*this.x
+            var y1=(screenheight-48)/mapheight*this.y
+            //canvas.Color = Color.White
+            //SetColor 255,255,255
+            ctx.fillStyle = 'white'
+            ctx.fillRect(x1,y1,3+2,3+2)
+            ctx.fillStyle = 'red'
+            ctx.fillRect(x1+1,y1+1,3,3)
+            //canvas.DrawRect(x1,y1,3+2,3+2)
+            //canvas.Color = Color.Red
+            //SetColor 255,0,0		
+            //canvas.DrawRect(x1+1,y1+1,3,3)
+
+        }
+   
+    }
+
+
+
+    //
+    // Items that move towards the player and into his inventory
+    // by mining,
+    //
+    class item{
+        constructor(x,y,kind){
+            this.px,this.py;
+            this.w,this.h;
+            this.deleteme;
+            this.angle;
+            this.mx,this.my;
+            this.speed;
+            this.kind; //coal,metal,gold,rock	
+            this.removetime=2000;
+            this.time;
+
+            this.px = x;
+            this.py = y;
+            this.kind = kind;
+            this.mx = randomRangeFloat(-2,2);
+            this.my = 0;
+            this.w = 3;
+            this.h = 3;
+        }
+        update(){
+            
+            // if to long in game then remove
+            this.time+=1;
+            if(this.time>this.removetime)this.deleteme=true;
+            // get player center position
+            var pcx=myplayer.px + (myplayer.pw/2);
+            var pcy=myplayer.py + (myplayer.ph/2);
+            //if distance closest then add to player inventory		
+            if(distanceM(pcx,pcy,this.px,this.py) < 10){
+                // code to add to player inventory here...
+                this.addtoplayerinventory();	
+                this.deleteme = true;
+            }
+
+            // gravity
+            if(mymap.mapcollide(this.px,this.py+Math.ceil(this.my)+2,this.w,this.h) == false){ 			
+                if(this.my<3)this.my+=.1;
+            }else{
+                this.my=0;
+            }
+
+            // if in range then move to player
+            if(distanceM(pcx,pcy,this.px,this.py) < 150){ 			
+                this.angle = getangle(this.px,this.py,pcx,pcy);
+                this.mx = Math.cos(this.angle);
+                this.my = Math.sin(this.angle);			
+            }else{
+                if(this.mx > 0)this.mx-=.01;
+                if(this.mx < 0)this.mx+=.01;
+                if(this.mx<0.1 && this.mx>0)this.mx=0;
+                if(this.mx>-0.1 && this.mx<0)this.mx=0;
+                            
+            }
+
+            // floor collision
+            if(mymap.mapcollide(this.px,this.py+1,this.w,this.h) == true){ 						
+                    this.my=-1;
+            }
+
+            // ceiling collision
+            if(mymap.mapcollide(this.px,this.py-1,this.w,this.h) == true){ 						
+                    this.my=1;
+            }
+            // left side collision
+            if(mymap.mapcollide(this.px-1,this.py,this.w,this.h) == true){ 						
+                    this.mx=1;
+            }
+            // right side collision
+            if(mymap.mapcollide(this.px+1,this.py,this.w,this.h) == true){ 						
+                    this.mx=-1;
+            }
+            // move the item
+            this.px += this.mx;
+            this.py += this.my;		
+        }
+        addtoplayerinventory(){
+            for(var i=0;i<myplayer.playeritemnames.length;i+=1){
+                if(this.kind == myplayer.playeritemnames[i]){
+                    myplayer.playeritem[i,1] += 1;
+                    return;
+                }
+            }
+        }
+    }
+
+    //fragmentation things
+    class frag{
+        constructor(x,y,owner){
+            this.px,this.py; //pixel x and y
+            this.owner;
+            this.angle;
+            this.w,this.h;
+            this.deleteme=false;
+            this.countdown;
+            this.mx;
+            this.my;
+            this.fragspeed;
+
+            this.owner = owner;
+            this.px = x;
+            this.py = y;
+            this.w = 3;
+            this.h = 3;
+            this.fragspeed = randomRange(4,7);
+            this.countdown = 100+randomRange(0,300);
+            this.angle = randomRangeFloat(0,Math.PI*2);
+            this.mx = Math.cos(this.angle);
+            this.my = Math.sin(this.angle);
+
+        }
+        update(){		
+            for(var ps=0;ps<this.fragspeed;ps+=1){  
+                this.countdown-=1;
+                if(this.countdown < 0){
+                    
+                    this.deleteme = true; 
+                    return;
+                }
+                
+                //Collision with mineable tiles
+                if(mymap.mapmineablecollide(this.px-4,this.py-4,this.w+8,this.h+8,true,"frag")==true){
+                    //this.deleteme = true;
+                }
+                
+                //Collision with the slime
+                //if(mygrowslime.slimecollide(this.px-2,this.py-2,this.w+4,this.h+4,true)==true){
+                //    this.deleteme = true;
+                //}
+                
+                
+                //bouncy vertical
+                if(mymap.mapcollide(this.px,this.py+2,1,this.h)==true){ 			
+                    this.my = -this.my*.8;//+Rnd(-.1,.1)
+                    var cnt=0;
+                    while(mymap.mapcollide(this.px,this.py+2,1,this.h)==true){
+                        this.py+=this.my;
+                        cnt+=1;
+                        if(cnt>100)break;
+                    }
+                    this.mx*=.8;
+                    this.my*=.8;
+                    if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                    if(this.my>0 && this.my<.2)this.my=.2;
+                    if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                    if(this.mx>0 && this.mx<.2)this.mx=.2;
+                    
+                }
+                //bounc ceiling
+                if(mymap.mapcollide(this.px,this.py-2,1,this.h)==true){		
+                    //slimed=slimecollide(px,py+2,1,h)
+                    //If slimed = true Then return
+                    this.my = -this.my*.8
+                    var cnt=0;
+                    while(mymap.mapcollide(this.px,this.py-2,1,this.h)==true){
+                        this.py+=this.my;
+                        cnt+=1;
+                        if(cnt>100)break;
+                    }
+                
+                    this.mx*=.8;
+                    this.my*=.8;
+                
+                    if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                    if(this.my>0 && this.my<.2)this.my=.2;
+                    if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                    if(this.mx>0 && this.mx<.2)this.mx=.2;
+                
+                }		
+                //bounce horizontally
+                if(mymap.mapcollide(this.px-this.w,this.py,this.w*2,1)==true){ 			
+                    this.mx = -this.mx*.8//+Rnd(-.1,.1)
+                    var cnt=0;
+                    while(mymap.mapcollide(this.px-this.w,this.py,this.w*2,1)==true){
+                        this.px+=this.mx;	
+                        cnt+=1;
+                        if(cnt>100)break;			
+                    }
+                    this.mx*=.8;
+                    this.my*=.8;
+                    if(this.my<0 && this.my>-0.2)this.my=-0.2
+                    if(this.my>0 && this.my<.2)this.my=.2
+                    if(this.mx<0 && this.mx>-0.2)this.mx=-0.2
+                    if(this.mx>0 && this.mx<.2)this.mx=.2
+                    
+                }
+                
+                this.px += this.mx;
+                this.py += this.my;
+                this.my+=.005;
+                
+
+
+
+                
+                // frag collision with walking monsters
+                for(var i=0;i<mywalkingmonster.length;i+=1){
+                    if(distanceM(mywalkingmonster[i].px,mywalkingmonster[i].py,this.px,this.py) < 10){
+                        mywalkingmonster[i].hp -= 5
+                        //mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,5,Color.Red))
+                        if(mywalkingmonster[i].hp<=0){
+                            mywalkingmonster[i].deleteme = true
+                            //myitem.Add(New item(i.px,i.py,"Monster Tail"))
+                              myitem.push(
+                                new item(
+                                this.px,this.py,"Monster Tail"    
+                                ) 
+                            );
+                        }
+                        this.deleteme = true
+                        return;
+                    }
+                }
+                
+                
+                // frag collision with flying monsters
+                for(var i=0;i<myflyingmonster.length;i++){
+                    if(distanceM(myflyingmonster[i].px,myflyingmonster[i].py,this.px,this.py) < 10){
+                        myflyingmonster[i].hp -= 5
+                        //mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,5,Color.Red))
+                        if(myflyingmonster[i].hp<=0){
+                            myflyingmonster[i].deleteme = true
+                            myitem.push(
+                                new item(
+                                this.px,this.py,"Monster Tooth"    
+                                ) 
+                            );
+                            //myitem.Add(New item(i.px,i.py,"Monster Tooth"))
+                        }
+                        this.deleteme = true;
+                        return;
+                    }
+                }	
+                
+                // frag collision with the eggs
+                if(this.eggcollide(this.px-1,this.py-1,this.w+2,this.h+2)==true){
+                    this.deleteme = true
+                    //myitem.Add(New item(px,py,"Egg Shell"))
+                    return;
+                }
+            }
+        }	
+
+    
+        eggcollide(x,y,w,h){
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            var x2=-1,y2=-1;
+            if(mymap.mapfinal[lefttopx][lefttopy] == mymap.tileegg){
+                x2=lefttopx;
+                y2=lefttopy;
+            }
+            if(mymap.mapfinal[righttopx][righttopy] == mymap.tileegg){
+                x2=righttopx;
+                y2=righttopy;
+            }
+            if(mymap.mapfinal[leftbottomx][leftbottomy] == mymap.tileegg){
+                x2=leftbottomx;
+                y2=leftbottomy;
+            }
+            if(mymap.mapfinal[rightbottomx][rightbottomy] == mymap.tileegg){
+                x2=rightbottomx;
+                y2=rightbottomy;
+            }
+            if( x2 != -1 ) {			
+                // destroy egg
+                if(randomRange(0,3)<1){
+                    mymap.mapfinal[x2][y2] = mymap.tileempty;
+                    //myitem.Add(New item(x2*tilewidth,y2*tileheight,"gold"))
+                    //mymap.updateimage(mymap.mapcanvas)
+                }
+                return true;
+            }
+            return false;
+        }    			
+
+    }
+
+
+
+    class grenade{
+        
+        constructor(x,y,facing){
+            
+            this.px,this.py; //pixel x and y
+            this.slimed=false;
+            this.angle;
+            this.w,this.h;
+            this.deleteme;
+            this.countdown;
+            this.mx;
+            this.my;
+            this.px = x;
+            this.py = y;
+            this.w = 6;
+            this.h = 6;
+            this.countdown = 500;
+            if(facing=="left"){
+                this.angle=Math.PI+.3;
+            }
+            if(facing=="right"){
+                this.angle=0-.3;
+            }
+            if(facing=="up"){
+                this.angle=Math.PI*1.55 + randomRangeFloat(-.2,.2);
+            }
+            if(facing=="down"){
+                this.angle = Math.PI/2 + randomRangeFloat(-.2,.2);
+            }
+            
+            //this.angle = angle;
+            this.mx = Math.cos(this.angle);
+            this.my = Math.sin(this.angle);
+        }
+        update(){	
+            
+            for(var bulletspeed=0;bulletspeed<4;bulletspeed+=1){
+                
+                //Life of frags	
+                this.countdown-=1;
+                if(this.countdown < 0){ 
+                    
+                    this.deleteme = true;
+                    var numfrags=randomRange(6,20);
+                    for(var i=0;i<numfrags;i+=1){
+
+                        // NOTE :
+                        //myfrag.AddLast(New frag(px,py,"player"))
+                        
+                        myfrag.push(
+                            
+                            new frag(
+                                this.px,this.py,"player"
+                            )
+                        );
+                    }
+                    return;
+                }
+                                
+                if(this.slimed==false){ 
+                    
+
+                    //if(this.slimecollide(this.px-this.w,this.py-this.h,this.w*2.5,this.h*2.5)){
+                    //    this.slimed = true; 
+                    //    continue;
+                // }
+                    //bounce ceiling
+                    
+                    if(this.mapcollide(this.px,this.py-2,1,this.h)==true){ 			
+                        //slimed=slimecollide(px,py+2,1,h)
+                        //If slimed = True Then Return
+                        this.my = -this.my*.8;
+                        var cnt=0;
+                        while(this.mapcollide(this.px,this.py-2,1,this.h)==true){
+                            this.py+=this.my;
+                            cnt+=1;
+                            if(cnt>100)break;
+                        }
+                    
+                        this.mx*=.8;
+                        this.my*=.8;
+                    
+                        if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                        if(this.my>0 && this.my<.2)this.my=.2;
+                        if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                        if(this.mx>0 && this.mx<.2)this.mx=.2;
+                    
+                    }
+
+    
+                    //bouncy vertical
+                    if(this.mapcollide(this.px,this.py+2,1,this.h)==true){ 			
+                        ////slimed=slimecollide(px,py+2,1,h)
+                        ////If slimed = True Then Return
+                        this.my = -this.my*.8;//'-.1,.1)
+                        var cnt=0;
+                        while(this.mapcollide(this.px,this.py+2,1,this.h)==true){
+                            this.py+=this.my;
+                            cnt+=1;
+                            if(cnt>100)break;
+                        }
+                        
+                        this.mx*=.8;
+                        this.my*=.8;
+                        
+                        if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                        if(this.my>0 && this.my<.2)this.my=.2;
+                        if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                        if(this.mx>0 & this.mx<.2)this.mx=.2;
+                        
+                    }
+                    //'bounce horizontally
+                    if(this.mapcollide(this.px-this.w,this.py,this.w*2,1)==true){ 			
+                        //'slimed=mapcollide(px-w,py,w*2,1)
+                        //'If slimed Then Return
+                        this.mx = -this.mx*.8;//'+Rnd(-.1,.1)
+                        var cnt=0;
+                        while(this.mapcollide(this.px-this.w,this.py,this.w*2,1)==true){
+                            this.px+=this.mx;
+                            cnt+=1;
+                            if(cnt>100)break;			
+                        }
+                        this.mx*=.8;
+                        this.my*=.8;			
+                        if(this.my<0 && this.my>-0.2)this.my=-0.2;
+                        if(this.my>0 && this.my<.2)this.my=.2;
+                        if(this.mx<0 && this.mx>-0.2)this.mx=-0.2;
+                        if(this.mx>0 && this.mx<.2)this.mx=.2;
+                        
+                    }
+            
+                    //' update the frag location
+                    this.px += this.mx;
+                    this.py += this.my;
+                    this.my+=.005;
+                    
+                }
+            
+            }
+        }
+        mapcollide(x,y,w,h){
+            
+            var mmw=mymap.mmw;
+            var mmh=mymap.mmh;
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            if(lefttopx < 0 || lefttopx >= mmw)return true;
+            if(lefttopy < 0 || lefttopy >= mmh)return true;
+            if(righttopx < 0 || righttopx >= mmw)return true;
+            if(righttopy < 0 || righttopy >= mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= mmh)return true;
+            
+
+
+   
+           
+            if(mymap.mapfinal[lefttopx][lefttopy] != mymap.tileempty)return true;
+            if(mymap.mapfinal[righttopx][righttopy] != mymap.tileempty)return true;
+            if(mymap.mapfinal[leftbottomx][leftbottomy] != mymap.tileempty)return true;
+            if(mymap.mapfinal[rightbottomx][rightbottomy] != mymap.tileempty)return true;						
+            //If mygrowslime.map[lefttopx*2,lefttopy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[righttopx*2,righttopy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[leftbottomx*2,leftbottomy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[rightbottomx*2,rightbottomy*2] = mymap.tileslime Then Return True						
+
+            return false;
+        }	
+        slimecollide(x,y,w,h){
+
+            var mmw=mymap.mmw;
+            var mmh=mymap.mmh;
+            var lefttopx		=((x)/tilewidth);
+            var lefttopy		=((y)/tileheight);
+            var righttopx		=((x+w)/tilewidth);
+            var righttopy		=((y)/tileheight);
+            var leftbottomx 	=((x)/tilewidth);
+            var leftbottomy 	=((y+h)/tileheight);
+            var rightbottomx	=((x+w)/tilewidth);												
+            var rightbottomy	=((y+h)/tileheight);
+
+            // '		If lefttopx < 0 Or lefttopx >= mmw Then Return True
+            //'		If lefttopy < 0 Or lefttopy >= mmh Then Return True
+            //'		If righttopx < 0 Or righttopx >= mmw Then Return True
+            //'		If righttopy < 0 Or righttopy >= mmh Then Return True
+            //'		If leftbottomx < 0 Or leftbottomx >= mmw Then Return True
+            //'		If leftbottomy < 0 Or leftbottomy >= mmh Then Return True
+            //'		If rightbottomx < 0 Or rightbottomx >= mmw Then Return True
+            //'		If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
+            //'	
+            
+            //If mygrowslime.map[lefttopx*2,lefttopy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[righttopx*2,righttopy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[leftbottomx*2,leftbottomy*2] = mymap.tileslime Then Return True
+            //If mygrowslime.map[rightbottomx*2,rightbottomy*2] = mymap.tileslime Then Return True						
+        
+            return false;
+        }	
+        
+        
+		
+    }
+
+
+
+    class bullet{
+        constructor(x,y,angle,owner,kind){
+            this.px,this.py;
+            this.mx,this.my;
+            this.angle;
+            this.w,this.h;
+            this.deleteme;
+            this.countdown;
+            this.owner;	
+
+            this.owner = owner;
+            this.px = x;
+            this.py = y;		
+         
+            this.w = 2;
+            this.h = 2;
+            this.mx = 1;
+            this.my = 1;
+            this.deleteme = false;
+            if(this.kind="shotgun"){
+                this.w = 2;
+                this.h = 2;
+                this.mx = randomRangeFloat(.9,1);
+                this.my = randomRangeFloat(.9,1);
+            }
+            this.countdown = 400+randomRange(0,100);
+            this.angle = angle;
+            	
+        }
+        update(){
+            for(var bulletspeed=0;bulletspeed<5;bulletspeed++){
+                this.countdown-=1
+                if(this.countdown < 0){
+                    this.deleteme = true;
+                    return;
+                }
+                
+                if(mymap.mapcollide2(this.px,this.py,this.w,this.h)==true)this.deleteme = true;
+            
+                
+                // Collision with a mineable tile
+                if(mymap.mapmineablecollide(this.px-2,this.py-2,this.w+4,this.h+4,true,"gun")==true){
+                    this.deleteme = true;
+                    return;
+                }		
+                
+                /*
+                // Collision with the slime
+                if(mygrowslime.slimecollide(this.px-2,this.py-2,this.w+4,this.h+4,true)==true){
+                    this.deleteme = true;
+                    return;
+                    //'Print Millisecs()
+                }		
+                */
+                
+                // Collision with bullet and walking monster
+                for(var i=0;i<mywalkingmonster.length;i++){
+                    if(distanceM(this.px,this.py,mywalkingmonster[i].px,mywalkingmonster[i].py) < tilewidth){ 
+                        mywalkingmonster[i].hp -= 1;
+                        //'mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,1,Color.Red))
+
+                        this.deleteme = true;		;		
+                        if(mywalkingmonster[i].hp <= 0){
+                            mywalkingmonster[i].deleteme = true;					
+                            //myitem.Add(New item(this.px,this.py,"Monster Tail"))
+                            myitem.push(
+                                new item(
+                                    this.px,this.py,"Monster Tail"    
+                                ) 
+                                   
+                                 
+                            );
+                            return;
+                        }
+                        return;
+                    }
+                }
+                
+                
+                // Collision with bullet and flying monster
+                for(var i=0;i<myflyingmonster.length;i++){
+                    if(distanceM(this.px,this.py,myflyingmonster[i].px,myflyingmonster[i].py) < tilewidth){
+                        myflyingmonster[i].hp -= 1
+                        //mynumberfall.Add(New numberfall(myflyingmonster[i].px+(myflyingmonster[i].w/2),myflyingmonster[i].py,1,'red'))
+                        //mynumberfall.push(
+                        //    new numberfall(
+                        //    myflyingmonster[i].px+(myflyingmonster[i].w/2),myflyingmonster[i].py,1,'red' 
+                        //    ) 
+                        //);
+
+                        this.deleteme = true;			
+                        if(myflyingmonster[i].hp <= 0){
+                            myflyingmonster[i].deleteme = true;					
+                            //myitem.Add(New item(px,py,"Monster Tooth"))
+                            myitem.push(
+                                new item(
+                                this.px,this.py,"Monster Tooth"    
+                                ) 
+                            );
+                            return;
+                        }
+                        return;
+                    }
+                }
+                
+                // Collision with bullet and egg
+                if(this.eggcollide(this.px,this.py,this.w,this.h)){ 						
+                    this.deleteme = true;
+                    //myitem.Add(New item(px,py,"Egg Shell"))
+                    
+                    myitem.push(
+                        new item(
+                        this.px,this.py,"Egg Shell"    
+                        ) 
+                    );
+                    
+                    return;
+                }
+                
+                this.px += Math.cos(this.angle)*this.mx;
+                this.py += Math.sin(this.angle)*this.my;
+                
+            }
+        }
+        //
+        // NOTE : Eggs are randomly removed here if hit.
+        //
+        eggcollide(x,y,w,h){
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx	    =Math.floor(((x)/tilewidth));
+            var leftbottomy	    =Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));											
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            
+            var x2=-1,y2=-1;
+            if(mymap.mapfinal[lefttopx][lefttopy] == mymap.tileegg){
+                x2=lefttopx;
+                y2=lefttopy;
+            }
+            if(mymap.mapfinal[righttopx][righttopy] == mymap.tileegg){
+                x2=righttopx;
+                y2=righttopy;
+            }
+            if(mymap.mapfinal[leftbottomx][leftbottomy] == mymap.tileegg){
+                x2=leftbottomx;
+                y2=leftbottomy;
+            }
+            if(mymap.mapfinal[rightbottomx][rightbottomy] == mymap.tileegg){
+                x2=rightbottomx;
+                y2=rightbottomy;
+            }
+            if(x2!=-1){			
+                if(randomRange(0,7)<1){ 
+                    mymap.mapfinal[x2][y2] = mymap.tileempty;
+                    //mymap.updateimage(mymap.mapcanvas)
+                }
+                return true;
+            }
+            return false;
+        }			
+    }
+
+
+    //
+    // This is the code for the people in the town.
+    //
+    class townperson{
+        constructor(x,y){
+            this.px,this.py; //'pixel position (0-width)
+            this.sx,this.sy; //'movement speed
+            this.x,this.y;//'tile x and y position
+            this.w,this.h;
+            this.hp; //'hitpoints
+            this.hpmax;
+            this.deleteme;
+            this.state;
+            this.substate;
+            this.jx;
+            this.jy;
+            this.oldpy; //'old py coordinate
+
+
+            this.x = x;
+            this.y = y;
+            this.w = tilewidth;
+            this.h = tileheight;
+            this.px = this.x*this.w;
+            this.py = this.y*this.h;
+            this.hp = randomRange(10,30);
+            this.hpmax = this.hp;
+            //'set the movement speed
+            this.sx = Math.random();
+            
+            //'		sy = sx
+            this.state="roam";
+            if(randomRange(0,10)<2){
+                this.substate="left";
+             }else{ 
+                this.substate="stand";
+             }
+        }
+        update(){		
+            //'		If laserwait>0 Then laserwait-=1
+            
+            if(this.px < this.x*this.w){
+                this.px += this.sx;
+            }
+            if(this.px > this.x*this.w){
+                this.px -= this.sx;
+            }
+            if(distanceM(this.px,this.py,this.x*this.w,this.y*this.h) > 8)return;
+                    
+            if(this.state=="roam"){
+                if(this.substate=="left"){
+                    
+                    ///Case "roam"												
+                    //    Select substate
+                    //        Case "left"
+                    if(this.x<3){
+                        this.substate="right";
+                        return;
+                    }
+                    this.x-=1;
+                    //'If Rnd(50) < 1 And mymap.mapfinal[x-1,y] = mymap.tileempty And mymap.mapfinal[x-1,y+1] <> mymap.tileempty Then substate="right"						
+                    //'If Rnd(50) < 1 And cannotgohere(x+1,y) = False And cannotgohere(x+1,y+1)=True Then substate="right" 
+                    if(this.cannotgohere(this.x-1,this.y) == true)this.substate = "right"
+                    if(this.cannotgohere(this.x-1,this.y+1) == false)this.substate = "right"
+                    //'If mymap.mapfinal[x-1,y]  <> mymap.tileempty Then substate="right"
+                    //'If mymap.mapfinal[x-1,y+1] = mymap.tileempty Then substate="right"
+                }
+                 if(this.substate=="right"){           
+                        //Case "right"						
+                            if(this.x>mapwidth-3){
+                                this.substate="left";
+                                return;
+                            }
+                            this.x+=1;
+                            //'If Rnd(50) < 1 And cannotgohere(x-1,y) =  False And cannotgohere(x-1,y+1)=True) substate="left"
+                            if(this.cannotgohere(this.x+1,this.y) == true)this.substate="left"
+                            if(this.cannotgohere(this.x+1,this.y+1) == false)this.substate="left"
+                            //'If Rnd(50) < 1 And mymap.mapfinal[x+1,y] = mymap.tileempty And mymap.mapfinal[x+1,y+1] <> mymap.tileempty Then substate="left"						
+                            //'If mymap.mapfinal[x+1,y]  <> mymap.tileempty Then substate="left"
+                            //'If mymap.mapfinal[x+1,y+1] = mymap.tileempty Then substate="left"
+                 }        
+                //End Select
+                this.randaction();
+            }
+        }
+        randaction(){
+            if(this.substate == "left" && randomRange(0,600)<2){
+                this.changedirection();
+                return;
+            }
+            if(this.substate == "right" && randomRange(0,600)<2){
+                this.changedirection();
+                return;
+            }
+            if(this.substate == "stand" && randomRange(0,600)<2){ 
+                if(randomRange(2) < 1){
+                    this.substate = "left";
+                 }else{
+                    this.substate="right";
+                 }
+                return;
+            }
+            if(randomRange(100) < 2){
+                this.substate = "stand";
+                return;
+            }
+        }
+        //Check if tile on map is blocked
+        cannotgohere(x,y){
+            if(mymap.mapfinal[x][y] == mymap.tilesolid)return true;
+            if(mymap.mapfinal[x][y] == mymap.tilemineable)return true;
+            if(mymap.mapfinal[x][y] == mymap.tileturret)return true;
+            return false;
+        }
+        changedirection(){
+            this.state = "roam";
+            if(this.substate == "left"){ 
+                this.substate="right"; 
+                this.x += 2;		
+            }else{ 
+                this.substate="left";
+                this.x -= 2;
+            }
+        }
+        // NOTE : MiniMap?
+        draw(){
+                var x1=screenwidth/mapwidth*this/x;
+                var y1=screenheight/mapheight*this.y;
+                ctx.fillStyle = 'white';
+                ctx.fillRect(x1,y1,3+2,3+2);
+                ctx.fillStyle = 'red';
+                ctx.fillRect(x1+1,y1+1,3,3);
+                //canvas.Color = Color.White
+                //SetColor 255,255,255
+                //canvas.DrawRect(x1,y1,3+2,3+2)
+                //canvas.Color = Color.Red
+                //SetColor 255,0,0		
+                //canvas.DrawRect(x1+1,y1+1,3,3)
+        
+        }
+    }
+
+
+    // our player inc (drawmap game routine)
+    class player{
+        constructor(x,y){
+            // Variable initialisation
+            this.x=x;
+            this.y=y;
+            this.hp=100;
+            this.hpmax=100;
+            this.playeritemnames=["Gold","Coal","Metal","Rock","Shotgun Round","Grenade","Sticky Grenade","Monster Tail","Monster Tooth","Egg Shell"];
+            this.playeritem = [];
+            this.regularmode=true;
+            this.jump=false;
+            this.incy=0;
+            this.movespeed;
+            this.px;
+            this.py;
+            this.pmx,this.pmy;
+            this.ptx,this.pty;
+            this.mox=0,this.moy=0;
+            this.pw,this.ph;	
+            this.mcx,this.mcy,this.mpx,this.mpy; // scroll coordinates
+            this.maptileswidth,this.maptilesheight;
+            this.tw=tilewidth;
+            this.th=tileheight;
+            this.facing="right";
+            this.gtkd=false; //grenade thrown key down
+            this.sfkd=false; //shogun fire key down
+            this.minedelay;
+            //
+            // Set variables and further initialisation
+            this.movespeed = 1;
+            this.px = tilewidth*mapwidth/2-64;
+            this.py = tileheight*14;
+            
+            this.pw = tilewidth;
+            this.ph = tileheight;
+            this.maptileswidth = Math.floor(screenwidth / this.tw);
+            this.maptilesheight = Math.floor(screenheight / this.th);
+
+            this.mcx=Math.floor((mapwidth/2)-((screenwidth/tilewidth)/2));
+            
+            this.mcy=0;
+            this.playeritem = create2DArray(this.playeritemnames.length,2);
+            this.createrandominventory();
+        }
+        createrandominventory(){
+		    for(var i=0;i<this.playeritemnames.length;i++){
+			    this.playeritem[i,0] = i;
+			    this.playeritem[i,1] = Math.floor(Math.random()*65);
+            }
+        }
+        updateplayercontrols(){
+            this.pmx = this.px-(this.mcx*this.tw);
+            this.pmy = this.py-(this.mcy*this.th);
+            this.ptx = this.px/this.tw;
+            this.pty = this.py/this.th;
+            if(this.playerladdercollision(this.px,this.py)){
+                this.jump=false;
+                this.laddermode();
+                this.movespeed = 1;			
+                }else{
+                for(var i=0;i<2;i++){
+                    this.playergravity();
+                }
+            }
+
+            this.movespeed +=.1;
+            if(this.movespeed > 4)this.movespeed = 4;
+            
+            // if no movement left and right up and down then slow down
+            //movement
+            if(Controller.Right==false){//Keyboard.KeyDown(Key.Right) = False
+                if(Controller.Left==false){//Keyboard.KeyDown(Key.Left) = False			
+                    if(Controller.Up==false){//Keyboard.KeyDown(Key.Up) = False
+                        if(Controller.Down==false){//Keyboard.KeyDown(Key.Down) = False			
+                            this.movespeed = 1;
+                        }
+                   }
+                }
+            }
+                            
+            for(var i=0;i<Math.ceil(this.movespeed);i++){
+                if(Controller.Right==true){//Keyboard.KeyDown(Key.Right)
+                    if(this.playertilecollision(this.px+1,this.py) == false){
+                        this.px+=1;
+                        this.scrollmap(1,0);
+                    }
+                }
+                if(Controller.Left==true){//Keyboard.KeyDown(Key.Left)
+                    if(this.playertilecollision(this.px-1,this.py) == false){
+                        this.px-=1;
+                        this.scrollmap(-1,0);
+                    }
+                }			
+            }
+            if(Controller.Left==true)this.facing="left";//Keyboard.KeyDown(Key.Left) Then facing="left"
+            if(Controller.Right==true)this.facing="right";//Keyboard.KeyDown(Key.Right) Then facing="right"
+            if(Controller.Up==true)this.facing="up";//Keyboard.KeyDown(Key.Up) Then facing="up"
+            if(Controller.Down==true)this.facing="down";//Keyboard.KeyDown(Key.Down) Then facing="down"
+
+            // throw grenade
+            if(Controller.Grenade==false)this.gtkd=false;//If Keyboard.KeyDown(Key.G) = False Then gtkd = False
+            if(this.gtkd == false && Controller.Grenade==true){//Keyboard.KeyDown(Key.G)
+                this.gtkd = true;			
+                
+                var pcx=this.px+(this.pw/2);
+                var pcy=this.py+(this.ph/2);						
+                //mygrenade.AddLast(New grenade(this.pcx,this.pcy,this.facing));
+                
+                mygrenade.push(
+                    new grenade(
+                        pcx,pcy,this.facing
+                        )
+                );
+            }
+            
+            // Fire shotgun
+            if(Controller.ShotGun==false)this.sfkd=false;//Keyboard.KeyDown(Key.S) = False Then sfkd = False
+            if(this.sfkd == false && Controller.ShotGun==true){//Keyboard.KeyDown(Key.S)
+                this.sfkd = true;	
+                this.fireshotgun();					
+            }
+
+            // Mine left or right
+            if(this.minedelay > 0)this.minedelay -= 1;
+            if(Controller.Mine==true && this.minedelay<=0){//Keyboard.KeyDown(Key.M) And minedelay <=0
+                this.minedelay = 30;
+                this.mine();
+            }
+
+            if(Controller.LaserWall==true){//If Keyboard.KeyReleased(Key.L)
+                Controller.LaserWall=false;
+                //mylaserwall.Add(New laserwall(px,py+ph))
+            }
+        }
+        //
+        // Mine a block up or down or left or right(key v) drops loot
+        //
+	    mine(){
+            if(this.facing == "left"){
+                for(var x=this.px;x>this.px-this.tilewidth;i-=1){// Step -1
+                    var x2 = x / tilewidth;
+                    var y2 = this.py / tileheight;
+                    if(mymap.mapfinal[x2][y2] == mymap.tilemineable){
+                        mymap.mapfinal[x2][y2] = mymap.tileempty;
+                        this.createmineitem(x2,y2);
+                        return;
+                    }
+                }
+            }
+            if(this.facing == "right"){
+                for(var x=this.px;x<this.px+(tilewidth*2);i++){
+                    var x2 = x / tilewidth;
+                    var y2 = this.py / tileheight;
+                    if(mymap.mapfinal[x2][y2] == mymap.tilemineable){
+                        mymap.mapfinal[x2][y2] = mymap.tileempty;
+                        this.createmineitem(x2,y2);
+                        return;
+                    }
+                }
+            }
+            if(this.facing == "up"){
+                for(var y=this.py;y>this.py-(tileheight*2);y-=1){// Step -1
+                    var x2 = this.px / tilewidth;
+                    var y2 = y / tileheight;
+                    if(mymap.mapfinal[x2][y2] == mymap.tilemineable){
+                        mymap.mapfinal[x2][y2] = mymap.tileempty;
+                        this.createmineitem(x2,y2);
+                        return
+                    }
+                }
+            }	
+            if(this.facing == "down"){
+                for(var y=this.py;y<this.py+tileheight;y++){
+                    var x2= this.px / tilewidth;
+                    var y2= y / tileheight;
+                    if(mymap.mapfinal[x2][y2] == mymap.tilemineable){
+                        mymap.mapfinal[x2][y2] = mymap.tileempty;
+                        this.createmineitem(x2,y2);
+                        return
+                    }
+                }
+            }	
+        }
+	    createmineitem(x2,y2){		
+            x2 *= this.tw;
+            y2 *= this.th;
+            x2 += this.tw/2;
+            y2 += this.th/2;
+            for(var i=0;i<Math.floor(Math.random()*3);i++){		
+                var item;
+                var num=Math.Floor(Math.random()*10);
+                if(num>=8)item="Gold"; 
+                if(num<8){
+                    item="Coal";
+                 }else{
+                    item="Rock";
+                 }		
+                //myitem.Add(New item(x2+Rnd(-tw/3,th/3),y2+Rnd(th/3,th/3),item))
+            }
+	    }
+        playerladdercollision(x,y){
+            var cx=Math.floor(x/this.tw);
+            var cy=Math.floor(y/this.th);
+            for(var y2=cy-1;y2<cy+2;y2++){
+                for(var x2=cx-1;x2<cx+2;x2++){
+                    if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){	            		        
+                        if(mymap.mapladder[Math.floor(x2)][Math.floor(y2)] == 1){	                	                     
+                            if(this.rectsoverlap(x,y,this.pw,this.ph,x2*this.tw,y2*this.th,this.tw,this.th) == true){                                    	                    
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        
+            return false;
+        }
+	    playertilecollision(x,y){
+            var cx=Math.floor(x/this.tw);
+            var cy=Math.floor(y/this.th);
+            for(var y2=cy-1;y2<cy+2;y2++){
+                for(var x2=cx-1;x2<cx+2;x2++){
+                    if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){	            		        
+                        if(mymap.mapfinal[Math.floor(x2)][Math.floor(y2)] != mymap.tileempty){// 'Or mymap.mapfinal[x2,y2] = mymap.tilemineable           
+                                                    
+                            if(rectsoverlap(x,y,this.pw,this.ph,x2*this.tw,
+                                            y2*this.th,this.tw,this.th) == true){;                                    	                    
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+    
+            return false;
+        }
+        laddermode(){
+            for(var i=0;i<Math.ceil(this.movespeed);i++){
+                if(Controller.Right==true){;//Keyboard.KeyDown(Key.Right)
+                    if(this.playertilecollision(this.px+1,this.py) == false){
+                        if(this.playerladdercollision(this.px+1,this.py) == true){
+                            this.px+=1;
+                            this.scrollmap(1,0);
+                        }
+                  }
+                }
+                if(Controller.Left == true){ //Keyboard.KeyDown(Key.Left)			
+                    if(this.playertilecollision(this.px-1,this.py) == false){
+                        if(this.playerladdercollision(this.px-1,this.py) == true){
+                            this.px-=1;
+                            this.scrollmap(-1,0);
+                        }
+                    }
+                }			
+                if(Controller.Up == true){//Keyboard.KeyDown(Key.Up)			
+                    if(this.playertilecollision(this.px,this.py-1) == false){
+                        if(this.playerladdercollision(this.px,this.py-1) == true){
+                            this.py-=1;
+                            this.scrollmap(0,-1);
+                        }
+                    }
+                }			
+                if(Controller.Down == true){//Keyboard.KeyDown(Key.Down)			
+                    if(this.playertilecollision(this.px,this.py+1) == false){
+                        if(this.playerladdercollision(this.px,this.py+1) == true){			
+                            this.py+=1;
+                            this.scrollmap(0,1);
+                        }
+                    }
+                }					  			  	
+            }
+        }
+        scrollmap(x,y){ 
+            if(x==-1)this.mox+=1;
+            if(x==1)this.mox-=1;
+            if(y==-1)this.moy+=1;
+            if(y==1)this.moy-=1;
+            if(this.mox>this.tw-1){
+                this.mcx-=1;
+                this.mox=0;
+            }
+            if(this.mox<-(this.tw-1)){
+                this.mcx+=1;
+                this.mox=0;
+            }
+            if(this.moy>this.th-1){
+                this.mcy-=1;
+                this.moy=0;
+            }
+            if(this.moy<-(this.th-1)){
+                this.mcy+=1;
+                this.moy=0;
+            }
+        }
+        playergravity(){
+            if(this.jump == false && this.playertilecollision(this.px,this.py+1) == false){ 
+                this.jump = true;
+                this.incy = 0;
+            }
+            if(this.jump == false && Controller.Jump==true){//Keyboard.KeyDown(Key.Space) = True            
+                this.incy = -5;
+                this.jump = true;
+            }
+            //If the player is in the jump
+            if(this.jump == true){
+                this.incy += 0.1;
+                //if the player is going up
+                if(this.incy <=0){
+                    for(var i= 0;i<Math.abs(this.incy);i++){                
+                        this.py -= 1;
+                        this.scrollmap(0,-1);
+                        if(this.playertilecollision(this.px,this.py-1) == true){
+                            this.incy = 0;
+                            break;
+                        }
+                    }
+                }
+                // if the player if going down
+                if(this.incy > 0){
+                    for(var i= 0;i< this.incy;i++){
+                        this.py += 1;
+                        this.scrollmap(0,1);
+                        //if the player touches the ground
+                        if(this.playertilecollision(this.px,this.py+1) == true){
+                            this.jump = false;                        
+                            break;
+                        }
+                    }
+                    if(this.incy>4)this.incy=4;
+                }
+            }
+        }
+        fireshotgun(){
+            var angle=0;
+            if(this.facing=="left"){
+                angle = Math.PI;
+            }
+            if(this.facing=="right"){
+                angle = 0;
+            }
+            if(this.facing=="up"){
+                angle = Math.PI*1.55+randomRangeFloat(-0.2,0.2);
+            }
+            if(this.facing=="down"){
+                angle = Math.PI/2+randomRangeFloat(-0.2,0.2);
+            }
+            
+            /*
+            Select facing
+                Case "left"
+                    angle=Pi
+                Case "right"
+                    angle=0
+                Case "up"
+                    'Print Pi*1.5
+                    angle=Pi*1.55+Rnd(-.2,.2)
+                    
+                Case "down"
+                    angle = Pi/2+Rnd(-.2,.2)
+            End Select
+            */
+            for(var i=0;i<7;i++){
+                mybullet.push(
+                    new bullet(
+                        this.px,this.py,angle+randomRangeFloat(-.1,.1),"player","shotgun"
+                        )
+                );
+                
+                //mybullet.AddLast(New bullet(px,py,angle+Rnd(-.1,.1),"player","shotgun"))
+            }
+        }
+        // player draw routine - all tile map game
+	    draw(){
+            ctx.globalAlpha = 1;
+            //canvas.Scissor = New Recti(32,32,screenwidth-32,screenheight-64)
+            //draw the map
+            //ctx.fillStyle='rgb(90,90,200)';
+            //ctx.fillRect(0,0,50,50);
+
+            //canvas.BlendMode = BlendMode.Opaque
+            for(var y=-1;y<this.maptilesheight;y++){
+
+                for(var x=-1;x<this.maptileswidth;x++){
+                    var x2=this.mcx+x;
+                    var y2=this.mcy+y;
+                    
+                    var x3=(x*this.tw)+this.mox;
+                    var y3=(y*this.th)+this.moy;
+                    
+                    
+                    if(x2<0 || x2>=mapwidth || y2<0 || y2>=mapheight)continue;				
+                    
+                    // NOTE : Gradient background.
+                    //
+                    if(y2<17){
+                        //canvas.Color = Color.White
+                        //canvas.DrawImage(mygradienttile.image[y2],x3,y3)
+                        ctx.fillStyle='rgb(90,90,200)';
+                        ctx.fillRect(x3,y3,this.tw,this.th);
+                    }
+                    
+                    // mymap.mapfinal[x2,y2]
+                    if(mymap.mapfinal[x2][y2]== mymap.tileempty){
+                        if(y2>16){
+                            //canvas.Color = Color.White
+                            //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],0],x3,y3)
+                            //ctx.fillStyle = 'rgb(80,35,20)';
+                            //ctx.fillRect(x3,y3,this.tw,this.th);
+                            ctx.drawImage(tileImage,0,0,32,32,x3,y3,tilewidth,tileheight);
+                            
+                        }
+                        //canvas.Color = Color.Brown
+                        //canvas.DrawRect(x3,y3,tw,th)
+                    }
+                    if(mymap.mapfinal[x2][y2]== mymap.tilesolid){
+                        if(y2>16){
+                            //canvas.Color = Color.White
+                            //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],1],x3,y3)
+                            //ctx.fillStyle = 'rgb(100,40,20)';
+                            //ctx.fillRect(x3,y3,this.tw,this.th);
+                            ctx.drawImage(tileImage,0,32,32,32,x3,y3,tilewidth,tileheight);
+                        }
+                        //canvas.Color = Color.Black
+                        //canvas.DrawRect(x3,y3,tw,th)
+                    }
+                    if(mymap.mapfinal[x2][y2] == mymap.tileegg){
+                        //canvas.OutlineMode=OutlineMode.Solid
+                        //canvas.OutlineColor = Color.White
+                        //canvas.OutlineWidth = 1						
+                        //canvas.Color = Color.Yellow
+                        //canvas.DrawRect(x3,y3,tw,th)
+                        //canvas.OutlineMode=OutlineMode.None
+                        ctx.fillStyle = 'yellow';
+                        ctx.fillRect(x3,y3,this.tw,this.th);
+                    }
+                    if(mymap.mapfinal[x2][y2]== mymap.tileturret){
+                        //canvas.OutlineMode=OutlineMode.Solid
+                        //canvas.OutlineColor = Color.Black
+                        //canvas.OutlineWidth = 1						
+                        //canvas.Color = Color.Grey
+                        //canvas.DrawRect(x3,y3,tw,th)	
+                        //canvas.OutlineMode=OutlineMode.None
+                        ctx.fillStyle = 'grey';
+                        ctx.fillRect(x3,y3,this.tw,this.th);
+                    }
+                    if(mymap.mapfinal[x2][y2]==mymap.tilemineable){
+                        //canvas.Color = Color.White
+                        //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],2],x3,y3)
+                        //canvas.Color = Color.Brown.Blend(Color.Yellow,.2)
+                        //canvas.DrawRect(x3,y3,tw,th)
+                        ctx.fillStyle = 'yellow';
+                        ctx.fillRect(x3,y3,this.tw,this.th);
+                    }
+                    //End Select	
+
+                    /*
+                    //draw the slime			
+                    for(var y4=0;y2< 2;y4++){
+                        for(var x4=0;x4< 2;x4++){
+                            if(mygrowslime.map[Math.floor((x2*2)+x4)][Math.floor((y2*2)+y4)] == 10){
+                                //canvas.Color = Color.Green
+                                //canvas.DrawRect(x3+(x4*(mygrowslime.tw)),y3+(y4*(mygrowslime.th)),mygrowslime.tw,mygrowslime.th)
+                                ctx.fillStyle = 'green';
+                                ctx.fillRect(x3+(x4*(mygrowslime.tw)),y3+(y4*(mygrowslime.th)),mygrowslime.tw,mygrowslime.th);
+                             }
+                        }
+                    }
+                    */
+
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+            //Draw the ladders		
+            for(var y=-1;y<this.maptilesheight;y++){
+                for(var x=-1;x<this.maptileswidth;x++){
+                    var x2=this.mcx+x;
+                    var y2=this.mcy+y;
+                    var x3=(x*this.tw)+this.mox;
+                    var y3=(y*this.th)+this.moy;
+                    if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){
+                        if(mymap.mapladder[x2][y2] == 1){
+                            //canvas.Color = Color.Brown
+                            //canvas.DrawRect(x3,y3,tw,th)
+                            //canvas.Color = Color.Red
+                            //canvas.DrawRect(x3,y3,tw/4,th/3)
+                            //ctx.fillStyle = 'brown';
+                            //ctx.fillRect(x3,y3,this.tw,this.th);
+                            //ctx.fillStyle = 'red';
+                            //ctx.fillRect(x3+this.tw/6,y3,this.tw/4,this.th/3);
+                            if(y2>16)ctx.drawImage(tileImage,0,0,32,32,x3,y3,tilewidth,tileheight);
+                            ctx.drawImage(tileImage,416,48,32,32,x3,y3,tilewidth,tileheight);
+
+                        }
+                    }
+                }
+            }
+
+            /*
+            '
+            ''Draw the trees
+            '
+            canvas.Color = Color.White		
+            For var i:=Eachin mytree
+                'If Rnd(100)<10 Then Print Millisecs()
+                var x2:Int=i.px-mcx*tw+mox
+                var y2:Int=i.py-mcy*th+moy
+                'i.draw(canvas,x2,y2)
+                canvas.DrawImage(i.image,x2,y2)
+                'canvas.Color = i.col
+                'canvas.DrawText(i.number,x2,y2)
+            Next
+                    
+            '
+            ''Draw the buildings
+            '
+            canvas.Color = Color.White
+            For Local i:=Eachin mybuilding
+                Local x2:Int=i.px-mcx*tw+mox
+                Local y2:Int=i.py-mcy*th+moy
+                i.draw(canvas,x2,y2)
+                'canvas.Color = i.col
+                'canvas.DrawText(i.number,x2,y2)
+            Next
+            */
+            //draw towns people
+
+            for(var i=0;i<mytownperson.length;i++){
+                var x1=mytownperson[i].px;
+                var y1=mytownperson[i].py;
+                var x2=(x1-(this.mcx*this.tw))+this.mox;
+                var y2=(y1-(this.mcy*this.th))+this.moy;
+                ctx.fillStyle = 'black';
+                ctx.fillRect(x2,y2,this.tw,this.th);
+                ctx.fillStyle = 'green';
+                ctx.fillRect(x2+1,y2+1,this.tw-2,this.th-2);
+                
+                //canvas.OutlineMode=OutlineMode.Solid
+                //canvas.OutlineColor = Color.Black
+                //canvas.OutlineWidth = 1				
+                //canvas.Color = Color.Green
+                //canvas.DrawRect(x2,y2,tw,th)
+                //canvas.OutlineMode = OutlineMode.None
+                this.drawpowerbar(x2,y2,mytownperson[i].hp,mytownperson[i].hpmax);
+                //'canvas.Color = Color.White
+                //'canvas.DrawText(i.state,x2,y2)
+                //'canvas.DrawText(i.substate,x2,y2+12)
+                //'canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                //'canvas.DrawText(i.px+","+i.py,x2,y2+37)
+            }
+            
+
+            // Draw the player
+            this.pmx = (this.px-(this.mcx*this.tw))+this.mox;
+            this.pmy = (this.py-(this.mcy*this.th))+this.moy;
+            //canvas.Color = Color.White
+            //canvas.DrawRect(pmx,pmy,pw,ph)
+            ctx.fillStyle = 'white';
+            ctx.fillRect(this.pmx,this.pmy,this.pw,this.ph);
+            this.drawpowerbar(this.pmx,this.pmy,this.hp,this.hpmax);
+
+            
+            //draw flying monsters	
+            for(var i=0;i<myflyingmonster.length;i++){
+                var x1=myflyingmonster[i].px;
+                var y1=myflyingmonster[i].py;
+                var x2=(x1-(this.mcx*this.tw))+this.mox;
+                var y2=(y1-(this.mcy*this.th))+this.moy;
+                //canvas.Color = Color.Red
+                //canvas.DrawRect(x2,y2,tw,th)
+                ctx.fillStyle = 'red';
+                ctx.fillRect(x2,y2,this.tw,this.th);
+                this.drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
+                //canvas.Color = Color.White
+                //canvas.DrawText(i.state,x2,y2)
+                //canvas.DrawText(i.substate,x2,y2+12)
+                //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
+            }
+            
+
+            
+            //draw walking monsters		
+            for(var i=0;i<mywalkingmonster.length;i++){
+                var x1=mywalkingmonster[i].px;
+                var y1=mywalkingmonster[i].py;
+                var x2=(x1-(this.mcx*this.tw))+this.mox;
+                var y2=(y1-(this.mcy*this.th))+this.moy;
+                //canvas.Color = Color.Red
+                //canvas.DrawRect(x2,y2,tw,th)
+                ctx.fillStyle = 'red';
+                ctx.fillRect(x2,y2,this.tw,this.th);
+                this.drawpowerbar(x2,y2,mywalkingmonster[i].hp,mywalkingmonster[i].hpmax);	
+                //ctx.fillStyle='white'
+                //ctx.fillText(mywalkingmonster[i].state+"-"+mywalkingmonster[i].substate,x2,y2)
+                //canvas.Color = Color.White
+                //canvas.DrawText(i.state,x2,y2)
+                //canvas.DrawText(i.substate,x2,y2+12)
+                //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
+            }
+            
+            
+            
+            // Draw the bullets
+            //
+            //canvas.OutlineMode=OutlineMode.Solid
+            //canvas.OutlineColor = Color.Grey
+            //canvas.OutlineWidth = 1					
+            //canvas.Color = Color.Yellow
+            ctx.fillStyle = 'yellow';
+            //For Local i:=Eachin mybullet
+            for(var i=0;i<mybullet.length;i++){
+                var x2=mybullet[i].px-this.mcx*this.tw+this.mox;
+                var y2=mybullet[i].py-this.mcy*this.th+this.moy;
+                //canvas.DrawCircle(x2,y2,i.w)
+                ctx.fillRect(x2,y2,mybullet[i].w,mybullet[i].w);
+            }
+            
+
+            
+            // Draw the grenades
+            //
+            //canvas.Color = Color.Titanium
+            
+            //For Local i:=Eachin mygrenade
+            for(var i=0;i<mygrenade.length;i++){
+                
+                var x2=mygrenade[i].px-this.mcx*this.tw+this.mox;
+                var y2=mygrenade[i].py-this.mcy*this.th+this.moy;
+                //canvas.DrawCircle(x2,y2,4)
+                ctx.fillStyle = 'rgb(250,250,250)';
+                ctx.fillRect(x2,y2,4,4);
+                ctx.fillStyle = 'rgb(50,50,50)';
+                ctx.fillRect(x2+1,y2+1,2,2);
+            }
+            
+
+            
+            // Draw the fragmentation 
+            //
+            //canvas.Color = Color.Gold
+            ctx.fillStyle = 'gold';
+            //For Local i:=Eachin myfrag
+            for(var i=0;i<myfrag.length;i++){
+                var x2=myfrag[i].px-this.mcx*this.tw+this.mox;
+                var y2=myfrag[i].py-this.mcy*this.th+this.moy;
+                //canvas.DrawCircle(x2,y2,3)
+                ctx.fillRect(x2,y2,3,3);
+                
+            }
+            
+
+            
+            // Draw the items
+            //
+            //canvas.Color = Color.Red
+            ctx.fillStyle = 'red';
+            //For Local i:=Eachin myitem
+            for(var i=0;i<myitem.length;i++){
+                var x2=myitem[i].px-this.mcx*this.tw+this.mox;
+                var y2=myitem[i].py-this.mcy*this.th+this.moy;			
+                //canvas.DrawCircle(x2,y2,3)
+                ctx.fillRect(x2,y2,3,3);
+            }
+            
+
+            /*
+            //
+            //Draw the tentacles 
+            //
+            //For Local i:=Eachin mytentacle
+            for(var i=0;i<mytentacle.length;i++){
+                var x1=mytentacle[i].basex-this.mcx*this.tw+this.mox;
+                var y1=mytentacle[i].basey-this.mcy*this.th+this.moy;			
+                var x2=mytentacle[i].topx-this.mcx*this.tw+this.mox;
+                var y2=mytentacle[i].topy-this.mcy*this.th+this.moy;			
+                //canvas.Color = Color.Green
+                
+                //canvas.DrawLine(x1+x3,y1+y3,x2+x3,y2+y3)
+                drawLine(x1+x3,y1+y3,x2+x3,y2+y3,'green',4);
+                if(mytentacle[i].grabbed == true){
+                    //canvas.Color = Color.Red
+                    //canvas.DrawRect(x2-(tilewidth/2),y2-(tileheight/2),tilewidth,tileheight)
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(x2-(tilewidth/2),y2-(tileheight/2),tilewidth,tileheight);
+                }
+            }
+            */
+            //canvas.OutlineMode=OutlineMode.None	
+            
+            
+            /*
+            // Draw the laser walls
+            
+            //For Local i:=Eachin mylaserwall
+            for(var i=0;i<mylaserwall.length;i++){
+                var x2=mylaserwall[i].tx-this.mcx*this.tw+this.mox;
+                var y2=mylaserwall[i].ty-this.mcy*this.th+this.moy;
+                var h=mylaserwall[i].by-mylaserwall[i].ty
+                //canvas.Color = Color.Yellow
+                //canvas.DrawRect(x2-2,y2,4,h)
+                //canvas.Color = Color.Red
+                //canvas.DrawRect(x2-4,y2,8,4)
+                //canvas.DrawRect(x2-4,y2+h-4,8,4)
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(x2-2,y2,4,h);
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(x2-4,y2,8,4);
+                ctx.fillRect(x2-4,y2+h-4,8,4);
+            }
+            */
+
+            /*
+            //
+            //Draw the falling numbers
+            //
+            for(var i=0;i<mynumberfall.length;i++){
+                var x2=mynumberfall[i].px-this.mcx*this.tw+this.mox;
+                var y2=mynumberfall[i].py-this.mcy*this.th+this.moy;
+                //canvas.Color = i.col
+                //canvas.DrawText(i.number,x2,y2)
+                ctx.fillStyle = 'red';
+                ctx.fillText(mynumberfall[i].number,x2,y2);
+            }
+            */
+            
+
+            
+        }
+
+	    drawpowerbar(x,y,hp,hpmax){
+            if(hp<0)return;
+            var powerbarlen=this.pw;
+            var cpos=(powerbarlen/hpmax)*hp;
+            //canvas.Color = Color.Black
+            //canvas.DrawRect(x,y,powerbarlen,5)
+            ctx.fillStyle='black';
+            ctx.fillRect(x,y,powerbarlen,5);
+            if(hp >= hpmax/2){
+                //canvas.Color = Color.Green
+                ctx.fillStyle = 'green';
+            }else if(hp<hpmax/2 && hp>hpmax/4){
+                //canvas.Color = Color.Yellow
+                ctx.fillStyle = 'yellow';
+            }else{
+                //canvas.Color = Color.Red
+                ctx.fillStyle = 'red';
+            }
+            //canvas.DrawRect(x+1,y+1,cpos,3)
+            ctx.fillRect(x+1,y+1,cpos,3);
+        }
+        rectsoverlap(x1,y1,w1,h1,x2,y2,w2,h2){
+            if( x1 >= (x2 + w2) || (x1 + w1) <= x2)return false;
+            if( y1 >= (y2 + h2) || (y1 + h1) <= y2)return false;
+            return true;
+        }
+    }
+
+    
+
+    // Our map system inc overview map view
+    class map{
+
+        constructor(sw,sh,mw,mh){
+            this.tw,this.th;
+            this.mw,this.mh;
+            this.sw,this.sh,this.mmh,this.mmw//'mmh is actual finalmap size
+            this.map=[];//New Int[1,1]
+            this.mapfinal=[];//New Int[1,1]
+            this.mapladder=[];//New Int[1,1]
+            //this.mapimage:Image
+            //this.mapcanvas:Canvas
+            //this.mapladderimage:Image
+            //this.mapladdercanvas:Canvas
+            this.mapdoor=[];//New Int[1,1]
+            this.maptilevariation=[];//New Int[1,1]
+            this.tilesolid=0;
+            this.tileempty=1;
+            this.tileegg=3;
+            this.tileturret=4;
+            this.tileslime=10;
+            this.tilemineable=50;
+            
+            this.mmw = mw;
+            this.mmh = mh;
+            this.mw = Math.floor(mw/3);
+            this.mh = Math.floor(mh/3);		
+            this.sw = sw;
+            this.sh = sh;
+            //mapimage = New Image(sw,sh)
+            //mapcanvas = New Canvas(mapimage)
+            //mapladderimage = New Image(sw,sh)
+            //mapladdercanvas = New Canvas(mapladderimage)
+            this.maptilevariation = create2DArray(mapwidth,mapheight);//New Int[mapwidth,mapheight]
+            for(var y=0;y<mapheight;y++){
+                for(var x=0;x<mapwidth;x++){
+                    this.maptilevariation[x][y] = Math.floor(Math.random()*4);
+                }
+            }
+            this.tw = this.sw/this.mmw;
+            this.th = this.sh/this.mmh;
+            //map = New Int[mw,mh]
+            this.map = create2DArray(this.mmw,this.mmh); 
+            this.mapfinal = create2DArray(this.mmw,this.mmh);
+
+            this.mapladder = create2DArray(this.mmw,this.mmh);
+            this.mapdoor = create2DArray(this.mmw,this.mmh);
+            //mapfinal = New Int[mmw,mmh]
+            //mapladder = New Int[mmw,mmh]
+            //mapdoor = New Int[mmw,mmh]
+            this.makemap();
+            this.finalizemap();
+            for(var i=0;i<1000;i++){
+                var x=randomRange(2,this.mmw-4);
+                var y=randomRange(17,this.mmh-4);
+                if(this.mapfinal[x][y] == 1){
+                    if(this.mapfinal[x][y+1] == 0){
+                        this.mapfinal[x][y] = 3;
+                    }
+                }
+            }	
+            //NOTE:
+            this.createfinalmineable();
+            this.updateladderimage();
+            this.updateimage();
+
+
+        }
+        
+        // Here we create the parts on the mapfinal that can be mined
+        // by the player (like in minecraft/digger) tilemineable
+        createfinalmineable(){
+            // 3 high mineable mineshafts right to left
+            for(var y1=15;y1<this.mmh-10;y1++){
+                for(var x1=3;x1<this.mmw-3;x1++){
+                    // Find suitable spot
+                    if (this.mapfinal[x1][y1] != this.tilesolid) continue;
+                    if (this.mapfinal[x1+1][y1] != this.tileempty) continue;
+                    if (this.mapfinal[x1][y1+1] != this.tilesolid) continue;
+                    if (this.mapfinal[x1][y1+2] != this.tilesolid) continue;
+                    if (this.mapfinal[x1][y1+3] != this.tilesolid) continue;
+                    if (this.mapfinal[x1+1][y1+4] != this.tilesolid) continue;
+                    if (this.mapfinal[x1+1][y1+1] != this.tileempty) continue;
+                    if (this.mapfinal[x1+1][y1+2] != this.tileempty) continue;
+                    if (this.mapfinal[x1+1][y1+3] != this.tileempty) continue;
+                    // See how far left we can go
+                    var len=0;			
+                    for(var x2=x1;x2<3;x2-=1){
+                        if (this.mapfinal[x2][y1] != this.tilesolid)break;
+                        if (this.mapfinal[x2][y1+1] != this.tilesolid)break;
+                        if (this.mapfinal[x2][y1+2] != this.tilesolid)break;
+                        if (this.mapfinal[x2][y1+3] != this.tilesolid)break;
+                        if (this.mapfinal[x2][y1+4] != this.tilesolid)break;
+                        len+=1;
+                    }
+                    // If we can go deep enough then prepare mineshaft
+                    if(len<=10)continue;
+                    len = randomRange(7,len);
+                    for(var x2=x1;x2<x1-(len-3);x2-=1){
+                        for(var y2=y1+1;y2<y1+4;y2++){ 
+                            this.mapfinal[x2][y2] = this.tilemineable;
+                        }
+                    }
+                }
+            }
+            //
+            //
+            // 3 high mineable mineshafts left to right
+            for(var y1=15;y1<this.mmh-10;y1++){
+                for(var x1=3;x1<this.mmw-3;x1++){
+                    // Find suitable spot
+                    if(this.mapfinal[x1][y1] != this.tilesolid)continue;
+                    if(this.mapfinal[x1-1][y1] != this.tileempty)continue;
+                    if(this.mapfinal[x1][y1+1] != this.tilesolid)continue;
+                    if(this.mapfinal[x1][y1+2] != this.tilesolid)continue;
+                    if(this.mapfinal[x1][y1+3] != this.tilesolid)continue;
+                    if(this.mapfinal[x1-1][y1+4] != this.tilesolid)continue;
+                    if(this.mapfinal[x1-1][y1+1] != this.tileempty)continue;
+                    if(this.mapfinal[x1-1][y1+2] != this.tileempty)continue;
+                    if(this.mapfinal[x1-1][y1+3] != this.tileempty)continue;
+                    // See how far left we can go
+                    var len=0;			
+                    for(var x2=x1;x2<this.mmw-4;x2++){
+                        if(this.mapfinal[x2][y1] != this.tilesolid)break;
+                        if(this.mapfinal[x2][y1+1] != this.tilesolid)break;
+                        if(this.mapfinal[x2][y1+2] != this.tilesolid)break;
+                        if(this.mapfinal[x2][y1+3] != this.tilesolid)break;
+                        if(this.mapfinal[x2][y1+4] != this.tilesolid)break;
+                        len+=1
+                    }
+                    // If we can go deep enough then prepare mineshaft
+                    if(len<=10)continue;
+                    len = randomRange(7,len);
+                    for(var x2=x1;x2<x1+(len-3);x2++){
+                        for(var y2=y1+1;y2<y1+4;y2++){ 
+                            this.mapfinal[x2][y2] = this.tilemineable;
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+
+        finalizemap(){
+            for(var y=1;y<this.mh-1;y++){
+                for(var x=1;x<this.mw-1;x++){
+                    if(this.map[x][y] == this.tileempty){
+                        for(var y2=-1;y2<=1;y2++){
+                            for(var x2=-1;x2<=1;x2++){
+                                this.mapfinal[Math.floor((x*3)+x2)][Math.floor((y*3)+y2)] = this.tileempty;
+                            }
+                        }			
+                    }
+                }
+            }
+            // make ladders/vines
+            for(var y=0;y<this.mh;y++){
+                for(var x=0;x<this.mw;x++){
+                    if(this.map[x][y] == 1){
+                        if(x-1>=0 && this.map[x-1][y] == 0){
+                            if(this.map[x+1][y] == 0){			
+                                var y2=y;
+                                while(this.map[x][y2] != 0){				
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3)] = 1;
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3-1)] = 1;
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3+1)] = 1;				
+                                    y2-=1;
+                                }
+                                y2=y;
+                                while(this.map[x][y2] != 0){				
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3)] = 1;
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3-1)] = 1;
+                                    this.mapladder[Math.floor((x*3))][Math.floor(y2*3+1)] = 1;
+                                    y2+=1;
+                                }
+                            }
+                        } 
+                    }
+                }
+            }
+            // make doors
+            for(var i=0;i<this.mmw*this.mmh/2;i++){
+                var x=randomRange(3,this.mmw-4);
+                var y=randomRange(3,this.mmh-2);
+                // door right side of tunnel
+        //'		if(Math.rnd()<0){
+                if(this.mapfinal[x][y] == 0){
+                if(this.mapfinal[x+1][y] == 0){
+                if(this.mapfinal[x-1][y] == 0){
+                if(this.mapfinal[x-2][y] == 0){
+                if(this.mapfinal[x-3][y] == 1){
+                if(this.mapfinal[x][y+1] == 1){
+                if(this.mapfinal[x][y+2] == 1){
+                if(this.mapfinal[x][y+3] == 1){
+                if(this.mapfinal[x][y+4] == 0){
+                    this.mapfinal[x][y+1] = 1;
+                    this.mapfinal[x][y+2] = 1;
+                    this.mapfinal[x][y+3] = 1;
+                    this.mapdoor[x][y+1 ] = 1;
+                    this.mapdoor[x][y+2 ] = 1;
+                    this.mapdoor[x][y+3 ] = 1;
+                } 
+                }
+                } 
+                } 
+                }
+                } 
+                }
+                }
+                }
+        //'		End If
+                // door left side of tunnel
+                if(this.mapfinal[x-1][y-1] == 0){
+                if(this.mapfinal[x][y] == 0){
+                if(this.mapfinal[x-1][y] == 0){
+                if(this.mapfinal[x+1][y] == 0){
+                if(this.mapfinal[x+2][y] == 0){
+                if(this.mapfinal[x+3][y] == 1){
+                if(this.mapfinal[x][y+1] == 1){
+                if(this.mapfinal[x][y+2] == 1){
+                if(this.mapfinal[x][y+3] == 1){
+                if(this.mapfinal[x][y+4] == 0){
+                    this.mapfinal[x][y+1] = 1;
+                    this.mapfinal[x][y+2] = 1;
+                    this.mapfinal[x][y+3] = 1;
+                    this.mapdoor[x][y+1 ] = 1;
+                    this.mapdoor[x][y+2 ] = 1;
+                    this.mapdoor[x][y+3 ] = 1;
+                } 
+                }
+                } 
+                } 
+                } 
+                }
+                } 
+                }
+                }
+                }
+
+            }
+        }
+        
+        makemap(){
+            
+            for(var y=1;y<6;y++){
+                for(var x=1;x<this.mw-1;x++){
+                    this.map[x][y] = 1;
+                }
+            }
+            var minedownx=5+(Math.floor(Math.random()*this.mw)-15);
+            for(var y=5;y<(this.mh/2)+10;y++){
+                this.map[Math.floor(this.mw/2)][y] = 1;
+            }
+            for(var i=0;i<(this.mw*this.mh)*6;i++){
+                var x=randomRange(2,this.mw-4);
+                var y=randomRange(2,this.mh-4);
+                if(this.map[x][y] == 1){					
+                    var v=randomRange(0,2);
+                    //Select v
+                    if(v==0){
+                        //    Case 0'go left or right										
+                        if(this.map[x-1][y] == 0){
+
+                            if(this.map[x-1][y] == 0){
+                                if(this.map[x+1][y] == 0){										
+                                    this.makeside(x,y,randomRange(0,2));
+                                } 
+                            }
+                        }
+                    }
+                    if(v==1){
+    					if(this.map[x][y-1]==0){
+	    				    if(this.map[x][y+1]==0){
+		    			        this.makevert(x,y,randomRange(0,2));
+                            }
+                        }
+                    }
+                }
+            }
+            this.widenhorizontal();
+        }
+        widenhorizontal(){
+            for(var i=0;i<this.mw*this.mh/2;i++){
+                var x=randomRange(2,this.mw-2);
+                var y=randomRange(2,this.mh-2);
+                if(this.map[x][y] == 1 && this.map[x][y-1] == 0 && this.map[x][y+1] == 0){				
+                    var w=0;
+                    var x2=x;
+                    var exitloop=false;
+                    while(exitloop == false){
+                        if(this.map[x2][y] == 0) exitloop = true; 
+                        if(this.map[x2][y-1] == 1) exitloop = true;
+                        if(this.map[x2][y+1] == 1) exitloop = true;				
+                        x2+=1;
+                        w+=1;
+                    }
+                    //
+                    
+                    if(w-2>3){					
+                        for(var x2=x;x2<=x+w-2;x2++){
+                            this.map[x2][y-1] = 1;
+                            this.map[x2][y+1] = 1;
+                            if(x2>x+2 && w>6 && x2<(x+5)){
+                                this.map[x2][y+2] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        makevert(x,y,side){
+            var l=randomRange(4,20);
+            if(y<22)return;
+            if(y>this.mh-22)return;
+            if(side ==  0){//down		
+                if(this.overlap(x-4,y+1,x+4,y+l+2) == false){
+                    for(var y2=y;y2<=y+l;y2++){
+                        this.map[x][y2] = 1;
+                    }
+                }
+            }
+            if(side ==  1){//up
+                if(this.overlap(x-4,(y-l)-3,x+4,y-1) == false){
+                    for(var y2=y-l;y2<=y;y2++){
+                        this.map[x][y2] = 1;
+                    }
+                }
+            }
+
+        }
+
+        makeside(x,y,side){		
+            
+            var l=randomRange(4,20);		
+            if(x<22)return;
+            if(x>this.mw-22)return;				
+            if(side==0){// 'left			
+
+                if(this.overlap((x-l)-2,y-5,x,y+5) == false){				
+                    for(var x2=x-l;x2<x;x2++){
+                        this.map[x2][y] = 1;
+                    }
+                }
+            }
+            if(side==1){// 'right		
+                if(this.overlap(x+1,y-5,x+l+2,y+5) == false){								
+                    for(var x2=x;x2<x+l;x2++){
+                        this.map[x2][y] = 1;
+                    }
+                }			
+            }	
+        }
+        overlap(x1,y1,x2,y2){
+            //return rectsoverlap(x1,y1,x2,y2);
+            for(var y=y1;y<y2;y++){
+                for(var x=x1;x<x2;x++){
+                    if(x>0 && x<this.mw && y>0 && y<this.mh){
+                        if(this.map[x][y] == 1)return true;
+                    }
+                }
+            }
+            return false;
+        }
+        drawladder(){						
+            for(var y=0;y<this.mmh;y++){
+                for(var x=0;x<this.mmw;x++){
+                    //Select mapladder[x,y]				
+                    if(this.mapladder[x][y]==0){
+                        //'canvas.Color = Color.None
+                        //'canvas.DrawRect(x*tw,y*th,tw,th)
+                    }
+                    if(this.mapladder[x][y]==1){	
+                        //canvas.Color = New Color(0.4,0,0)
+                        //canvas.DrawRect(x*tw,y*th,tw,th)
+                        //'canvas.DrawRect(0,0,100,100)
+                        //canvas.Color = New Color(0.7,0.7,0)
+                        //canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
+                        ctx2.fillStyle = 'rgb(20,0,0)';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.fillStyle = 'rgb(160,160,0)';
+                        drawLine(x*this.tw,y*this.th,x*this.tw,y*this.th+this.th-2,'rgb(160,160,0)');
+                    }
+                    //End Select			
+                }
+            }		
+        }
+
+        updateladderimage(){				
+        
+            //canvas.BlendMode = BlendMode.Opaque
+            //canvas.Clear(New Color(0,0,0,.5))
+            for(var y=0;y<this.mmh;y++){// Until mmh
+                for(var x=0;x<this.mmw;x++){
+                    if(this.mapladder[x][y]==0){
+                    }
+                    if(this.mapladder[x][y]==1){
+                        ctx.fillStyle = 'red';
+                        ctx.globalAlpha = 0.5;
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx.fillStyle = 'yellow';
+                        drawLine(x*this.tw,y*this.th,x*this.tw,y*this.th+this.th-2);
+                        ctx.globalAlpha = 1;
+                    }
+                    /*
+                    Select mapladder[x,y]				
+                        Case 0
+                        canvas.Color = Color.None
+                        canvas.DrawRect(x*tw,y*th,tw,th)
+                        Case 1								
+                        canvas.Color = Color.Red
+                        canvas.Alpha = 0.5
+                        canvas.DrawRect(x*tw,y*th,tw,th)
+                        canvas.Color = Color.Yellow
+                        canvas.DrawLine(x*tw,y*th,x*tw,y*th+th-2)
+                    End Select
+                    */
+                }
+            }
+            //canvas.Flush()
+        }	
+        draw(){		
+            for(var y=0;y<this.mmh;y++){
+                for(var x=0;x<this.mmw;x++){
+                    if(this.mapfinal[x][y]==this.tilesolid){
+                        ctx.fillStyle = 'black';
+                    }
+                    if(this.mapfinal[x][y]==this.tileempty){
+                        ctx.fillStyle = 'white';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                    if(this.mapfinal[x][y]==this.tileegg){
+                        ctx.fillStyle = 'yellow';
+                        ctx.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+
+                    //Select mapfinal[x,y]
+                        //Case tilesolid
+                        //canvas.Color = Color.Black
+                        //Case tileempty
+                        //canvas.Color = Color.White
+                        //canvas.DrawRect(x*tw,y*th,tw,th)
+                        //Case tileegg			
+                       // canvas.Color = Color.Yellow
+                        //canvas.DrawRect(x*tw,y*th,tw,th)
+                    //End Select	
+                }
+            }		
+        }
+        updateimage(){
+            		
+            
+            //canvas.BlendMode = BlendMode.Opaque	
+            //canvas.Clear(Color.Black)
+            //canvas.BlendMode = BlendMode.Opaque
+            ctx2.fillStyle='black'
+            ctx2.fillRect(0,0,screenwidth,screenheight)
+            for(var y=2;y<this.mmh;y++){
+                for(var x=2;x<this.mmw;x++){
+                    var a = this.mapfinal[x][y];
+                    if(a==this.tileempty){
+                        if(y>16){
+                        ctx2.globalAlpha = 1;
+                        ctx2.fillStyle = 'rgb(50,20,5)';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        }
+                    }
+                    if(a==this.tilesolid){
+                        ctx2.globalAlpha = 1;
+                        ctx2.fillStyle = 'brown';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                    if(a==this.tileegg){
+                        ctx2.globalAlpha = 0.8;
+                        ctx2.fillStyle = 'yellow';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                    if(a==this.tileturret){
+                        ctx2.globalAlpha = 0.8;
+                        ctx2.fillStyle = 'grey';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                    if(a==this.tilemineable){
+                        
+                        ctx2.globalAlpha = 0.8;
+                        ctx2.fillStyle = 'rgb(180,180,30)';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                    }
+                }
+            }
+            //canvas.Flush()
+            //ctx=c.getContext("2d");{
+        } 
+        mapmineablecollide(x,y,w,h,remove,kind){
+            
+            var mmw=mymap.mmw;
+            var mmh=mymap.mmh;
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            if(lefttopx < 0 || lefttopx >= mmw)return true;
+            if(lefttopy < 0 || lefttopy >= mmh)return true;
+            if(righttopx < 0 || righttopx >= mmw)return true;
+            if(righttopy < 0 || righttopy >= mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= mmh)return true;
+            
+            if(mymap.mapfinal[lefttopx][lefttopy] == mymap.tilemineable){ 
+                if(remove==true){
+                    this.removemineable(lefttopx,lefttopy,kind);
+                }
+                return true;
+            }
+            if(mymap.mapfinal[righttopx][righttopy] == mymap.tilemineable){ 
+                if(remove==true){
+                   this.removemineable(righttopx,righttopy,kind);
+                }
+                return true;
+            }
+            if(mymap.mapfinal[leftbottomx][leftbottomy] == mymap.tilemineable){ 
+                if(remove==true){
+                    this.removemineable(leftbottomx,leftbottomy,kind);
+                }
+                return true;
+            }
+            if(mymap.mapfinal[rightbottomx][rightbottomy] == mymap.tilemineable){
+                if(remove==true){
+                    this.removemineable(rightbottomx,rightbottomy,kind);
+                }
+                return true;						
+            }
+            return false;
+        }
+
+        // Every now and then remove mineable tile
+        // and add item
+        //
+        removemineable(x,y,kind){
+            var chance=10;
+            if(kind=="gun")chance=50; 
+            if(kind=="frag")chance = 10;
+            if(randomRange(0,chance) < 2){
+                mymap.mapfinal[x][y] = mymap.tileempty;
+                myitem.push(
+                    new item(
+                        (x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"
+                        )
+                );                
+                //myitem.Add(New item((x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"))
+            }
+        }
+            
+        tilecollide(x,y,w,h,tile){
+            var lefttopx		=((x)/tilewidth);
+            var lefttopy		=((y)/tileheight);
+            var righttopx		=((x+w)/tilewidth);
+            var righttopy		=((y)/tileheight);
+            var leftbottomx 	=((x)/tilewidth);
+            var leftbottomy 	=((y+h)/tileheight);
+            var rightbottomx	=((x+w)/tilewidth);												
+            var rightbottomy	=((y+h)/tileheight);
+            if(lefttopx < 0 || lefttopx >= this.mmw)return  false;
+            if(lefttopy < 0 || lefttopy >= this.mmh)return  false;
+            if(righttopx < 0 || righttopx >= this.mmw)return  false;
+            if(righttopy < 0 || righttopy >= this.mmh)return  false;
+            if(leftbottomx < 0 || leftbottomx >= this.mmw)return  false;
+            if(leftbottomy < 0 || leftbottomy >= this.mmh)return  false;
+            if(rightbottomx < 0 || rightbottomx >= this.mmw)return  false;
+            if(rightbottomy < 0 || rightbottomy >= this.mmh)return  false;
+            
+            if(this.mapfinal[lefttopx][lefttopy] == tile)return  true;
+            if(this.mapfinal[righttopx][righttopy] == tile)return  true;
+            if(this.mapfinal[leftbottomx][leftbottomy] == tile)return  true;
+            if(this.mapfinal[rightbottomx][rightbottomy] == tile)return  true;						
+            return false;
+        }
+        mapcollide(x,y,w,h){
+            //console.log(x+","+y+","+w+","+h);
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            if(lefttopx < 0 || lefttopx >= this.mmw)return true;
+            if(lefttopy < 0 || lefttopy >= this.mmh)return true;
+            if(righttopx < 0 || righttopx >= this.mmw)return true;
+            if(righttopy < 0 || righttopy >= this.mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= this.mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= this.mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= this.mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= this.mmh)return true;
+            
+            
+            if(this.mapfinal[lefttopx][lefttopy] != mymap.tileempty) return  true;
+            if(this.mapfinal[righttopx][righttopy] != mymap.tileempty) return  true;
+            if(this.mapfinal[leftbottomx][leftbottomy] != mymap.tileempty) return  true;
+            if(this.mapfinal[rightbottomx][rightbottomy] != mymap.tileempty) return  true;						
+            return false;
+        }
+        //Collide with solid and mineable
+        mapcollide2(x,y,w,h){
+            
+            var lefttopx		=Math.floor(((x)/tilewidth));
+            var lefttopy		=Math.floor(((y)/tileheight));
+            var righttopx		=Math.floor(((x+w)/tilewidth));
+            var righttopy		=Math.floor(((y)/tileheight));
+            var leftbottomx 	=Math.floor(((x)/tilewidth));
+            var leftbottomy 	=Math.floor(((y+h)/tileheight));
+            var rightbottomx	=Math.floor(((x+w)/tilewidth));												
+            var rightbottomy	=Math.floor(((y+h)/tileheight));
+            if(lefttopx < 0 || lefttopx >= this.mmw)return true;
+            if(lefttopy < 0 || lefttopy >= this.mmh)return true;
+            if(righttopx < 0 || righttopx >= this.mmw)return true;
+            if(righttopy < 0 || righttopy >= this.mmh)return true;
+            if(leftbottomx < 0 || leftbottomx >= this.mmw)return true;
+            if(leftbottomy < 0 || leftbottomy >= this.mmh)return true;
+            if(rightbottomx < 0 || rightbottomx >= this.mmw)return true;
+            if(rightbottomy < 0 || rightbottomy >= this.mmh)return true;
+
+            if(this.mapfinal[lefttopx][lefttopy] == mymap.tilesolid)return true;
+            if(this.mapfinal[righttopx][righttopy] == mymap.tilesolid) return  true;
+            if(this.mapfinal[leftbottomx][leftbottomy] == mymap.tilesolid) return  true;
+            if(this.mapfinal[rightbottomx][rightbottomy] == mymap.tilesolid) return  true;						
+
+            if(this.mapfinal[lefttopx][lefttopy] == mymap.tilemineable) return  true;
+            if(this.mapfinal[righttopx][righttopy] == mymap.tilemineable) return  true;
+            if(this.mapfinal[leftbottomx][leftbottomy] == mymap.tilemineable) return  true;
+            if(this.mapfinal[rightbottomx][rightbottomy] == mymap.tilemineable) return  true;						
+
+            return false;
+        }
+
+    }
+
+
+    img.src="data:image/png;base64,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";
+    
+
+
+    c.addEventListener("touchend", touchHandler);
+    c.addEventListener("touchstart", touchHandler);
+    
+    var tmap = [
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,0,0,2,0,0,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,1,1,1,1,1,1,1,0,0,2,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+        [1,0,0,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
+        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ]
+
+    var tilemap = [];
+
+    // Copy an array and make it a copy
+    // that you can modify without modifying\
+    // the original.
+    for (var i = 0; i < tmap.length; i++)
+    tilemap[i] = tmap[i].slice();
+
+
+    for(y=0;y<tmap.length;y++){
+        for(x=0;x<tmap[0].length;x++){
+            if(tmap[y][x]==1 && tilemap[y][x]==1){
+                if(Math.random()<.25 && x+1<tmap[0].length && tmap[y][x+1]==1){
+                    tilemap[y][x]=4;
+                    tilemap[y][x+1]=5;
+                }else{
+                    tilemap[y][x]=Math.floor(Math.random()*3)+1;
+                }
+            }
+            if(tmap[y][x]==2){
+                if(tmap[y-1][x]==1){
+                    tilemap[y][x]=6;
+                    //map[y][x]=0;
+                }
+                if(tmap[y+1][x]==0){
+                    tilemap[y][x]=7;
+                }
+                if(tmap[y-1][x]==2 && tmap[y+1][x]==2){
+                    tilemap[y][x]=8;
+                }
+            }
+        }
+    }
+
+    var [colx,coly,colw,colh] = [80,80,50,50];
+    var debug;
+    var lasttouchx,lasttouchy;
+    var autoscroll=false;
+    var tw,th;
+    var [camx,camy] = [0,0];
+
+
+    var mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
+    //var myc=new player();
+    var myplayer=new player();
+    var mybullet = [];
+    var mygrenade = [];
+    var myfrag = [];
+    var myitem = [];
+    var myflyingmonster = [];
+    var mywalkingmonster = [];    
+    var myturret = [];
+	//'
+	//' Create the towns people
+	//'
+	var mytownperson = [];
+    for(var i=0;i<mapwidth/40;i++){
+        mytownperson.push(
+			new townperson(
+				randomRange(3,mapwidth/2-5),
+                16) 
+        );
+        mytownperson.push(
+			new townperson(
+				randomRange(mapwidth/2+5,mapwidth-5),
+                16)
+        );
+
+	    //mytownperson.Add(New townperson(Rnd(3,mapwidth/2-5),16))
+		//mytownperson.Add(New townperson(Rnd(mapwidth/2+5,mapwidth-5),16))
+    }
+    //
+    // add turrets
+    myturret.push(
+        new turret() 
+    );
+    myturret.push(
+        new turret() 
+    );
+
+    offscreenCanvas.width=window.innerWidth-32;
+    offscreenCanvas.height=window.innerHeight-32;
+    gameloop=setInterval(doGameLoop2,15);
+    function doGameLoop2(){
+        myCanvas.height = window.innerHeight-32;
+        myCanvas.width = window.innerWidth-32;
+        //tw = Math.floor(myCanvas.width,tmap[0].length); 	
+        //th = Math.floor(myCanvas.height,tmap.length);
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.fillStyle="rgb(0,0,0)";
+        ctx.fillRect(0,0,c.width,c.height);
+
+        //  UPDATES
+        //
+		//update the towns people
+		for(i=0;i<mytownperson.length;i++){
+			mytownperson[i].update();
+        }
+
+        // update the bullets
+        if(mybullet.length>0){
+            //Update the bullets
+            for(var i=0;i<mybullet.length;i++){
+                mybullet[i].update();
+            
+            }
+            // remove bullet from list
+            for(var i=mybullet.length-1;i>=0;i-=1){
+                if(mybullet[i].deleteme == true){
+                    mybullet.splice(i, 1);
+                }
+            }		
+        }
+        // Update the grenades
+        if(mygrenade.length>0){
+            
+            //Update the grenades
+            for(var i=0;i<mygrenade.length;i++){
+                
+                mygrenade[i].update();
+                
+            }
+            // remove grenade from list
+            for(var i=mygrenade.length-1;i>=0;i-=1){
+                if(mygrenade[i].deleteme == true){
+                    mygrenade.splice(i, 1);
+                }
+            }		
+        }
+        // Update the frag
+        if(myfrag.length>0){            
+            //Update the frags
+            for(var i=0;i<myfrag.length;i++){                
+                myfrag[i].update();                
+            }
+            // remove frag from list
+            for(var i=myfrag.length-1;i>=0;i-=1){
+                if(myfrag[i].deleteme == true){
+                    myfrag.splice(i, 1);
+                }
+            }		
+        }
+        // Update the items
+        if(myitem.length>0){            
+            //Update the items
+            for(var i=0;i<myitem.length;i++){                
+                myitem[i].update();                
+            }
+            // remove item from list
+            for(var i=myitem.length-1;i>=0;i-=1){
+                if(myitem[i].deleteme == true){
+                    myitem.splice(i, 1);
+                }
+            }
+        }
+        // Update the flying monster
+        if(myflyingmonster.length>0){            
+            //Update the flying monster
+            for(var i=0;i<myflyingmonster.length;i++){ 
+                for(var j=0;j<1;j++){               
+                    myflyingmonster[i].update();
+                }              
+            }
+            // remove flying monster from list
+            for(var i=myflyingmonster.length-1;i>=0;i-=1){
+                if(myflyingmonster[i].deleteme == true){
+                    myflyingmonster.splice(i, 1);
+                }
+            }
+        }
+        // Update the walking monster
+        if(mywalkingmonster.length>0){            
+            //Update the walking monster
+            for(var i=0;i<mywalkingmonster.length;i++){ 
+                for(var j=0;j<1;j++){               
+                    mywalkingmonster[i].update();
+                }              
+            }
+            // remove walking monster from list
+            for(var i=mywalkingmonster.length-1;i>=0;i-=1){
+                if(mywalkingmonster[i].deleteme == true){
+                    mywalkingmonster.splice(i, 1);
+                }
+            }
+        }
+
+        // Update the turret
+        if(myturret.length>0){            
+            //Update the turret
+            for(var i=0;i<myturret.length;i++){ 
+                for(var j=0;j<=1;j++){               
+                    myturret[i].update();
+                }              
+            }
+        }
+
+        if(myflyingmonster.length<maxflyingmonsters){
+        for(var i=0;i<=1;i++){
+            addflyingmonster();
+            addwalkingmonster();
+        }
+        }
+
+        //mymap.draw();
+		if(Controller.MiniMap==false){
+			var tp=false;
+			//If Keyboard.KeyDown(Key.LeftControl) 
+			//	myplayer.userscrollmap()
+			//	tp=True
+			//End If
+			if(tp==false){
+				myplayer.updateplayercontrols()
+            }
+			//canvas.Clear(Color.Black)
+			myplayer.draw()
+            ctx.scale(2,2);     
+            ctx.globalAlpha = 0.5;       
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0,0,360,38);
+            ctx.fillStyle = 'white';
+            
+		    ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
+		    ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
+            ctx.fillText(myflyingmonster.length,320,15);//debug
+            ctx.scale(1,1);
+            ctx.globalAlpha = 1;
+            //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
+        }
+        //ctx.drawImage(tileImage,0,0,32,32,0,0,32,32);
+
+        if(Controller.MiniMap==true){
+            //offscreenCanvas.width=window.innerWidth-32;
+            //offscreenCanvas.height=window.innerHeight-32;
+            if(Math.random()<.1){
+            //ctx2.fillStyle = 'black'
+            //ctx.fillRect(0,0,ctx2.width,ctx2.height)
+            mymap.updateimage();    
+            mymap.drawladder();
+             
+            ctx2.globalAlpha = 0.25
+			ctx2.fillStyle = 'rgb(255,255,255)'
+			var x1=myplayer.mcx*mymap.tw
+			var y1=myplayer.mcy*mymap.th
+			ctx2.fillRect(x1,y1,mymap.tw*myplayer.maptileswidth,mymap.th*myplayer.maptilesheight)
+
+            }
+
+            ctx2.globalAlpha=1;
+            //ctx2.fillStyle="#FFFF00";
+            //ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
+            ctx.drawImage(offscreenCanvas,0,0);
+            for(var i=0;i<myflyingmonster.length;i++){
+                myflyingmonster[i].draw();
+            }
+            for(var i=0;i<mywalkingmonster.length;i++){
+                mywalkingmonster[i].draw();
+            } 
+        }
+    }
+    function doGameLoop(){
+        myCanvas.height = window.innerHeight-32;
+        myCanvas.width = window.innerWidth-32;
+        tw = Math.floor(myCanvas.width,tmap[0].length); 	
+        th = Math.floor(myCanvas.height,tmap.length);
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.fillStyle="rgb(0,0,0)";
+        ctx.fillRect(0,0,c.width,c.height);
+
+
+        // Draw the tile map..
+        tw = 32;
+        th = 32;
+        // using the camx and camy variables.
+        // get the tile left and top and bottom and right
+        // of the screen. Draw between these tiles from the map.
+        var lt = Math.floor(-camx / tw);
+        var tt = Math.floor(-camy / th);
+        var rt = Math.floor((-camx / tw)+((myCanvas.width/tw)))+1;
+        var bt = Math.floor((-camy / th)+((myCanvas.height/th)))+1;
+        for(var y = tt; y < bt; ++y) {
+            for(var x = lt; x < rt; ++x) {
+                if(x>=0 && y>=0 && x<tmap[0].length && y<tmap.length){
+                    var dx = (x*tw)+camx;
+                    var dy = (y*th)+camy;
+
+                    if(tilemap[y][x]==1){
+                            ctx.drawImage(img,32,0,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==2){
+                        ctx.drawImage(img,32,16,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==3){
+                        ctx.drawImage(img,56,16,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==4){
+                        ctx.drawImage(img,56,0,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==5){
+                        ctx.drawImage(img,72,0,16,16,dx,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==6){
+                        ctx.drawImage(img,0,0,24,16,dx-tw/4,dy,tw+tw/2,th);
+                    }
+                    if(tilemap[y][x]==7){
+                        ctx.drawImage(img,8,32,16,16,dx+tw/4,dy,tw,th);
+                    }
+                    if(tilemap[y][x]==8){
+                        ctx.drawImage(img,8,16,16,16,dx+tw/4,dy,tw,th);
+                    }
+
+                    if(tilemap[y][x]==0){
+                        ctx.fillStyle = 'rgb(10,4,1)';
+                        ctx.fillRect(dx,dy,tw,th);
+                    }
+                }
+            }
+        }
+        autoscr();
+
+        var z = rectmapcollide(colx,coly,colw,colh,0,0);
+        ctx.globalAlpha = .5;
+        if(z===false){
+            ctx.fillStyle='yellow';
+        }
+        if(z===true){
+            ctx.fillStyle='red';
+        }
+
+        ctx.fillRect(colx,coly,colw,colh);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle="rgb(255,255,255)";
+        ctx.fillText("Drawing a tilemap example."+debug,10,10); 
+
+    }
+
+
+
+
+
+    function touchHandler(e){
+        if(e.type=="touchstart" && e.touches) {
+            var x = e.changedTouches[0].clientX;
+            var y = e.changedTouches[0].clientY;
+            lasttouchx = x;
+            lasttouchy = y;
+            autoscroll = true;
+            colx = x-colw/2;
+            coly = y-colh/2;
+            //myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+            e.preventDefault();
+        }
+        if(e.type=="touchend" && e.touches) {
+            var x = e.changedTouches[0].clientX;
+            var y = e.changedTouches[0].clientY;
+            autoscroll = false;
+        
+            //myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+            e.preventDefault();
+        }
+
+    }
+
+    //
+    // Scroll the map and
+    // keep the edges of the map
+    // as the limit.
+    //
+    function autoscr(){
+        if(autoscroll==false)return;
+        var x = lasttouchx;
+        var y = lasttouchy;
+        
+        if(	x<myCanvas.width/2 && 
+                y>myCanvas.height/4 && 
+                y<myCanvas.height-myCanvas.height/4){
+            if(camx<=0)camx+=16;
+        }
+        
+        if(	x>myCanvas.width/2 &&
+                y>myCanvas.height/4 && 
+                y<myCanvas.height-myCanvas.width/4){
+            
+            if(camx>-((tmap[0].length*tw)-myCanvas.width)){
+            camx-=16;
+            }
+        }
+        
+        if(	y<myCanvas.height/4 ){
+            
+            if(camy<0)camy+=16;
+        }
+        
+        if(	y>myCanvas.height/4+myCanvas.height/2 ){
+        
+            if(camy>-((tmap.length*th)-myCanvas.height))camy-=16;
+        }
+
+    }
+
+    function rectmapcollide(x,y,w,h,offsetx,offsety){
+
+        var cx=Math.floor((x-camx)/tw);
+        var cy=Math.floor((y-camy)/th);
+
+        for(var y2=cy-1;y2<cy+3;y2++){
+        for(var x2=cx-1;x2<cx+3;x2++){	
+            if(x2>=0 && x2<tmap[0].length && y2>=0 && y2<tmap.length){
+                if(tmap[y2][x2] == 1){
+                    var x3 = ((x2)*tw)+camx;
+                    var y3 = ((y2)*th)+camy;
+                    if(rectsoverlap(x+offsetx,y+offsety,w,h,x3,y3,tw,th)==true){
+                        return true;
+                    }
+                }
+            }
+        }
+        }
+        return false;
+    }
+
+    function rectsoverlap(r1x1,r1y1,r1w,r1h,r2x1,r2y1,r2w,r2h){
+        var r1x2 = r1x1+r1w;
+        var r1y2 = r1y1+r1h;
+        var r2x2 = r2x1+r2w;
+        var r2y2 = r2y1+r2h;
+        
+        return (r1x1 < r2x2 && r1x2 > r2x1 && r1y1 < r2y2 && r1y2 > r2y1);
+
+    }
+    function create2DArray(rows,columns) {
+        //var x = new Array(rows);
+        //for (var i = 0; i < rows; i++) {
+        //    x[i] = new Array(columns);
+        //}
+        //return x;
+	    var x = [];
+	    for(var i=0;i<rows;i++){
+		    x[i] = new Array();
+		    for(var j=0;j<columns;j++){
+			    x[i][j]=0;
+		    }
+	    }
+        return x;
+    }
+
+    function controllerconnected(evt){
+    }
+
+    // keyboard key down events
+    function kd(evt){
+
+        if(evt.keyCode==37){//cursor left
+            Controller.Left = true;
+        }
+        if(evt.keyCode==39){//cursor right
+            Controller.Right = true;
+        }
+        if(evt.keyCode==38){//cursor up
+            Controller.Up = true;
+        }
+        if(evt.keyCode==40){//cursor down
+            Controller.Down = true;
+        }
+        if(evt.keyCode==90){ // z
+            Controller.ShotGun = true;
+        }
+        if(evt.keyCode==88){ //x
+            Controller.Grenade = true;
+        }
+        //
+        if(evt.keyCode==67){ //c
+            //Controller.LaserWall = true;
+        }
+        //86
+        if(evt.keyCode==86){ //v
+            Controller.Mine = true;
+        }
+        if(evt.keyCode==32){ //space
+            Controller.Jump = true;
+        }
+        if(evt.keyCode==16){ //left shift
+            Controller.MiniMap = true;
+        }
+    }
+    //
+    // Keyboard events Key Up
+    function ku(evt){
+        if(evt.keyCode==37){
+            Controller.Left = false;
+        }
+        if(evt.keyCode==39){
+            Controller.Right = false;
+        }
+        if(evt.keyCode==38){
+            Controller.Up = false;
+        }
+        if(evt.keyCode==40){
+            Controller.Down = false;
+        }
+        if(evt.keyCode==90){ // z
+            Controller.ShotGun = false;
+        }
+        if(evt.keyCode==88){ //x
+            Controller.Grenade = false;
+        }
+        // Only trigger once..
+        if(evt.keyCode==67){ //c
+            Controller.LaserWall = true;
+        }
+        if(evt.keyCode==86){ //v
+            Controller.Mine = false;
+        }
+        if(evt.keyCode==32){ //space
+            Controller.Jump = false;
+        }
+        if(evt.keyCode==16){ //left shift
+            Controller.MiniMap = false;
+        }
+    }
+    //
+    // This function adds a walking monster to the game
+    //
+    function addwalkingmonster(){ //hatch
+        var cnt = mywalkingmonster.length
+        var cnt2 = myflyingmonster.length
+
+        
+        // If there are not to many walking monsters
+        // and still some egg laying monsters left
+        if(cnt<maxwalkingmonsters && cnt2>0){
+            //DebugLog (mapwidth+mapheight)/10
+            for(var i=0;i<(mapwidth+mapheight)/10;i+=1){
+                if(Math.random()< egghatchspeed){
+                    var x=randomRange(0,mapwidth)
+                    var y=randomRange(0,mapheight)
+                    if(mymap.mapfinal[x][y] == mymap.tileegg){
+                        // If there are no walking monsters nearby
+                        var makemonster=true
+                        for(var ii=0;ii<mywalkingmonster.length;ii+=1){
+                            if(distanceM(x,y,mywalkingmonster[ii].x,mywalkingmonster[ii].y) < 6)makemonster = false
+                        }					
+                        if(makemonster == true){
+                            mymap.mapfinal[x][y] = mymap.tileempty
+                            mywalkingmonster.push(
+                                new walkingmonster(
+                                x,y    
+                                )
+                            );
+                            //mywalkingmonster.AddLast(New walkingmonster(x,y))
+                            //mymap.updateimage(mymap.mapcanvas)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    //
+    //This function adds a flying monster to the game
+    //
+    function addflyingmonster(){// 'hatch
+        var cnt=myflyingmonster.length;
+        //for(var i=0;i<myflyingmonster.length;i++){
+        //    cnt+=1
+        //}
+        if(cnt<maxflyingmonsters){
+            //'DebugLog (mapwidth+mapheight)/10
+            for(var i=0;i<(mapwidth+mapheight)/10;i++){
+                if(Math.random() < egghatchspeed){
+                    var x=randomRange(0,mapwidth);
+                    var y=randomRange(0,mapheight);
+                    if(mymap.mapfinal[x][y] == mymap.tileegg){
+                        mymap.mapfinal[x][y] = mymap.tileempty
+                        myflyingmonster.push(
+                                new theflyingmonster(
+                                x,y    
+                                )
+                            );
+                        //myflyingmonster.AddLast(New theflyingmonster(x,y))
+                        //mymap.updateimage(mymap.mapcanvas)
+                    }
+                }
+            }
+        }
+    }
+
+    function drawLine(x1,y1,x2,y2,stroke = 'black', width = 1) {
+        if (stroke) {
+            ctx.strokeStyle = stroke;
+        }
+
+        if (width) {
+            ctx.lineWidth = width;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(x1,y1);
+        ctx.lineTo(x2,y2);
+        ctx.stroke();
+    }
+    function randomRange(min=0, max=1) {
+        return Math.floor(Math.random() * (max - min) + min);
+    }
+    function randomRangeFloat(min=0, max=1) {
+        return (Math.random() * (max - min) + min);
+    }
+
+    // Not floored.
+    function getangle(x1,y1,x2,y2){
+        return Math.atan2(y2-y1, x2-x1);
+    }  	     
+    // not floored - Manhattan distance
+    function distanceM(x1,y1,x2,y2){
+        return Math.abs(x2-x1)+Math.abs(y2-y1);
+    }	
+
+</script>
+</body>
+</html>
