@@ -23,8 +23,8 @@ Use different browser.
 </canvas>
 <script>
     //
-    //
-    //
+    // Added - collision bullet flyingmonster
+    // Added - collision frag(grenade explosion fragments)
     //
     //
     // Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
@@ -628,21 +628,21 @@ Use different browser.
                     }
                 }
                 */ 
-                /*
+                
                 // frag collision with flying monsters
-                for(var i:=Eachin myflyingmonster
-                    if(distance(i.px,i.py,px,py) < 10
-                        i.hp -= 5
+                for(var i=0;i<myflyingmonster.length;i++){
+                    if(distanceM(myflyingmonster[i].px,myflyingmonster[i].py,this.px,this.py) < 10){
+                        myflyingmonster[i].hp -= 5
                         //mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,5,Color.Red))
-                        if(i.hp<=0
-                            i.deleteme = true
+                        if(myflyingmonster[i].hp<=0){
+                            myflyingmonster[i].deleteme = true
                             //myitem.Add(New item(i.px,i.py,"Monster Tooth"))
                         }
                         this.deleteme = true;
                         return;
                     }
                 }	
-                */
+                
                 // frag collision with the eggs
                 if(this.eggcollide(this.px-1,this.py-1,this.w+2,this.h+2)==true){
                     this.deleteme = true
