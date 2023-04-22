@@ -99,8 +99,8 @@ Use different browser.
             this.hp //hitpoints
             this.hpmax
             this.deleteme
-            this.state:String
-            this.substate:String
+            this.state
+            this.substate
             this.jx
             this.jy
             this.oldpy //old py coordinate
@@ -111,9 +111,9 @@ Use different browser.
             this.px = x*this.w
             this.py = y*this.h
             this.hp = randomRange(10,30)
-            this.hpmax = hp
+            this.hpmax = this.hp
             //set the movement speed
-            this.sx = Rnd(0.3,3)
+            this.sx = randomRangeFloat(0.3,3)
             //sy = sx
             this.state="hatched"
         }
@@ -138,7 +138,7 @@ Use different browser.
                 //		If py > y*h)py -= sy
                 if(this.laserwall())this.changedirection()
                 if(distanceM(this.px,this.py,this.x*this.w,this.y*this.h) > 8)return
-            }else{
+                }else{
                 if(this.substate == "jump"){
                     if(mymap.mapcollide(this.px+this.jx,this.py,this.w,this.h) == false){
                         this.px += this.jx
@@ -158,94 +158,108 @@ Use different browser.
                     this.y = this.py / tileheight
                 }
             }
-            Select state
-                Case "hatched"
-                    this.state="roam"
-                    this.substate="left"
-                Case "attack"
+            if(this.state=="hatched"){
+                //Case "hatched"
+                this.state="roam"
+                this.substate="left"
+            }
+            if(this.state=="attack"){
+                //Case "attack"
+ 
 
-
-                    Select substate
-                        Case "setjump"
-                            if(myplayer.py < this.py)this.substate="finishjump"
-                            if(myplayer.py > this.py+3)this.substate="finishjump"
-                            var d=distanceM(myplayer.px,myplayer.py,this.px,this.py)
-                            if(this.px < myplayer.px)this.jx = d/35 Else this.jx = -d/35
-                            
-                            if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 50)this.jy = -2
-                            this.substate = "jump"
-                            return
-                        Case "jump"
-                            //						
-                            var cnt=0
-                            For var ppy=0 Until 40
-                                if(mymap.mapcollide(this.px+(this.jx*10),this.py+ppy,w,h) == false)cnt+=1
-                            Next
-                            if(cnt>30)jx=-jx
-                        Case "finishjump"
-                            this.state = "roam"
-                            this.x = this.px / tilewidth
-                            this.y = this.py / tileheight
-                            if(randomRange(0,2)< 1)this.substate == "left" Else this.substate="right"						
-                    End Select	
-
-
-                Case "roam"								
-                    if(this.canattackplayer()){
-                        this.state="attack"
-                        this.substate="setjump"
+                if(this.substate=="setjump"){
+                    //Case "setjump"
+                    if(myplayer.py < this.py)this.substate="finishjump"
+                    if(myplayer.py > this.py+3)this.substate="finishjump"
+                    var d=distanceM(myplayer.px,myplayer.py,this.px,this.py)
+                    if(this.px < myplayer.px){
+                        this.jx = d/35
+                        }else{
+                        this.jx = -d/35
                     }
                     
+                    if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 50)this.jy = -2
+                    this.substate = "jump"
+                    return
+                }
+                if(this.substate=="jump"){
+                    //Case "jump"
+                    //						
+                    var cnt=0
+                    for(var ppy=0;ppy<40;ppy+=1){
+                        if(mymap.mapcollide(this.px+(this.jx*10),this.py+ppy,this.w,this.h) == false)cnt+=1
+                    }
+                    if(cnt>30)this.jx=-this.jx
+                }
+                if(this.substate=="finishjump"){
+                    //Case "finishjump"
+                    this.state = "roam"
+                    this.x = this.px / tilewidth
+                    this.y = this.py / tileheight
+                    if(randomRange(0,2)< 1){
+                        this.substate == "left"
+                        }else{
+                        this.substate="right"	
+                    }					
+                }//End Select	
 
-
-
-                    Select substate
-                        Case "left"
-                            x-=1
-                            //If Rnd(50) < 1 And mymap.mapfinal[x-1,y] = mymap.tileempty And mymap.mapfinal[x-1,y+1] <> mymap.tileempty Then substate="right"						
-                            //If Rnd(50) < 1 And cannotgohere(x+1,y) = false And cannotgohere(x+1,y+1)=true Then substate="right" 
-                            if(this.cannotgohere(this.x-1,this.y) == true)this.substate = "right"
-                            if(this.cannotgohere(this.x-1,this.y+1) == false)this.substate = "right"
-                            //If mymap.mapfinal[x-1,y]  <> mymap.tileempty Then substate="right"
-                            //If mymap.mapfinal[x-1,y+1] = mymap.tileempty Then substate="right"
-                            If this.x<3)this.substate="right"
-                            
-                        Case "right"						
-                            this.x+=1
-                            //If Rnd(50) < 1 And cannotgohere(x-1,y) =  false And cannotgohere(x-1,y+1)=true Then substate="left"
-                            if(this.cannotgohere(this.x+1,this.y) == true)this.substate="left"
-                            if(thiscannotgohere(this.x+1,this.y+1) == false)this.substate="left"
-                            //If Rnd(50) < 1 And mymap.mapfinal[x+1,y] = mymap.tileempty And mymap.mapfinal[x+1,y+1] <> mymap.tileempty Then substate="left"						
-                            //If mymap.mapfinal[x+1,y]  <> mymap.tileempty Then substate="left"
-                            //If mymap.mapfinal[x+1,y+1] = mymap.tileempty Then substate="left"
-                            if(this.x>mapwidth-3)this.substate=="left"
-                    End Select
-
-
+            }
+            if(this.state=="roam"){
+                //Case "roam"								
+                if(this.canattackplayer()){
+                    this.state="attack"
+                    this.substate="setjump"
+                }
+                  
+                if(this.substate=="left"){
+                    //Case "left"
+                    this.x-=1
+                    //If Rnd(50) < 1 And mymap.mapfinal[x-1,y] = mymap.tileempty And mymap.mapfinal[x-1,y+1] <> mymap.tileempty Then substate="right"						
+                    //If Rnd(50) < 1 And cannotgohere(x+1,y) = false And cannotgohere(x+1,y+1)=true Then substate="right" 
+                    if(this.cannotgohere(this.x-1,this.y) == true)this.substate = "right"
+                    if(this.cannotgohere(this.x-1,this.y+1) == false)this.substate = "right"
+                    //If mymap.mapfinal[x-1,y]  <> mymap.tileempty Then substate="right"
+                    //If mymap.mapfinal[x-1,y+1] = mymap.tileempty Then substate="right"
+                    if(this.x<3)this.substate="right"
+                }
+                if(this.substate=="right"){        
+                    //Case "right"						
+                    this.x+=1
+                    //If Rnd(50) < 1 And cannotgohere(x-1,y) =  false And cannotgohere(x-1,y+1)=true Then substate="left"
+                    if(this.cannotgohere(this.x+1,this.y) == true)this.substate="left"
+                    if(this.cannotgohere(this.x+1,this.y+1) == false)this.substate="left"
+                    //If Rnd(50) < 1 And mymap.mapfinal[x+1,y] = mymap.tileempty And mymap.mapfinal[x+1,y+1] <> mymap.tileempty Then substate="left"						
+                    //If mymap.mapfinal[x+1,y]  <> mymap.tileempty Then substate="left"
+                    //If mymap.mapfinal[x+1,y+1] = mymap.tileempty Then substate="left"
+                    if(this.x>mapwidth-3)this.substate=="left"
+                }//End Select
 
                     //gorandleftorright()
-            End Select
+            }
         }
 
 
         canattackplayer(){
-            if(distance(this.px,this.py,myplayer.px,myplayer.py) > 150)return false
-            if(myplayer.px < this.px
-                for(var xx=this.px/tilewidth Until this.px/tilewidth-3 Step -1
-                    if(mymap.mapfinal[xx,this.y+1] <> mymap.tilesolid)return false
+            
+            if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 150)return false
+            
+            if(myplayer.px < this.px){
+                for(var xx=this.px/tilewidth;xx>this.px/tilewidth-3;xx-=1){
+                    if(mymap.mapfinal[Math.floor(xx)][this.y+1] != mymap.tilesolid)return false
                 }
-            Else
-                for(var xx=this.px/tilewidth Until this.px/tilewidth+3
-                    if(mymap.mapfinal[xx,this.y+1] <> mymap.tilesolid)return false
+            }else{
+                for(var xx=this.px/tilewidth;xx<this.px/tilewidth+3;xx+=1){
+                    if(mymap.mapfinal[Math.floor(xx)][this.y+1] != mymap.tilesolid)return false
                 }			
             }
+            
             var angle = getangle(this.px,this.py,myplayer.px,myplayer.py)
             var clearpath=false
             var mx = Math.cos(angle)
             var my = Math.sin(angle)
-            var monx = px
-            var mony = py
-            for(var i=0 Until 200
+            var monx = this.px
+            var mony = this.py
+            for(var i=0;i<200;i+=1){
                 monx += mx
                 mony += my
                 if(distanceM(monx,mony,myplayer.px,myplayer.py) < 20)return true
@@ -256,46 +270,58 @@ Use different browser.
         }	
         // for the walking monster Check if(tile on map is blocked
         cannotgohere(x,y){
+            x = Math.floor(x)
+            y = Math.floor(y)
             if(mymap.mapfinal[x][y] == mymap.tilesolid)return true
             if(mymap.mapfinal[x][y] == mymap.tilemineable)return true
             if(mymap.mapfinal[x][y] == mymap.tileturret)return true
             return false
+
         }
         laserwall(){
-            For var i:=Eachin mylaserwall
-                if(rectsoverlap((this.px-this.w)+(randomRange(-this.w,this.w)),this.py-this.h,this.w*2,this.h*2,i.tx-5,i.ty,10,i.by-i.ty)
+            /*
+            for(var i=0;i<mylaserwall.length;i+=1){
+                if(rectsoverlap((this.px-this.w)+(randomRange(-this.w,this.w)),this.py-this.h,this.w*2,this.h*2,mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
                     return true
                 } 
             }
+            */
             return false
         }
         collidelaserwall(x,y,w1,h1){
-            For var i:=Eachin mylaserwall
-                if(rectsoverlap((x-w1)+(randomRange(-w1,w1)),y-h1,w1*2,h1*2,i.tx-5,i.ty,10,i.by-i.ty)
+            /*
+            for(var i=0;i<mylaserwall.length;i+=1){
+                if(rectsoverlap((x-w1)+(randomRange(-w1,w1)),y-h1,w1*2,h1*2,mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
                     return true
                 } 
             }
+            */
             return false
+            
         }	
         changedirection(){
             this.state = "roam"
-            if(this.substate == "left")
+            if(this.substate == "left"){
                 this.substate="right" 
                 this.x += 2		
-            Else 
+                }else{
                 substate="left"
                 this.x -= 2
             }
         }	
         draw(){
-                var x1=screenwidth/Float(mapwidth)*Float(x)
-                var y1=screenheight/Float(mapheight)*Float(y)
-                canvas.Color = Color.White
-                //SetColor 255,255,255
-                canvas.DrawRect(x1,y1,3+2,3+2)
-                canvas.Color = Color.Red
-                //SetColor 255,0,0		
-                canvas.DrawRect(x1+1,y1+1,3,3)
+            var x1=(screenwidth-48)/mapwidth*this.x
+            var y1=(screenheight-48)/mapheight*this.y
+            ctx2.fillStyle = 'white'
+            ctx2.fillRect(x1,y1,3+2,3+2)
+            ctx2.fillStyle = 'red'
+            ctx2.fillRect(x1,y1,3,3)
+            //canvas.Color = Color.White
+            //SetColor 255,255,255
+            //canvas.DrawRect(x1,y1,3+2,3+2)
+            //canvas.Color = Color.Red
+            //SetColor 255,0,0		
+            //canvas.DrawRect(x1+1,y1+1,3,3)
         
         }
 
@@ -2104,8 +2130,8 @@ Use different browser.
                 var y2=(y1-(this.mcy*this.th))+this.moy;
                 //canvas.Color = Color.Red
                 //canvas.DrawRect(x2,y2,tw,th)
-                ctx.fillStyle = 'red';
-                ctx.fillRect(x2,y2,this.tw,this.th);
+                //ctx.fillStyle = 'red';
+                //ctx.fillRect(x2,y2,this.tw,this.th);
                 this.drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
                 //canvas.Color = Color.White
                 //canvas.DrawText(i.state,x2,y2)
@@ -2115,7 +2141,7 @@ Use different browser.
             }
             
 
-            /*
+            
             //draw walking monsters		
             for(var i=0;i<mywalkingmonster.length;i++){
                 var x1=mywalkingmonster[i].px;
@@ -2126,14 +2152,16 @@ Use different browser.
                 //canvas.DrawRect(x2,y2,tw,th)
                 ctx.fillStyle = 'red';
                 ctx.fillRect(x2,y2,this.tw,this.th);
-                drawpowerbar(x2,y2,mywalkingmonster[i].hp,mywalkingmonster[i].hpmax);			
+                this.drawpowerbar(x2,y2,mywalkingmonster[i].hp,mywalkingmonster[i].hpmax);	
+                ctx.fillStyle='white'
+                ctx.fillText(mywalkingmonster[i].state+"-"+mywalkingmonster[i].substate,x2,y2)
                 //canvas.Color = Color.White
                 //canvas.DrawText(i.state,x2,y2)
                 //canvas.DrawText(i.substate,x2,y2+12)
                 //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
                 //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
             }
-            */
+            
             
             
             // Draw the bullets
@@ -3003,6 +3031,7 @@ Use different browser.
     var myfrag = [];
     var myitem = [];
     var myflyingmonster = [];
+    var mywalkingmonster = [];    
     var myturret = [];
 	//'
 	//' Create the towns people
@@ -3121,6 +3150,22 @@ Use different browser.
                 }
             }
         }
+        // Update the walking monster
+        if(mywalkingmonster.length>0){            
+            //Update the walking monster
+            for(var i=0;i<mywalkingmonster.length;i++){ 
+                for(var j=0;j<=1;j++){               
+                    mywalkingmonster[i].update();
+                }              
+            }
+            // remove walking monster from list
+            for(var i=mywalkingmonster.length-1;i>=0;i-=1){
+                if(mywalkingmonster[i].deleteme == true){
+                    mywalkingmonster.splice(i, 1);
+                }
+            }
+        }
+
         // Update the turret
         if(myturret.length>0){            
             //Update the turret
@@ -3132,8 +3177,9 @@ Use different browser.
         }
 
         if(myflyingmonster.length<maxflyingmonsters){
-        for(var i=0;i<=1;i++){
+        for(var i=0;i<=32;i++){
             addflyingmonster();
+            addwalkingmonster();
         }
         }
 
@@ -3170,6 +3216,9 @@ Use different browser.
             mymap.drawladder();
             for(var i=0;i<myflyingmonster.length;i++){
                 myflyingmonster[i].draw();
+            }
+            for(var i=0;i<mywalkingmonster.length;i++){
+                mywalkingmonster[i].draw();
             }
             ctx2.globalAlpha=1;
             //ctx2.fillStyle="#FFFF00";
@@ -3433,7 +3482,43 @@ Use different browser.
             Controller.MiniMap = false;
         }
     }
+    //
+    // This function adds a walking monster to the game
+    //
+    function addwalkingmonster(){ //hatch
+        var cnt = mywalkingmonster.length
+        var cnt2 = myflyingmonster.length
 
+        
+        // If there are not to many walking monsters
+        // and still some egg laying monsters left
+        if(cnt<maxwalkingmonsters && cnt2>0){
+            //DebugLog (mapwidth+mapheight)/10
+            for(var i=0;i<(mapwidth+mapheight)/10;i+=1){
+                if(Math.random()< egghatchspeed){
+                    var x=randomRange(0,mapwidth)
+                    var y=randomRange(0,mapheight)
+                    if(mymap.mapfinal[x][y] == mymap.tileegg){
+                        // If there are no walking monsters nearby
+                        var makemonster=true
+                        for(var ii=0;ii<mywalkingmonster.length;ii+=1){
+                            if(distanceM(x,y,mywalkingmonster[ii].x,mywalkingmonster[ii].y) < 6)makemonster = false
+                        }					
+                        if(makemonster == true){
+                            mymap.mapfinal[x][y] = mymap.tileempty
+                            mywalkingmonster.push(
+                                new walkingmonster(
+                                x,y    
+                                )
+                            );
+                            //mywalkingmonster.AddLast(New walkingmonster(x,y))
+                            //mymap.updateimage(mymap.mapcanvas)
+                        }
+                    }
+                }
+            }
+        }
+    }
     //
     //This function adds a flying monster to the game
     //
