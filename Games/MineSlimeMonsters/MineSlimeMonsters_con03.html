@@ -367,10 +367,10 @@ setInterval(() => {
         draw(){
             var x1=(screenwidth-48)/mapwidth*this.x
             var y1=(screenheight-48)/mapheight*this.y
-            ctx2.fillStyle = 'white'
-            ctx2.fillRect(x1,y1,3+2,3+2)
-            ctx2.fillStyle = 'blue'
-            ctx2.fillRect(x1+1,y1+1,3,3)
+            ctx.fillStyle = 'white'
+            ctx.fillRect(x1,y1,3+2,3+2)
+            ctx.fillStyle = 'blue'
+            ctx.fillRect(x1+1,y1+1,3,3)
             //canvas.Color = Color.White
             //SetColor 255,255,255
             //canvas.DrawRect(x1,y1,3+2,3+2)
@@ -793,10 +793,10 @@ setInterval(() => {
             var y1=(screenheight-48)/mapheight*this.y
             //canvas.Color = Color.White
             //SetColor 255,255,255
-            ctx2.fillStyle = 'white'
-            ctx2.fillRect(x1,y1,3+2,3+2)
-            ctx2.fillStyle = 'red'
-            ctx2.fillRect(x1+1,y1+1,3,3)
+            ctx.fillStyle = 'white'
+            ctx.fillRect(x1,y1,3+2,3+2)
+            ctx.fillStyle = 'red'
+            ctx.fillRect(x1+1,y1+1,3,3)
             //canvas.DrawRect(x1,y1,3+2,3+2)
             //canvas.Color = Color.Red
             //SetColor 255,0,0		
@@ -3294,12 +3294,7 @@ setInterval(() => {
             //ctx.fillRect(0,0,ctx2.width,ctx2.height)
             mymap.updateimage();    
             mymap.drawladder();
-            for(var i=0;i<myflyingmonster.length;i++){
-                myflyingmonster[i].draw();
-            }
-            for(var i=0;i<mywalkingmonster.length;i++){
-                mywalkingmonster[i].draw();
-            }   
+             
             ctx2.globalAlpha = 0.25
 			ctx2.fillStyle = 'rgb(255,255,255)'
 			var x1=myplayer.mcx*mymap.tw
@@ -3312,6 +3307,12 @@ setInterval(() => {
             //ctx2.fillStyle="#FFFF00";
             //ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
             ctx.drawImage(offscreenCanvas,0,0);
+            for(var i=0;i<myflyingmonster.length;i++){
+                myflyingmonster[i].draw();
+            }
+            for(var i=0;i<mywalkingmonster.length;i++){
+                mywalkingmonster[i].draw();
+            } 
         }
     }
     function doGameLoop(){
