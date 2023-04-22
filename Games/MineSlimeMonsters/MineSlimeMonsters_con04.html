@@ -2077,8 +2077,9 @@ setInterval(() => {
                         //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],2],x3,y3)
                         //canvas.Color = Color.Brown.Blend(Color.Yellow,.2)
                         //canvas.DrawRect(x3,y3,tw,th)
-                        ctx.fillStyle = 'yellow';
-                        ctx.fillRect(x3,y3,this.tw,this.th);
+                        //ctx.fillStyle = 'yellow';
+                        //ctx.fillRect(x3,y3,this.tw,this.th);
+                        ctx.drawImage(tileImage,0,64,32,32,x3,y3,tilewidth,tileheight);
                     }
                     //End Select	
 
