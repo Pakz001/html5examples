@@ -43,6 +43,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 
  <br><br>
 **Ideas :**
+* Replay - When you die the last few seconds are replayed showing how you died(zoomed in)
 * Scientist say matter can form out of nothingness. Taking this a notch further, "the spawning of devil eggs".
 * infinite sized maps? (Keep mining - save/load chunks)
 * Shops to sell loot and buy loads of ammo and guns and equipment.
