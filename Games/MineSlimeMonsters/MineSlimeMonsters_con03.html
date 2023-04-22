@@ -68,7 +68,7 @@ setInterval(() => {
         for(var i=0;i<16;i++){
             if(myGamepad.buttons[i].pressed==true)a=i
         }
-        //if(a!=-1)console.log(a)
+        if(a!=-1)console.log(a)
         
         Controller.Left = false
         Controller.Right = false
@@ -77,6 +77,10 @@ setInterval(() => {
         Controller.Jump = false
         Controller.ShotGun = false
         Controller.Grenade = false
+        Controller.MiniMap = false
+        if(myGamepad.buttons[9].pressed==true){
+            Controller.MiniMap = true
+        }
         if(myGamepad.buttons[3].pressed==true){
             Controller.Grenade = true
         }
@@ -1002,21 +1006,26 @@ setInterval(() => {
 
 
 
-                /*
+                
                 // frag collision with walking monsters
                 for(var i=0;i<mywalkingmonster.length;i+=1){
-                    if(distanceM(i.px,i.py,px,py) < 10
-                        i.hp -= 5
+                    if(distanceM(mywalkingmonster[i].px,mywalkingmonster[i].py,this.px,this.py) < 10){
+                        mywalkingmonster[i].hp -= 5
                         //mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,5,Color.Red))
-                        if(i.hp<=0
-                            i.deleteme = true
-                            myitem.Add(New item(i.px,i.py,"Monster Tail"))
+                        if(mywalkingmonster[i].hp<=0){
+                            mywalkingmonster[i].deleteme = true
+                            //myitem.Add(New item(i.px,i.py,"Monster Tail"))
+                              myitem.push(
+                                new item(
+                                this.px,this.py,"Monster Tail"    
+                                ) 
+                            );
                         }
                         this.deleteme = true
                         return;
                     }
                 }
-                */ 
+                
                 
                 // frag collision with flying monsters
                 for(var i=0;i<myflyingmonster.length;i++){
@@ -1025,6 +1034,11 @@ setInterval(() => {
                         //mynumberfall.Add(New numberfall(i.px+(i.w/2),i.py,5,Color.Red))
                         if(myflyingmonster[i].hp<=0){
                             myflyingmonster[i].deleteme = true
+                            myitem.push(
+                                new item(
+                                this.px,this.py,"Monster Tooth"    
+                                ) 
+                            );
                             //myitem.Add(New item(i.px,i.py,"Monster Tooth"))
                         }
                         this.deleteme = true;
@@ -1351,7 +1365,7 @@ setInterval(() => {
                     //'Print Millisecs()
                 }		
                 */
-                /*
+                
                 // Collision with bullet and walking monster
                 for(var i=0;i<mywalkingmonster.length;i++){
                     if(distanceM(this.px,this.py,mywalkingmonster[i].px,mywalkingmonster[i].py) < tilewidth){ 
@@ -1362,17 +1376,19 @@ setInterval(() => {
                         if(mywalkingmonster[i].hp <= 0){
                             mywalkingmonster[i].deleteme = true;					
                             //myitem.Add(New item(this.px,this.py,"Monster Tail"))
-                            mywalkingmonster.push(
-                                new walkingmonster(
-                                this.px,this.py,"Monster Tail"    
+                            myitem.push(
+                                new item(
+                                    this.px,this.py,"Monster Tail"    
                                 ) 
+                                   
+                                 
                             );
                             return;
                         }
                         return;
                     }
                 }
-                */
+                
                 
                 // Collision with bullet and flying monster
                 for(var i=0;i<myflyingmonster.length;i++){
@@ -2204,8 +2220,8 @@ setInterval(() => {
                 ctx.fillStyle = 'red';
                 ctx.fillRect(x2,y2,this.tw,this.th);
                 this.drawpowerbar(x2,y2,mywalkingmonster[i].hp,mywalkingmonster[i].hpmax);	
-                ctx.fillStyle='white'
-                ctx.fillText(mywalkingmonster[i].state+"-"+mywalkingmonster[i].substate,x2,y2)
+                //ctx.fillStyle='white'
+                //ctx.fillText(mywalkingmonster[i].state+"-"+mywalkingmonster[i].substate,x2,y2)
                 //canvas.Color = Color.White
                 //canvas.DrawText(i.state,x2,y2)
                 //canvas.DrawText(i.substate,x2,y2+12)
