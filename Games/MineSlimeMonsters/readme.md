@@ -32,6 +32,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 
 
 **Conversion notes :**
+* Usse a Xbox Controller(others untested)
 * Added new controller code system. Should make joypad and touch control easier.
 * Figure out what to do with resolution / window size changes.(pauze/rebuild?)
 * Still struggling with offscreen canvasses.
