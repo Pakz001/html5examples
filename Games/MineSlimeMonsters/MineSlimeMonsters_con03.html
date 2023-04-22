@@ -369,8 +369,8 @@ setInterval(() => {
             var y1=(screenheight-48)/mapheight*this.y
             ctx2.fillStyle = 'white'
             ctx2.fillRect(x1,y1,3+2,3+2)
-            ctx2.fillStyle = 'red'
-            ctx2.fillRect(x1,y1,3,3)
+            ctx2.fillStyle = 'blue'
+            ctx2.fillRect(x1+1,y1+1,3,3)
             //canvas.Color = Color.White
             //SetColor 255,255,255
             //canvas.DrawRect(x1,y1,3+2,3+2)
@@ -796,7 +796,7 @@ setInterval(() => {
             ctx2.fillStyle = 'white'
             ctx2.fillRect(x1,y1,3+2,3+2)
             ctx2.fillStyle = 'red'
-            ctx2.fillRect(x1,y1,3,3)
+            ctx2.fillRect(x1+1,y1+1,3,3)
             //canvas.DrawRect(x1,y1,3+2,3+2)
             //canvas.Color = Color.Red
             //SetColor 255,0,0		
@@ -2844,9 +2844,18 @@ setInterval(() => {
             //canvas.BlendMode = BlendMode.Opaque	
             //canvas.Clear(Color.Black)
             //canvas.BlendMode = BlendMode.Opaque
+            ctx2.fillStyle='black'
+            ctx2.fillRect(0,0,screenwidth,screenheight)
             for(var y=2;y<this.mmh;y++){
                 for(var x=2;x<this.mmw;x++){
                     var a = this.mapfinal[x][y];
+                    if(a==this.tileempty){
+                        if(y>16){
+                        ctx2.globalAlpha = 1;
+                        ctx2.fillStyle = 'rgb(50,20,5)';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        }
+                    }
                     if(a==this.tilesolid){
                         ctx2.globalAlpha = 1;
                         ctx2.fillStyle = 'brown';
@@ -2862,9 +2871,10 @@ setInterval(() => {
                         ctx2.fillStyle = 'grey';
                         ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
                     }
-                    if(a==this.tileminable){
+                    if(a==this.tilemineable){
+                        
                         ctx2.globalAlpha = 0.8;
-                        ctx2.fillStyle = 'rgb(140,80,30)';
+                        ctx2.fillStyle = 'rgb(180,180,30)';
                         ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
                     }
                 }
@@ -3128,7 +3138,8 @@ setInterval(() => {
         new turret() 
     );
 
-
+    offscreenCanvas.width=window.innerWidth-32;
+    offscreenCanvas.height=window.innerHeight-32;
     gameloop=setInterval(doGameLoop2,15);
     function doGameLoop2(){
         myCanvas.height = window.innerHeight-32;
@@ -3276,9 +3287,11 @@ setInterval(() => {
             //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
         }
         if(Controller.MiniMap==true){
-            offscreenCanvas.width=window.innerWidth-32;
-            offscreenCanvas.height=window.innerHeight-32;
-
+            //offscreenCanvas.width=window.innerWidth-32;
+            //offscreenCanvas.height=window.innerHeight-32;
+            if(Math.random()<.1){
+            //ctx2.fillStyle = 'black'
+            //ctx.fillRect(0,0,ctx2.width,ctx2.height)
             mymap.updateimage();    
             mymap.drawladder();
             for(var i=0;i<myflyingmonster.length;i++){
@@ -3286,7 +3299,15 @@ setInterval(() => {
             }
             for(var i=0;i<mywalkingmonster.length;i++){
                 mywalkingmonster[i].draw();
+            }   
+            ctx2.globalAlpha = 0.25
+			ctx2.fillStyle = 'rgb(255,255,255)'
+			var x1=myplayer.mcx*mymap.tw
+			var y1=myplayer.mcy*mymap.th
+			ctx2.fillRect(x1,y1,mymap.tw*myplayer.maptileswidth,mymap.th*myplayer.maptilesheight)
+
             }
+
             ctx2.globalAlpha=1;
             //ctx2.fillStyle="#FFFF00";
             //ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
