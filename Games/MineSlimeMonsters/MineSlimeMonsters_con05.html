@@ -74,7 +74,7 @@ setInterval(() => {
         for(var i=0;i<16;i++){
             if(myGamepad.buttons[i].pressed==true)a=i
         }
-        if(a!=-1)console.log(a)
+        //if(a!=-1)console.log(a)
         
         Controller.Left = false
         Controller.Right = false
@@ -144,6 +144,383 @@ setInterval(() => {
     var startingeggfreq = 0.2 //0 to 1 0 is none 1 is full
     var maxflyingmonsters=30
     var maxwalkingmonsters=30
+
+    class growslime{
+        constructor(){
+            this.map
+            this.w,this.h
+            this.tw,this.th
+            this.openx
+            this.openy
+            this.slimetile=10
+            this.slimestartx,this.slimestarty
+
+            this.w = Math.floor(mymap.mmw * 2)
+            this.h = Math.floor(mymap.mmh * 2)
+            this.tw = tilewidth/2//'mymap.tw * 2
+            this.th = tileheight/2//'mymap.th * 2+2
+            //map = New Int[w,h]
+            this. map = create2DArray(this.w,this.h)
+            //copy the map from the game into this map
+            for(var y=0 ;y<mymap.mmh;y+=1){
+                for(var x=0;x<mymap.mmw;x+=1){
+                    for(var y2=0;y2<2;y2+=1){
+                        for(var x2=0;x2<2;x2+=1){
+                            this.map[(x*2)+x2][(y*2)+y2] = mymap.mapfinal[x][y]			
+                        }
+                    }
+                }
+            }
+            //create the active slime list
+            this.openx = []
+            this.openy = []
+            this.findslimestartpos()
+            this.openx.push(this.slimestartx)
+            this.openy.push(this.slimestarty)
+            this.map[this.slimestartx][this.slimestarty]=this.slimetile
+        }
+        findslimestartpos(){
+            for(var y=this.h-1;y>=0;y-=1){
+                for(var x=0;x<this.w;x+=1){
+                    if(this.map[x][y] == 1){ 
+                        this.slimestartx = Math.floor(x)
+                        this.slimestarty = Math.floor(y)
+                        return
+                    }
+                }
+            }
+        }
+        remove(x,y){		
+            this.map[x][y] = mymap.tileempty
+            var rem=false
+            var tmpx = []
+            var tmpy = []
+            for(var i=0;i<this.openx.length;i+=1){
+                if(this.openx[i] == x && this.openy[i] == y){
+                    //map[x,y] = mymap.tileempty
+                    rem = true
+                }else{
+                    tmpx.push(x)
+                    tmpy.push(y)
+                }
+            }
+            if(rem == false)return
+            this.openx = []
+            this.openy = []
+            for(var i=0;i<tmpx.length;i+=1){
+                this.openx.push(tmpx[i])
+                this.openy.push(tmpy[i])
+            }
+        }
+        update(speed){
+            var freq
+            if(this.speed == "slow"){
+                this.freq = 120
+            }else{
+                this.freq = 20
+            }
+            
+            //every now And then check if we can restore growth
+            if(randomRange(0,1500) < 2){
+                for(var y=0;y<mymap.mmw*2;y+=1){
+                    for(var x=0;x<mymap.mmh*2;x+=1){
+                        if(mygrowslime.map[x][y] == mymap.tileslime){					
+                            for(var i=0;i<this.openx.length;i+=1){
+                                if(this.openx[i] == x && this.openy[i] == y)continue
+                            }					
+                            var cnt=0
+                            for(var y2=y-1;y2<=y+1;y2+=1){
+                                for(var x2=x-1;x2<=x+1;x2+=1){
+                                    if(mygrowslime.map[x2][y2] == mymap.tileempty){
+                                        cnt+=1
+                                    }
+                                }
+                            }
+                            if(cnt<9){
+                                this.addslime(x,y)
+                            }					
+                        }
+                    }
+                }
+            }
+            
+            // Tentacle check
+            // Every now and then check if active slime part is in range
+            // of player/enemy and then check if path is clear and if so
+            // then initiate tentacle.
+            // Grab player
+            for(var i=0;i<this.openx.length;i+=1){
+                var x1 = this.openx[i] * (myplayer.tw/2)
+                var y1 = this.openy[i] * (myplayer.th/2)
+                var pcx = myplayer.px+(myplayer.pw/2)
+                var pcy = myplayer.py+(myplayer.ph/2)
+                // grab walking monster
+                if(randomRange(0,300) < 2){
+                    for(var i2=0;i2<mywalkingmonster.length;i2+=1){
+                        var mcx=mywalkingmonster[i2].px+(mywalkingmonster[i2].w/2)
+                        var mcy=mywalkingmonster[i2].py+(mywalkingmonster[i2].h/2)
+                        if(distanceM(mcx,mcy,x1,y1) < 200){
+                            var an = getangle(x1,y1,mcx,mcy)
+                            var mx = Math.cos(an)
+                            var my = Math.sin(an)
+                            var x2 = x1
+                            var y2 = y1
+                            for(var i3=0;i3<200;i3+=1){
+                                x2 += mx
+                                y2 += my
+                                if(mymap.mapcollide(x2,y2,mywalkingmonster[i2].w,mywalkingmonster[i2].h) == true){
+                                    break
+                                }
+                                if(distanceM(x2,y2,mcx,mcy) < 50){
+                                    //NOTE:
+                                    //mytentacle.Add(New tentacle(x1,y1,mcx,mcy))					
+                                    break
+                                }
+                            }
+                            break
+                        }
+                    }
+                }
+
+                // grab monster
+                if(randomRange(0,300) < 2){
+                    for(var i2=0;i2<myflyingmonster.length;i2+=1){
+                        var mcx=myflyingmonster[i2].px+(myflyingmonster[i2].w/2)
+                        var mcy=myflyingmonster[i2].py+(myflyingmonster[i2].h/2)
+                        if(distanceM(mcx,mcy,x1,y1) < 200){
+                            var an = getangle(x1,y1,mcx,mcy)
+                            var mx = Math.cos(an)
+                            var my = Math.sin(an)
+                            var x2 = x1
+                            var y2 = y1
+                            for(var i3=0;i3<200;i3+=1){
+                                x2 += mx
+                                y2 += my
+                                if(mymap.mapcollide(x2,y2,myflyingmonster[i2].w,myflyingmonster[i2].h) == true){
+                                    break
+                                }
+                                if(distanceM(x2,y2,mcx,mcy) < 50){
+                                    //NOTE:
+                                    //mytentacle.Add(New tentacle(x1,y1,mcx,mcy))					
+                                    break
+                                }
+                            }
+                            break
+                        }
+                    }
+                }
+                //grab player
+                if(randomRange(0,300)<2 && distanceM(pcx,pcy,x1,y1) < 200){ 
+                    var an = getangle(x1,y1,pcx,pcy)
+                    var mx = Math.cos(an)
+                    var my = Math.sin(an)
+                    var x2 = x1
+                    var y2 = y1
+                    for(var i2=0;i2<200;i2+=1){
+                        x2 += mx
+                        y2 += my
+                        if(mymap.mapcollide(x2,y2,myplayer.pw,myplayer.ph) == true){
+                            break
+                        }
+                        if(distanceM(x2,y2,pcx,pcy) < 50){
+                            //NOTE:
+                            //mytentacle.Add(New tentacle(x1,y1,pcx,pcy))					
+                            break
+                        }
+                    }
+                    break
+                }			
+            }
+
+
+            
+            // Expand Slime		
+            for(var i=0;i<this.openx.length;i+=1){
+                if(randomRangeFloat(0,this.freq) > 2)continue
+                var x2=this.openx[i]
+                var y2=this.openy[i]
+                //bottom bleft or bright first
+                var r=randomRange(0,6)
+                if(r==0 && y2+1<this.h && this.map[x2][y2+1] == 1){
+                    this.addslime(x2,y2+1)
+                    continue
+                }
+                if(r==1 && x2-1 >=0 && y2+1 <this.h && this.map[x2-1][y2+1] == 1){
+                    this.addslime(x2-1,y2+1)
+                    continue
+                }
+                if(r==2 && y2+1<this.h && this.map[x2+1][y2+1] == 1){
+                    this.addslime(x2+1,y2+1)
+                    continue
+                }
+                // left Or right Then
+                r = randomRange(0,2)
+                if(r==0 && x2-1>=0 && this.map[x2-1][y2] == 1){
+                    this.addslime(x2-1,y2)
+                    continue
+                }
+                if(r==1 && x2+1<this.w && this.map[x2+1][y2] == 1){
+                    this.addslime(x2+1,y2)
+                    continue
+                }
+                // up lup and rup
+                r = randomRange(0,23)
+                if(r==0 && y2-1>=0 && this.map[x2][y2-1] == 1){
+                    this.addslime(x2,y2-1)
+                    continue
+                }
+                if(r==1 && x2-1>=0 && y2-1>=0 && this.map[x2-1][y2-1] == 1){
+                    this.addslime(x2-1,y2-1)
+                    continue
+                }
+                if(r==2 && x2+1<this.w && y2-1>=0 && this.map[x2+1][y2-1] == 1){
+                    this.addslime(x2+1,y2-1)
+                    continue
+                }
+            }
+            
+            var tx=[]
+            var ty=[]
+            // Remove Obsolete slime
+            
+            for(var i=0;i<this.openx.length;i+=1){
+                var cnt=0
+                for(var y=-1;y<=1;y+=1){
+                    for(var x=-1;x<=1;x+=1){
+                        var x2=this.openx[i]+x
+                        var y2=this.openy[i]+y
+                        
+                        if(x2<0 || y2<0 || x2>=this.w || y2>=this.h){
+                            cnt+=1
+                            continue
+                        }				
+                        if(this.map[x2][y2] == 10)cnt+=1
+                        if(this.map[x2][y2] == 0)cnt+=1
+                        //if map[x2,y2] = 1 Then cnt+=1
+                        //If map[x2,y2] <> 1 Then cnt+=1
+                    }
+                }		
+                if(cnt==9){
+                    //openx.Remove(i)
+                    //openy.Remove(i)
+                    }else{
+                    tx.push(this.openx[i])
+                    ty.push(this.openy[i])
+                }
+            }
+            this.openx = []
+            this.openy = []
+            for(var i=0;i<tx.length;i+=1){
+                this.openx.push(tx[i])
+                this.openy.push(ty[i])
+            }
+            
+            // Remove open slime where no slimetiles are underneath
+            tx = []
+            ty = []
+            for(var i=0;i<this.openx.length;i+=1){
+                if(this.map[this.openx[i]][this.openy[i]] == this.slimetile){
+                    tx.push(this.openx[i])
+                    ty.push(this.openy[i])
+                    }else{
+                }
+            }
+            this.openx = []
+            this.openy = []
+            for(var i=0;i<tx.length;i+=1){
+                this.openx.push(tx[i])
+                this.openy.push(ty[i])
+            }
+
+        }
+
+        slimecollide(x,y,w,h,remove){
+            if(remove == true && randomRange(0,20) > 2)remove=false
+            var mmw=mymap.mmw
+            var mmh=mymap.mmh
+            var lefttopx		=Math.floor(((x)/tilewidth))
+            var lefttopy		=Math.floor(((y)/tileheight))
+            var righttopx		=Math.floor(((x+w)/tilewidth))
+            var righttopy		=Math.floor(((y)/tileheight))
+            var leftbottomx	    =Math.floor(((x)/tilewidth))
+            var leftbottomy	    =Math.floor(((y+h)/tileheight))
+            var rightbottomx	=Math.floor(((x+w)/tilewidth))												
+            var rightbottomy	=Math.floor(((y+h)/tileheight))
+            //
+            //		If lefttopx < 0 Or lefttopx >= mmw Then return True
+            //		If lefttopy < 0 Or lefttopy >= mmh Then return True
+            //		If righttopx < 0 Or righttopx >= mmw Then return True
+            //		If righttopy < 0 Or righttopy >= mmh Then return True
+            //		If leftbottomx < 0 Or leftbottomx >= mmw Then return True
+            //		If leftbottomy < 0 Or leftbottomy >= mmh Then return True
+            //		If rightbottomx < 0 Or rightbottomx >= mmw Then return True
+            //		If rightbottomy < 0 Or rightbottomy >= mmh Then return True
+            //	
+            for(var y2=0;y2<=1;y2+=1){
+            for(var x2=0;x2<=1;x2+=1){
+                    if(mygrowslime.map[lefttopx*2+x2][lefttopy*2+y2] == mymap.tileslime){	
+                        if(remove == true){				
+                            this.removeslime(lefttopx*2+x2,lefttopy*2+y2)
+                        }
+                        return true
+                    }
+                    if(mygrowslime.map[righttopx*2+x2][righttopy*2+y2] == mymap.tileslime){			
+                        if(remove == true){
+                            this.removeslime(righttopx*2+x2,righttopy*2+y2)
+                        }
+                        return true
+                    }
+                    if(mygrowslime.map[leftbottomx*2+x2][leftbottomy*2+y2] == mymap.tileslime){			
+                        if(remove == true){
+                            this.removeslime(leftbottomx*2+x2,leftbottomy*2+y2)
+                        }
+                        return true
+                    }
+                    if(mygrowslime.map[rightbottomx*2+x2][rightbottomy*2+y2] == mymap.tileslime){			
+                        if(remove == true){
+                            this.removeslime(rightbottomx*2+x2,rightbottomy*2+y2)
+                        }
+                        return true						
+                    }
+                }
+            }
+                return false
+        }	
+        removeslime(x,y){
+            for(var y2=y-1;y2<=y+1;y2+=1){
+                for(var x2=x-1;x2<=x+1;x2+=1){
+                    mygrowslime.remove(x2,y2)
+                }
+            }
+        }
+
+        addslime(sx,sy){
+            if(mymap.mapcollide((sx/2)*tilewidth,(sy/2)*tileheight,tilewidth/2,tileheight/2))return
+            //console.log("add slime here:"+sx+","+sy)
+            this.openx.push(sx)
+            this.openy.push(sy)
+            this.map[sx][sy] = this.slimetile
+        }
+
+        drawmap(){
+            // Draw the solid slimes ()
+            for(var y=0;y<this.h;y+=1){
+                for(var x=0;x<this.w;x+=1){
+                    var x1=x*mymap.tw/2
+                    var y1=y*mymap.th/2
+                    if(this.map[x][y] == this.slimetile){
+                        //console.log("a")
+                        ctx2.fillStyle='green'
+                        ctx2.fillRect(x1,y1,mymap.tw/2,mymap.th/2)
+                        //canvas.Color = Color.Green
+                        //canvas.DrawRect(x1,y1,mymap.tw/2,mymap.th/2)
+                    }            
+                }
+            }
+
+        }	
+    }
+
     //'
     //' Drop a number from a x,y position
     //' 
@@ -983,9 +1360,9 @@ setInterval(() => {
                 }
                 
                 //Collision with the slime
-                //if(mygrowslime.slimecollide(this.px-2,this.py-2,this.w+4,this.h+4,true)==true){
-                //    this.deleteme = true;
-                //}
+                if(mygrowslime.slimecollide(this.px-2,this.py-2,this.w+4,this.h+4,true)==true){
+                    this.deleteme = true;
+                }
                 
                 
                 //bouncy vertical
@@ -1217,10 +1594,10 @@ setInterval(() => {
                 if(this.slimed==false){ 
                     
 
-                    //if(this.slimecollide(this.px-this.w,this.py-this.h,this.w*2.5,this.h*2.5)){
-                    //    this.slimed = true; 
-                    //    continue;
-                // }
+                    if(this.slimecollide(this.px-this.w,this.py-this.h,this.w*2.5,this.h*2.5)){
+                        this.slimed = true; 
+                        continue;
+                    }
                     //bounce ceiling
                     
                     if(this.mapcollide(this.px,this.py-2,1,this.h)==true){ 			
@@ -1414,14 +1791,14 @@ setInterval(() => {
                     return;
                 }		
                 
-                /*
+                
                 // Collision with the slime
                 if(mygrowslime.slimecollide(this.px-2,this.py-2,this.w+4,this.h+4,true)==true){
                     this.deleteme = true;
                     return;
                     //'Print Millisecs()
                 }		
-                */
+                
                 
                 // Collision with bullet and walking monster
                 for(var i=0;i<mywalkingmonster.length;i++){
@@ -2146,10 +2523,10 @@ setInterval(() => {
                     }
                     //End Select	
 
-                    /*
+                    
                     //draw the slime			
-                    for(var y4=0;y2< 2;y4++){
-                        for(var x4=0;x4< 2;x4++){
+                    for(var y4=0;y4< 2;y4++){
+                       for(var x4=0;x4< 2;x4++){
                             if(mygrowslime.map[Math.floor((x2*2)+x4)][Math.floor((y2*2)+y4)] == 10){
                                 //canvas.Color = Color.Green
                                 //canvas.DrawRect(x3+(x4*(mygrowslime.tw)),y3+(y4*(mygrowslime.th)),mygrowslime.tw,mygrowslime.th)
@@ -2158,7 +2535,7 @@ setInterval(() => {
                              }
                         }
                     }
-                    */
+                    
 
                 }
             }
@@ -3176,6 +3553,7 @@ setInterval(() => {
     var mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
     //var myc=new player();
     var myplayer=new player();
+    var mygrowslime = new growslime();
     var mybullet = [];
     var mygrenade = [];
     var myfrag = [];
@@ -3226,6 +3604,10 @@ setInterval(() => {
 
         //  UPDATES
         //
+        // grow slime monster
+        //for(var i=0;i<2;i+=1){
+        mygrowslime.update("slow")
+        //}
 		//update the towns people
 		for(i=0;i<mytownperson.length;i++){
 			mytownperson[i].update();
@@ -3384,6 +3766,7 @@ setInterval(() => {
             //ctx.fillRect(0,0,ctx2.width,ctx2.height)
             mymap.updateimage();    
             mymap.drawladder();
+            mygrowslime.drawmap();
              
             ctx2.globalAlpha = 0.25
 			ctx2.fillStyle = 'rgb(255,255,255)'
