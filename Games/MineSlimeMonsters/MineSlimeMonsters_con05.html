@@ -1386,7 +1386,7 @@ setInterval(() => {
                 //Case "left"
                     this.x-=1						
                     if(mymap.mapfinal[this.x-1][this.y]  != mymap.tileempty)this.substate="right"
-                    if(x<3)this.substate="right"
+                    if(this.x<3)this.substate="right"
                     // if flying on the ground level)move up 1 tile
                     if(mymap.mapfinal[this.x][this.y+1]  != mymap.tileempty)this.y-=1
                     if(mymap.mapfinal[this.x][this.y-1]  != mymap.tileempty)this.y+=1
@@ -2885,6 +2885,12 @@ setInterval(() => {
                         ctx.fillRect(x3,y3,this.tw,this.th);
                     }
                     
+                    //if(mymap.tilemap[x2][y2]>=0 && mymap.tilemap[x2][y2]<=2){
+                    if(y2>16){
+                        //if(mymap.tilemap[x2][y2]>30)console.log(mymap.tilemap[x2][y2])
+                        drawTile(x3,y3,mymap.tilemap[x2][y2])
+                    }
+                    //}
                     // mymap.mapfinal[x2,y2]
                     if(mymap.mapfinal[x2][y2]== mymap.tileempty){
                         if(y2>16){
@@ -2892,7 +2898,7 @@ setInterval(() => {
                             //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],0],x3,y3)
                             //ctx.fillStyle = 'rgb(80,35,20)';
                             //ctx.fillRect(x3,y3,this.tw,this.th);
-                            ctx.drawImage(tileImage,0,0,32,32,x3,y3,tilewidth,tileheight);
+                            //ctx.drawImage(tileImage,0,0,32,32,x3,y3,tilewidth,tileheight);
                             
                         }
                         //canvas.Color = Color.Brown
@@ -2904,7 +2910,7 @@ setInterval(() => {
                             //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],1],x3,y3)
                             //ctx.fillStyle = 'rgb(100,40,20)';
                             //ctx.fillRect(x3,y3,this.tw,this.th);
-                            ctx.drawImage(tileImage,0,32,32,32,x3,y3,tilewidth,tileheight);
+                            //ctx.drawImage(tileImage,0,32,32,32,x3,y3,tilewidth,tileheight);
                         }
                         //canvas.Color = Color.Black
                         //canvas.DrawRect(x3,y3,tw,th)
@@ -2936,7 +2942,7 @@ setInterval(() => {
                         //canvas.DrawRect(x3,y3,tw,th)
                         //ctx.fillStyle = 'yellow';
                         //ctx.fillRect(x3,y3,this.tw,this.th);
-                        ctx.drawImage(tileImage,0,64,32,32,x3,y3,tilewidth,tileheight);
+                        //ctx.drawImage(tileImage,0,64,32,32,x3,y3,tilewidth,tileheight);
                     }
                     //End Select	
 
@@ -2959,7 +2965,7 @@ setInterval(() => {
 
 
 
-
+            
 
 
 
@@ -3276,7 +3282,7 @@ setInterval(() => {
             //this.mapladderimage:Image
             //this.mapladdercanvas:Canvas
             this.mapdoor=[];//New Int[1,1]
-            this.maptilevariation=[];//New Int[1,1]
+            //this.maptilevariation=[];//New Int[1,1]
             this.tilesolid=0;
             this.tileempty=1;
             this.tileegg=3;
@@ -3294,12 +3300,12 @@ setInterval(() => {
             //mapcanvas = New Canvas(mapimage)
             //mapladderimage = New Image(sw,sh)
             //mapladdercanvas = New Canvas(mapladderimage)
-            this.maptilevariation = create2DArray(mapwidth,mapheight);//New Int[mapwidth,mapheight]
-            for(var y=0;y<mapheight;y++){
-                for(var x=0;x<mapwidth;x++){
-                    this.maptilevariation[x][y] = Math.floor(Math.random()*4);
-                }
-            }
+            //this.maptilevariation = create2DArray(mapwidth,mapheight);//New Int[mapwidth,mapheight]
+            //for(var y=0;y<mapheight;y++){
+            //    for(var x=0;x<mapwidth;x++){
+            //        this.maptilevariation[x][y] = Math.floor(Math.random()*4);
+            //    }
+            //}
             this.tw = this.sw/this.mmw;
             this.th = this.sh/this.mmh;
             //map = New Int[mw,mh]
@@ -3327,9 +3333,165 @@ setInterval(() => {
             this.updateladderimage();
             this.updateimage();
 
+            this.tilemap = []
+            this.tilemap = create2DArray(this.mmw,this.mmh)
+            this.makeTilemap()
+            //for(var y=0;y<this.mmh;y+=1){
+            //for(var x=0;x<this.mmw;x+=1){
+            //    if(this.tilemap[x][y]==42)console.log("asdasdasd")
+            //}}
 
         }
-        
+        makeTilemap(){
+            //this.tilesolid=0;
+            //this.tileempty=1;
+            //this.tileegg=3;
+            //this.tileturret=4;
+            //this.tileslime=10;
+            //this.tilemineable=50;
+            for(var y=0;y<this.mmh;y+=1){
+                for(var x=0;x<this.mmh;x+=1){
+                    // cave background
+                    if(this.mapfinal[x][y]==this.tileempty){
+                        this.tilemap[x][y] = this.randomBag([0,1,2])
+                    }
+                    // cave solid
+                    if(this.mapfinal[x][y]==this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([20,21])
+                    }
+                }
+            }
+            // shadow pass
+            for(var y=0;y<this.mmh;y+=1){
+                for(var x=0;x<this.mmh;x+=1){
+                    // shadow cave background if on its left
+                    // is a solid tile
+                    if(this.mapBound(x-1,y) && this.mapfinal[x][y]==this.tileempty && this.mapfinal[x-1][y]==this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([6,7,8])
+                    }
+                    // shadow cave background if above empty is solid tile  
+                    if(this.mapBound(x,y-1) && this.mapfinal[x][y]==this.tileempty && this.mapfinal[x][y-1]==this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([12,13,14])
+                    }
+
+                }
+            }
+            // light surface pass
+            for(var y=0;y<this.mmh;y+=1){
+                for(var x=0;x<this.mmh;x+=1){
+                    if(this.mapBound(x,y-1) && this.mapfinal[x][y]==this.tilesolid && this.mapfinal[x][y-1]==this.tileempty){
+                        this.tilemap[x][y] = this.randomBag([24])
+                    }
+                    if(this.mapBound(x,y-1) && this.mapfinal[x][y]==this.tilesolid && this.mapfinal[x][y-1]==this.tileegg){
+                        this.tilemap[x][y] = this.randomBag([24])
+                    }
+                }
+            }
+            // shadow corners
+            for(var y=0;y<this.mmh;y+=1){
+                for(var x=0;x<this.mmh;x+=1){
+                    if( this.mapBound(x-1,y)==true && 
+                        this.mapBound(x,y-1)==true && 
+                        this.mapfinal[x][y]     ==  this.tileempty && 
+                        this.mapfinal[x-1][y-1]   ==  this.tilesolid &&
+                        this.mapfinal[x][y-1]   ==  this.tileempty &&
+                        this.mapfinal[x-1][y]   ==  this.tileempty){
+                        this.tilemap[x][y] = this.randomBag([3,4,5])
+                    }
+                    if( this.mapBound(x-1,y)==true && 
+                        this.mapBound(x,y-1)==true && 
+                        this.mapfinal[x][y]     ==  this.tileempty && 
+                        this.mapfinal[x-1][y]   ==  this.tilesolid &&
+                        this.mapfinal[x][y-1]   ==  this.tilesolid &&
+                        this.mapfinal[x-1][y-1]   ==  this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([9,10,11])
+                    }
+                    if( this.mapBound(x-1,y)==true && 
+                        this.mapBound(x,y-1)==true && 
+                        this.mapfinal[x][y]     ==  this.tileempty && 
+                        this.mapfinal[x-1][y]   ==  this.tileempty &&
+                        this.mapfinal[x][y-1]   ==  this.tilesolid &&
+                        this.mapfinal[x-1][y-1]   ==  this.tileempty){
+                        this.tilemap[x][y] = this.randomBag([15,16,17])
+                    }
+
+                }
+            }
+            // Gold ore vains
+            for(var y=0;y<this.mmh;y+=1){
+                for(var x=0;x<this.mmh;x+=1){
+                    if(  
+                        this.mapBound(x,y-1)==true && this.mapBound(x,y+1)==true &&
+                        this.mapfinal[x][y]     ==  this.tilemineable && 
+                        this.mapfinal[x][y-1]   ==  this.tilemineable && 
+                        this.mapfinal[x][y+1]   ==  this.tilemineable){
+                        this.tilemap[x][y] = this.randomBag([40,41])                      
+                    }
+
+                    if(  
+                        this.mapBound(x,y-1)==true && 
+                        this.mapfinal[x][y]     ==  this.tilemineable && 
+                        this.mapfinal[x][y-1]   ==  this.tilesolid){
+
+                        this.tilemap[x][y] = this.randomBag([42,43])   //42 43
+                                            
+                    }
+                    if(  
+                        this.mapBound(x,y+1)==true && 
+                        this.mapfinal[x][y]     ==  this.tilemineable && 
+                        this.mapfinal[x][y+1]   ==  this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([44,45])//44 45
+
+                    }
+
+                }
+            }
+            // Gold ore vains corners
+            for(var y=0;y<this.mmh;y+=1){
+                for(var x=0;x<this.mmh;x+=1){
+                    // corners right side  
+                    if(  
+                        this.mapBound(x+1,y)==true && this.mapBound(x,y-1)==true &&
+                        this.mapfinal[x][y]     ==  this.tilemineable && 
+                        this.mapfinal[x+1][y]   ==  this.tilesolid && 
+                        this.mapfinal[x][y-1]   ==  this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([48])                      
+                    }
+                   if(  
+                        this.mapBound(x+1,y)==true && this.mapBound(x,y+1)==true &&
+                        this.mapfinal[x][y]     ==  this.tilemineable && 
+                        this.mapfinal[x+1][y]   ==  this.tilesolid && 
+                        this.mapfinal[x][y+1]   ==  this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([49])                      
+                    }
+                    // corners left side
+                   if(  
+                        this.mapBound(x-1,y)==true && this.mapBound(x,y-1)==true &&
+                        this.mapfinal[x][y]     ==  this.tilemineable && 
+                        this.mapfinal[x-1][y]   ==  this.tilesolid && 
+                        this.mapfinal[x][y-1]   ==  this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([46])                      
+                    }
+                   if(  
+                        this.mapBound(x-1,y)==true && this.mapBound(x,y+1)==true &&
+                        this.mapfinal[x][y]     ==  this.tilemineable && 
+                        this.mapfinal[x-1][y]   ==  this.tilesolid && 
+                        this.mapfinal[x][y+1]   ==  this.tilesolid){
+                        this.tilemap[x][y] = this.randomBag([47])                      
+                    }
+                }
+            }
+            
+        }
+        // return random of inputted array
+        randomBag(a){
+            return a[Math.floor(Math.random()*a.length)]
+        }
+        // stay within map bound 
+        mapBound(x,y){
+            if(x<0 || x>=this.mmw || y<0 || y>=this.mmh)return false
+            return true
+        }
         // Here we create the parts on the mapfinal that can be mined
         // by the player (like in minecraft/digger) tilemineable
         createfinalmineable(){
@@ -3348,7 +3510,7 @@ setInterval(() => {
                     if (this.mapfinal[x1+1][y1+3] != this.tileempty) continue;
                     // See how far left we can go
                     var len=0;			
-                    for(var x2=x1;x2<3;x2-=1){
+                    for(var x2=x1;x2>3;x2-=1){
                         if (this.mapfinal[x2][y1] != this.tilesolid)break;
                         if (this.mapfinal[x2][y1+1] != this.tilesolid)break;
                         if (this.mapfinal[x2][y1+2] != this.tilesolid)break;
@@ -3357,10 +3519,12 @@ setInterval(() => {
                         len+=1;
                     }
                     // If we can go deep enough then prepare mineshaft
+                    //console.log(len)
                     if(len<=10)continue;
                     len = randomRange(7,len);
-                    for(var x2=x1;x2<x1-(len-3);x2-=1){
+                    for(var x2=x1;x2>x1-(len-3);x2-=1){
                         for(var y2=y1+1;y2<y1+4;y2++){ 
+                            
                             this.mapfinal[x2][y2] = this.tilemineable;
                         }
                     }
@@ -3812,6 +3976,7 @@ setInterval(() => {
             if(kind=="frag")chance = 10;
             if(randomRange(0,chance) < 2){
                 mymap.mapfinal[x][y] = mymap.tileempty;
+                mymap.tilemap[x][y] = mymap.randomBag([0,1,2])
                 myitem.push(
                     new item(
                         (x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"
@@ -3913,58 +4078,7 @@ setInterval(() => {
 
     c.addEventListener("touchend", touchHandler);
     c.addEventListener("touchstart", touchHandler);
-    
-    var tmap = [
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1,0,0,2,0,0,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
-        [1,1,1,1,1,1,1,1,0,0,2,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-        [1,0,0,0,2,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-        [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1],
-        [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    ]
-
-    var tilemap = [];
-
-    // Copy an array and make it a copy
-    // that you can modify without modifying\
-    // the original.
-    for (var i = 0; i < tmap.length; i++)
-    tilemap[i] = tmap[i].slice();
-
-
-    for(y=0;y<tmap.length;y++){
-        for(x=0;x<tmap[0].length;x++){
-            if(tmap[y][x]==1 && tilemap[y][x]==1){
-                if(Math.random()<.25 && x+1<tmap[0].length && tmap[y][x+1]==1){
-                    tilemap[y][x]=4;
-                    tilemap[y][x+1]=5;
-                }else{
-                    tilemap[y][x]=Math.floor(Math.random()*3)+1;
-                }
-            }
-            if(tmap[y][x]==2){
-                if(tmap[y-1][x]==1){
-                    tilemap[y][x]=6;
-                    //map[y][x]=0;
-                }
-                if(tmap[y+1][x]==0){
-                    tilemap[y][x]=7;
-                }
-                if(tmap[y-1][x]==2 && tmap[y+1][x]==2){
-                    tilemap[y][x]=8;
-                }
-            }
-        }
-    }
-
+ 
     var [colx,coly,colw,colh] = [80,80,50,50];
     var debug;
     var lasttouchx,lasttouchy;
@@ -4262,84 +4376,7 @@ setInterval(() => {
             }
         }
     }
-    function doGameLoop(){
-        myCanvas.height = window.innerHeight-32;
-        myCanvas.width = window.innerWidth-32;
-        tw = Math.floor(myCanvas.width,tmap[0].length); 	
-        th = Math.floor(myCanvas.height,tmap.length);
-        ctx.clearRect(0,0,c.width,c.height);
-        ctx.fillStyle="rgb(0,0,0)";
-        ctx.fillRect(0,0,c.width,c.height);
-
-
-        // Draw the tile map..
-        tw = 32;
-        th = 32;
-        // using the camx and camy variables.
-        // get the tile left and top and bottom and right
-        // of the screen. Draw between these tiles from the map.
-        var lt = Math.floor(-camx / tw);
-        var tt = Math.floor(-camy / th);
-        var rt = Math.floor((-camx / tw)+((myCanvas.width/tw)))+1;
-        var bt = Math.floor((-camy / th)+((myCanvas.height/th)))+1;
-        for(var y = tt; y < bt; ++y) {
-            for(var x = lt; x < rt; ++x) {
-                if(x>=0 && y>=0 && x<tmap[0].length && y<tmap.length){
-                    var dx = (x*tw)+camx;
-                    var dy = (y*th)+camy;
-
-                    if(tilemap[y][x]==1){
-                            ctx.drawImage(img,32,0,16,16,dx,dy,tw,th);
-                    }
-                    if(tilemap[y][x]==2){
-                        ctx.drawImage(img,32,16,16,16,dx,dy,tw,th);
-                    }
-                    if(tilemap[y][x]==3){
-                        ctx.drawImage(img,56,16,16,16,dx,dy,tw,th);
-                    }
-                    if(tilemap[y][x]==4){
-                        ctx.drawImage(img,56,0,16,16,dx,dy,tw,th);
-                    }
-                    if(tilemap[y][x]==5){
-                        ctx.drawImage(img,72,0,16,16,dx,dy,tw,th);
-                    }
-                    if(tilemap[y][x]==6){
-                        ctx.drawImage(img,0,0,24,16,dx-tw/4,dy,tw+tw/2,th);
-                    }
-                    if(tilemap[y][x]==7){
-                        ctx.drawImage(img,8,32,16,16,dx+tw/4,dy,tw,th);
-                    }
-                    if(tilemap[y][x]==8){
-                        ctx.drawImage(img,8,16,16,16,dx+tw/4,dy,tw,th);
-                    }
-
-                    if(tilemap[y][x]==0){
-                        ctx.fillStyle = 'rgb(10,4,1)';
-                        ctx.fillRect(dx,dy,tw,th);
-                    }
-                }
-            }
-        }
-        autoscr();
-
-        var z = rectmapcollide(colx,coly,colw,colh,0,0);
-        ctx.globalAlpha = .5;
-        if(z===false){
-            ctx.fillStyle='yellow';
-        }
-        if(z===true){
-            ctx.fillStyle='red';
-        }
-
-        ctx.fillRect(colx,coly,colw,colh);
-        ctx.globalAlpha = 1;
-        ctx.fillStyle="rgb(255,255,255)";
-        ctx.fillText("Drawing a tilemap example."+debug,10,10); 
-
-    }
-
-
-
+   
 
 
     function touchHandler(e){
@@ -4619,6 +4656,7 @@ setInterval(() => {
     }	
    // tile - Draw a tile from the level tile(s) atlas
     function drawTile(x,y,tile){
+        
         //var row = tile % maxRows
         //var column = tile / maxRows
         ctx.drawImage(tileImage,tileAtlasIndex[tile].x,tileAtlasIndex[tile].y,tileImageCellSize,tileImageCellSize,
@@ -4634,9 +4672,9 @@ setInterval(() => {
         var tile = 0
         for(var j=0;j<(tileImageHeight/tileImageCellSize);j+=1){
             for(var i=0;i<(tileImageWidth/tileImageCellSize);i+=1){            
-                var row = tile % maxRows
-                var column = tile / maxRows                
-                tileAtlasIndex.push({x:row*tileImageCellSize,y:column*tileImageCellSize})
+                var row = Math.floor(tile % maxRows)
+                var column = Math.floor(tile / maxRows)                
+                tileAtlasIndex.push({x:Math.floor(row*tileImageCellSize),y:Math.floor(column*tileImageCellSize)})
                 tile+=1;
             }
         }
