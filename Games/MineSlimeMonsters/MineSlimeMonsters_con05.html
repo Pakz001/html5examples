@@ -27,7 +27,9 @@ Use different browser.
     // eggs get eaten by slime.
     // possible bug ai bottom of slime can pass through slime.
     //
-    //
+    // fix problems with laserwall slime and jumping monsters and flickering
+    // ai.
+    // 
     // Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
     //
     // When it gets around 5000 lines it should be close to converted.
@@ -75,7 +77,7 @@ setInterval(() => {
         for(var i=0;i<16;i++){
             if(myGamepad.buttons[i].pressed==true)a=i
         }
-        //if(a!=-1)console.log(a)
+        if(a!=-1)console.log(a)
         
         Controller.Left = false
         Controller.Right = false
@@ -85,6 +87,10 @@ setInterval(() => {
         Controller.ShotGun = false
         Controller.Grenade = false
         Controller.MiniMap = false
+        Controller.LaserWall = false
+        if(myGamepad.buttons[1].pressed==true){
+            Controller.LaserWall = true
+        }
         if(myGamepad.buttons[9].pressed==true){
             Controller.MiniMap = true
         }
@@ -158,179 +164,274 @@ setInterval(() => {
 
     var gamestate = "select" // menu and state we are in.
 
-class menuselect{
-	//this.image:Image	
-	//this.icanvas:Canvas
-    constructor(){
-		//image=New Image(800,600)
-		//image.Handle=New Vec2f( 0,0 )
-		//icanvas=New Canvas( image )
-		//icanvas.Clear(Color.Black)
-        this.delay = 0
-        this.maxDelay = 8
-    	this.m
-	    this.index=0
-		this.x1=50
-		this.y1=100
-		this.w1=150
-		this.h1=150
-		this.sw1=150
-		this.sh1=150
-        this.m1 = create2DArray(this.w1,this.h1)
-		//SeedRnd(1)
-		var m = new map(this.sw1,this.sh1,this.w1,this.h1)
-        for(var x = 0;x<this.w1;x+=1){
-            for(var y = 0;y<this.h1;y+=1){
-                this.m1[x][y] = m.mapfinal[x][y]
-            }
+    class laserwall{
+        constructor(x,y){
+            // bottom x and y and top x and y
+            this.bx,this.by
+            this.tx,this.ty
+            this.deleteme
+
+            if(this.toclosetoother(x,y))return
+            this.bx = x
+            this.by = this.getbottomtile(x,y)
+            this.tx = x
+            this.ty = this.gettoptile(x,y-10)		
         }
-		//drawmap(icanvas,x,y,w,h)
-		this.x2 = 200
-		this.y2 = 100
-		this.w2 = 250
-		this.h2 = 250
-		this.sw2 = 250
-		this.sh2 = 250
-        this.m2 = create2DArray(this.w2,this.h2)
-		var m = new map(this.sw2,this.sh2,this.w2,this.h2)
-        for(var x = 0;x<this.w2;x+=1){
-            for(var y = 0;y<this.h2;y+=1){
-                this.m2[x][y] = m.mapfinal[x][y]
-            }
-        }
-		//drawmap(icanvas,x,y,w,h)
-		this.x3 = 450
-		this.y3 = 100
-		this.w3 = 300
-		this.h3 = 300
-		this.sw3 = 300
-		this.sh3 = 300
-        this.m3 = create2DArray(this.w3,this.h3)
-		var m = new map(this.sw3,this.sh3,this.w3,this.h3)
-        for(var x = 0;x<this.w3;x+=1){
-            for(var y = 0;y<this.h3;y+=1){
-                this.m3[x][y] = m.mapfinal[x][y]
-            }
-        }
-		//drawmap(icanvas,x,y,w,h)		
-		//icanvas.Flush()		
-    }
-	update(){
         
-		//if(Controller..KeyReleased(Key.Escape) Then App.Terminate()	
-        if(this.delay<this.maxDelay)this.delay+=1
-		if(this.delay+1>=this.maxDelay && Controller.Left==true){
-            this.index-=1;
-            this.delay=0
-        }
-		if(this.delay+1>=this.maxDelay && Controller.Right==true){
-            this.index+=1;
-            this.delay=0
-        }
-		if(this.index<0)this.index = 0
-		if(this.index>2)this.index = 2
-		if(Controller.ShotGun==true){
-			if(this.index==0){
-				mapwidth = 150
-				mapheight = 150
+        update(){
+            return  
+            /*
+            // Make flying enemies turn into other direction
+            // if close by
+            For Local i:=Eachin myflyingmonster
+                //If i.laserwait<>0 Then Continue
+                Local mx
+                If i.substate="right" Then mx=5 Else mx = -5
+                If rectsoverlap(i.px-i.w+mx,i.py-i.h,i.w*3,i.h*3,tx-20,ty,40,(by-ty))
+                //i.laserwait=160
+                If i.substate="right" 
+                    i.substate="left" 
+                    i.x-=1
+                    i.px -= 6
+                Else 
+                    i.substate="right"
+                    i.x+=1
+                    i.px += 6
+                    
+                }
+                
+                }
             }
-			if(this.index==1){
-				mapwidth = 250
-				mapheight = 250
-            }
-            if(this.index==2){
-				mapwidth = 300
-				mapheight = 300
-            }
-			//resetmap(screenwidth,screenheight)
-			gamestate="setup"			
+        */
         }
-    }
-	draw(){
-		//canvas.DrawImage(image,0,0)
-		ctx2.fillStyle='white'
-        ctx2.save()
-        ctx2.scale(2,2)
-        ctx2.fillText("Use Cursor left and Right to select Button(fire) to Play",0,10)
-        ctx2.scale(1,1)
-        ctx2.restore()
-        //canvas.DrawText("Use Cursor left and Right to select Enter to Play",0,0)
-		//canvas.PushMatrix()
-		//canvas.Scale(2,2)
-		//canvas.DrawText("Select Difficulty",400/2,50/2,.5,.5)
-		//canvas.PopMatrix()
-		//canvas.Color = Color.Yellow
-		var x=50
-		var y=100
-		var w=150
-		var h=150
-		if(this.index == 0){ 
-			this.mydrawrect(x,y,w,h)
-			this.mydrawrect(x+1,y+1,w-2,h-2)
-        }
-		x = 200
-		y = 100
-		w = 250
-		h = 250
-		if(this.index == 1){ 
-			this.mydrawrect(x,y,w,h)
-			this.mydrawrect(x+1,y+1,w-2,h-2)
-        }
-		x = 450
-		y = 100
-		w = 300
-		h = 300
-		if(this.index == 2){ 
-			this.mydrawrect(x,y,w,h)
-			this.mydrawrect(x+1,y+1,w-2,h-2)
-        }
-    }
-	drawmap(){
-        ctx2.fillStyle='black'
-        ctx2.fillRect(0,0,screenwidth,screenheight)
-        var x,y,w,h
-        for(var i=0;i<3;i+=1){
-            if(i==0){
-                x = this.x1
-                y = this.y1
-                w = this.w1
-                h = this.h1
-            }
-            if(i==1){
-                x = this.x2
-                y = this.y2
-                w = this.w2
-                h = this.h2
-            }
-            if(i==2){
-                x = this.x3
-                y = this.y3
-                w = this.w3
-                h = this.h3
-            }
+        draw(){
+            var dx=(screenwidth)/(mapwidth)
+            var dy=(screenheight)/(mapheight)
+            var x1=(tx/tilewidth)*dx
+            var y1=(ty/tileheight)*dy
+            var x2=(bx/tilewidth)*dx
+            var y2=(by/tileheight)*dy
+            var h=y2-y1
             
-            for(var y1=0;y1<h;y1+=1){
-                for(var x1=0;x1<w;x1+=1){
-                    var a;
-                    if(i==0)a = this.m1[x1][y1]
-                    if(i==1)a = this.m2[x1][y1]
-                    if(i==2)a = this.m3[x1][y1]
-                    if(a==1){
-                        ctx2.fillStyle = 'rgb(255,255,255)'
-                        ctx2.fillRect(x1+x,y1+y,1,1)
-                    } 
+            canvas.Color = Color.Yellow
+            //SetColor 255,0,0		
+            canvas.DrawRect(x1+1,y1+1,3,h)
+
+        }	
+        // return true if new laserwall is to close to
+        // existing laser wall
+        toclosetoother(x,y){
+            for(var i=0;i<mylaserwall.length;i+=1){
+                if(distanceM(x,y,mylaserwall[i].tx,mylaserwall[i].ty) < tilewidth*4)return true
+                if(distanceM(x,y,mylaserwall[i].bx,mylaserwall[i].by) < tilewidth*4)return true
+            }
+            return false
+        }
+        
+        // Get the y position of bottom of the first tile above
+        getbottomtile(x,y){
+            var y2=y			
+            var cnt=0
+            while(cnt<10000){
+                cnt+=1
+                if(mymap.mapcollide(x,y2,2,2))return y2
+                y2+=1
+            }
+            return y
+            //NOTE:
+        }
+        
+        //Get the y position of the top of the first tile below
+        gettoptile(x,y){
+            var y2=y
+            var cnt=0
+            while(cnt<1000){
+                cnt+=1
+                if(mymap.mapcollide(x,y2,2,2))return y2
+                y2-=1
+            }
+            return y
+            //NOTE
+        }
+
+    }
+
+    //
+    // Menu selection (choose 3 level sizes - untested for restarts) NOTE:
+    //
+    class menuselect{
+        //this.image:Image	
+        //this.icanvas:Canvas
+        constructor(){
+            //image=New Image(800,600)
+            //image.Handle=New Vec2f( 0,0 )
+            //icanvas=New Canvas( image )
+            //icanvas.Clear(Color.Black)
+            this.delay = 0
+            this.maxDelay = 8
+            this.m
+            this.index=0
+            this.x1=50
+            this.y1=100
+            this.w1=150
+            this.h1=150
+            this.sw1=150
+            this.sh1=150
+            this.m1 = create2DArray(this.w1,this.h1)
+            //SeedRnd(1)
+            var m = new map(this.sw1,this.sh1,this.w1,this.h1)
+            for(var x = 0;x<this.w1;x+=1){
+                for(var y = 0;y<this.h1;y+=1){
+                    this.m1[x][y] = m.mapfinal[x][y]
+                }
+            }
+            //drawmap(icanvas,x,y,w,h)
+            this.x2 = 200
+            this.y2 = 100
+            this.w2 = 250
+            this.h2 = 250
+            this.sw2 = 250
+            this.sh2 = 250
+            this.m2 = create2DArray(this.w2,this.h2)
+            var m = new map(this.sw2,this.sh2,this.w2,this.h2)
+            for(var x = 0;x<this.w2;x+=1){
+                for(var y = 0;y<this.h2;y+=1){
+                    this.m2[x][y] = m.mapfinal[x][y]
+                }
+            }
+            //drawmap(icanvas,x,y,w,h)
+            this.x3 = 450
+            this.y3 = 100
+            this.w3 = 300
+            this.h3 = 300
+            this.sw3 = 300
+            this.sh3 = 300
+            this.m3 = create2DArray(this.w3,this.h3)
+            var m = new map(this.sw3,this.sh3,this.w3,this.h3)
+            for(var x = 0;x<this.w3;x+=1){
+                for(var y = 0;y<this.h3;y+=1){
+                    this.m3[x][y] = m.mapfinal[x][y]
+                }
+            }
+            //drawmap(icanvas,x,y,w,h)		
+            //icanvas.Flush()		
+        }
+        update(){
+            
+            //if(Controller..KeyReleased(Key.Escape) Then App.Terminate()	
+            if(this.delay<this.maxDelay)this.delay+=1
+            if(this.delay+1>=this.maxDelay && Controller.Left==true){
+                this.index-=1;
+                this.delay=0
+            }
+            if(this.delay+1>=this.maxDelay && Controller.Right==true){
+                this.index+=1;
+                this.delay=0
+            }
+            if(this.index<0)this.index = 0
+            if(this.index>2)this.index = 2
+            if(Controller.ShotGun==true){
+                if(this.index==0){
+                    mapwidth = 150
+                    mapheight = 150
+                }
+                if(this.index==1){
+                    mapwidth = 250
+                    mapheight = 250
+                }
+                if(this.index==2){
+                    mapwidth = 300
+                    mapheight = 300
+                }
+                //resetmap(screenwidth,screenheight)
+                gamestate="setup"			
+            }
+        }
+        draw(){
+            //canvas.DrawImage(image,0,0)
+            ctx2.fillStyle='white'
+            ctx2.save()
+            ctx2.scale(2,2)
+            ctx2.fillText("Use Cursor left and Right to select Button(fire) to Play",0,10)
+            ctx2.scale(1,1)
+            ctx2.restore()
+            //canvas.DrawText("Use Cursor left and Right to select Enter to Play",0,0)
+            //canvas.PushMatrix()
+            //canvas.Scale(2,2)
+            //canvas.DrawText("Select Difficulty",400/2,50/2,.5,.5)
+            //canvas.PopMatrix()
+            //canvas.Color = Color.Yellow
+            var x=50
+            var y=100
+            var w=150
+            var h=150
+            if(this.index == 0){ 
+                this.mydrawrect(x,y,w,h)
+                this.mydrawrect(x+1,y+1,w-2,h-2)
+            }
+            x = 200
+            y = 100
+            w = 250
+            h = 250
+            if(this.index == 1){ 
+                this.mydrawrect(x,y,w,h)
+                this.mydrawrect(x+1,y+1,w-2,h-2)
+            }
+            x = 450
+            y = 100
+            w = 300
+            h = 300
+            if(this.index == 2){ 
+                this.mydrawrect(x,y,w,h)
+                this.mydrawrect(x+1,y+1,w-2,h-2)
+            }
+        }
+        drawmap(){
+            ctx2.fillStyle='black'
+            ctx2.fillRect(0,0,screenwidth,screenheight)
+            var x,y,w,h
+            for(var i=0;i<3;i+=1){
+                if(i==0){
+                    x = this.x1
+                    y = this.y1
+                    w = this.w1
+                    h = this.h1
+                }
+                if(i==1){
+                    x = this.x2
+                    y = this.y2
+                    w = this.w2
+                    h = this.h2
+                }
+                if(i==2){
+                    x = this.x3
+                    y = this.y3
+                    w = this.w3
+                    h = this.h3
+                }
+                
+                for(var y1=0;y1<h;y1+=1){
+                    for(var x1=0;x1<w;x1+=1){
+                        var a;
+                        if(i==0)a = this.m1[x1][y1]
+                        if(i==1)a = this.m2[x1][y1]
+                        if(i==2)a = this.m3[x1][y1]
+                        if(a==1){
+                            ctx2.fillStyle = 'rgb(255,255,255)'
+                            ctx2.fillRect(x1+x,y1+y,1,1)
+                        } 
+                    }
                 }
             }
         }
-    }
-	mydrawrect(x,y,w,h){
+        mydrawrect(x,y,w,h){
 
-		drawLine(x,y,x+w,y,'white',3,ctx2)
-		drawLine(x+w,y,x+w,y+h,'white',3,ctx2)
-		drawLine(x,y,x,y+h,'white',3,ctx2)
-		drawLine(x,y+h,x+w,y+h,'white',3,ctx2)
+            drawLine(x,y,x+w,y,'white',3,ctx2)
+            drawLine(x+w,y,x+w,y+h,'white',3,ctx2)
+            drawLine(x,y,x,y+h,'white',3,ctx2)
+            drawLine(x,y+h,x+w,y+h,'white',3,ctx2)
+        }
     }
-}
 
     //
     // The tentacle for the growing slime monster
@@ -1055,34 +1156,38 @@ class menuselect{
             return false
 
         }
-        laserwall(){
-            /*
-            for(var i=0;i<mylaserwall.length;i+=1){
-                if(rectsoverlap((this.px-this.w)+(randomRange(-this.w,this.w)),this.py-this.h,this.w*2,this.h*2,mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
-                    return true
-                } 
-            }
-            */
-            return false
-        }
         collidelaserwall(x,y,w1,h1){
-            /*
+        
+            
             for(var i=0;i<mylaserwall.length;i+=1){
-                if(rectsoverlap((x-w1)+(randomRange(-w1,w1)),y-h1,w1*2,h1*2,mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
+                if(rectsoverlap((x-w1)+(randomRangeFloat(-w1,w1)),y-h1,w1*2,
+                                h1*2,mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
                     return true
                 } 
             }
-            */
             return false
             
-        }	
+        }
+        laserwall(){
+            //return false;
+            
+            for(var i=0;i<mylaserwall.length;i+=1){
+                if(rectsoverlap(    (this.px-this.w)+(randomRangeFloat(-this.w,this.w)),
+                                    this.py-this.h,this.w*2,this.h*2,
+                                    mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
+                    return true
+                } 
+        }
+            return false
+            
+        }
         changedirection(){
             this.state = "roam"
             if(this.substate == "left"){
                 this.substate="right" 
                 this.x += 2		
                 }else{
-                substate="left"
+                this.substate="left"
                 this.x -= 2
             }
         }	
@@ -1247,7 +1352,7 @@ class menuselect{
             if(this.px > this.x*this.w)this.px -= this.sx
             if(this.py < this.y*this.h)this.py += this.sy
             if(this.py > this.y*this.h)this.py -= this.sy
-            //if(laserwall()==true)changedirection()
+            if(this.laserwall()==true)this.changedirection()
             if(distanceM(this.px,this.py,this.x*this.w,this.y*this.h) > 8)return
             //Select state
             if(this.state=="hatched"){
@@ -1382,26 +1487,29 @@ class menuselect{
             return true
         }
         collidelaserwall(x,y,w1,h1){
-            return false;
-            /*
-            for(var i=Eachin mylaserwall
-                If rectsoverlap((x-w1)+(Rnd(-w1,w1)),y-h1,w1*2,h1*2,i.tx-5,i.ty,10,i.by-i.ty)
-                    return True
+        
+            
+            for(var i=0;i<mylaserwall.length;i+=1){
+                if(rectsoverlap((x-w1)+(randomRangeFloat(-w1,w1)),y-h1,w1*2,
+                                h1*2,mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
+                    return true
                 } 
-            Next
-            return False
-            */
+            }
+            return false
+            
         }
         laserwall(){
-            return false;
-            /*
-            For var i:=Eachin mylaserwall
-                If rectsoverlap((this.px-w)+(Rnd(-w,w)),this.py-h,w*2,h*2,i.tx-5,i.ty,10,i.by-i.ty)
-                    return True
+            //return false;
+            
+            for(var i=0;i<mylaserwall.length;i+=1){
+                if(rectsoverlap(    (this.px-this.w)+(randomRangeFloat(-this.w,this.w)),
+                                    this.py-this.h,this.w*2,this.h*2,
+                                    mylaserwall[i].tx-5,mylaserwall[i].ty,10,mylaserwall[i].by-mylaserwall[i].ty)){
+                    return true
                 } 
-            Next
-            return False
-            */
+        }
+            return false
+            
         }
         changedirection(){
             this.state = "roam"
@@ -2504,6 +2612,10 @@ class menuselect{
             if(Controller.LaserWall==true){//If Keyboard.KeyReleased(Key.L)
                 Controller.LaserWall=false;
                 //mylaserwall.Add(New laserwall(px,py+ph))
+                mylaserwall.push(
+                    new laserwall(
+                        this.px,this.py+this.ph) 
+                );
             }
         }
         //
@@ -3080,7 +3192,7 @@ class menuselect{
             //canvas.OutlineMode=OutlineMode.None	
             
             
-            /*
+            
             // Draw the laser walls
             
             //For Local i:=Eachin mylaserwall
@@ -3099,7 +3211,7 @@ class menuselect{
                 ctx.fillRect(x2-4,y2,8,4);
                 ctx.fillRect(x2-4,y2+h-4,8,4);
             }
-            */
+            
 
             
             //
@@ -3361,7 +3473,7 @@ class menuselect{
                 }
                 }
                 }
-        //'		End If
+        //'		}
                 // door left side of tunnel
                 if(this.mapfinal[x-1][y-1] == 0){
                 if(this.mapfinal[x][y] == 0){
@@ -3875,6 +3987,7 @@ class menuselect{
     var mynumberfall = [];
     var mytentacle = [];
     var mytownperson = [];
+    var mylaserwall = [];
     offscreenCanvas.width=window.innerWidth-32;
     offscreenCanvas.height=window.innerHeight-32;
     gameloop=setInterval(doGameLoop2,15);
@@ -3945,7 +4058,21 @@ class menuselect{
                 mytownperson[i].update();
             }
 
-        // update the tentacles
+            // update the laserwall
+            if(mylaserwall.length>0){
+                //Update the laserwall
+                for(var i=0;i<mylaserwall.length;i++){
+                    mylaserwall[i].update();
+                
+                }
+                // remove laserwall from list
+                for(var i=mylaserwall.length-1;i>=0;i-=1){
+                    if(mylaserwall[i].deleteme == true){
+                        mylaserwall.splice(i, 1);
+                    }
+                }		
+            }
+            // update the tentacles
             if(mytentacle.length>0){
                 //Update the tentacles
                 for(var i=0;i<mytentacle.length;i++){
@@ -4083,7 +4210,7 @@ class menuselect{
                 //If Keyboard.KeyDown(Key.LeftControl) 
                 //	myplayer.userscrollmap()
                 //	tp=True
-                //End If
+                //}
                 if(tp==false){
                     myplayer.updateplayercontrols()
                 }
