@@ -2148,10 +2148,10 @@ setInterval(() => {
             //'		If rightbottomy < 0 Or rightbottomy >= mmh Then Return True
             //'	
             
-            //If mygrowslime.map[lefttopx*2,lefttopy*2] = mymap.tileslime Then Return True
-            //If mygrowslime.map[righttopx*2,righttopy*2] = mymap.tileslime Then Return True
-            //If mygrowslime.map[leftbottomx*2,leftbottomy*2] = mymap.tileslime Then Return True
-            //If mygrowslime.map[rightbottomx*2,rightbottomy*2] = mymap.tileslime Then Return True						
+            if(mygrowslime.map[Math.floor(lefttopx*2)][Math.floor(lefttopy*2)] == mymap.tileslime)return true
+            if(mygrowslime.map[Math.floor(righttopx*2)][Math.floor(righttopy*2)] == mymap.tileslime)return true
+            if(mygrowslime.map[Math.floor(leftbottomx*2)][Math.floor(leftbottomy*2)] == mymap.tileslime)return true
+            if(mygrowslime.map[Math.floor(rightbottomx*2)][Math.floor(rightbottomy*2)] == mymap.tileslime)return true						
         
             return false;
         }	
