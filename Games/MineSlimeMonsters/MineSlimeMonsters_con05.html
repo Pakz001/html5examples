@@ -156,7 +156,181 @@ setInterval(() => {
     var maxflyingmonsters=30
     var maxwalkingmonsters=30
 
-    var gamestate = "" // menu and state we are in.
+    var gamestate = "select" // menu and state we are in.
+
+class menuselect{
+	//this.image:Image	
+	//this.icanvas:Canvas
+    constructor(){
+		//image=New Image(800,600)
+		//image.Handle=New Vec2f( 0,0 )
+		//icanvas=New Canvas( image )
+		//icanvas.Clear(Color.Black)
+        this.delay = 0
+        this.maxDelay = 8
+    	this.m
+	    this.index=0
+		this.x1=50
+		this.y1=100
+		this.w1=150
+		this.h1=150
+		this.sw1=150
+		this.sh1=150
+        this.m1 = create2DArray(this.w1,this.h1)
+		//SeedRnd(1)
+		var m = new map(this.sw1,this.sh1,this.w1,this.h1)
+        for(var x = 0;x<this.w1;x+=1){
+            for(var y = 0;y<this.h1;y+=1){
+                this.m1[x][y] = m.mapfinal[x][y]
+            }
+        }
+		//drawmap(icanvas,x,y,w,h)
+		this.x2 = 200
+		this.y2 = 100
+		this.w2 = 250
+		this.h2 = 250
+		this.sw2 = 250
+		this.sh2 = 250
+        this.m2 = create2DArray(this.w2,this.h2)
+		var m = new map(this.sw2,this.sh2,this.w2,this.h2)
+        for(var x = 0;x<this.w2;x+=1){
+            for(var y = 0;y<this.h2;y+=1){
+                this.m2[x][y] = m.mapfinal[x][y]
+            }
+        }
+		//drawmap(icanvas,x,y,w,h)
+		this.x3 = 450
+		this.y3 = 100
+		this.w3 = 300
+		this.h3 = 300
+		this.sw3 = 300
+		this.sh3 = 300
+        this.m3 = create2DArray(this.w3,this.h3)
+		var m = new map(this.sw3,this.sh3,this.w3,this.h3)
+        for(var x = 0;x<this.w3;x+=1){
+            for(var y = 0;y<this.h3;y+=1){
+                this.m3[x][y] = m.mapfinal[x][y]
+            }
+        }
+		//drawmap(icanvas,x,y,w,h)		
+		//icanvas.Flush()		
+    }
+	update(){
+        
+		//if(Controller..KeyReleased(Key.Escape) Then App.Terminate()	
+        if(this.delay<this.maxDelay)this.delay+=1
+		if(this.delay+1>=this.maxDelay && Controller.Left==true){
+            this.index-=1;
+            this.delay=0
+        }
+		if(this.delay+1>=this.maxDelay && Controller.Right==true){
+            this.index+=1;
+            this.delay=0
+        }
+		if(this.index<0)this.index = 0
+		if(this.index>2)this.index = 2
+		if(Controller.ShotGun==true){
+			if(this.index==0){
+				mapwidth = 150
+				mapheight = 150
+            }
+			if(this.index==1){
+				mapwidth = 250
+				mapheight = 250
+            }
+            if(this.index==2){
+				mapwidth = 300
+				mapheight = 300
+            }
+			//resetmap(screenwidth,screenheight)
+			gamestate="setup"			
+        }
+    }
+	draw(){
+		//canvas.DrawImage(image,0,0)
+		ctx2.fillStyle='white'
+        ctx2.save()
+        ctx2.scale(2,2)
+        ctx2.fillText("Use Cursor left and Right to select Button(fire) to Play",0,10)
+        ctx2.scale(1,1)
+        ctx2.restore()
+        //canvas.DrawText("Use Cursor left and Right to select Enter to Play",0,0)
+		//canvas.PushMatrix()
+		//canvas.Scale(2,2)
+		//canvas.DrawText("Select Difficulty",400/2,50/2,.5,.5)
+		//canvas.PopMatrix()
+		//canvas.Color = Color.Yellow
+		var x=50
+		var y=100
+		var w=150
+		var h=150
+		if(this.index == 0){ 
+			this.mydrawrect(x,y,w,h)
+			this.mydrawrect(x+1,y+1,w-2,h-2)
+        }
+		x = 200
+		y = 100
+		w = 250
+		h = 250
+		if(this.index == 1){ 
+			this.mydrawrect(x,y,w,h)
+			this.mydrawrect(x+1,y+1,w-2,h-2)
+        }
+		x = 450
+		y = 100
+		w = 300
+		h = 300
+		if(this.index == 2){ 
+			this.mydrawrect(x,y,w,h)
+			this.mydrawrect(x+1,y+1,w-2,h-2)
+        }
+    }
+	drawmap(){
+        ctx2.fillStyle='black'
+        ctx2.fillRect(0,0,screenwidth,screenheight)
+        var x,y,w,h
+        for(var i=0;i<3;i+=1){
+            if(i==0){
+                x = this.x1
+                y = this.y1
+                w = this.w1
+                h = this.h1
+            }
+            if(i==1){
+                x = this.x2
+                y = this.y2
+                w = this.w2
+                h = this.h2
+            }
+            if(i==2){
+                x = this.x3
+                y = this.y3
+                w = this.w3
+                h = this.h3
+            }
+            
+            for(var y1=0;y1<h;y1+=1){
+                for(var x1=0;x1<w;x1+=1){
+                    var a;
+                    if(i==0)a = this.m1[x1][y1]
+                    if(i==1)a = this.m2[x1][y1]
+                    if(i==2)a = this.m3[x1][y1]
+                    if(a==1){
+                        ctx2.fillStyle = 'rgb(255,255,255)'
+                        ctx2.fillRect(x1+x,y1+y,1,1)
+                    } 
+                }
+            }
+        }
+    }
+	mydrawrect(x,y,w,h){
+
+		drawLine(x,y,x+w,y,'white',3,ctx2)
+		drawLine(x+w,y,x+w,y+h,'white',3,ctx2)
+		drawLine(x,y,x,y+h,'white',3,ctx2)
+		drawLine(x,y+h,x+w,y+h,'white',3,ctx2)
+    }
+}
 
     //
     // The tentacle for the growing slime monster
@@ -3686,7 +3860,7 @@ setInterval(() => {
     var tw,th;
     var [camx,camy] = [0,0];
 
-
+    var mymenuselect = new menuselect()
     var mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
     //var myc=new player();
     var myplayer=new player();
@@ -3700,34 +3874,7 @@ setInterval(() => {
     var myturret = [];
     var mynumberfall = [];
     var mytentacle = [];
-	//'
-	//' Create the towns people
-	//'
-	var mytownperson = [];
-    for(var i=0;i<mapwidth/40;i++){
-        mytownperson.push(
-			new townperson(
-				randomRange(3,mapwidth/2-5),
-                16) 
-        );
-        mytownperson.push(
-			new townperson(
-				randomRange(mapwidth/2+5,mapwidth-5),
-                16)
-        );
-
-	    //mytownperson.Add(New townperson(Rnd(3,mapwidth/2-5),16))
-		//mytownperson.Add(New townperson(Rnd(mapwidth/2+5,mapwidth-5),16))
-    }
-    //
-    // add turrets
-    myturret.push(
-        new turret() 
-    );
-    myturret.push(
-        new turret() 
-    );
-
+    var mytownperson = [];
     offscreenCanvas.width=window.innerWidth-32;
     offscreenCanvas.height=window.innerHeight-32;
     gameloop=setInterval(doGameLoop2,15);
@@ -3740,204 +3887,252 @@ setInterval(() => {
         ctx.fillStyle="rgb(0,0,0)";
         ctx.fillRect(0,0,c.width,c.height);
 
-        //  UPDATES
-        //
-        // grow slime monster
-        //for(var i=0;i<2;i+=1){
-        mygrowslime.update("slow")
-        //}
-		//update the towns people
-		for(i=0;i<mytownperson.length;i++){
-			mytownperson[i].update();
-        }
 
-      // update the tentacles
-        if(mytentacle.length>0){
-            //Update the tentacles
-            for(var i=0;i<mytentacle.length;i++){
-                mytentacle[i].update();
+        if(gamestate=="select"){
             
-            }
-            // remove tentacle from list
-            for(var i=mytentacle.length-1;i>=0;i-=1){
-                if(mytentacle[i].deleteme == true){
-                    mytentacle.splice(i, 1);
-                }
-            }		
+            mymenuselect.update()
+            mymenuselect.drawmap()
+            mymenuselect.draw()
+            //mymenuselect.draw()   
+            ctx.drawImage(offscreenCanvas,0,0)
+
         }
-        // update the bullets
-        if(mybullet.length>0){
-            //Update the bullets
-            for(var i=0;i<mybullet.length;i++){
-                mybullet[i].update();
+        if(gamestate=="setup"){
+            myplayer=new player();
+            mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
+            //'
+            //' Create the towns people
+            //'
             
+            for(var i=0;i<mapwidth/40;i++){
+                mytownperson.push(
+                    new townperson(
+                        randomRange(3,mapwidth/2-5),
+                        16) 
+                );
+                mytownperson.push(
+                    new townperson(
+                        randomRange(mapwidth/2+5,mapwidth-5),
+                        16)
+                );
+
+                //mytownperson.Add(New townperson(Rnd(3,mapwidth/2-5),16))
+                //mytownperson.Add(New townperson(Rnd(mapwidth/2+5,mapwidth-5),16))
             }
-            // remove bullet from list
-            for(var i=mybullet.length-1;i>=0;i-=1){
-                if(mybullet[i].deleteme == true){
-                    mybullet.splice(i, 1);
-                }
-            }		
+            myturret = [];
+            //
+            // add turrets
+            myturret.push(
+                new turret() 
+            );
+            myturret.push(
+                new turret() 
+            );
+
+            gamestate = "play"
         }
-        // Update the grenades
-        if(mygrenade.length>0){
-            
-            //Update the grenades
-            for(var i=0;i<mygrenade.length;i++){
+        if(gamestate=="play"){
                 
-                mygrenade[i].update();
-                
-            }
-            // remove grenade from list
-            for(var i=mygrenade.length-1;i>=0;i-=1){
-                if(mygrenade[i].deleteme == true){
-                    mygrenade.splice(i, 1);
-                }
-            }		
-        }
-        // Update the frag
-        if(myfrag.length>0){            
-            //Update the frags
-            for(var i=0;i<myfrag.length;i++){                
-                myfrag[i].update();                
-            }
-            // remove frag from list
-            for(var i=myfrag.length-1;i>=0;i-=1){
-                if(myfrag[i].deleteme == true){
-                    myfrag.splice(i, 1);
-                }
-            }		
-        }
-        // Update the items
-        if(myitem.length>0){            
-            //Update the items
-            for(var i=0;i<myitem.length;i++){                
-                myitem[i].update();                
-            }
-            // remove item from list
-            for(var i=myitem.length-1;i>=0;i-=1){
-                if(myitem[i].deleteme == true){
-                    myitem.splice(i, 1);
-                }
-            }
-        }
-        // Update the flying monster
-        if(myflyingmonster.length>0){            
-            //Update the flying monster
-            for(var i=0;i<myflyingmonster.length;i++){ 
-                for(var j=0;j<1;j++){               
-                    myflyingmonster[i].update();
-                }              
-            }
-            // remove flying monster from list
-            for(var i=myflyingmonster.length-1;i>=0;i-=1){
-                if(myflyingmonster[i].deleteme == true){
-                    myflyingmonster.splice(i, 1);
-                }
-            }
-        }
-        // Update the walking monster
-        if(mywalkingmonster.length>0){            
-            //Update the walking monster
-            for(var i=0;i<mywalkingmonster.length;i++){ 
-                for(var j=0;j<1;j++){               
-                    mywalkingmonster[i].update();
-                }              
-            }
-            // remove walking monster from list
-            for(var i=mywalkingmonster.length-1;i>=0;i-=1){
-                if(mywalkingmonster[i].deleteme == true){
-                    mywalkingmonster.splice(i, 1);
-                }
-            }
-        }
-        // Update the falling numbers
-        if(mynumberfall.length>0){            
-            //Update the numbers
-            for(var i=0;i<mynumberfall.length;i++){ 
-                for(var j=0;j<1;j++){               
-                    mynumberfall[i].update();
-                }              
-            }
-            // remove falling numbers
-            for(var i=mynumberfall.length-1;i>=0;i-=1){
-                if(mynumberfall[i].deleteme == true){
-                    mynumberfall.splice(i, 1);
-                }
-            }
-        }
-        // Update the turret
-        if(myturret.length>0){            
-            //Update the turret
-            for(var i=0;i<myturret.length;i++){ 
-                for(var j=0;j<=1;j++){               
-                    myturret[i].update();
-                }              
-            }
-        }
-
-        if(myflyingmonster.length<maxflyingmonsters){
-        for(var i=0;i<=1;i++){
-            addflyingmonster();
-            addwalkingmonster();
-        }
-        }
-
-        //mymap.draw();
-		if(Controller.MiniMap==false){
-			var tp=false;
-			//If Keyboard.KeyDown(Key.LeftControl) 
-			//	myplayer.userscrollmap()
-			//	tp=True
-			//End If
-			if(tp==false){
-				myplayer.updateplayercontrols()
-            }
-			//canvas.Clear(Color.Black)
-			myplayer.draw()
-            ctx.scale(2,2);     
-            ctx.globalAlpha = 0.5;       
-            ctx.fillStyle = 'black';
-            ctx.fillRect(0,0,360,38);
-            ctx.fillStyle = 'white';
             
-		    ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
-		    ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
-            ctx.fillText(myflyingmonster.length,320,15);//debug
-            ctx.scale(1,1);
-            ctx.globalAlpha = 1;
-            //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
-        }
-        //ctx.drawImage(tileImage,0,0,32,32,0,0,32,32);
-        //drawTile(0,0,52)
-        if(Controller.MiniMap==true){
-            //offscreenCanvas.width=window.innerWidth-32;
-            //offscreenCanvas.height=window.innerHeight-32;
-            if(Math.random()<.1){
-            //ctx2.fillStyle = 'black'
-            //ctx.fillRect(0,0,ctx2.width,ctx2.height)
-            mymap.updateimage();    
-            mymap.drawladder();
-            mygrowslime.drawmap();
-             
-            ctx2.globalAlpha = 0.25
-			ctx2.fillStyle = 'rgb(255,255,255)'
-			var x1=myplayer.mcx*mymap.tw
-			var y1=myplayer.mcy*mymap.th
-			ctx2.fillRect(x1,y1,mymap.tw*myplayer.maptileswidth,mymap.th*myplayer.maptilesheight)
-
+            //  UPDATES
+            //
+            // grow slime monster
+            //for(var i=0;i<2;i+=1){
+            mygrowslime.update("slow")
+            //}
+            //update the towns people
+            for(i=0;i<mytownperson.length;i++){
+                mytownperson[i].update();
             }
 
-            ctx2.globalAlpha=1;
-            //ctx2.fillStyle="#FFFF00";
-            //ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
-            ctx.drawImage(offscreenCanvas,0,0);
-            for(var i=0;i<myflyingmonster.length;i++){
-                myflyingmonster[i].draw();
+        // update the tentacles
+            if(mytentacle.length>0){
+                //Update the tentacles
+                for(var i=0;i<mytentacle.length;i++){
+                    mytentacle[i].update();
+                
+                }
+                // remove tentacle from list
+                for(var i=mytentacle.length-1;i>=0;i-=1){
+                    if(mytentacle[i].deleteme == true){
+                        mytentacle.splice(i, 1);
+                    }
+                }		
             }
-            for(var i=0;i<mywalkingmonster.length;i++){
-                mywalkingmonster[i].draw();
-            } 
+            // update the bullets
+            if(mybullet.length>0){
+                //Update the bullets
+                for(var i=0;i<mybullet.length;i++){
+                    mybullet[i].update();
+                
+                }
+                // remove bullet from list
+                for(var i=mybullet.length-1;i>=0;i-=1){
+                    if(mybullet[i].deleteme == true){
+                        mybullet.splice(i, 1);
+                    }
+                }		
+            }
+            // Update the grenades
+            if(mygrenade.length>0){
+                
+                //Update the grenades
+                for(var i=0;i<mygrenade.length;i++){
+                    
+                    mygrenade[i].update();
+                    
+                }
+                // remove grenade from list
+                for(var i=mygrenade.length-1;i>=0;i-=1){
+                    if(mygrenade[i].deleteme == true){
+                        mygrenade.splice(i, 1);
+                    }
+                }		
+            }
+            // Update the frag
+            if(myfrag.length>0){            
+                //Update the frags
+                for(var i=0;i<myfrag.length;i++){                
+                    myfrag[i].update();                
+                }
+                // remove frag from list
+                for(var i=myfrag.length-1;i>=0;i-=1){
+                    if(myfrag[i].deleteme == true){
+                        myfrag.splice(i, 1);
+                    }
+                }		
+            }
+            // Update the items
+            if(myitem.length>0){            
+                //Update the items
+                for(var i=0;i<myitem.length;i++){                
+                    myitem[i].update();                
+                }
+                // remove item from list
+                for(var i=myitem.length-1;i>=0;i-=1){
+                    if(myitem[i].deleteme == true){
+                        myitem.splice(i, 1);
+                    }
+                }
+            }
+            // Update the flying monster
+            if(myflyingmonster.length>0){            
+                //Update the flying monster
+                for(var i=0;i<myflyingmonster.length;i++){ 
+                    for(var j=0;j<1;j++){               
+                        myflyingmonster[i].update();
+                    }              
+                }
+                // remove flying monster from list
+                for(var i=myflyingmonster.length-1;i>=0;i-=1){
+                    if(myflyingmonster[i].deleteme == true){
+                        myflyingmonster.splice(i, 1);
+                    }
+                }
+            }
+            // Update the walking monster
+            if(mywalkingmonster.length>0){            
+                //Update the walking monster
+                for(var i=0;i<mywalkingmonster.length;i++){ 
+                    for(var j=0;j<1;j++){               
+                        mywalkingmonster[i].update();
+                    }              
+                }
+                // remove walking monster from list
+                for(var i=mywalkingmonster.length-1;i>=0;i-=1){
+                    if(mywalkingmonster[i].deleteme == true){
+                        mywalkingmonster.splice(i, 1);
+                    }
+                }
+            }
+            // Update the falling numbers
+            if(mynumberfall.length>0){            
+                //Update the numbers
+                for(var i=0;i<mynumberfall.length;i++){ 
+                    for(var j=0;j<1;j++){               
+                        mynumberfall[i].update();
+                    }              
+                }
+                // remove falling numbers
+                for(var i=mynumberfall.length-1;i>=0;i-=1){
+                    if(mynumberfall[i].deleteme == true){
+                        mynumberfall.splice(i, 1);
+                    }
+                }
+            }
+            // Update the turret
+            if(myturret.length>0){            
+                //Update the turret
+                for(var i=0;i<myturret.length;i++){ 
+                    for(var j=0;j<=1;j++){               
+                        myturret[i].update();
+                    }              
+                }
+            }
+
+            if(myflyingmonster.length<maxflyingmonsters){
+            for(var i=0;i<=1;i++){
+                addflyingmonster();
+                addwalkingmonster();
+            }
+            }
+
+            //mymap.draw();
+            if(Controller.MiniMap==false){
+                var tp=false;
+                //If Keyboard.KeyDown(Key.LeftControl) 
+                //	myplayer.userscrollmap()
+                //	tp=True
+                //End If
+                if(tp==false){
+                    myplayer.updateplayercontrols()
+                }
+                //canvas.Clear(Color.Black)
+                myplayer.draw()
+                ctx.scale(2,2);     
+                ctx.globalAlpha = 0.5;       
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0,0,360,38);
+                ctx.fillStyle = 'white';
+                
+                ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
+                ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
+                ctx.fillText(myflyingmonster.length,320,15);//debug
+                ctx.scale(1,1);
+                ctx.globalAlpha = 1;
+                //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
+            }
+            //ctx.drawImage(tileImage,0,0,32,32,0,0,32,32);
+            //drawTile(0,0,52)
+            if(Controller.MiniMap==true){
+                //offscreenCanvas.width=window.innerWidth-32;
+                //offscreenCanvas.height=window.innerHeight-32;
+                if(Math.random()<.1){
+                //ctx2.fillStyle = 'black'
+                //ctx.fillRect(0,0,ctx2.width,ctx2.height)
+                mymap.updateimage();    
+                mymap.drawladder();
+                mygrowslime.drawmap();
+                
+                ctx2.globalAlpha = 0.25
+                ctx2.fillStyle = 'rgb(255,255,255)'
+                var x1=myplayer.mcx*mymap.tw
+                var y1=myplayer.mcy*mymap.th
+                ctx2.fillRect(x1,y1,mymap.tw*myplayer.maptileswidth,mymap.th*myplayer.maptilesheight)
+
+                }
+
+                ctx2.globalAlpha=1;
+                //ctx2.fillStyle="#FFFF00";
+                //ctx2.fillRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
+                ctx.drawImage(offscreenCanvas,0,0);
+                for(var i=0;i<myflyingmonster.length;i++){
+                    myflyingmonster[i].draw();
+                }
+                for(var i=0;i<mywalkingmonster.length;i++){
+                    mywalkingmonster[i].draw();
+                } 
+            }
         }
     }
     function doGameLoop(){
@@ -4266,19 +4461,19 @@ setInterval(() => {
         }
     }
 
-    function drawLine(x1,y1,x2,y2,stroke = 'black', width = 1) {
+    function drawLine(x1,y1,x2,y2,stroke = 'black', width = 1,c = ctx) {
         if (stroke) {
-            ctx.strokeStyle = stroke;
+            c.strokeStyle = stroke;
         }
 
         if (width) {
-            ctx.lineWidth = width;
+            c.lineWidth = width;
         }
 
-        ctx.beginPath();
-        ctx.moveTo(x1,y1);
-        ctx.lineTo(x2,y2);
-        ctx.stroke();
+        c.beginPath();
+        c.moveTo(x1,y1);
+        c.lineTo(x2,y2);
+        c.stroke();
     }
     function randomRange(min=0, max=1) {
         return Math.floor(Math.random() * (max - min) + min);
