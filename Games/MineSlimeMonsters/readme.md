@@ -32,6 +32,10 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 <br><br>
 
 
+Play NEW game in browser - controller / keyboard only -](https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/)
+
+<br><br>
+
 
 **Conversion notes :**
 * Usse a Xbox Controller(others untested)
