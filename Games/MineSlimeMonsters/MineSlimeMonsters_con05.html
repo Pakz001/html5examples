@@ -132,6 +132,16 @@ setInterval(() => {
         MiniMap:false,
     } 
 
+    // w and h of the tile image file
+    var tileImageWidth = 640
+    var tileImageHeight = 480;
+    var tileImageCellSize = 32;
+    var maxColumns = tileImageHeight/tileImageCellSize
+    var maxRows = tileImageWidth/tileImageCellSize
+    var tileAtlasIndex = [];
+    bufferTileAtlas() // Buffer the coordinates of the tile cells
+
+
     var mapwidth=320;
     var mapheight=240;
     var screenwidth=window.innerWidth+48;
@@ -3899,7 +3909,7 @@ setInterval(() => {
             //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
         }
         //ctx.drawImage(tileImage,0,0,32,32,0,0,32,32);
-
+        //drawTile(0,0,52)
         if(Controller.MiniMap==true){
             //offscreenCanvas.width=window.innerWidth-32;
             //offscreenCanvas.height=window.innerHeight-32;
@@ -4285,6 +4295,31 @@ setInterval(() => {
     function distanceM(x1,y1,x2,y2){
         return Math.abs(x2-x1)+Math.abs(y2-y1);
     }	
+   // tile - Draw a tile from the level tile(s) atlas
+    function drawTile(x,y,tile){
+        //var row = tile % maxRows
+        //var column = tile / maxRows
+        ctx.drawImage(tileImage,tileAtlasIndex[tile].x,tileAtlasIndex[tile].y,tileImageCellSize,tileImageCellSize,
+                        x,y,tilewidth,tileheight);
+        //        ctx.drawImage(tileImage,row*tileImageCellSize,
+        //                               column*tileImageCellSize,tileImageCellSize,tileImageCellSize,
+        //                               x,y,tilewidth,tileheight);
+    }
+    //
+    // Create a list of the cell coordinates in the tile atlas image. (optimize)
+    //
+    function bufferTileAtlas(){
+        var tile = 0
+        for(var j=0;j<(tileImageHeight/tileImageCellSize);j+=1){
+            for(var i=0;i<(tileImageWidth/tileImageCellSize);i+=1){            
+                var row = tile % maxRows
+                var column = tile / maxRows                
+                tileAtlasIndex.push({x:row*tileImageCellSize,y:column*tileImageCellSize})
+                tile+=1;
+            }
+        }
+    }
+
 
 </script>
 </body>
