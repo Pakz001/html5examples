@@ -145,6 +145,111 @@ setInterval(() => {
     var maxflyingmonsters=30
     var maxwalkingmonsters=30
 
+    var gamestate = "" // menu and state we are in.
+
+    //
+    // The tentacle for the growing slime monster
+    //
+    class tentacle{
+
+        constructor(basex,basey,targetx,targety){
+            this.basex,this.basey
+            this.targetx,this.targety
+            this.topx,this.topy
+            this.angle
+            this.mx,this.my
+            this.speed = 14
+            this.deleteme=false
+            this.state = "outgoing"
+            this.grabbed=false
+            this.grabbedx
+            this.grabbedy
+            this.basex = basex
+            this.basey = basey
+            this.topx = basex
+            this.topy = basey
+            this.targetx = targetx
+            this.targety = targety
+            this.angle = getangle(basex,basey,targetx,targety)
+            this.mx = Math.cos(this.angle)
+            this.my = Math.sin(this.angle)
+            console.log(this.basex+","+this.basey)
+        }
+        update(){
+            if(this.speed > 1)this.speed -= .1;
+            for(var movement=0;movement<this.speed;movement+=1){
+                this.topx += this.mx
+                this.topy += this.my
+                if(this.state == "outgoing"){
+                    //check collision with walkingmonster
+                    for(var i=0;i<mywalkingmonster.length;i+=1){
+                        var x=mywalkingmonster[i].px+(mywalkingmonster[i].w/2)
+                        var y=mywalkingmonster[i].py+(mywalkingmonster[i].h/2)
+                        if(distanceM(this.topx,this.topy,x,y) < 10){
+                            this.topx = mywalkingmonster[i].px
+                            this.topy = mywalkingmonster[i].py
+                            this.angle = getangle(this.topx,this.topy,this.basex,this.basey)
+                            this.mx = Math.cos(this.angle)
+                            this.my = Math.sin(this.angle)
+                            this.grabbed = true
+                            this.state = "ingoing"
+                            mywalkingmonster[i].deleteme = true
+                            break						
+                        }
+                    }
+
+                    //check collision with flyingmonster
+                    for(var i=0;i<myflyingmonster.length;i+=1){
+                        var x=myflyingmonster[i].px+(myflyingmonster[i].w/2)
+                        var y=myflyingmonster[i].py+(myflyingmonster[i].h/2)
+                        if(distanceM(this.topx,this.topy,x,y) < 10){
+                            this.topx = myflyingmonster[i].px
+                            this.topy = myflyingmonster[i].py
+                            this.angle = getangle(this.topx,this.topy,this.basex,this.basey)
+                            this.mx = Math.cos(this.angle)
+                            this.my = Math.sin(this.angle)
+                            this.grabbed = true
+                            this.state = "ingoing"
+                            myflyingmonster[i].deleteme = true
+                            break
+                        }
+                    }
+                    //check collision with player
+                    var x=myplayer.px+(myplayer.pw/2)
+                    var y=myplayer.py+(myplayer.ph/2)
+                    if(developmode == false && distanceM(x,y,this.topx,this.topy) < 20){
+                        this.mx = -this.mx
+                        this.my = -this.my
+                        this.state = "ingoing"
+                        myplayer.hp -= 10
+                        mynumberfall.push(
+                                new numberfall(
+                                    myplayer.px+(myplayer.pw/2),myplayer.py,10,'red'
+                                    ) 
+                        );
+                        //mynumberfall.Add(New numberfall(myplayer.px+(myplayer.pw/2),myplayer.py,10,Color.Red))
+                        if(myplayer.hp < 0){ 
+                            gamestate = "select"
+                            return
+                        }
+                    }
+                }	
+                if(this.state=="outgoing" && this.grabbed==false && distanceM(this.topx,this.topy,this.targetx,this.targety) < 10){ 
+                        this.state = "ingoing"
+                        this.mx = -this.mx
+                        this.my = -this.my
+                        return
+                }
+                if(this.state == "ingoing"){
+                    if(distanceM(this.topx,this.topy,this.basex,this.basey) < 10){
+                        this.deleteme = true
+                        return
+                    }
+                }
+            }
+        }	
+    }
+
     class growslime{
         constructor(){
             this.map
@@ -273,7 +378,12 @@ setInterval(() => {
                                 }
                                 if(distanceM(x2,y2,mcx,mcy) < 50){
                                     //NOTE:
-                                    //mytentacle.Add(New tentacle(x1,y1,mcx,mcy))					
+                                    //mytentacle.Add(New tentacle(x1,y1,mcx,mcy))	
+                                    mytentacle.push(
+                                        new tentacle(
+                                            x1,y1,mcx,mcy
+                                            ) 
+                                    );				
                                     break
                                 }
                             }
@@ -301,7 +411,12 @@ setInterval(() => {
                                 }
                                 if(distanceM(x2,y2,mcx,mcy) < 50){
                                     //NOTE:
-                                    //mytentacle.Add(New tentacle(x1,y1,mcx,mcy))					
+                                    //mytentacle.Add(New tentacle(x1,y1,mcx,mcy))	
+                                    mytentacle.push(
+                                        new tentacle(
+                                            x1,y1,mcx,mcy
+                                            ) 
+                                    );				
                                     break
                                 }
                             }
@@ -324,7 +439,12 @@ setInterval(() => {
                         }
                         if(distanceM(x2,y2,pcx,pcy) < 50){
                             //NOTE:
-                            //mytentacle.Add(New tentacle(x1,y1,pcx,pcy))					
+                            //mytentacle.Add(New tentacle(x1,y1,pcx,pcy))	
+                            mytentacle.push(
+                                new tentacle(
+                                    x1,y1,pcx,pcy
+                                    ) 
+                                );				
                             break
                         }
                     }
@@ -2737,14 +2857,16 @@ setInterval(() => {
             ctx.fillStyle = 'red';
             //For Local i:=Eachin myitem
             for(var i=0;i<myitem.length;i++){
+                
                 var x2=myitem[i].px-this.mcx*this.tw+this.mox;
                 var y2=myitem[i].py-this.mcy*this.th+this.moy;			
+                
                 //canvas.DrawCircle(x2,y2,3)
                 ctx.fillRect(x2,y2,3,3);
             }
             
 
-            /*
+            
             //
             //Draw the tentacles 
             //
@@ -2753,11 +2875,15 @@ setInterval(() => {
                 var x1=mytentacle[i].basex-this.mcx*this.tw+this.mox;
                 var y1=mytentacle[i].basey-this.mcy*this.th+this.moy;			
                 var x2=mytentacle[i].topx-this.mcx*this.tw+this.mox;
-                var y2=mytentacle[i].topy-this.mcy*this.th+this.moy;			
+                var y2=mytentacle[i].topy-this.mcy*this.th+this.moy;	
+
+                //var x2=myitem[i].px-this.mcx*this.tw+this.mox;
+                //var y2=myitem[i].py-this.mcy*this.th+this.moy;		
                 //canvas.Color = Color.Green
                 
                 //canvas.DrawLine(x1+x3,y1+y3,x2+x3,y2+y3)
-                drawLine(x1+x3,y1+y3,x2+x3,y2+y3,'green',4);
+                drawLine(x1,y1,x2,y2,'green',4);
+                //console.log(+mytentacle[i].basex+ ', '+mytentacle[i].basey)
                 if(mytentacle[i].grabbed == true){
                     //canvas.Color = Color.Red
                     //canvas.DrawRect(x2-(tilewidth/2),y2-(tileheight/2),tilewidth,tileheight)
@@ -2765,7 +2891,7 @@ setInterval(() => {
                     ctx.fillRect(x2-(tilewidth/2),y2-(tileheight/2),tilewidth,tileheight);
                 }
             }
-            */
+            
             //canvas.OutlineMode=OutlineMode.None	
             
             
@@ -3562,6 +3688,7 @@ setInterval(() => {
     var mywalkingmonster = [];    
     var myturret = [];
     var mynumberfall = [];
+    var mytentacle = [];
 	//'
 	//' Create the towns people
 	//'
@@ -3613,6 +3740,20 @@ setInterval(() => {
 			mytownperson[i].update();
         }
 
+      // update the tentacles
+        if(mytentacle.length>0){
+            //Update the tentacles
+            for(var i=0;i<mytentacle.length;i++){
+                mytentacle[i].update();
+            
+            }
+            // remove tentacle from list
+            for(var i=mytentacle.length-1;i>=0;i-=1){
+                if(mytentacle[i].deleteme == true){
+                    mytentacle.splice(i, 1);
+                }
+            }		
+        }
         // update the bullets
         if(mybullet.length>0){
             //Update the bullets
