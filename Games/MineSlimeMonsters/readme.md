@@ -1,5 +1,6 @@
-# Porting code : 3675 of 5000.
+# Porting code : 3766 of 5000.
 *(Monkey2 to Javascript)*
+<br>_04 and up requires Data/ folder<br>
 <br>Now with Game Controller(Xbox) Support)<br>
 <br>Working on gfx more(see below) and less typing because of numb hands..<br>
 
