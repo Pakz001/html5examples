@@ -566,6 +566,7 @@ setInterval(() => {
             this.openx = []
             this.openy = []
             this.findslimestartpos()
+            console.log(this.slimestartx+","+this.slimestarty)
             this.openx.push(this.slimestartx)
             this.openy.push(this.slimestarty)
             this.map[this.slimestartx][this.slimestarty]=this.slimetile
@@ -573,7 +574,7 @@ setInterval(() => {
         findslimestartpos(){
             for(var y=this.h-1;y>=0;y-=1){
                 for(var x=0;x<this.w;x+=1){
-                    if(this.map[x][y] == 1){ 
+                    if(this.map[x][y] == mymap.tileempty){ 
                         this.slimestartx = Math.floor(x)
                         this.slimestarty = Math.floor(y)
                         return
@@ -604,6 +605,7 @@ setInterval(() => {
             }
         }
         update(speed){
+            
             var freq
             if(this.speed == "slow"){
                 this.freq = 120
@@ -901,11 +903,13 @@ setInterval(() => {
         }
 
         addslime(sx,sy){
+            
             if(mymap.mapcollide((sx/2)*tilewidth,(sy/2)*tileheight,tilewidth/2,tileheight/2))return
             //console.log("add slime here:"+sx+","+sy)
             this.openx.push(sx)
             this.openy.push(sy)
             this.map[sx][sy] = this.slimetile
+            //console.log("z")
         }
 
         drawmap(){
@@ -3525,7 +3529,7 @@ setInterval(() => {
                     for(var x2=x1;x2>x1-(len-3);x2-=1){
                         for(var y2=y1+1;y2<y1+4;y2++){ 
                             
-                            this.mapfinal[x2][y2] = this.tilemineable;
+                            //this.mapfinal[x2][y2] = this.tilemineable;
                         }
                     }
                 }
@@ -4127,6 +4131,7 @@ setInterval(() => {
         if(gamestate=="setup"){
             myplayer=new player();
             mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
+            mygrowslime = new growslime();
             //'
             //' Create the towns people
             //'
@@ -4164,7 +4169,7 @@ setInterval(() => {
             //  UPDATES
             //
             // grow slime monster
-            //for(var i=0;i<2;i+=1){
+            //for(var i=0;i<5;i+=1){
             mygrowslime.update("slow")
             //}
             //update the towns people
