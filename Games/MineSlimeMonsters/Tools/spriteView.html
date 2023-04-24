@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+    <style>
+        #myCanvas {touch-action: none;
+        -webkit-touch-callout:none;
+        -webkit-user-select:none;
+        -khtml-user-select:none;
+        -moz-user-select:none;
+        -ms-user-select:none;
+        user-select:none;
+        -webkit-tap-highlight-color:rgba(0,0,0,0);
+        }
+    </style>
+<canvas id="myCanvas" width="640" height="480" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+<script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+   // load the tiles..
+    var tileImage = new Image();
+    tileImage.src = 'Data/sprites.png';
+
+
+  
+
+    gameloop=setInterval(doGameLoop,16);
+    
+    function doGameLoop(){
+        myCanvas.height = window.innerHeight-32;
+        myCanvas.width = window.innerWidth-32;
+        ctx.fillStyle = 'rgb(30,60,10)'
+        ctx.fillRect(0,0,c.width,c.height);
+        ctx.fillStyle = 'white'
+
+        ctx.save()
+        ctx.scale(1.5,1.5)
+        ctx.drawImage(tileImage,96,0)
+
+        
+        var index = 0
+        for(var y=0;y<(480);y+=32){
+            for(var x=0;x<640;x+=32){
+                
+                ctx.fillStyle = "black"
+                for(var x2=0;x2<32;x2+=1){
+                    ctx.globalAlpha = 0.8-(0.8/(32)*x2)
+                    ctx.fillRect(x+96+8+x2,y+6,1,12)
+                }
+                ctx.globalAlpha = 0.6
+                ctx.fillStyle = "white"
+                ctx.fillText(index,x+96+8,y+12)
+                index+=1
+            }
+        }
+        ctx.globalAlpha = 1
+        ctx.restore()
+    }
+    //
+    //
+    // tile - Draw a tile from the level tile(s) atlas
+    function drawTile(x,y,tile){
+        ctx.drawImage(tileImage,tileAtlasIndex[tile].x,tileAtlasIndex[tile].y,tileImageCellSize,tileImageCellSize,
+                        x,y,tilewidth,tileheight);
+    }
+    //
+    // Create a list of the cell coordinates in the tile atlas image. (optimize)
+    //
+    function bufferTileAtlas(){
+        var tile = 0
+        for(var j=0;j<(tileImageHeight/tileImageCellSize);j+=1){
+            for(var i=0;i<(tileImageWidth/tileImageCellSize);i+=1){            
+                var row = Math.floor(tile % maxRows)
+                var column = Math.floor(tile / maxRows)                
+                tileAtlasIndex.push({x:Math.floor(row*tileImageCellSize),y:Math.floor(column*tileImageCellSize)})
+                tile+=1;
+            }
+        }
+    }
+    
+</script>
+</body>
+</html>
