@@ -15,11 +15,6 @@
 *(In the '3d/threetest/test' folder.)*
 <br>
 <br>
-<br>Voxel Game Progress video -<br>Youtube link below--<br>
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=4RCbTE9Z_4A" target="_blank">
- <img src="http://img.youtube.com/vi/4RCbTE9Z_4A/mqdefault.jpg" alt="Watch the video" width="25%" border="10" /></a>
-<br>
-<br>
 Tools/BrushFactory. - phone(landscape/portait mode) - tablet (portrait/landscape mode)
 <img src="Media/6B3127F3-029B-40E2-B0F4-C072647B62D3.png" width="50%"></img><br>
 *(In the tools folder.)*
