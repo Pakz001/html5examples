@@ -1,9 +1,11 @@
 <img src="Media/screenshot.png" width=40% height=40%><br>
 # Mine, Slime and Monsters
 *Head down a mine and mine minerals and valuables dropped by the monsters that live and grow in the mine.*
-
+*Ported from my Monkey2 repo. Adding features and gfx. Now playable with Controller.*
 <br><br>
-Ported from my Monkey2 repo. Adding features and gfx. Now playable with Controller.
+Play current versionin browser - controller / keyboard only.<br>
+https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/
+<br><br>
 
 
 <br><br>
@@ -33,10 +35,7 @@ I was planning on creating (more)gfx for the game and adding features and cleani
 <br><br>
 
 
-Play NEW game in browser - controller / keyboard only <br>
-https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/
 
-<br><br>
 
 
 
