@@ -9,34 +9,17 @@ https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/
 
 
 <br><br>
-
-![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif)<br>
+<img src="[https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif)" width=20% height=20%><br>
 *(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)*
-
-
-*(some of the level graphics that wil be used in the early version..)*
-
-
-
 <br>
 <br>
 <br>
 Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
-<br>
-When it gets around 5000 lines it should be close to converted.
-<br>
-<br>
-I was planning on creating (more)gfx for the game and adding features and cleaning it up a bit..
-<br>
-    
+<br>    
 <br>Old Version : (Emscripten)<br>
 <img src="Media/oldversion.jpg" width="20%"></img><br>
 [Play game in browser - old / keyboard only -](https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html)
 <br><br>
-
-
-
-
 
 
 
