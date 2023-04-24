@@ -84,7 +84,7 @@ Use different browser.
             for(var i=0;i<16;i++){
                 if(myGamepad.buttons[i].pressed==true)a=i
             }
-            if(a!=-1)console.log(a)
+            //if(a!=-1)console.log(a)
             
             Controller.Left = false
             Controller.Right = false
@@ -163,22 +163,91 @@ Use different browser.
     var tileheight=24;
     var developmode = false;
 
-    var egghatchspeed= 0.1 //how fast eggs hatch
+    // random == 2
+    var egggrowspeed = 1000
+    var egghatchspeed = 1000
+    //var egghatchspeed= 0.1 //how fast eggs hatch
     var egglayingfreq = 0.1 // lay lots of eggs 1 lay less eggs 0 '0 to 1
     var startingeggfreq = 0.2 //0 to 1 0 is none 1 is full
     var maxflyingmonsters=30
     var maxwalkingmonsters=30
 
-    var gamestate = "select" // menu and state we are in.
+    var gamestate = "select" // menu and st
 
+    // Monster Spawning Eggs. 
+    //
     class egg{
-        constructor(){
+        constructor(x,y){
+            this.px,this.py
+            this.deleteme = false
+            // frame 0 = layed mini egg. 1,2 = growing. 3 is fullgrown
+            this.frames = [0,1,2,3,4,5,6,7,8,9] // all the frames of the egg
+            this.animationFrames =  [4,5,6,7,8,9] // cracked egg, to completely broken
+            //
+            ///
+            
+
+
+            this.animationTime =    ["random","random","random",60*10,100,10,10,10,60*20] // frame times
+            this.frame = 0;   
+            this.state = "random"
+            this.x = x;
+            this.y = y;
+            this.w = tilewidth;
+            this.h = tileheight;
+            this.px = this.x*this.w;
+            this.py = this.y*this.h;
+            this.spawned = false
+            //console.log("start"+this.px+','+this.py)
         }
-        // draw routine in player class
-        update(){
+        
+        update(){   
+            if(this.deleteme==true)return
+            if(this.state=="random"){
+
+                // first 3(0,1,2) frames are random speed (a..b)
+                if(this.frame<3 && randomRange(0,egggrowspeed)==1){
+                    this.frame+=1
+                }            
+                // if on the 3rd frame then play animation
+                if(this.frame==3 && randomRange(0,egghatchspeed)==1){
+                    this.state="animate"
+                }
+            }
+            // animate the sprite. if the last frame has ended then delete from egg list
+            if(this.state=="animate"){
+                this.animationTime[this.frame]-=1
+                if(this.animationTime[this.frame]<=0){
+                    this.frame+=1
+                }
+                if(this.spawned==false && this.frame==this.animationTime.length-2){
+                    this.spawned = true
+                    if(randomRange(0,2)==1){
+                        if(myflyingmonster.length<maxflyingmonsters){
+                            myflyingmonster.push(
+                                    new theflyingmonster(
+                                    this.x,this.y    
+                                    )
+                            );
+                        }
+                        }else{
+                        if(mywalkingmonster.length<maxwalkingmonsters){
+                            mywalkingmonster.push(
+                                    new walkingmonster(
+                                    this.x,this.y    
+                                    )
+                            );
+                        }
+                    }
+                }
+                if(this.frame==this.animationTime.length-1){
+                    this.deleteme = true
+                    mymap.mapfinal[this.x][this.y]=mymap.tileempty
+                    //mymap.tilemap[this.x][this.y]
+                }
+            }
         }
-        updateTileMap(){
-        }
+
     }
 
 
@@ -584,7 +653,7 @@ Use different browser.
             this.openx = []
             this.openy = []
             this.findslimestartpos()
-            console.log(this.slimestartx+","+this.slimestarty)
+            //console.log(this.slimestartx+","+this.slimestarty)
             this.openx.push(this.slimestartx)
             this.openy.push(this.slimestarty)
             this.map[this.slimestartx][this.slimestarty]=this.slimetile
@@ -625,10 +694,10 @@ Use different browser.
         update(speed){
             
             var freq
-            if(this.speed == "slow"){
-                this.freq = 120
+            if(speed == "slow"){
+                freq = 120//120
             }else{
-                this.freq = 20
+                freq = 20
             }
             
             //every now And then check if we can restore growth
@@ -762,7 +831,8 @@ Use different browser.
             
             // Expand Slime		
             for(var i=0;i<this.openx.length;i+=1){
-                if(randomRangeFloat(0,this.freq) > 2)continue
+                if(randomRangeFloat(0,freq) > 2)continue
+                
                 var x2=this.openx[i]
                 var y2=this.openy[i]
                 //bottom bleft or bright first
@@ -1477,7 +1547,7 @@ Use different browser.
                     if(distanceM(myplayer.px,myplayer.py,this.px,this.py) < 100){
                         }else{
                         mymap.mapfinal[this.x][this.y] = 3
-                        
+                        myegg.push(new egg(this.x,this.y));                        
                         //mymap.updateimage(mymap.mapcanvas)				
                     }
                 }else{
@@ -1953,8 +2023,20 @@ Use different browser.
             }
             if( x2 != -1 ) {			
                 // destroy egg
-                if(randomRange(0,3)<1){
+                if(randomRange(0,2)<1){
                     mymap.mapfinal[x2][y2] = mymap.tileempty;
+                    // destroy egg in myegg
+                    for(var i=0;i<myegg.length;i+=1){
+                        if(myegg[i].x==x2 && myegg[i].y==y2){
+                            if(myegg[i].frame>1){
+                                myegg[i].state="animate"
+                                myegg[i].frame=5                            
+                            }else{
+                                myegg[i].deleteme = true
+                            }
+                            return true
+                        }
+                    }
                     //myitem.Add(New item(x2*tilewidth,y2*tileheight,"gold"))
                     //mymap.updateimage(mymap.mapcanvas)
                 }
@@ -2350,6 +2432,18 @@ Use different browser.
                 if(randomRange(0,7)<1){ 
                     mymap.mapfinal[x2][y2] = mymap.tileempty;
                     //mymap.updateimage(mymap.mapcanvas)
+                  // destroy egg in myegg
+                    for(var i=0;i<myegg.length;i+=1){
+                        if(myegg[i].x==x2 && myegg[i].y==y2){
+                            if(myegg[i].frame>1){
+                                myegg[i].state="animate"
+                                myegg[i].frame=5                            
+                            }else{
+                                myegg[i].deleteme = true
+                            }
+                            return true
+                        }
+                    }
                 }
                 return true;
             }
@@ -2944,8 +3038,8 @@ Use different browser.
                         //canvas.Color = Color.Yellow
                         //canvas.DrawRect(x3,y3,tw,th)
                         //canvas.OutlineMode=OutlineMode.None
-                        ctx.fillStyle = 'yellow';
-                        ctx.fillRect(x3,y3,this.tw,this.th);
+                        //ctx.fillStyle = 'yellow';
+                        //ctx.fillRect(x3,y3,this.tw,this.th);
                     }
                     if(mymap.mapfinal[x2][y2]== mymap.tileturret){
                         //canvas.OutlineMode=OutlineMode.Solid
@@ -3074,6 +3168,32 @@ Use different browser.
             }
             
 
+            //draw eggs	
+            
+            for(var i=0;i<myegg.length;i++){
+
+                var x1=myegg[i].px;
+                var y1=myegg[i].py;
+                var x2=(x1-(this.mcx*this.tw))+this.mox;
+                var y2=(y1-(this.mcy*this.th))+this.moy;
+                //var x2=(x1-(this.mcx*this.tw))+this.mox;
+                //var y2=(y1-(this.mcy*this.th))+this.moy;
+                //canvas.Color = Color.Red
+                //canvas.DrawRect(x2,y2,tw,th)
+                //ctx.fillStyle = 'red';
+                //ctx.fillRect(x2,y2,this.tw,this.th);
+                //console.log(x2+','+y2)
+                drawSprite(x2,y2,myegg[i].frame)
+                //ctx.fillStyle="white"
+                //ctx.fillRect(x2,y2,this.tw,this.th);
+                //this.drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
+                //canvas.Color = Color.White
+                //canvas.DrawText(i.state,x2,y2)
+                //canvas.DrawText(i.substate,x2,y2+12)
+                //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
+                //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
+            }
+
             // Draw the player
             this.pmx = (this.px-(this.mcx*this.tw))+this.mox;
             this.pmy = (this.py-(this.mcy*this.th))+this.moy;
@@ -3095,6 +3215,7 @@ Use different browser.
                 ctx.fillStyle = 'red';
                 ctx.fillRect(x2,y2,this.tw,this.th);
                 this.drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
+                
                 //canvas.Color = Color.White
                 //canvas.DrawText(i.state,x2,y2)
                 //canvas.DrawText(i.substate,x2,y2+12)
@@ -3345,8 +3466,10 @@ Use different browser.
                 var x=randomRange(2,this.mmw-4);
                 var y=randomRange(17,this.mmh-4);
                 if(this.mapfinal[x][y] == 1){
+                    // add egg to the map
                     if(this.mapfinal[x][y+1] == 0){
-                        this.mapfinal[x][y] = 3;
+                        this.mapfinal[x][y] = this.tileegg;
+                        
                     }
                 }
             }	
@@ -3363,6 +3486,16 @@ Use different browser.
             //    if(this.tilemap[x][y]==42)console.log("asdasdasd")
             //}}
 
+        }
+        addAllEggsFromMap(){
+            for(var y=0;y<this.mmh;y+=1){
+                for(var x=0;x<this.mmw;x+=1){
+                    if(this.mapfinal[x][y]==this.tileegg){
+                        myegg.push(new egg(x,y));
+                        //myegg[myegg.length-1].frame=3;
+                    }
+                }
+            }
         }
         makeTilemap(){
             //this.tilesolid=0;
@@ -4096,14 +4229,10 @@ Use different browser.
     c.addEventListener("touchend", touchHandler);
     c.addEventListener("touchstart", touchHandler);
  
-    var [colx,coly,colw,colh] = [80,80,50,50];
-    var debug;
-    var lasttouchx,lasttouchy;
-    var autoscroll=false;
-    var tw,th;
-    var [camx,camy] = [0,0];
 
     var mymenuselect = new menuselect()
+    
+    var myegg = [];
     var mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
     //var myc=new player();
     var myplayer=new player();
@@ -4119,9 +4248,14 @@ Use different browser.
     var mytentacle = [];
     var mytownperson = [];
     var mylaserwall = [];
+    
+    
+    //
     offscreenCanvas.width=window.innerWidth-32;
     offscreenCanvas.height=window.innerHeight-32;
+    //
     gameloop=setInterval(doGameLoop2,15);
+    //
     function doGameLoop2(){
         myCanvas.height = window.innerHeight-32;
         myCanvas.width = window.innerWidth-32;
@@ -4143,7 +4277,9 @@ Use different browser.
         }
         if(gamestate=="setup"){
             myplayer=new player();
+            myegg = []
             mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
+            mymap.addAllEggsFromMap()
             mygrowslime = new growslime();
             //'
             //' Create the towns people
@@ -4188,6 +4324,21 @@ Use different browser.
             //update the towns people
             for(i=0;i<mytownperson.length;i++){
                 mytownperson[i].update();
+            }
+
+            // update the eggs
+            if(myegg.length>0){
+                //Update the eggs
+                for(var i=0;i<myegg.length;i++){
+                    myegg[i].update();
+                
+                }
+                // remove eggs from list
+                for(var i=myegg.length-1;i>=0;i-=1){
+                    if(myegg[i].deleteme == true){
+                        myegg.splice(i, 1);
+                    }
+                }		
             }
 
             // update the laserwall
@@ -4356,7 +4507,7 @@ Use different browser.
                 
                 ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
                 ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
-                ctx.fillText(myflyingmonster.length,320,15);//debug
+                ctx.fillText(myegg.length,320,15);//debug
                 ctx.scale(1,1);
                 ctx.globalAlpha = 1;
                 //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
@@ -4544,6 +4695,7 @@ Use different browser.
     // This function adds a walking monster to the game
     //
     function addwalkingmonster(){ //hatch
+        return
         var cnt = mywalkingmonster.length
         var cnt2 = myflyingmonster.length
 
@@ -4581,6 +4733,7 @@ Use different browser.
     //This function adds a flying monster to the game
     //
     function addflyingmonster(){// 'hatch
+        return
         var cnt=myflyingmonster.length;
         //for(var i=0;i<myflyingmonster.length;i++){
         //    cnt+=1
@@ -4598,6 +4751,8 @@ Use different browser.
                                 x,y    
                                 )
                             );
+
+                        //console.log("monster added "+x+ ","+y)
                         //myflyingmonster.AddLast(New theflyingmonster(x,y))
                         //mymap.updateimage(mymap.mapcanvas)
                     }
@@ -4635,6 +4790,13 @@ Use different browser.
     function distanceM(x1,y1,x2,y2){
         return Math.abs(x2-x1)+Math.abs(y2-y1);
     }	
+    //
+    //
+    // sprite - Draw a sprite from the sprite atlas
+    function drawSprite(x,y,sprite){
+        ctx.drawImage(spriteImage,tileAtlasIndex[sprite].x,tileAtlasIndex[sprite].y,tileImageCellSize,tileImageCellSize,
+                        x,y,tilewidth,tileheight);
+    }
     //
     //
     // tile - Draw a tile from the level tile(s) atlas
