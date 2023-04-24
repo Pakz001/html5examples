@@ -1,6 +1,5 @@
 
 # html5 javascript game oriented example code. 
-## ( Learn to code games by studying examples )
 
 
 <br><br>
