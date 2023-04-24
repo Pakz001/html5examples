@@ -1,7 +1,7 @@
-<p align="center"><img src="Media/screenshot.png" width=75% height=75%><br>
+<p align="left"><img src="Media/screenshot.png" width=40% height=40%></p><br>
 # Mine, Slime and Monsters
 *Head down a mine and mine minerals and valuables dropped by the monsters that live and grow in the mine.*
-</p>
+
 <br><br>
 Ported from my Monkey2 repo. Adding features and gfx. Now playable with Controller.
 
