@@ -7,11 +7,10 @@
 <br>Link:<br>
 <a href="https://cromdesi.home.xs4all.nl/html5examples/">Visit this repo's website - run and view examples - updated last december</a><br>
 <br>
-
-
 (Gamedev) - Snippets / templates / functions / prototypes
-
 <br><br>
+## Some of the content in the repo
+<br>
 (tablet / phone Browser Touch voxel engine)(book files chapter 1..x)<br>
 <img src="3D/threeTest/Test/Media/4ACEC619-2702-465D-912C-B3C9FCB2B23E.png" width="50%"></img><br>
 *(In the '3d/threetest/test' folder.)*
