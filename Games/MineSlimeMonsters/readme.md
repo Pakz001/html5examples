@@ -1,3 +1,5 @@
+<p align="center"><img src="Media/screenshot.png" width=75% height=75%><br></p><br>
+
 # Mine, Slime and Monsters
 *Head down a mine and mine minerals and valuables dropped by the monsters that live and grow in the mine.*
 <br><br><br><br>
@@ -9,7 +11,7 @@ Ported from my Monkey2 repo. Adding features and gfx. Now playable with Controll
 ![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif)<br>
 *(sketch for the walking egg monsters. Wil get scarier and colored after tweaking)*
 
-<img src="Media/screenshot.png" width=100% height=100%><br>
+
 *(some of the level graphics that wil be used in the early version..)*
 
 
