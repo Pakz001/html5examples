@@ -1,8 +1,8 @@
-# Porting code : 4686 of 5000.
-*(Monkey2 to Javascript)*
-<br>_04 and up requires Data/ folder<br>
-<br>Now with Game Controller(Xbox) Support)<br>
-<br>Working on gfx more(see below) and less typing because of numb hands..<br>
+#Mine Slime and Monsters
+<br>
+*Head down a mine and mine minerals and valuables dropped by the monsters that live and grow in the mine.*
+<br>
+Ported from my Monkey2 repo. Adding features and gfx. Now playable with Controller.
 
 
 <br><br>
@@ -38,13 +38,6 @@ https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/
 <br><br>
 
 
-**Conversion notes :**
-* Usse a Xbox Controller(others untested)
-* Added new controller code system. Should make joypad and touch control easier.
-* Figure out what to do with resolution / window size changes.(pauze/rebuild?)
-* Still struggling with offscreen canvasses.
-* Need to fix a memory leak from old version.
-* Variables Ints in array -> pay attention. (fix : Math.floor(variable) ) - note - Look at wrong use of this. - look at random(x,y)
 
 
  <br><br>
