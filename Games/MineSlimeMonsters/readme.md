@@ -38,5 +38,4 @@ Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
 
 <br><br>
 **Adding Features later on :**
-* Controller(xbox)
 * Touch screen controls(touch the screen and it displays a sliding menu to activate touch controls.)
