@@ -5,7 +5,7 @@
 
 <br><br>
 <br>Link:<br>
-<a href="https://cromdesi.home.xs4all.nl/html5examples/">Visit the repo site - run and view examples - update december</a><br>
+<a href="https://cromdesi.home.xs4all.nl/html5examples/">Visit this repo's website - run and view examples - updated last december</a><br>
 <br>
 
 
