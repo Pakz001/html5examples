@@ -22,9 +22,9 @@
 <br></a>
 
 <br>
-Tools/BrushFactory. - phone(landscape/portait mode) - tablet (portrait/landscape mode)<br>
-<img src="Media/6B3127F3-029B-40E2-B0F4-C072647B62D3.png" width="60%"><br>
-(In the tools folder.)
+Tools/BrushFactory. - phone(landscape/portait mode) - tablet (portrait/landscape mode)
+<img src="Media/6B3127F3-029B-40E2-B0F4-C072647B62D3.png" width="60%">
+*(In the tools folder.)*
 <br>
 <br>
 
