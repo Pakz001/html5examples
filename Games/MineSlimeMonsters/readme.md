@@ -1,7 +1,7 @@
 #Mine Slime and Monsters
-<br>
+<br><br>
 *Head down a mine and mine minerals and valuables dropped by the monsters that live and grow in the mine.*
-<br>
+<br><br><br><br>
 Ported from my Monkey2 repo. Adding features and gfx. Now playable with Controller.
 
 
