@@ -1894,7 +1894,8 @@ Use different browser.
         addtoplayerinventory(){
             for(var i=0;i<myplayer.playeritemnames.length;i+=1){
                 if(this.kind == myplayer.playeritemnames[i]){
-                    myplayer.playeritem[i,1] += 1;
+                    console.log("added"+this.kind)
+                    myplayer.playeritem[i][1] += 1;
                     return;
                 }
             }
@@ -2750,12 +2751,12 @@ Use different browser.
             
             this.mcy=0;
             this.playeritem = create2DArray(this.playeritemnames.length,2);
-            this.createrandominventory();
+            //this.createrandominventory();
         }
         createrandominventory(){
 		    for(var i=0;i<this.playeritemnames.length;i++){
-			    this.playeritem[i,0] = i;
-			    this.playeritem[i,1] = Math.floor(Math.random()*65);
+			    this.playeritem[i][0] = i;
+			    this.playeritem[i][1] = Math.floor(Math.random()*65);
             }
         }
         updateplayercontrols(){
@@ -4315,7 +4316,7 @@ Use different browser.
                 mymap.tilemap[x][y] = mymap.randomBag([0,1,2])
                 myitem.push(
                     new item(
-                        (x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"
+                        (x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"Gold"
                         )
                 );                
                 //myitem.Add(New item((x*tilewidth)+tilewidth/2,(y*tileheight)+tileheight/2,"gold"))
@@ -4682,7 +4683,9 @@ Use different browser.
                 }
                 //canvas.Clear(Color.Black)
                 myplayer.draw()
-                ctx.scale(2,2);     
+                ctx.save()
+                ctx.scale(2,.7);    
+
                 ctx.globalAlpha = 0.5;       
                 ctx.fillStyle = 'black';
                 ctx.fillRect(0,0,360,38);
@@ -4692,6 +4695,18 @@ Use different browser.
                 ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
                 ctx.fillText(myitem.length,320,15);//debug
                 ctx.scale(1,1);
+                ctx.restore()
+                ctx.scale(1.3,1.3)
+                ctx.fillStyle = 'white'
+                for(var i=0;i<6;i+=1){
+                    ctx.fillText(myplayer.playeritemnames[i],(i*120)+40,32)
+                    ctx.fillText(myplayer.playeritem[i][1],i*120,32)
+                }
+                for(var i=6;i<myplayer.playeritemnames.length;i+=1){
+                    ctx.fillText(myplayer.playeritemnames[i],((i-6)*120)+40,45)
+                    ctx.fillText(myplayer.playeritem[i][1],((i-6)*120),45)
+                }
+
                 ctx.globalAlpha = 1;
                 //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
             }
