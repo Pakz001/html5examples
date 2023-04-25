@@ -217,16 +217,16 @@ Use different browser.
                 }
             }
             if(this.deleteme==true)return
-            if(this.frame<4){
-                this.brightness+=this.inc
-                if(this.brightness>this.maxBrightness){
-                    this.inc=-this.inc
-                }
-                if(this.brightness<100){
-                    this.inc=-this.inc
-                }
-                
-            }
+            //if(this.frame<4){
+            //    this.brightness+=this.inc
+            //    if(this.brightness>this.maxBrightness){
+            //        this.inc=-this.inc
+            //    }
+            //    if(this.brightness<100){
+            //        this.inc=-this.inc
+            //   }
+            //    
+            //}
             if(this.state=="random"){
 
                 // first 3(0,1,2) frames are random speed (a..b)
@@ -2387,6 +2387,7 @@ Use different browser.
                 
                 // Collision with bullet and walking monster
                 for(var i=0;i<mywalkingmonster.length;i++){
+                    if(mywalkingmonster[i].inRange==false)continue
                     if(distanceM(this.px,this.py,mywalkingmonster[i].px,mywalkingmonster[i].py) < tilewidth){ 
                         mywalkingmonster[i].hp -= 1;
                         mynumberfall.push(
@@ -2417,6 +2418,7 @@ Use different browser.
                 
                 // Collision with bullet and flying monster
                 for(var i=0;i<myflyingmonster.length;i++){
+                    if(myflyingmonster[i].inRange==false)continue
                     if(distanceM(this.px,this.py,myflyingmonster[i].px,myflyingmonster[i].py) < tilewidth){
                         myflyingmonster[i].hp -= 1
                         mynumberfall.push(
@@ -3094,41 +3096,7 @@ Use different browser.
                             ctx.globalAlpha = 1
                         }
                     }
-                    //}
-                    // mymap.mapfinal[x2,y2]
-                    if(mymap.mapfinal[x2][y2]== mymap.tileempty){
-                        if(y2>16){
-                            //canvas.Color = Color.White
-                            //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],0],x3,y3)
-                            //ctx.fillStyle = 'rgb(80,35,20)';
-                            //ctx.fillRect(x3,y3,this.tw,this.th);
-                            //ctx.drawImage(tileImage,0,0,32,32,x3,y3,tilewidth,tileheight);
-                            
-                        }
-                        //canvas.Color = Color.Brown
-                        //canvas.DrawRect(x3,y3,tw,th)
-                    }
-                    if(mymap.mapfinal[x2][y2]== mymap.tilesolid){
-                        if(y2>16){
-                            //canvas.Color = Color.White
-                            //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],1],x3,y3)
-                            //ctx.fillStyle = 'rgb(100,40,20)';
-                            //ctx.fillRect(x3,y3,this.tw,this.th);
-                            //ctx.drawImage(tileImage,0,32,32,32,x3,y3,tilewidth,tileheight);
-                        }
-                        //canvas.Color = Color.Black
-                        //canvas.DrawRect(x3,y3,tw,th)
-                    }
-                    if(mymap.mapfinal[x2][y2] == mymap.tileegg){
-                        //canvas.OutlineMode=OutlineMode.Solid
-                        //canvas.OutlineColor = Color.White
-                        //canvas.OutlineWidth = 1						
-                        //canvas.Color = Color.Yellow
-                        //canvas.DrawRect(x3,y3,tw,th)
-                        //canvas.OutlineMode=OutlineMode.None
-                        //ctx.fillStyle = 'yellow';
-                        //ctx.fillRect(x3,y3,this.tw,this.th);
-                    }
+                    
                     if(mymap.mapfinal[x2][y2]== mymap.tileturret){
                         //canvas.OutlineMode=OutlineMode.Solid
                         //canvas.OutlineColor = Color.Black
@@ -3139,16 +3107,7 @@ Use different browser.
                         ctx.fillStyle = 'grey';
                         ctx.fillRect(x3,y3,this.tw,this.th);
                     }
-                    if(mymap.mapfinal[x2][y2]==mymap.tilemineable){
-                        //canvas.Color = Color.White
-                        //canvas.DrawImage(mytile.image[mymap.maptilevariation[x2,y2],2],x3,y3)
-                        //canvas.Color = Color.Brown.Blend(Color.Yellow,.2)
-                        //canvas.DrawRect(x3,y3,tw,th)
-                        //ctx.fillStyle = 'yellow';
-                        //ctx.fillRect(x3,y3,this.tw,this.th);
-                        //ctx.drawImage(tileImage,0,64,32,32,x3,y3,tilewidth,tileheight);
-                    }
-                    //End Select	
+                   
 
                     
                     //draw the slime			
@@ -3171,7 +3130,7 @@ Use different browser.
 
             
 
-
+            
 
 
 
@@ -3180,10 +3139,12 @@ Use different browser.
             //Draw the ladders		
             for(var y=-1;y<this.maptilesheight;y++){
                 for(var x=-1;x<this.maptileswidth;x++){
+
                     var x2=this.mcx+x;
                     var y2=this.mcy+y;
                     var x3=(x*this.tw)+this.mox;
                     var y3=(y*this.th)+this.moy;
+                    if(x2<this.mcx-2 || x2>this.mcx+40 || y2<this.mcy-2 || y2>this.mcy+40)continue
                     if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){
                         if(mymap.mapladder[x2][y2] == 1){
                             //canvas.Color = Color.Brown
@@ -3275,11 +3236,13 @@ Use different browser.
                 //ctx.fillRect(x2,y2,this.tw,this.th);
                 //console.log(x2+','+y2)
                 //console.log(myegg[i].brightness)
-                ctx.filter = "brightness("+
-                            myegg[i].brightness
-                            +"%)"
+                //ctx.filter = "brightness("+
+            //            myegg[i].brightness
+                //            +"%)"
                 //ctx.filter = "brightness(400%)"
                 drawSprite(x2,y2,myegg[i].frame)
+  
+
                 //ctx.fillStyle="white"
                 //ctx.fillRect(x2,y2,this.tw,this.th);
                 //this.drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
@@ -3289,7 +3252,8 @@ Use different browser.
                 //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
                 //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
             }
-            ctx.filter = "brightness(100%)"
+            ctx.globalAlpa = 1
+            //ctx.filter = "brightness(100%)"
             //ctx.restore()
 
             // Draw the player
@@ -3360,6 +3324,7 @@ Use different browser.
                 var y2=mybullet[i].py-this.mcy*this.th+this.moy;
                 //canvas.DrawCircle(x2,y2,i.w)
                 ctx.fillRect(x2,y2,mybullet[i].w,mybullet[i].w);
+
             }
             
 
@@ -4477,6 +4442,7 @@ Use different browser.
 
             gamestate = "play"
         }
+        
         if(gamestate=="play"){
                 
             
@@ -4534,6 +4500,7 @@ Use different browser.
                     }
                 }		
             }
+        
             // update the bullets
             if(mybullet.length>0){
                 //Update the bullets
@@ -4645,12 +4612,12 @@ Use different browser.
                 }
             }
 
-            if(myflyingmonster.length<maxflyingmonsters){
-            for(var i=0;i<=10;i++){
-                addflyingmonster();
-                addwalkingmonster();
-            }
-            }
+            //if(myflyingmonster.length<maxflyingmonsters){
+            //for(var i=0;i<=10;i++){
+            //    addflyingmonster();
+            //    addwalkingmonster();
+            //}
+            //}
 
             //mymap.draw();
             if(Controller.MiniMap==false){
