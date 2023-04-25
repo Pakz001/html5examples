@@ -164,8 +164,8 @@ Use different browser.
     var developmode = false;
 
     // random == 2
-    var egggrowspeed = 1000
-    var egghatchspeed = 1000
+    var egggrowspeed = 100//1000
+    var egghatchspeed = 100//1000
     //var egghatchspeed= 0.1 //how fast eggs hatch
     var egglayingfreq = 0.1 // lay lots of eggs 1 lay less eggs 0 '0 to 1
     var startingeggfreq = 0.2 //0 to 1 0 is none 1 is full
@@ -1114,16 +1114,78 @@ Use different browser.
             this.py = y*this.h
             this.hp = randomRange(10,30)
             this.hpmax = this.hp
-
+            this.direction = "left"
             this.inRange = true
             this.inRangeCnt = 0
             this.inRangeCntMax = 30
+            this.animationFacing = "left"
             //set the movement speed
             this.sx = randomRangeFloat(0.3,3)
             //sy = sx
             this.state="hatched"
+
+            this.frame = 20
+            this.animationMode = "pingpong" 
+            this.animation = [20,21,22]
+            this.animationTime = [10,10,10]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }
+        setwWalkAnimation(){
+            this.frame = 20
+            this.animationMode = "pingpong" 
+            this.animation = [20,21,22]
+            this.animationTime = [10,10,10]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }
+        setjumpAnimation(){
+            this.frame = 23
+            this.animationMode = "playonce" 
+            this.animation = [23,24,25]
+            this.animationTime = [7,7,111]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }
+        setLandAnimation(){
+            this.frame = 26
+            this.animationMode = "playonce" 
+            this.animation = [26,27]
+            this.animationTime = [20,10000]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
         }
         update(){		
+
+            this.animationCurrentTime+=1
+            //console.log(this.animationIndex)
+            if(this.animationCurrentTime>=this.animationTime[this.animationIndex]){
+                this.animationCurrentTime = 0
+                this.animationIndex+=this.animationDirection
+                if(this.animationIndex==this.animation.length-1){
+                    //this.animationIndex = 0
+                    if(this.animationMode=="pingpong"){
+                        this.animationDirection = -1
+                    }
+                    if(this.animationMode=="playonce"){
+                        this.animationDirection = 0
+                        this.frame=25
+                    }
+                }
+                if(this.animationIndex==0){
+                    if(this.animationMode="pingpong"){
+                        this.animationDirection = 1
+                    }
+                }
+                if(this.animation[this.animationIndex]==25)console.log("ewerwer")
+                this.frame = this.animation[this.animationIndex]
+                
+            }
+
             this.inRangeCnt+=1
             if(this.inRangeCnt>this.inRangeCntMax){
                 this.inRangeCnt = 0;
@@ -1182,15 +1244,24 @@ Use different browser.
                 //Case "hatched"
                 this.state="roam"
                 this.substate="left"
+                if(Math.random()<.5)this.substate="right"
+                this.animationFacing = this.substate
             }
             if(this.state=="attack"){
                 //Case "attack"
  
 
                 if(this.substate=="setjump"){
+                    this.setjumpAnimation()
                     //Case "setjump"
-                    if(myplayer.py < this.py)this.substate="finishjump"
-                    if(myplayer.py > this.py+3)this.substate="finishjump"
+                    if(myplayer.py < this.py){
+                        this.substate="finishjump"
+                        
+                    }
+                    if(myplayer.py > this.py+3){
+                        this.substate="finishjump"
+                        
+                    }
                     var d=distanceM(myplayer.px,myplayer.py,this.px,this.py)
                     if(this.px < myplayer.px){
                         this.jx = d/35
@@ -1198,8 +1269,15 @@ Use different browser.
                         this.jx = -d/35
                     }
                     
-                    if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 50)this.jy = -2
+                    if(distanceM(this.px,this.py,myplayer.px,myplayer.py) > 50){
+                        this.jy = -2
+                    }else{
+                        //this.setLandAnimation()
+                    }
+                    // face into the direction of the player when we jump
                     this.substate = "jump"
+                    this.animationFacing="right"
+                    if(this.px>myplayer.px)this.animationFacing="left"
                     return
                 }
                 if(this.substate=="jump"){
@@ -1212,14 +1290,18 @@ Use different browser.
                     if(cnt>30)this.jx=-this.jx
                 }
                 if(this.substate=="finishjump"){
+                    this.setwWalkAnimation()
                     //Case "finishjump"
                     this.state = "roam"
                     this.x = this.px / tilewidth
                     this.y = this.py / tileheight
                     if(randomRange(0,2)< 1){
                         this.substate == "left"
+                        this.animationFacing = this.substate
                         }else{
                         this.substate="right"	
+                        
+                        this.animationFacing = this.substate
                     }					
                 }//End Select	
 
@@ -1236,22 +1318,40 @@ Use different browser.
                     this.x-=1
                     //If Rnd(50) < 1 And mymap.mapfinal[x-1,y] = mymap.tileempty And mymap.mapfinal[x-1,y+1] <> mymap.tileempty Then substate="right"						
                     //If Rnd(50) < 1 And cannotgohere(x+1,y) = false And cannotgohere(x+1,y+1)=true Then substate="right" 
-                    if(this.cannotgohere(this.x-1,this.y) == true)this.substate = "right"
-                    if(this.cannotgohere(this.x-1,this.y+1) == false)this.substate = "right"
+                    if(this.cannotgohere(this.x-1,this.y) == true){
+                        this.substate = "right"
+                        this.animationFacing = this.substate
+                    }
+                    if(this.cannotgohere(this.x-1,this.y+1) == false){
+                        this.substate = "right"
+                        this.animationFacing = this.substate
+                    }
                     //If mymap.mapfinal[x-1,y]  <> mymap.tileempty Then substate="right"
                     //If mymap.mapfinal[x-1,y+1] = mymap.tileempty Then substate="right"
-                    if(this.x<3)this.substate="right"
+                    if(this.x<3){
+                        this.substate="right"
+                        this.animationFacing = this.substate
+                    }
                 }
                 if(this.substate=="right"){        
                     //Case "right"						
                     this.x+=1
                     //If Rnd(50) < 1 And cannotgohere(x-1,y) =  false And cannotgohere(x-1,y+1)=true Then substate="left"
-                    if(this.cannotgohere(this.x+1,this.y) == true)this.substate="left"
-                    if(this.cannotgohere(this.x+1,this.y+1) == false)this.substate="left"
+                    if(this.cannotgohere(this.x+1,this.y) == true){
+                        this.substate="left"
+                        this.animationFacing = this.substate
+                    }
+                    if(this.cannotgohere(this.x+1,this.y+1) == false){
+                        this.substate="left"
+                        this.animationFacing = this.substate
+                    }
                     //If Rnd(50) < 1 And mymap.mapfinal[x+1,y] = mymap.tileempty And mymap.mapfinal[x+1,y+1] <> mymap.tileempty Then substate="left"						
                     //If mymap.mapfinal[x+1,y]  <> mymap.tileempty Then substate="left"
                     //If mymap.mapfinal[x+1,y+1] = mymap.tileempty Then substate="left"
-                    if(this.x>mapwidth-3)this.substate=="left"
+                    if(this.x>mapwidth-3){
+                        this.substate=="left"
+                        this.animationFacing = this.substate
+                    }
                 }//End Select
 
                     //gorandleftorright()
@@ -1285,7 +1385,7 @@ Use different browser.
                 if(distanceM(monx,mony,myplayer.px,myplayer.py) < 20)return true
                 if(mymap.mapcollide(monx,mony,this.w/2,this.h/2) == true)return false	
                 if(this.collidelaserwall(monx,mony,this.w,this.h))return false
-            }				
+            }			
             return true
         }	
         // for the walking monster Check if(tile on map is blocked
@@ -3333,8 +3433,9 @@ Use different browser.
                 var y2=(y1-(this.mcy*this.th))+this.moy;
                 //canvas.Color = Color.Red
                 //canvas.DrawRect(x2,y2,tw,th)
-                ctx.fillStyle = 'red';
-                ctx.fillRect(x2,y2,this.tw,this.th);
+                //ctx.fillStyle = 'red';
+                //ctx.fillRect(x2,y2,this.tw,this.th);
+                drawSprite(x2,y2,40)
                 this.drawpowerbar(x2,y2,myflyingmonster[i].hp,myflyingmonster[i].hpmax);
                 
                 //canvas.Color = Color.White
@@ -3355,8 +3456,20 @@ Use different browser.
                 var y2=(y1-(this.mcy*this.th))+this.moy;
                 //canvas.Color = Color.Red
                 //canvas.DrawRect(x2,y2,tw,th)
-                ctx.fillStyle = 'red';
-                ctx.fillRect(x2,y2,this.tw,this.th);
+                //ctx.fillStyle = 'red';
+                //ctx.fillRect(x2,y2,this.tw,this.th);
+                var a=false
+
+                if(mywalkingmonster[i].animationFacing=="left"){
+                    a=-1
+                }else{
+                    a=1
+                }
+                drawSprite(x2,y2,mywalkingmonster[i].frame,a)
+                //ctx.globalAlpha = .3
+                //ctx.fillStyle = 'white';
+                //ctx.fillRect(x2,y2+4,this.tw,this.th-16);
+                //ctx.globalAlpha=1
                 this.drawpowerbar(x2,y2,mywalkingmonster[i].hp,mywalkingmonster[i].hpmax);	
                 //ctx.fillStyle='white'
                 //ctx.fillText(mywalkingmonster[i].state+"-"+mywalkingmonster[i].substate,x2,y2)
@@ -4437,7 +4550,6 @@ Use different browser.
     var mytownperson = [];
     var mylaserwall = [];
     
-    
     //
     offscreenCanvas.width=window.innerWidth-32;
     offscreenCanvas.height=window.innerHeight-32;
@@ -4509,6 +4621,10 @@ Use different browser.
             myturret.push(
                 new turret() 
             );
+
+            for(var i=0;i<10;i++){
+                //myegg.push(new egg(64-i,16))
+            }
 
             gamestate = "play"
         }
@@ -5009,9 +5125,17 @@ Use different browser.
     //
     //
     // sprite - Draw a sprite from the sprite atlas
-    function drawSprite(x,y,sprite){
-        ctx.drawImage(spriteImage,tileAtlasIndex[sprite].x,tileAtlasIndex[sprite].y,tileImageCellSize,tileImageCellSize,
+    function drawSprite(x,y,sprite,flipH=1,flipV=1){
+        if(flipH==-1){
+        ctx.save(); // Save the current state
+        ctx.scale(-1, 1); // Set scale to flip the image    
+        ctx.drawImage(spriteImage,tileAtlasIndex[sprite].x,tileAtlasIndex[sprite].y, tileImageCellSize , tileImageCellSize,
+                        -x-tilewidth,y,tilewidth,tileheight);
+        ctx.restore();
+        }else{
+        ctx.drawImage(spriteImage,tileAtlasIndex[sprite].x,tileAtlasIndex[sprite].y, tileImageCellSize , tileImageCellSize,
                         x,y,tilewidth,tileheight);
+        }
     }
     //
     //
