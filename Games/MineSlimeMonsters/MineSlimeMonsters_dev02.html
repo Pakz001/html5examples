@@ -210,7 +210,7 @@ Use different browser.
             this.inRangeCnt+=1
             if(this.inRangeCnt>this.inRangeCntMax){
                 this.inRangeCnt = 0;
-                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>1000){
                     this.inRange=false
                 }else{
                     this.inRange=true
@@ -297,7 +297,7 @@ Use different browser.
             this.inRangeCnt+=1
             if(this.inRangeCnt>this.inRangeCntMax){
                 this.inRangeCnt = 0;
-                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>1000){
                     this.inRange=false
                 }else{
                     this.inRange=true
@@ -1127,7 +1127,7 @@ Use different browser.
             this.inRangeCnt+=1
             if(this.inRangeCnt>this.inRangeCntMax){
                 this.inRangeCnt = 0;
-                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>1000){
                     this.inRange=false
                 }else{
                     this.inRange=true
@@ -1146,7 +1146,7 @@ Use different browser.
                             ) 
                     );
                     //mynumberfall.Add(New numberfall(myplayer.px+(myplayer.pw/2),myplayer.py,2,Color.Red))
-                    if(myplayer.hp < 0)this.gamestate = "select"
+                    if(myplayer.hp < 0)gamestate = "select"
                 }
             }
             
@@ -1480,7 +1480,7 @@ Use different browser.
             this.inRangeCnt+=1
             if(this.inRangeCnt>this.inRangeCntMax){
                 this.inRangeCnt = 0;
-                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>1000){
                     this.inRange=false
                 }else{
                     this.inRange=true
@@ -1499,7 +1499,7 @@ Use different browser.
                             ) 
                     );
                     //mynumberfall.Add(New numberfall(myplayer.this.px+(myplayer.pw/2),myplayer.this.py,2,Color.Red))
-                    if(myplayer.hp < 0 )this.gamestate = "select";
+                    if(myplayer.hp < 0 )gamestate = "select";
                 }
             }
 
@@ -1826,12 +1826,17 @@ Use different browser.
             this.my = 0;
             this.w = 3;
             this.h = 3;
+
+            if(mymap.mapcollide(this.px,this.py,this.w,this.h) == true){ 						
+                    this.deleteme = true
+            }
+
         }
         update(){
             this.inRangeCnt+=1
             if(this.inRangeCnt>this.inRangeCntMax){
                 this.inRangeCnt = 0;
-                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>1000){
                     this.inRange=false
                 }else{
                     this.inRange=true
@@ -1887,6 +1892,7 @@ Use different browser.
             if(mymap.mapcollide(this.px+1,this.py,this.w,this.h) == true){ 						
                     this.mx=-1;
             }
+
             // move the item
             this.px += this.mx;
             this.py += this.my;		
@@ -2598,7 +2604,7 @@ Use different browser.
             this.inRangeCnt+=1
             if(this.inRangeCnt>this.inRangeCntMax){
                 this.inRangeCnt = 0;
-                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>1000){
                     this.inRange=false
                 }else{
                     this.inRange=true
@@ -4462,6 +4468,17 @@ Use different browser.
             myegg = []
             mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
             mymap.addAllEggsFromMap()
+    mybullet = [];
+    mygrenade = [];
+    myfrag = [];
+    myitem = [];
+    myflyingmonster = [];
+    mywalkingmonster = [];    
+    //var myturret = [];
+    mynumberfall = [];
+    mytentacle = [];
+    mytownperson = [];
+    mylaserwall = [];
             mygrowslime = new growslime();
             //'
             //' Create the towns people
@@ -4482,6 +4499,7 @@ Use different browser.
                 //mytownperson.Add(New townperson(Rnd(3,mapwidth/2-5),16))
                 //mytownperson.Add(New townperson(Rnd(mapwidth/2+5,mapwidth-5),16))
             }
+
             myturret = [];
             //
             // add turrets
