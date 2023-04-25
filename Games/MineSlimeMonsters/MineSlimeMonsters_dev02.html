@@ -164,8 +164,8 @@ Use different browser.
     var developmode = false;
 
     // random == 2
-    var egggrowspeed = 100//1000
-    var egghatchspeed = 100//1000
+    var egggrowspeed = 1000
+    var egghatchspeed = 1000
     //var egghatchspeed= 0.1 //how fast eggs hatch
     var egglayingfreq = 0.1 // lay lots of eggs 1 lay less eggs 0 '0 to 1
     var startingeggfreq = 0.2 //0 to 1 0 is none 1 is full
@@ -708,6 +708,15 @@ Use different browser.
         }
         remove(x,y){		
             this.map[x][y] = mymap.tileempty
+            //drop gold from slime
+            if(Math.random()<.1){
+            myitem.push(
+                new item(
+                (x/2)*tilewidth,(y/2)*tileheight,"Gold"    
+
+                ) 
+            );
+            }
             var rem=false
             var tmpx = []
             var tmpy = []
@@ -727,6 +736,7 @@ Use different browser.
                 this.openx.push(tmpx[i])
                 this.openy.push(tmpy[i])
             }
+          
         }
         update(speed){
             
@@ -1025,6 +1035,10 @@ Use different browser.
                     mygrowslime.remove(x2,y2)
                 }
             }
+            
+
+            
+            
         }
 
         addslime(sx,sy){
@@ -1181,7 +1195,7 @@ Use different browser.
                         this.animationDirection = 1
                     }
                 }
-                if(this.animation[this.animationIndex]==25)console.log("ewerwer")
+                //if(this.animation[this.animationIndex]==25)console.log("ewerwer")
                 this.frame = this.animation[this.animationIndex]
                 
             }
