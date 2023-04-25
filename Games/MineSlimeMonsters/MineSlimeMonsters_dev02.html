@@ -190,7 +190,7 @@ Use different browser.
             this.inRangeCnt = 0 
             this.inRangeCntMax = 30
 
-            this.animationTime =    ["random","random","random",60*10,100,10,10,10,60*20] // frame times
+            this.animationTime =    ["random","random","random",10,10,10,10,10,10,400] // frame times
             this.frame = 0;   
             this.state = "random"
             this.x = x;
@@ -244,7 +244,7 @@ Use different browser.
                 if(this.animationTime[this.frame]<=0){
                     this.frame+=1
                 }
-                if(this.spawned==false && this.frame==this.animationTime.length-2){
+                if(this.spawned==false && this.frame==this.animationTime.length-3){
                     this.spawned = true
                     if(randomRange(0,2)==1){
                         if(myflyingmonster.length<maxflyingmonsters){
@@ -264,7 +264,7 @@ Use different browser.
                         }
                     }
                 }
-                if(this.frame==this.animationTime.length-1){
+                if(this.frame==this.animationTime.length){
                     this.deleteme = true
                     mymap.mapfinal[this.x][this.y]=mymap.tileempty
                     //mymap.tilemap[this.x][this.y]
@@ -1900,7 +1900,7 @@ Use different browser.
         addtoplayerinventory(){
             for(var i=0;i<myplayer.playeritemnames.length;i+=1){
                 if(this.kind == myplayer.playeritemnames[i]){
-                    console.log("added"+this.kind)
+                    
                     myplayer.playeritem[i][1] += 1;
                     return;
                 }
@@ -4464,21 +4464,22 @@ Use different browser.
 
         }
         if(gamestate=="setup"){
+            addonce = 1;
             myplayer=new player();
             myegg = []
             mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
             mymap.addAllEggsFromMap()
-    mybullet = [];
-    mygrenade = [];
-    myfrag = [];
-    myitem = [];
-    myflyingmonster = [];
-    mywalkingmonster = [];    
-    //var myturret = [];
-    mynumberfall = [];
-    mytentacle = [];
-    mytownperson = [];
-    mylaserwall = [];
+            mybullet = [];
+            mygrenade = [];
+            myfrag = [];
+            myitem = [];
+            myflyingmonster = [];
+            mywalkingmonster = [];    
+            //var myturret = [];
+            mynumberfall = [];
+            mytentacle = [];
+            mytownperson = [];
+            mylaserwall = [];
             mygrowslime = new growslime();
             //'
             //' Create the towns people
@@ -4495,11 +4496,14 @@ Use different browser.
                         randomRange(mapwidth/2+5,mapwidth-5),
                         16)
                 );
-
+        
                 //mytownperson.Add(New townperson(Rnd(3,mapwidth/2-5),16))
                 //mytownperson.Add(New townperson(Rnd(mapwidth/2+5,mapwidth-5),16))
             }
-
+        for(var i=10;i>0;i-=1){
+            mymap.mapfinal[64-i][16]=mymap.tileegg
+            myegg.push(new egg(64-i,16))
+        }
             myturret = [];
             //
             // add turrets
