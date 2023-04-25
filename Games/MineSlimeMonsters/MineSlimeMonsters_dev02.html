@@ -289,7 +289,8 @@ Use different browser.
             this.bx = x
             this.by = this.getbottomtile(x,y)
             this.tx = x
-            this.ty = this.gettoptile(x,y-10)		
+            this.ty = this.gettoptile(x,y-10)	
+            if(distanceM(this.by,0,this.ty,0)>400)this.deleteme=true
         }
         
         update(){
@@ -1814,6 +1815,10 @@ Use different browser.
             this.removetime=2000;
             this.time;
 
+            this.inRange = true
+            this.inRangeCnt = 0
+            this.inRangeCntMax = 30
+
             this.px = x;
             this.py = y;
             this.kind = kind;
@@ -1823,7 +1828,15 @@ Use different browser.
             this.h = 3;
         }
         update(){
-            
+            this.inRangeCnt+=1
+            if(this.inRangeCnt>this.inRangeCntMax){
+                this.inRangeCnt = 0;
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                    this.inRange=false
+                }else{
+                    this.inRange=true
+                }
+            }            
             // if to long in game then remove
             this.time+=1;
             if(this.time>this.removetime)this.deleteme=true;
@@ -2141,7 +2154,24 @@ Use different browser.
             if(facing=="down"){
                 this.angle = Math.PI/2 + randomRangeFloat(-.2,.2);
             }
-            
+            if(Controller.Left==true && Controller.Up==true){
+                this.angle = -Math.PI/1.2
+                
+            }else
+                if(Controller.Right==true && Controller.Up==true){
+                this.angle = -Math.PI/4
+            }else
+
+                if(Controller.Right==true && Controller.Down==true){
+                
+                this.angle = Math.PI/4
+            }else
+
+                if(Controller.Left==true && Controller.Down==true){
+                
+                this.angle = Math.PI-Math.PI/4
+
+            }            
             //this.angle = angle;
             this.mx = Math.cos(this.angle);
             this.my = Math.sin(this.angle);
@@ -3029,6 +3059,25 @@ Use different browser.
             if(this.facing=="down"){
                 angle = Math.PI/2+randomRangeFloat(-0.2,0.2);
             }
+            if(Controller.Left==true && Controller.Up==true){
+                angle = -Math.PI/1.2
+                
+            }else
+                if(Controller.Right==true && Controller.Up==true){
+                angle = -Math.PI/4
+            }else
+
+                if(Controller.Right==true && Controller.Down==true){
+                
+                angle = Math.PI/4
+            }else
+
+                if(Controller.Left==true && Controller.Down==true){
+                
+                angle = Math.PI-Math.PI/4
+
+            }
+
             
             /*
             Select facing
@@ -3044,10 +3093,12 @@ Use different browser.
                     angle = Pi/2+Rnd(-.2,.2)
             End Select
             */
+            var posx = (this.px+this.pw/2)+(Math.cos(angle)*16)
+            var posy = (this.py+this.ph/2)+(Math.sin(angle)*16)
             for(var i=0;i<7;i++){
                 mybullet.push(
                     new bullet(
-                        this.px,this.py,angle+randomRangeFloat(-.1,.1),"player","shotgun"
+                        posx,posy,angle+randomRangeFloat(-.1,.1),"player","shotgun"
                         )
                 );
                 
@@ -3368,7 +3419,7 @@ Use different browser.
             ctx.fillStyle = 'red';
             //For Local i:=Eachin myitem
             for(var i=0;i<myitem.length;i++){
-                
+                if(myitem[i].inRange==false)continue
                 var x2=myitem[i].px-this.mcx*this.tw+this.mox;
                 var y2=myitem[i].py-this.mcy*this.th+this.moy;			
                 
@@ -4639,7 +4690,7 @@ Use different browser.
                 
                 ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
                 ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
-                ctx.fillText(myegg.length,320,15);//debug
+                ctx.fillText(myitem.length,320,15);//debug
                 ctx.scale(1,1);
                 ctx.globalAlpha = 1;
                 //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
