@@ -159,8 +159,8 @@ Use different browser.
     var mapheight=240;
     var screenwidth=window.innerWidth+48;
     var screenheight=window.innerHeight+48;
-    var tilewidth=24;
-    var tileheight=24;
+    var tilewidth=20;
+    var tileheight=20;
     var developmode = false;
 
     // random == 2
@@ -198,11 +198,25 @@ Use different browser.
             this.px = this.x*this.w;
             this.py = this.y*this.h;
             this.spawned = false
+    	    this.brightness = randomRange(100,200)
+            this.inc=randomRangeFloat(1,2)
+            this.maxBrightness = randomRange(150,300)
             //console.log("start"+this.px+','+this.py)
         }
         
         update(){   
+
             if(this.deleteme==true)return
+            if(this.frame<4){
+                this.brightness+=this.inc
+                if(this.brightness>this.maxBrightness){
+                    this.inc=-this.inc
+                }
+                if(this.brightness<100){
+                    this.inc=-this.inc
+                }
+                
+            }
             if(this.state=="random"){
 
                 // first 3(0,1,2) frames are random speed (a..b)
@@ -3168,7 +3182,8 @@ Use different browser.
             }
             
 
-            //draw eggs	
+            //draw eggs
+            //ctx.save()
             
             for(var i=0;i<myegg.length;i++){
 
@@ -3183,6 +3198,11 @@ Use different browser.
                 //ctx.fillStyle = 'red';
                 //ctx.fillRect(x2,y2,this.tw,this.th);
                 //console.log(x2+','+y2)
+                //console.log(myegg[i].brightness)
+                ctx.filter = "brightness("+
+                            myegg[i].brightness
+                            +"%)"
+                //ctx.filter = "brightness(400%)"
                 drawSprite(x2,y2,myegg[i].frame)
                 //ctx.fillStyle="white"
                 //ctx.fillRect(x2,y2,this.tw,this.th);
@@ -3193,6 +3213,8 @@ Use different browser.
                 //canvas.DrawText(i.x*i.w+","+i.y*i.h,x2,y2+22)
                 //canvas.DrawText(i.px+","+i.py,x2,y2+37)                
             }
+            ctx.filter = "brightness(100%)"
+            //ctx.restore()
 
             // Draw the player
             this.pmx = (this.px-(this.mcx*this.tw))+this.mox;
