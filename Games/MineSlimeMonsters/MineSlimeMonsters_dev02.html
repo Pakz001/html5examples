@@ -186,7 +186,9 @@ Use different browser.
             //
             ///
             
-
+            this.inRange = true
+            this.inRangeCnt = 0 
+            this.inRangeCntMax = 30
 
             this.animationTime =    ["random","random","random",60*10,100,10,10,10,60*20] // frame times
             this.frame = 0;   
@@ -205,7 +207,15 @@ Use different browser.
         }
         
         update(){   
-
+            this.inRangeCnt+=1
+            if(this.inRangeCnt>this.inRangeCntMax){
+                this.inRangeCnt = 0;
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                    this.inRange=false
+                }else{
+                    this.inRange=true
+                }
+            }
             if(this.deleteme==true)return
             if(this.frame<4){
                 this.brightness+=this.inc
@@ -272,6 +282,9 @@ Use different browser.
             this.tx,this.ty
             this.deleteme
 
+            this.inRange = true
+            this.inRangeCnt = 0
+            this.inRangeCntMax = 30
             if(this.toclosetoother(x,y))return
             this.bx = x
             this.by = this.getbottomtile(x,y)
@@ -280,6 +293,15 @@ Use different browser.
         }
         
         update(){
+            this.inRangeCnt+=1
+            if(this.inRangeCnt>this.inRangeCntMax){
+                this.inRangeCnt = 0;
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                    this.inRange=false
+                }else{
+                    this.inRange=true
+                }
+            }
             return  // Note : check
             /*
             // Make flying enemies turn into other direction
@@ -380,7 +402,7 @@ Use different browser.
             this.sh1=150
             this.m1 = create2DArray(this.w1,this.h1)
             //SeedRnd(1)
-            var m = new map(this.sw1,this.sh1,this.w1,this.h1)
+            var m = new map(this.sw1,this.sh1,this.w1,this.h1,false)
             for(var x = 0;x<this.w1;x+=1){
                 for(var y = 0;y<this.h1;y+=1){
                     this.m1[x][y] = m.mapfinal[x][y]
@@ -394,7 +416,7 @@ Use different browser.
             this.sw2 = 250
             this.sh2 = 250
             this.m2 = create2DArray(this.w2,this.h2)
-            var m = new map(this.sw2,this.sh2,this.w2,this.h2)
+            var m = new map(this.sw2,this.sh2,this.w2,this.h2,false)
             for(var x = 0;x<this.w2;x+=1){
                 for(var y = 0;y<this.h2;y+=1){
                     this.m2[x][y] = m.mapfinal[x][y]
@@ -408,7 +430,7 @@ Use different browser.
             this.sw3 = 300
             this.sh3 = 300
             this.m3 = create2DArray(this.w3,this.h3)
-            var m = new map(this.sw3,this.sh3,this.w3,this.h3)
+            var m = new map(this.sw3,this.sh3,this.w3,this.h3,false)
             for(var x = 0;x<this.w3;x+=1){
                 for(var y = 0;y<this.h3;y+=1){
                     this.m3[x][y] = m.mapfinal[x][y]
@@ -1091,12 +1113,25 @@ Use different browser.
             this.py = y*this.h
             this.hp = randomRange(10,30)
             this.hpmax = this.hp
+
+            this.inRange = true
+            this.inRangeCnt = 0
+            this.inRangeCntMax = 30
             //set the movement speed
             this.sx = randomRangeFloat(0.3,3)
             //sy = sx
             this.state="hatched"
         }
         update(){		
+            this.inRangeCnt+=1
+            if(this.inRangeCnt>this.inRangeCntMax){
+                this.inRangeCnt = 0;
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                    this.inRange=false
+                }else{
+                    this.inRange=true
+                }
+            }
             //If laserwait>0 Then laserwait-=1
         
             // Damage to player
@@ -1423,6 +1458,10 @@ Use different browser.
             this.state
             this.substate
 
+            this.inRange = true // should he be drawn
+            this.inRangeCnt = 0
+            this.inRangeCntMax = 30
+
             this.x = x
             this.y = y
             this.w = tilewidth
@@ -1436,7 +1475,17 @@ Use different browser.
             this.sy = this.sx;
             this.state="hatched"
         }
-        update(){		
+        update(){
+            this.inRangeCnt+=1
+            if(this.inRangeCnt>this.inRangeCntMax){
+                this.inRangeCnt = 0;
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                    this.inRange=false
+                }else{
+                    this.inRange=true
+                }
+            }
+
     //		If laserwait>0)laserwait-=1
             // Damage to player
             if(developmode == false){
@@ -2228,10 +2277,15 @@ Use different browser.
 
    
            
-            if(mymap.mapfinal[lefttopx][lefttopy] != mymap.tileempty)return true;
-            if(mymap.mapfinal[righttopx][righttopy] != mymap.tileempty)return true;
-            if(mymap.mapfinal[leftbottomx][leftbottomy] != mymap.tileempty)return true;
-            if(mymap.mapfinal[rightbottomx][rightbottomy] != mymap.tileempty)return true;						
+            if(mymap.mapfinal[lefttopx][lefttopy] != mymap.tileempty && 
+                mymap.mapfinal[lefttopx][lefttopy] != mymap.tileegg )return true;
+            if(mymap.mapfinal[righttopx][righttopy] != mymap.tileempty && 
+                mymap.mapfinal[righttopx][righttopy] != mymap.tileegg)return true;
+            if(mymap.mapfinal[leftbottomx][leftbottomy] != mymap.tileempty &&
+                mymap.mapfinal[leftbottomx][leftbottomy] != mymap.tileegg )return true;
+            if(mymap.mapfinal[rightbottomx][rightbottomy] != mymap.tileempty &&
+                mymap.mapfinal[rightbottomx][rightbottomy] != mymap.tileegg )return true;						
+
             //If mygrowslime.map[lefttopx*2,lefttopy*2] = mymap.tileslime Then Return True
             //If mygrowslime.map[righttopx*2,righttopy*2] = mymap.tileslime Then Return True
             //If mygrowslime.map[leftbottomx*2,leftbottomy*2] = mymap.tileslime Then Return True
@@ -2485,6 +2539,9 @@ Use different browser.
             this.oldpy; //'old py coordinate
 
 
+            this.inRange = true
+            this.inRangeCnt = 0
+            this.inRangeCntMax = 30
             this.x = x;
             this.y = y;
             this.w = tilewidth;
@@ -2505,6 +2562,15 @@ Use different browser.
              }
         }
         update(){		
+            this.inRangeCnt+=1
+            if(this.inRangeCnt>this.inRangeCntMax){
+                this.inRangeCnt = 0;
+                if(distanceM(myplayer.px,myplayer.py,this.px,this.py)>800){
+                    this.inRange=false
+                }else{
+                    this.inRange=true
+                }
+            }
             //'		If laserwait>0 Then laserwait-=1
             
             if(this.px < this.x*this.w){
@@ -2837,7 +2903,8 @@ Use different browser.
             for(var y2=cy-1;y2<cy+2;y2++){
                 for(var x2=cx-1;x2<cx+2;x2++){
                     if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){	            		        
-                        if(mymap.mapfinal[Math.floor(x2)][Math.floor(y2)] != mymap.tileempty){// 'Or mymap.mapfinal[x2,y2] = mymap.tilemineable           
+                        if(mymap.mapfinal[Math.floor(x2)][Math.floor(y2)] != mymap.tileempty && 
+                            mymap.mapfinal[Math.floor(x2)][Math.floor(y2)] != mymap.tileegg ){// 'Or mymap.mapfinal[x2,y2] = mymap.tilemineable           
                                                     
                             if(rectsoverlap(x,y,this.pw,this.ph,x2*this.tw,
                                             y2*this.th,this.tw,this.th) == true){;                                    	                    
@@ -3165,6 +3232,7 @@ Use different browser.
             //draw towns people
 
             for(var i=0;i<mytownperson.length;i++){
+                if(mytownperson[i].inRange==false)continue
                 var x1=mytownperson[i].px;
                 var y1=mytownperson[i].py;
                 var x2=(x1-(this.mcx*this.tw))+this.mox;
@@ -3193,6 +3261,7 @@ Use different browser.
             //ctx.save()
             
             for(var i=0;i<myegg.length;i++){
+                if(myegg[i].inRange==false)continue
 
                 var x1=myegg[i].px;
                 var y1=myegg[i].py;
@@ -3235,6 +3304,7 @@ Use different browser.
             
             //draw flying monsters	
             for(var i=0;i<myflyingmonster.length;i++){
+                if(myflyingmonster[i].inRange==false)continue
                 var x1=myflyingmonster[i].px;
                 var y1=myflyingmonster[i].py;
                 var x2=(x1-(this.mcx*this.tw))+this.mox;
@@ -3256,6 +3326,7 @@ Use different browser.
             
             //draw walking monsters		
             for(var i=0;i<mywalkingmonster.length;i++){
+                if(mywalkingmonster[i].inRange==false)continue
                 var x1=mywalkingmonster[i].px;
                 var y1=mywalkingmonster[i].py;
                 var x2=(x1-(this.mcx*this.tw))+this.mox;
@@ -3375,6 +3446,7 @@ Use different browser.
             
             //For Local i:=Eachin mylaserwall
             for(var i=0;i<mylaserwall.length;i++){
+                if(mylaserwall[i].inRange==false)continue
                 var x2=mylaserwall[i].tx-this.mcx*this.tw+this.mox;
                 var y2=mylaserwall[i].ty-this.mcy*this.th+this.moy;
                 var h=mylaserwall[i].by-mylaserwall[i].ty
@@ -3442,7 +3514,7 @@ Use different browser.
     // Our map system inc overview map view
     class map{
 
-        constructor(sw,sh,mw,mh){
+        constructor(sw,sh,mw,mh,full=true){
             this.tw,this.th;
             this.mw,this.mh;
             this.sw,this.sh,this.mmh,this.mmw//'mmh is actual finalmap size
@@ -3491,6 +3563,7 @@ Use different browser.
             //mapdoor = New Int[mmw,mmh]
             this.makemap();
             this.finalizemap();
+            if(full==false)return
             for(var i=0;i<1000;i++){
                 var x=randomRange(2,this.mmw-4);
                 var y=randomRange(17,this.mmh-4);
@@ -4573,7 +4646,7 @@ Use different browser.
             }
 
             if(myflyingmonster.length<maxflyingmonsters){
-            for(var i=0;i<=1;i++){
+            for(var i=0;i<=10;i++){
                 addflyingmonster();
                 addwalkingmonster();
             }
