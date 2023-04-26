@@ -697,7 +697,15 @@ Use different browser.
             //console.log(this.slimestartx+","+this.slimestarty)
             this.openx.push(this.slimestartx)
             this.openy.push(this.slimestarty)
+            this.openx.push(this.slimestartx)
+            this.openy.push(this.slimestarty-1)
+            this.openx.push(this.slimestartx+1)
+            this.openy.push(this.slimestarty)
+
+            this.map[this.slimestartx+1][this.slimestarty]=this.slimetile
+            this.map[this.slimestartx][this.slimestarty-1]=this.slimetile
             this.map[this.slimestartx][this.slimestarty]=this.slimetile
+
         }
         findslimestartpos(){
             for(var y=this.h-1;y>=0;y-=1){
@@ -743,12 +751,12 @@ Use different browser.
           
         }
         update(speed){
-            speed = "fast"
+            if(developmode==true)speed = "fast"
             var freq
             if(speed == "slow"){
                 freq = 120//120
             }else{
-                freq = 20
+                freq = 10
             }
             
             //every now And then check if we can restore growth
@@ -1058,7 +1066,9 @@ Use different browser.
 
         addslime(sx,sy){
             
-            if(mymap.mapcollide(((sx+1*tilewidth)/2),((sy+1*tileheight)/2),tilewidth/2,tileheight/2))return 
+            if( mymap.mapcollide(((sx+1*tilewidth)/2),((sy+1*tileheight)/2),tilewidth/2,tileheight/2)
+            && mymap.mapcollide(((sx*tilewidth)/2),((sy*tileheight)/2),tilewidth/2,tileheight/2)
+                )return 
             //if(mymap.mapcollide(((sx*tilewidth)/2),((sy*tileheight)/2),tilewidth/2,tileheight/2))return 
                        //console.log("add slime here:"+sx+","+sy)
             this.openx.push(sx)
@@ -3034,13 +3044,26 @@ Use different browser.
                 this.laddermode();
                 this.movespeed = 1;			
                 }else{
+                    //console.log(mygrowslime.map[Math.floor((this.px/tilewidth)/2)][Math.floor((this.py/tileheight)/2)])
                 for(var i=0;i<2;i++){
+                    //if(mygrowslime.map[Math.floor((this.px/tilewidth)*2)][Math.floor((this.py/tileheight)*2)]==mymap.tileslime){
+                    //this.playerSlimeGravity()
+                    //console.log("w")
+                    //}else{    
                     this.playergravity();
+                    if(mygrowslime.map[Math.floor((this.px/tilewidth)*2)][Math.floor((this.py/tileheight)*2)]==mymap.tileslime)break
+                    //}
                 }
             }
 
             this.movespeed +=.1;
+            if(mygrowslime.map[Math.floor((this.px/tilewidth)*2)][Math.floor((this.py/tileheight)*2)]==mymap.tileslime){
+                this.movespeed = 1;
+            }
             if(this.movespeed > 4)this.movespeed = 4;
+            if(mygrowslime.map[Math.floor((this.px/tilewidth)*2)][Math.floor((this.py/tileheight)*2)]==mymap.tileslime)   {
+                this.movespeed=1;
+            }         
             
             // if no movement left and right up and down then slow down
             //movement
@@ -3273,12 +3296,50 @@ Use different browser.
                 this.moy=0;
             }
         }
+        playerSlimeGravity(){
+            if(this.jump == false && this.playertilecollision(this.px,this.py+1) == false){ 
+                this.jump = true;
+                this.incy = 0;
+            }
+            if(this.jump == false && Controller.Jump==true){//Keyboard.KeyDown(Key.Space) = True
+                this.incy = -5;
+                this.jump = true;
+            }
+            //If the player is in the jump
+            if(this.jump == true){
+                this.incy += 0.1;
+                //if the player is going up
+                if(this.incy <=0){
+                    for(var i= 0;i<Math.abs(this.incy);i++){                
+                        this.py -= 1;
+                        this.scrollmap(0,-1);
+                        if(this.playertilecollision(this.px,this.py-1) == true){
+                            this.incy = 0;
+                            break;
+                        }
+                    }
+                }
+                // if the player if going down
+                if(this.incy > 0){
+                    for(var i= 0;i< this.incy;i++){
+                        this.py += 1;
+                        this.scrollmap(0,1);
+                        //if the player touches the ground
+                        if(this.playertilecollision(this.px,this.py+1) == true){
+                            this.jump = false;                        
+                            break;
+                        }
+                    }
+                    if(this.incy>2)this.incy=2;
+                }
+            }
+        }        
         playergravity(){
             if(this.jump == false && this.playertilecollision(this.px,this.py+1) == false){ 
                 this.jump = true;
                 this.incy = 0;
             }
-            if(this.jump == false && Controller.Jump==true){//Keyboard.KeyDown(Key.Space) = True            
+            if(this.jump == false && Controller.Jump==true){//Keyboard.KeyDown(Key.Space) = True
                 this.incy = -5;
                 this.jump = true;
             }
