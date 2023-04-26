@@ -37,5 +37,10 @@ Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
 * Ladder rider - tool for going up and down ladders faster (store:levels)
 
 <br><br>
-**Adding Features later on :**
+**Adding Features later on/bugs :**
 * Touch screen controls(touch the screen and it displays a sliding menu to activate touch controls.)
+* Fix up slime tiles. Bottom floor is unused. player can go through slime(?) Round edges(auto tiling)
+* Create start position at slime location.
+* Copy selected map from selection to game (new map)
+* Walker ai walks backwards sometimes
+
