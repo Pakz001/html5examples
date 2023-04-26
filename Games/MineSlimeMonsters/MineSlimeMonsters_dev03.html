@@ -22,6 +22,10 @@
 Use different browser.
 </canvas>
 <script>
+
+
+    var developmode = false;
+
     //
     // Note :   Optimise lists by creating list with anything close to the player. Rebuild these
     //          lists every x millisecs.
@@ -162,7 +166,6 @@ Use different browser.
     var screenheight=window.innerHeight+48;
     var tilewidth=32;
     var tileheight=32;
-    var developmode = false;
 
     // random == 2
     var egggrowspeed = 1000
@@ -740,7 +743,7 @@ Use different browser.
           
         }
         update(speed){
-            
+            speed = "fast"
             var freq
             if(speed == "slow"){
                 freq = 120//120
@@ -749,7 +752,7 @@ Use different browser.
             }
             
             //every now And then check if we can restore growth
-            if(randomRange(0,1500) < 2){
+            if(randomRange(0,1500) < 2){//1500
                 for(var y=0;y<mymap.mmw*2;y+=1){
                     for(var x=0;x<mymap.mmh*2;x+=1){
                         if(mygrowslime.map[x][y] == mymap.tileslime){					
@@ -883,8 +886,14 @@ Use different browser.
                 
                 var x2=this.openx[i]
                 var y2=this.openy[i]
+
+        
+
                 //bottom bleft or bright first
                 var r=randomRange(0,6)
+                if(this.map[x2][y2+1]==1){
+                    this.addslime(x2,y2+2)
+                }
                 if(r==0 && y2+1<this.h && this.map[x2][y2+1] == 1){
                     this.addslime(x2,y2+1)
                     continue
@@ -895,6 +904,7 @@ Use different browser.
                 }
                 if(r==2 && y2+1<this.h && this.map[x2+1][y2+1] == 1){
                     this.addslime(x2+1,y2+1)
+
                     continue
                 }
                 // left Or right Then
@@ -940,6 +950,8 @@ Use different browser.
                         }				
                         if(this.map[x2][y2] == 10)cnt+=1
                         if(this.map[x2][y2] == 0)cnt+=1
+                        //if(this.map[x2][y2] != mymap.tileempty)cnt+=1
+                        
                         //if map[x2,y2] = 1 Then cnt+=1
                         //If map[x2,y2] <> 1 Then cnt+=1
                     }
@@ -947,10 +959,11 @@ Use different browser.
                 if(cnt==9){
                     //openx.Remove(i)
                     //openy.Remove(i)
-                    }else{
-                    tx.push(this.openx[i])
-                    ty.push(this.openy[i])
-                }
+                    }else{// if( this.map[this.openx[i]][this.openy[i]] == mymap.tileempty ){
+                        tx.push(this.openx[i])
+                        ty.push(this.openy[i])
+                    }
+                
             }
             this.openx = []
             this.openy = []
@@ -959,6 +972,7 @@ Use different browser.
                 this.openy.push(ty[i])
             }
             
+            /*
             // Remove open slime where no slimetiles are underneath
             tx = []
             ty = []
@@ -975,7 +989,7 @@ Use different browser.
                 this.openx.push(tx[i])
                 this.openy.push(ty[i])
             }
-
+            */
         }
 
         slimecollide(x,y,w,h,remove){
@@ -1044,11 +1058,13 @@ Use different browser.
 
         addslime(sx,sy){
             
-            if(mymap.mapcollide((sx/2)*tilewidth,(sy/2)*tileheight,tilewidth/2,tileheight/2))return
-            //console.log("add slime here:"+sx+","+sy)
+            if(mymap.mapcollide(((sx+1*tilewidth)/2),((sy+1*tileheight)/2),tilewidth/2,tileheight/2))return 
+            //if(mymap.mapcollide(((sx*tilewidth)/2),((sy*tileheight)/2),tilewidth/2,tileheight/2))return 
+                       //console.log("add slime here:"+sx+","+sy)
             this.openx.push(sx)
             this.openy.push(sy)
-            this.map[sx][sy] = this.slimetile
+            //console.log(this.map[sx][sy])
+            if(this.map[sx][sy]==mymap.tileempty)this.map[sx][sy] = this.slimetile
             //console.log("z")
         }
 
@@ -2981,6 +2997,25 @@ Use different browser.
             this.mcy=0;
             this.playeritem = create2DArray(this.playeritemnames.length,2);
             //this.createrandominventory();
+           
+        }
+        setPositionNearSlimeMonster(){
+            for(var y=0;y<mygrowslime.map.length;y+=1){
+                for(var x=0;x<mygrowslime.map[0].length;x+=1){
+                    if(mygrowslime.map[x][y]==mygrowslime.slimetile){
+                        myplayer.px = Math.floor(((x+2)/2)*tilewidth)
+                        myplayer.py = Math.floor(((y-4)/2)*tileheight)
+                        myplayer.mcx = Math.floor((myplayer.px/tilewidth))
+                        myplayer.mcy = Math.floor((myplayer.py/tilewidth))
+                        myplayer.mcx-=20
+                        myplayer.mcy-=10
+                        console.log(myplayer.py/tilewidth)                        
+                        break
+                    }
+                }
+            }
+            
+
         }
         createrandominventory(){
 		    for(var i=0;i<this.playeritemnames.length;i++){
@@ -2988,6 +3023,7 @@ Use different browser.
 			    this.playeritem[i][1] = Math.floor(Math.random()*65);
             }
         }
+
         updateplayercontrols(){
             this.pmx = this.px-(this.mcx*this.tw);
             this.pmy = this.py-(this.mcy*this.th);
@@ -3413,7 +3449,23 @@ Use different browser.
 
             
 
+            if(developmode){
+                for(var i=0;i<mygrowslime.openx.length;i++){
+                    var x1=mygrowslime.openx[i]*tilewidth/2
+                    var y1=mygrowslime.openy[i]*tileheight/2
+                    var x2=(x1-(this.mcx*this.tw))+this.mox;
+                    var y2=(y1-(this.mcy*this.th))+this.moy;
 
+                //var x1=mytownperson[i].px;
+                //var y1=mytownperson[i].py;
+                //var x2=(x1-(this.mcx*this.tw))+this.mox;
+                //var y2=(y1-(this.mcy*this.th))+this.moy;
+                    ctx.globalAlpha = 0.5
+                    ctx.fillStyle="red"
+                    ctx.fillRect(x2,y2,tilewidth/2,tileheight/2)
+                }
+            }
+            ctx.globalAlpha=1
 
 
 
@@ -4755,7 +4807,7 @@ Use different browser.
             for(var i=0;i<10;i++){
                 //myegg.push(new egg(64-i,16))
             }
-
+             if(developmode)myplayer.setPositionNearSlimeMonster()
             gamestate = "play"
         }
         
@@ -4957,7 +5009,7 @@ Use different browser.
                 
                 ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
                 ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
-                ctx.fillText(myitem.length,320,15);//debug
+                ctx.fillText(mygrowslime.openx.length,320,15);//debug
                 ctx.scale(1,1);
                 ctx.restore()
                 ctx.scale(1.3,1.3)
