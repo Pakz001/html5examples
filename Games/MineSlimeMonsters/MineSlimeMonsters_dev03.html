@@ -756,7 +756,7 @@ Use different browser.
             if(speed == "slow"){
                 freq = 120//120
             }else{
-                freq = 10
+                freq = 1
             }
             
             //every now And then check if we can restore growth
@@ -1065,10 +1065,10 @@ Use different browser.
         }
 
         addslime(sx,sy){
-            
-            if( mymap.mapcollide(((sx+1*tilewidth)/2),((sy+1*tileheight)/2),tilewidth/2,tileheight/2)
-            && mymap.mapcollide(((sx*tilewidth)/2),((sy*tileheight)/2),tilewidth/2,tileheight/2)
-                )return 
+            //var a=0
+            //if(mymap.mapcollide((((sx)+1*tilewidth)/2),(((sy)+1*tileheight)/2),tilewidth/2,tileheight/2))a+=1
+            if(mymap.mapcollide(((sx*tilewidth)/2),((sy*tileheight)/2),tilewidth/3,tileheight/3))return
+            //if(a==1)return
             //if(mymap.mapcollide(((sx*tilewidth)/2),((sy*tileheight)/2),tilewidth/2,tileheight/2))return 
                        //console.log("add slime here:"+sx+","+sy)
             this.openx.push(sx)
