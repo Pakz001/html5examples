@@ -164,8 +164,8 @@ Use different browser.
     var mapheight=240;
     var screenwidth=window.innerWidth+48;
     var screenheight=window.innerHeight+48;
-    var tilewidth=32;
-    var tileheight=32;
+    var tilewidth=48;
+    var tileheight=48;
 
     // random == 2
     var egggrowspeed = 1000
@@ -3179,18 +3179,13 @@ Use different browser.
             // Player animation
             //
             //if(Controller.Up==false && Controller.Down==false){
-                if(this.noControllerPressed() && this.currentAnimation!="aimRight")  this.setStandingAnimation()
-                if( this.currentAnimation == "aimDown" || this.currentAnimation=="aimRightDown" ||
-                    this.currentAnimation == "aimRight" || this.currentAnimation=="aimRightUp" ||
-                    this.currentAnimation == "aimUp"){
-                    //if(Controller.Left==true || Controller.Right==true)this.setWalkingAnimation()     
-                }
-                if(Controller.Left==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
-                if(Controller.Right==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
-                if(Controller.Left==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
-                if(Controller.Right==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
-                if(Controller.Left==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
-                if(Controller.Right==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
+            
+            if(Controller.Left==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
+            if(Controller.Right==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
+            if(Controller.Left==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
+            if(Controller.Right==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
+            if(Controller.Left==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
+            if(Controller.Right==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
 
             //}           
 
@@ -3212,6 +3207,8 @@ Use different browser.
                       if(this.currentAnimation!="ladderClimbingAnimation"){
                            this.setLadderAnimation()
                        }
+                }else if(this.currentAnimation=="ladderAnimation"){
+                            this.setStandingAnimation()
                 }
             }
 
