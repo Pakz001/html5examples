@@ -3020,6 +3020,27 @@ Use different browser.
             this.setStandingAnimation()
            
         }
+        setLadderClimbingAnimation(){
+            this.currentAnimation = "ladderClimbingAnimation"
+            this.frame = 70
+            this.animationMode = "loop" 
+            this.animation = [70,71,72]
+            this.animationTime = [10,10,10]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }            
+
+        setLadderAnimation(){
+            this.currentAnimation = "ladderAnimation"
+            this.frame = 70
+            this.animationMode = "loop" 
+            this.animation = [70]
+            this.animationTime = [10]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }            
         setJumpingAnimation(){
             this.currentAnimation = "jumpingAnimation"
             this.frame = 61
@@ -3093,18 +3114,45 @@ Use different browser.
                 
             }          
             
-            if(this.noControllerPressed())this.setStandingAnimation()
-            if(Controller.Left==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
-            if(Controller.Right==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
-            if(Controller.Left==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
-            if(Controller.Right==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
-
-
-
+            // get coordinates on map
             this.pmx = this.px-(this.mcx*this.tw);
             this.pmy = this.py-(this.mcy*this.th);
-            this.ptx = this.px/this.tw;
-            this.pty = this.py/this.th;
+            this.ptx = Math.floor(this.px/this.tw)
+            this.pty = Math.floor(this.py/this.th)
+
+            //
+            // Player animation
+            //
+            if(Controller.Up==false && Controller.Down==false){
+                if(this.noControllerPressed())this.setStandingAnimation()
+                if(Controller.Left==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
+                if(Controller.Right==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
+                if(Controller.Left==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
+                if(Controller.Right==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
+            }           
+
+//            if(this.playerladdercollision(this.px,this.py) && this.currentAnimation!="ladderAnimation" && this.currentAnimation!="ladderClimbingAnimation"){
+//                this.setLadderAnimation()
+//            }
+
+            if(Controller.Up==true || Controller.Down==true){
+                if(this.playerladdercollision(this.px,this.py)){
+                    if(this.currentAnimation!="ladderClimbingAnimation"){
+                        this.setLadderClimbingAnimation()
+                        this.animationCurrentTime=10
+                    }
+                }                    
+            }
+//
+            if(Controller.Up==false && Controller.Down==false){
+                if(this.playerladdercollision(this.px,this.py) ){
+                      if(this.currentAnimation!="ladderClimbingAnimation"){
+                           this.setLadderAnimation()
+                       }
+                }
+            }
+
+            
             if(this.playerladdercollision(this.px,this.py)){
                 this.jump=false;
                 this.laddermode();
