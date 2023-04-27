@@ -31,6 +31,9 @@ Use different browser.
     //          lists every x millisecs.
     //
     //
+    // Bug with laserwall close together??
+    //
+    //
     // add + turrets shoot slime + slime eats villagers + villagers can shoot +
     // eggs get eaten by slime.
     // possible bug ai bottom of slime can pass through slime.
@@ -294,7 +297,7 @@ Use different browser.
             this.by = this.getbottomtile(x,y)
             this.tx = x
             this.ty = this.gettoptile(x,y-10)	
-            if(distanceM(this.by,0,this.ty,0)>400)this.deleteme=true
+            if(distanceM(this.by,0,this.ty,0)>tileheight*12)this.deleteme=true
         }
         
         update(){
