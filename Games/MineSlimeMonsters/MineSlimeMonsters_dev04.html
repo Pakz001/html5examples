@@ -164,8 +164,8 @@ Use different browser.
     var mapheight=240;
     var screenwidth=window.innerWidth+48;
     var screenheight=window.innerHeight+48;
-    var tilewidth=32;
-    var tileheight=32;
+    var tilewidth=48;
+    var tileheight=48;
 
     // random == 2
     var egggrowspeed = 1000
@@ -3002,9 +3002,10 @@ Use different browser.
             this.maptileswidth = Math.floor(screenwidth / this.tw);
             this.maptilesheight = Math.floor(screenheight / this.th);
 
-            this.mcx=Math.floor((mapwidth/2)-((screenwidth/tilewidth)/2));
+            this.mcx=Math.floor(this.px/tilewidth)-Math.floor(this.maptileswidth/2);
             
-            this.mcy=0;
+            this.mcy=Math.floor(this.py/tilewidth)-Math.floor(this.maptilesheight/2);
+            console.log(this.maptilesheight)
             this.playeritem = create2DArray(this.playeritemnames.length,2);
             //this.createrandominventory();
 
@@ -3067,7 +3068,7 @@ Use different browser.
             this.frame = 60
             this.animationMode = "loop" 
             this.animation = [60,61,62,63,64]
-            this.animationTime = [10,10,10,10,10]
+            this.animationTime = [5,5,5,5,5]
             this.animationIndex = 0
             this.animationDirection = 1
             this.animationCurrentTime = 0
@@ -3089,7 +3090,7 @@ Use different browser.
             if(this.animationCurrentTime>this.animationTime[this.animationIndex]){
                 this.animationCurrentTime = 0
                 this.animationIndex+=this.animationDirection
-                if(this.animationIndex>=this.animation.length-1){
+                if(this.animationIndex>this.animation.length-1){
                     //this.animationIndex = 0
                     if(this.animationMode=="loop"){
                         this.frame = this.animation[0]
@@ -3597,7 +3598,7 @@ Use different browser.
                     
                     
                     if(x2<0 || x2>=mapwidth || y2<0 || y2>=mapheight)continue;		
-                    if(x2<this.mcx-2 || x2>this.mcx+40 || y2<this.mcy-2 || y2>this.mcy+40)continue
+                    //if(x2<this.mcx-2 || x2>this.mcx+40 || y2<this.mcy-2 || y2>this.mcy+40)continue
                     
                     // NOTE : Gradient background.
                     //
@@ -3683,7 +3684,7 @@ Use different browser.
                     var y2=this.mcy+y;
                     var x3=(x*this.tw)+this.mox;
                     var y3=(y*this.th)+this.moy;
-                    if(x2<this.mcx-2 || x2>this.mcx+40 || y2<this.mcy-2 || y2>this.mcy+40)continue
+                    //if(x2<this.mcx-2 || x2>this.mcx+40 || y2<this.mcy-2 || y2>this.mcy+40)continue
                     if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){
                         if(mymap.mapladder[x2][y2] == 1){
                             //canvas.Color = Color.Brown
@@ -4051,6 +4052,8 @@ Use different browser.
             this.map=[];//New Int[1,1]
             this.mapfinal=[];//New Int[1,1]
             this.mapladder=[];//New Int[1,1]
+            this.numScreenTilesHor = Math.floor(screenwidth / tilewidth)
+            this.numScreenTilesVer = Math.floor(screenheight / tileheight)
             //this.mapimage:Image
             //this.mapcanvas:Canvas
             //this.mapladderimage:Image
