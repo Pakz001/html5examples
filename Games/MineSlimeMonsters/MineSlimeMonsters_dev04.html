@@ -3348,7 +3348,11 @@ Use different browser.
                 for(var x2=cx-1;x2<cx+2;x2++){
                     if(x2>=0 && x2<mapwidth && y2>=0 && y2<mapheight){	            		        
                         if(mymap.mapladder[Math.floor(x2)][Math.floor(y2)] == 1){	                	                     
-                            if(this.rectsoverlap(x,y,this.pw,this.ph,x2*this.tw,y2*this.th,this.tw,this.th) == true){                                    	                    
+                            if(this.rectsoverlap(x,y,
+                                                this.pw,this.ph,
+                                                (x2*this.tw)+this.tw/2,
+                                                (y2*this.th),
+                                                (this.tw/9),(this.th)) == true){                                    	                    
                                 return true;
                             }
                         }
