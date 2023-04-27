@@ -164,8 +164,8 @@ Use different browser.
     var mapheight=240;
     var screenwidth=window.innerWidth+48;
     var screenheight=window.innerHeight+48;
-    var tilewidth=48;
-    var tileheight=48;
+    var tilewidth=32;
+    var tileheight=32;
 
     // random == 2
     var egggrowspeed = 1000
@@ -3124,13 +3124,13 @@ Use different browser.
             //
             // Player animation
             //
-            if(Controller.Up==false && Controller.Down==false){
+            //if(Controller.Up==false && Controller.Down==false){
                 if(this.noControllerPressed())this.setStandingAnimation()
                 if(Controller.Left==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
                 if(Controller.Right==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
                 if(Controller.Left==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
                 if(Controller.Right==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
-            }           
+            //}           
 
 //            if(this.playerladdercollision(this.px,this.py) && this.currentAnimation!="ladderAnimation" && this.currentAnimation!="ladderClimbingAnimation"){
 //                this.setLadderAnimation()
@@ -3796,6 +3796,8 @@ Use different browser.
             //ctx.filter = "brightness(100%)"
             //ctx.restore()
 
+
+
             // Draw the player
             this.pmx = (this.px-(this.mcx*this.tw))+this.mox;
             this.pmy = (this.py-(this.mcy*this.th))+this.moy;
@@ -3805,13 +3807,15 @@ Use different browser.
             //ctx.fillRect(this.pmx,this.pmy,this.pw,this.ph);
             this.drawpowerbar(this.pmx,this.pmy-6,this.hp,this.hpmax);
             var a = -1
-            if(this.facing=="left"){
+            if(Controller.Left==true || this.facing=="left"){
                 a=-1
             }else{
                 a=1
             }            
             drawSprite(this.pmx,this.pmy,this.frame,a)
             
+
+
             //draw flying monsters	
             for(var i=0;i<myflyingmonster.length;i++){
                 if(myflyingmonster[i].inRange==false)continue
