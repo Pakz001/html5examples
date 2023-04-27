@@ -3021,6 +3021,60 @@ Use different browser.
             this.setStandingAnimation()
            
         }
+        setAimUpAnimation(){
+            this.currentAnimation = "aimUp"
+            this.frame = 69
+            this.animationMode = "loop" 
+            this.animation = [69]
+            this.animationTime = [10]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }          
+
+        setAimRightUpAnimation(){
+            this.currentAnimation = "aimRightUp"
+            this.frame = 68
+            this.animationMode = "loop" 
+            this.animation = [68]
+            this.animationTime = [10]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }          
+
+        setAimRightAnimation(){
+            this.currentAnimation = "aimRight"
+            this.frame = 67
+            this.animationMode = "loop" 
+            this.animation = [67]
+            this.animationTime = [10]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }          
+
+        setAimRightDownAnimation(){
+            this.currentAnimation = "aimRightDown"
+            this.frame = 66
+            this.animationMode = "loop" 
+            this.animation = [66]
+            this.animationTime = [10]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }          
+
+        setAimDownAnimation(){
+            this.currentAnimation = "aimDown"
+            this.frame = 65
+            this.animationMode = "loop" 
+            this.animation = [65]
+            this.animationTime = [65]
+            this.animationIndex = 0
+            this.animationDirection = 1
+            this.animationCurrentTime = 0
+        }          
         setLadderClimbingAnimation(){
             this.currentAnimation = "ladderClimbingAnimation"
             this.frame = 70
@@ -3125,11 +3179,19 @@ Use different browser.
             // Player animation
             //
             //if(Controller.Up==false && Controller.Down==false){
-                if(this.noControllerPressed())this.setStandingAnimation()
+                if(this.noControllerPressed() && this.currentAnimation!="aimRight")  this.setStandingAnimation()
+                if( this.currentAnimation == "aimDown" || this.currentAnimation=="aimRightDown" ||
+                    this.currentAnimation == "aimRight" || this.currentAnimation=="aimRightUp" ||
+                    this.currentAnimation == "aimUp"){
+                    //if(Controller.Left==true || Controller.Right==true)this.setWalkingAnimation()     
+                }
                 if(Controller.Left==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
                 if(Controller.Right==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
                 if(Controller.Left==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
                 if(Controller.Right==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
+                if(Controller.Left==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
+                if(Controller.Right==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
+
             //}           
 
 //            if(this.playerladdercollision(this.px,this.py) && this.currentAnimation!="ladderAnimation" && this.currentAnimation!="ladderClimbingAnimation"){
@@ -3522,32 +3584,40 @@ Use different browser.
             var angle=0;
             if(this.facing=="left"){
                 angle = Math.PI;
+                this.setAimRightAnimation()
             }
             if(this.facing=="right"){
                 angle = 0;
+                this.setAimRightAnimation()
             }
             if(this.facing=="up"){
                 angle = Math.PI*1.55+randomRangeFloat(-0.2,0.2);
+                this.setAimUpAnimation()
             }
             if(this.facing=="down"){
                 angle = Math.PI/2+randomRangeFloat(-0.2,0.2);
+                this.setAimDownAnimation()
             }
             if(Controller.Left==true && Controller.Up==true){
                 angle = -Math.PI/1.2
+                this.setAimRightUpAnimation()
                 
             }else
                 if(Controller.Right==true && Controller.Up==true){
                 angle = -Math.PI/4
+                this.setAimRightUpAnimation()
             }else
 
                 if(Controller.Right==true && Controller.Down==true){
                 
                 angle = Math.PI/4
+                this.setAimRightDownAnimation()
             }else
 
                 if(Controller.Left==true && Controller.Down==true){
                 
                 angle = Math.PI-Math.PI/4
+                this.setAimRightDownAnimation()
 
             }
 
