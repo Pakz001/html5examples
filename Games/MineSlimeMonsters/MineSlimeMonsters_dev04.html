@@ -3179,13 +3179,14 @@ Use different browser.
             // Player animation
             //
             //if(Controller.Up==false && Controller.Down==false){
-            
-            if(Controller.Left==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
-            if(Controller.Right==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
-            if(Controller.Left==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
-            if(Controller.Right==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
-            if(Controller.Left==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
-            if(Controller.Right==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
+                if(this.noControllerPressed() && this.currentAnimation!="aimRight")  this.setStandingAnimation()
+               
+                if(Controller.Left==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
+                if(Controller.Right==true && this.currentAnimation=="standingAnimation")this.setWalkingAnimation()
+                if(Controller.Left==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
+                if(Controller.Right==true && this.currentAnimation=="jumpingAnimation")this.setWalkingAnimation()
+                if(Controller.Left==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
+                if(Controller.Right==true && this.currentAnimation=="aimRight")this.setWalkingAnimation()
 
             //}           
 
