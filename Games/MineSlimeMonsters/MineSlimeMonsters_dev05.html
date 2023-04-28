@@ -4293,11 +4293,20 @@ Use different browser.
             var tx = Math.floor(myplayer.px / tilewidth)
             var ty = Math.floor(myplayer.py  / tileheight)
             var d = Math.floor(myplayer.maptileswidth)
+            if(myplayer.maptilesheight>myplayer.maptileswidth)d=Math.floor(myplayer.maptilesheight)
             var m = 0.055
+            //if(myplayer.maptileswidth>myplayer.maptilesheight && myplayer.maptileswidth<20)m=myplayer.maptileswidth/150
+            //if(myplayer.maptilesheight>myplayer.maptileswidth && myplayer.maptilesheight<20)m=myplayer.maptilesheight/150
+            if(myplayer.maptilesheight>myplayer.maptileswidth)m = 1.0/(myplayer.maptilesheight/1.65)
+            
+            if(myplayer.maptileswidth>myplayer.maptilesheight)m = 1.0/(myplayer.maptileswidth/1.65)
+            //console.log(m + ","+myplayer.maptilesheight)
+            
             if(myplayer.pty<20){
                 d*=2
                 m/=3
             }
+            
             //console.log(d)
             for(var y=ty-d;y<ty+d;y+=1){
             for(var x=tx-d;x<tx+d;x+=1){
