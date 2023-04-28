@@ -5063,6 +5063,13 @@ Use different browser.
     //
     offscreenCanvas.width=window.innerWidth-32;
     offscreenCanvas.height=window.innerHeight-32;
+    touchAreaDownX = []
+    touchAreaDownY = []
+    touchAreaWidth = []
+    touchAreaHeight = []
+    touchControlsLeft(true)
+    touchControlsRight(true)
+
     //
     gameloop=setInterval(doGameLoop2,15);
     //
@@ -5083,6 +5090,9 @@ Use different browser.
             mymenuselect.draw()
             //mymenuselect.draw()   
             ctx.drawImage(offscreenCanvas,0,0)
+            touchControlsLeft(false)
+            touchControlsRight(false)
+
 
         }
         if(gamestate=="setup"){
@@ -5136,12 +5146,7 @@ Use different browser.
                 //myegg.push(new egg(64-i,16))
             }
             if(developmode)myplayer.setPositionNearSlimeMonster()
-            touchAreaDownX = []
-            touchAreaDownY = []
-            touchAreaWidth = []
-            touchAreaHeight = []
-            touchControlsLeft(true)
-            touchControlsRight(true)
+
             gamestate = "play"
         }
         
