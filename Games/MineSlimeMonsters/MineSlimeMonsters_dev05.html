@@ -157,6 +157,8 @@ Use different browser.
     window.addEventListener("touchstart", touchHandler,false);					
     window.addEventListener("touchmove", touchHandler,false);
 
+    var touchControlVisible = false // press screen to activate touch screen controls...
+
     // w and h of the tile image file
     var tileImageWidth = 640
     var tileImageHeight = 480;
@@ -419,12 +421,13 @@ Use different browser.
             this.maxDelay = 8
             this.m
             this.index=0
-            this.x1=50
+            this.sw1=(screenwidth/6)
+            this.sh1=150
+
+            this.x1=25
             this.y1=100
             this.w1=150
             this.h1=150
-            this.sw1=150
-            this.sh1=150
             this.m1 = create2DArray(this.w1,this.h1)
             //SeedRnd(1)
             var m = new map(this.sw1,this.sh1,this.w1,this.h1,false)
@@ -434,12 +437,13 @@ Use different browser.
                 }
             }
             //drawmap(icanvas,x,y,w,h)
-            this.x2 = 200
+            this.sw2 = (screenwidth/6)//250
+            this.sh2 = 250
+
+            this.x2 = ((screenwidth)/2)-(this.sw2)
             this.y2 = 100
             this.w2 = 250
             this.h2 = 250
-            this.sw2 = 250
-            this.sh2 = 250
             this.m2 = create2DArray(this.w2,this.h2)
             var m = new map(this.sw2,this.sh2,this.w2,this.h2,false)
             for(var x = 0;x<this.w2;x+=1){
@@ -448,12 +452,14 @@ Use different browser.
                 }
             }
             //drawmap(icanvas,x,y,w,h)
-            this.x3 = 450
+            this.sw3 = (screenwidth/6)
+            this.sh3 = 300
+
+            this.x3 = (screenwidth)-(this.sw3*2)
+            //console.log(this.x3)
             this.y3 = 100
             this.w3 = 300
             this.h3 = 300
-            this.sw3 = 300
-            this.sh3 = 300
             this.m3 = create2DArray(this.w3,this.h3)
             var m = new map(this.sw3,this.sh3,this.w3,this.h3,false)
             for(var x = 0;x<this.w3;x+=1){
@@ -509,25 +515,25 @@ Use different browser.
             //canvas.DrawText("Select Difficulty",400/2,50/2,.5,.5)
             //canvas.PopMatrix()
             //canvas.Color = Color.Yellow
-            var x=50
+            var x=this.x1
             var y=100
-            var w=150
+            var w=this.sw1
             var h=150
             if(this.index == 0){ 
                 this.mydrawrect(x,y,w,h)
                 this.mydrawrect(x+1,y+1,w-2,h-2)
             }
-            x = 200
+            x = this.x2
             y = 100
-            w = 250
+            w = this.sw2
             h = 250
             if(this.index == 1){ 
                 this.mydrawrect(x,y,w,h)
                 this.mydrawrect(x+1,y+1,w-2,h-2)
             }
-            x = 450
+            x = this.x3
             y = 100
-            w = 300
+            w = this.sw3
             h = 300
             if(this.index == 2){ 
                 this.mydrawrect(x,y,w,h)
@@ -538,24 +544,34 @@ Use different browser.
             ctx2.fillStyle='black'
             ctx2.fillRect(0,0,screenwidth,screenheight)
             var x,y,w,h
+            var tw,th
             for(var i=0;i<3;i+=1){
                 if(i==0){
                     x = this.x1
                     y = this.y1
                     w = this.w1
                     h = this.h1
+                    tw = this.sw1/this.w1
+
+                    th=1
                 }
                 if(i==1){
                     x = this.x2
                     y = this.y2
                     w = this.w2
                     h = this.h2
+                    tw =  this.sw2/w
+                    th=1
+
+                    th=1
                 }
                 if(i==2){
                     x = this.x3
                     y = this.y3
                     w = this.w3
                     h = this.h3
+                    tw = this.sw3/this.w3
+                    th=1
                 }
                 
                 for(var y1=0;y1<h;y1+=1){
@@ -566,7 +582,7 @@ Use different browser.
                         if(i==2)a = this.m3[x1][y1]
                         if(a==1){
                             ctx2.fillStyle = 'rgb(255,255,255)'
-                            ctx2.fillRect(x1+x,y1+y,1,1)
+                            ctx2.fillRect(x+(x1*tw),y+(y1*th),1,1)
                         } 
                     }
                 }
@@ -5101,6 +5117,8 @@ Use different browser.
             mymenuselect.draw()
             //mymenuselect.draw()   
             ctx.drawImage(offscreenCanvas,0,0)
+            ctx.fillStyle="white"
+            ctx.fillText("(Touch the screen to activate touch screen interface.)",0,35)
             touchControlsLeft(false)
             touchControlsRight(false)
 
@@ -5677,15 +5695,16 @@ Use different browser.
         }
     }
     function touchControlsRight(setup=true){
-
+        
         if(setup==false){
             ctx.fillStyle = 'grey'
-            ctx.globalAlpha = 0.25
+            ctx.globalAlpha = 0.45
         } 
         for(var y=-1;y<=1;y+=1){
             for(var x=-1;x<=1;x+=1){
 
                 if(setup==false){
+                    if(touchControlVisible==false)return
                     ctx.fillRect(   touchControlsRightX+(x*(touchButtonWidth)),touchControlsRightY+(y*(touchButtonHeight)),
                                     touchButtonWidth*.9,touchButtonHeight*.9)
                 }else{
@@ -5700,18 +5719,17 @@ Use different browser.
     }
 
     function touchControlsLeft(setup=true){
-        
         //x1-=64
         //y1-=120
         if(setup==false){
             ctx.fillStyle = 'grey'
-            ctx.globalAlpha = 0.25
+            ctx.globalAlpha = 0.45
         }
         for(var y=-1;y<=1;y+=1){
             for(var x=-1;x<=1;x+=1){
 
                 if(setup==false){
-                    
+                    if(touchControlVisible==false)return
                     ctx.fillRect(   touchControlsLeftX+(x*(touchButtonWidth)),touchControlsLeftY+(y*(touchButtonHeight)),
                                 touchButtonWidth*.9,touchButtonHeight*.9)
                 }else{
@@ -5727,7 +5745,7 @@ Use different browser.
         if(setup==false)ctx.globalAlpha = 1
     }
     function touchHandler(e){
-
+        if(touchControlVisible==false)touchControlVisible=true
         if(e.type=="touchstart" && e.touches) {
             var x = e.changedTouches[0].clientX;
             var y = e.changedTouches[0].clientY;
