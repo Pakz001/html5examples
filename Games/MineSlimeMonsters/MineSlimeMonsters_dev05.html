@@ -187,9 +187,9 @@ Use different browser.
     var gamestate = "select" // menu and st
 
     var touchControlsLeftX = screenwidth*.13
-    var touchControlsLeftY = screenheight*.70
+    var touchControlsLeftY = screenheight*.66
     var touchControlsRightX = screenwidth*.70
-    var touchControlsRightY = screenheight*.70
+    var touchControlsRightY = screenheight*.66
 
     var touchButtonWidth = screenwidth*.064
     var touchButtonHeight = screenheight*.064
@@ -3620,6 +3620,7 @@ Use different browser.
             }
         }
         fireshotgun(){
+            console.log("Fire routine"+Controller.Left+","+Controller.Up)
             var angle=0;
             if(this.facing=="left"){
                 angle = Math.PI;
@@ -3638,6 +3639,7 @@ Use different browser.
                 this.setAimDownAnimation()
             }
             if(Controller.Left==true && Controller.Up==true){
+                
                 angle = -Math.PI/1.2
                 this.setAimRightUpAnimation()
                 
@@ -5787,12 +5789,12 @@ Use different browser.
     // Set controller from the touch handler (touch screen)
     //
     function setController(num,set){
-        Controller.Down=false;
+        //Controller.Down=false;
         //Controller.Left=false
         //Controller.Right=false
-        Controller.Up=false
-        Controller.ShotGun=false
-        Controller.Grenade=false
+        //Controller.Up=false
+        //Controller.ShotGun=false
+        //Controller.Grenade=false
         Controller.LaserWall=false
         Controller.Jump=false
 
@@ -5801,21 +5803,22 @@ Use different browser.
 
         // left side controller
         if(num==0){
-            Controller.Left=set
+            if(Controller.Right==false)Controller.Left=set
             Controller.Up=set
+            console.log("set:"+Controller.Left+","+Controller.Up)
         }
         if(num==1){
             Controller.Up=set
         }
         if(num==2){            
-            Controller.Right=set
+            if(Controller.Left==false)Controller.Right=set
             Controller.Up=set
         }
         if(num==3){
-            Controller.Left=set
+            if(Controller.Right==false)Controller.Left=set
         }
         if(num==5){
-            Controller.Right=set
+            if(Controller.Left==false)Controller.Right=set
         }
         if(num==6){
             Controller.Left=set
@@ -5825,7 +5828,7 @@ Use different browser.
             Controller.Down=set
         }
         if(num==8){
-            Controller.Right=set
+            if(Controller.Left==false)Controller.Right=set
             Controller.Down=set
         }
         //
@@ -5843,8 +5846,8 @@ Use different browser.
         if(num==17){
             Controller.LaserWall=set
         }
-
-
+console.log("inside"+Controller.Left+","+Controller.Up)
+        
     }
 </script>
 </body>
