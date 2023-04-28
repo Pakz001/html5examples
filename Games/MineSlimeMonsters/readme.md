@@ -39,6 +39,7 @@ Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
 * rescue villagers (mission?)
 * Lighting system?
 * Ladder rider - tool for going up and down ladders faster (store:levels)
+* tile (globalAlpha) light fill around play to add some mood and eye candy
 
 <br><br>
 **Adding Features later on/bugs :**
