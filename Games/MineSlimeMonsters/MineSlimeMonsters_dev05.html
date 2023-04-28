@@ -3023,7 +3023,8 @@ Use different browser.
             this.px;
             this.py;
             this.pmx,this.pmy;
-            this.ptx,this.pty;
+            this.ptx,this.pty; // tile x and y position
+            this.optx,this.opty // old tile x and y position
             this.mox=0,this.moy=0;
             this.pw,this.ph;	
             this.mcx,this.mcy,this.mpx,this.mpy; // scroll coordinates
@@ -3218,6 +3219,13 @@ Use different browser.
             this.pmy = this.py-(this.mcy*this.th);
             this.ptx = Math.floor(this.px/this.tw)
             this.pty = Math.floor(this.py/this.th)
+            if(this.optx == this.ptx && this.opty == this.pty ){
+
+                }else{
+                mymap.lightTheMap()
+                this.optx = this.ptx
+                this.opty = this.pty
+            }
 
             //
             // Player animation
@@ -3716,6 +3724,8 @@ Use different browser.
         }
         // player draw routine - all tile map game
 	    draw(){
+            //console.log(myplayer.ptx+","+myplayer.optx+"||"+myplayer.pty+","+myplayer.opty)   
+            
             ctx.globalAlpha = 1;
             //canvas.Scissor = New Recti(32,32,screenwidth-32,screenheight-64)
             //draw the map
@@ -3734,6 +3744,7 @@ Use different browser.
                     
                     
                     if(x2<0 || x2>=mapwidth || y2<0 || y2>=mapheight)continue;		
+                    ctx.globalAlpha = 1.0-mymap.lightmap2[x2][y2]
                     //if(x2<this.mcx-2 || x2>this.mcx+40 || y2<this.mcy-2 || y2>this.mcy+40)continue
                     
                     // NOTE : Gradient background.
@@ -3748,13 +3759,15 @@ Use different browser.
                     //if(mymap.tilemap[x2][y2]>=0 && mymap.tilemap[x2][y2]<=2){
                     if(y2>16){
                         //if(mymap.tilemap[x2][y2]>30)console.log(mymap.tilemap[x2][y2])
-   
+                        //ctx.globalAlpha = mymap.[x2][y2]
+
                         drawTile(x3,y3,mymap.tilemap[x2][y2])
                         if(mymap.lightmap[x2][y2]>0){
                             ctx.globalAlpha = 1.0-(mymap.lightmap[x2][y2])
                             drawTile(x3,y3,20)
                             ctx.globalAlpha = 1
                         }
+                        
                     }
                     
                     if(mymap.mapfinal[x2][y2]== mymap.tileturret){
@@ -3831,6 +3844,7 @@ Use different browser.
                             //ctx.fillRect(x3,y3,this.tw,this.th);
                             //ctx.fillStyle = 'red';
                             //ctx.fillRect(x3+this.tw/6,y3,this.tw/4,this.th/3);
+                            
                             if(y2>16)ctx.drawImage(tileImage,0,0,32,32,x3,y3,tilewidth,tileheight);
                             ctx.drawImage(tileImage,416,48,32,32,x3,y3,tilewidth,tileheight);
 
@@ -3899,11 +3913,12 @@ Use different browser.
             
             for(var i=0;i<myegg.length;i++){
                 if(myegg[i].inRange==false)continue
-
                 var x1=myegg[i].px;
                 var y1=myegg[i].py;
                 var x2=(x1-(this.mcx*this.tw))+this.mox;
                 var y2=(y1-(this.mcy*this.th))+this.moy;
+               // ctx.globalAlpha = 1.0-mymap.lightmap2[Math.floor(x1/tilewidth)][Math.floor(y1/tileheight)]
+
                 //var x2=(x1-(this.mcx*this.tw))+this.mox;
                 //var y2=(y1-(this.mcy*this.th))+this.moy;
                 //canvas.Color = Color.Red
@@ -4213,6 +4228,8 @@ Use different browser.
             this.mh = Math.floor(mh/3);		
             this.sw = sw;
             this.sh = sh;
+
+            //this.lightmap = []
             //mapimage = New Image(sw,sh)
             //mapcanvas = New Canvas(mapimage)
             //mapladderimage = New Image(sw,sh)
@@ -4231,6 +4248,7 @@ Use different browser.
 
             this.mapladder = create2DArray(this.mmw,this.mmh);
             this.mapdoor = create2DArray(this.mmw,this.mmh);
+            this.lightmap = create2DArray(this.mmw,this.mmh);
             //mapfinal = New Int[mmw,mmh]
             //mapladder = New Int[mmw,mmh]
             //mapdoor = New Int[mmw,mmh]
@@ -4263,7 +4281,69 @@ Use different browser.
             //for(var x=0;x<this.mmw;x+=1){
             //    if(this.tilemap[x][y]==42)console.log("asdasdasd")
             //}}
+            this.lightmap2 = create2DArray(this.mmw,this.mmh)
+            this.lightTheMap()
 
+        }
+        
+        lightTheMap(){
+            
+            if(myplayer==null)return
+            
+            var tx = Math.floor(myplayer.px / tilewidth)
+            var ty = Math.floor(myplayer.py  / tileheight)
+            var d = Math.floor(myplayer.maptileswidth)
+            var m = 0.055
+            if(myplayer.pty<20){
+                d*=2
+                m/=3
+            }
+            //console.log(d)
+            for(var y=ty-d;y<ty+d;y+=1){
+            for(var x=tx-d;x<tx+d;x+=1){
+                if(x>=0 && x<this.mmw && y>=0 && y<this.mmh){
+                    if(this.canLightTile(x,y)==true) mymap.lightmap2[x][y]=1
+                }
+            }}
+            //console.log("state")
+            var openlist = []
+            openlist.push({x:tx,y:ty})
+            this.lightmap2[tx][ty] = 0.1
+            var lval = 0.1
+            
+            while(openlist.length>0){
+                var x1 = openlist[0].x
+                var y1 = openlist[0].y
+                //console.log(openlist.length+"."+this.lightmap2[x1][y1]+","+x1+","+y1)
+                openlist.shift()
+
+                if(this.lightmap2[x1][y1]>=0.90)break
+                if(x1-1>=0 && this.canLightTile(x1-1,y1)==true && this.lightmap2[x1-1][y1]==1){
+                    this.lightmap2[x1-1][y1] = this.lightmap2[x1][y1]+m
+                    openlist.push({x:x1-1,y:y1})
+                }
+                if(x1+1<this.mmw && this.canLightTile(x1+1,y1)==true  && this.lightmap2[x1+1][y1]==1){
+                    this.lightmap2[x1+1][y1] = this.lightmap2[x1][y1]+m
+                    openlist.push({x:x1+1,y:y1})
+                }
+                if(y1-1>=0 && this.canLightTile(x1,y1-1)==true  && this.lightmap2[x1][y1-1]==1){
+                    this.lightmap2[x1][y1-1] = this.lightmap2[x1][y1]+m
+                    openlist.push({x:x1,y:y1-1})
+                }
+                if(y1+1<this.mmh && this.canLightTile(x1,y1+1)==true  && this.lightmap2[x1][y1+1]==1){
+                    this.lightmap2[x1][y1+1] = this.lightmap2[x1][y1]+m
+                    openlist.push({x:x1,y:y1+1})
+                }
+
+
+            }
+            
+        }
+        canLightTile(x,y){
+            if(this.mapfinal[x][y]==mymap.tileegg)return true
+            if(this.mapfinal[x][y]==mymap.tileempty)return true
+            if(this.mapfinal[x][y]==mymap.tileslime)return true
+            return false
         }
         addAllEggsFromMap(){
             for(var y=0;y<this.mmh;y+=1){
@@ -4476,6 +4556,7 @@ Use different browser.
             }
 
         }
+       
         // return random of inputted array
         randomBag(a){
             return a[Math.floor(Math.random()*a.length)]
