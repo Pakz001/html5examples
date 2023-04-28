@@ -187,12 +187,12 @@ Use different browser.
     var gamestate = "select" // menu and st
 
     var touchControlsLeftX = screenwidth*.13
-    var touchControlsLeftY = screenheight*.7
-    var touchControlsRightX = screenwidth*.76
-    var touchControlsRightY = screenheight*.7
+    var touchControlsLeftY = screenheight*.70
+    var touchControlsRightX = screenwidth*.70
+    var touchControlsRightY = screenheight*.70
 
-    var touchButtonWidth = screenwidth*.07
-    var touchButtonHeight = screenheight*.07
+    var touchButtonWidth = screenwidth*.064
+    var touchButtonHeight = screenheight*.064
     var touchAreaDownX = []
     var touchAreaDownY = []
     var touchAreaWidth = []
@@ -5722,12 +5722,15 @@ Use different browser.
             var y = e.changedTouches[0].clientY;
             lasttouchx = x;
             lasttouchy = y;
-
+            for(var j=0;j<e.changedTouches.length;j+=1){
+            x = e.changedTouches[j].clientX;
+            y = e.changedTouches[j].clientY;
             for(var i=0;i<touchAreaDownX.length;i+=1){
                 if(rectsoverlap(touchAreaDownX[i],touchAreaDownY[i],touchAreaWidth[i],touchAreaHeight[i],
                     x,y,1,1)){
                         setController(i,true)
                 }
+            }
             }
 
             e.preventDefault();
@@ -5738,6 +5741,9 @@ Use different browser.
             //touchDownX[i] = e.changedTouches[i].clientX
             //touchDownY[i] = e.changedTouches[i].clientY    
 
+            for(var j=0;j<e.changedTouches.length;j+=1){
+            x = e.changedTouches[j].clientX;
+            y = e.changedTouches[j].clientY;
             for(var i=0;i<touchAreaDownX.length;i+=1){
                 if(rectsoverlap(touchAreaDownX[i],touchAreaDownY[i],touchAreaWidth[i],touchAreaHeight[i],
                     x,y,1,1)==true){
@@ -5745,6 +5751,9 @@ Use different browser.
                         setController(i,true)
                 }
             }
+            }
+            
+
 
 //                touchDownX[i] = e.changedTouches[i].clientX
 //                touchDownY[i] = e.changedTouches[i].clientY    
