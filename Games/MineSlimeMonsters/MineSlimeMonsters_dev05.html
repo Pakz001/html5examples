@@ -27,14 +27,12 @@ Use different browser.
     var developmode = false;
 
     //
-    // Note :   Optimise lists by creating list with anything close to the player. Rebuild these
-    //          lists every x millisecs.
     //
     //
     // Bug with laserwall close together??
     //
     // 
-    // randomize grenade throwing a bit
+    // randomize grenade throwing a bit * test
     // jump from ladder * test
     // add + turrets shoot slime + slime eats villagers + villagers can shoot +
     // eggs get eaten by slime.
@@ -45,7 +43,8 @@ Use different browser.
     // 
     // Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
     //
-    // When it gets around 5000 lines it should be close to converted.
+    // Conversion note : The procedural house and tree generators from the original
+    // Monkey2 version were not added.
     //
     //
     //
@@ -74,10 +73,7 @@ Use different browser.
     window.addEventListener("keydown",kd,true);
     window.addEventListener("keyup",ku,true);
 
-    window.addEventListener("touchend", touchHandler,false);
-    window.addEventListener("touchstart", touchHandler,false);					
-    window.addEventListener("touchmove", touchHandler,false);
-
+    
     //
     //
     // NOTE : handle connect/disconnect not included - JOYPAD
@@ -157,6 +153,9 @@ Use different browser.
         Jump:false,
         MiniMap:false,
     } 
+    window.addEventListener("touchend", touchHandler,false);
+    window.addEventListener("touchstart", touchHandler,false);					
+    window.addEventListener("touchmove", touchHandler,false);
 
     // w and h of the tile image file
     var tileImageWidth = 640
@@ -186,6 +185,18 @@ Use different browser.
     var maxwalkingmonsters=30
 
     var gamestate = "select" // menu and st
+
+    var touchControlsLeftX = screenwidth*.13
+    var touchControlsLeftY = screenheight*.7
+    var touchControlsRightX = screenwidth*.76
+    var touchControlsRightY = screenheight*.7
+
+    var touchButtonWidth = screenwidth*.07
+    var touchButtonHeight = screenheight*.07
+    var touchAreaDownX = []
+    var touchAreaDownY = []
+    var touchAreaWidth = []
+    var touchAreaHeight = []
 
     // Monster Spawning Eggs. 
     //
@@ -5124,12 +5135,18 @@ Use different browser.
             for(var i=0;i<10;i++){
                 //myegg.push(new egg(64-i,16))
             }
-             if(developmode)myplayer.setPositionNearSlimeMonster()
+            if(developmode)myplayer.setPositionNearSlimeMonster()
+            touchAreaDownX = []
+            touchAreaDownY = []
+            touchAreaWidth = []
+            touchAreaHeight = []
+            touchControlsLeft(true)
+            touchControlsRight(true)
             gamestate = "play"
         }
         
         if(gamestate=="play"){
-                
+               
             
             //  UPDATES
             //
@@ -5314,8 +5331,14 @@ Use different browser.
                 if(tp==false){
                     myplayer.updateplayercontrols()
                 }
+
                 //canvas.Clear(Color.Black)
                 myplayer.draw()
+                // Draw the touch screen buttons
+                touchControlsLeft(false)
+                
+                touchControlsRight(false)
+
                 ctx.save()
                 ctx.scale(2,.7);    
 
@@ -5326,7 +5349,7 @@ Use different browser.
                 
                 ctx.fillText("Press 1(new level) or Home(selection). Left shift(map view) I(Inventory)",0,15);
                 ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
-                ctx.fillText(mygrowslime.openx.length,320,15);//debug
+                ctx.fillText("",320,15);//debug
                 ctx.scale(1,1);
                 ctx.restore()
                 ctx.scale(1.3,1.3)
@@ -5341,6 +5364,7 @@ Use different browser.
                 }
 
                 ctx.globalAlpha = 1;
+
                 //ctx.fillText(myflyingmonster[0].state+"-"+myflyingmonster[0].substate,320,30);//debug
             }
             //ctx.drawImage(tileImage,0,0,32,32,0,0,32,32);
@@ -5379,28 +5403,7 @@ Use different browser.
    
 
 
-    function touchHandler(e){
-        if(e.type=="touchstart" && e.touches) {
-            var x = e.changedTouches[0].clientX;
-            var y = e.changedTouches[0].clientY;
-            lasttouchx = x;
-            lasttouchy = y;
-            autoscroll = true;
-            colx = x-colw/2;
-            coly = y-colh/2;
-            //myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
-            e.preventDefault();
-        }
-        if(e.type=="touchend" && e.touches) {
-            var x = e.changedTouches[0].clientX;
-            var y = e.changedTouches[0].clientY;
-            autoscroll = false;
-        
-            //myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
-            e.preventDefault();
-        }
 
-    }
 
     function rectmapcollide(x,y,w,h,offsetx,offsety){
 
@@ -5657,38 +5660,178 @@ Use different browser.
             }
         }
     }
-    //
-    // Touch control
-    //
+    function touchControlsRight(setup=true){
+
+        if(setup==false){
+            ctx.fillStyle = 'grey'
+            ctx.globalAlpha = 0.25
+        } 
+        for(var y=-1;y<=1;y+=1){
+            for(var x=-1;x<=1;x+=1){
+
+                if(setup==false){
+                    ctx.fillRect(   touchControlsRightX+(x*(touchButtonWidth)),touchControlsRightY+(y*(touchButtonHeight)),
+                                    touchButtonWidth*.9,touchButtonHeight*.9)
+                }else{
+                    touchAreaDownX.push((touchControlsRightX+(x*(touchButtonWidth))))
+                    touchAreaDownY.push((touchControlsRightY+(y*(touchButtonHeight))))
+                    touchAreaWidth.push(touchButtonWidth)
+                    touchAreaHeight.push(touchButtonHeight)                                    
+                }
+            }
+        }
+        if(setup==false)ctx.globalAlpha = 1
+    }
+
+    function touchControlsLeft(setup=true){
+        
+        //x1-=64
+        //y1-=120
+        if(setup==false){
+            ctx.fillStyle = 'grey'
+            ctx.globalAlpha = 0.25
+        }
+        for(var y=-1;y<=1;y+=1){
+            for(var x=-1;x<=1;x+=1){
+
+                if(setup==false){
+                    
+                    ctx.fillRect(   touchControlsLeftX+(x*(touchButtonWidth)),touchControlsLeftY+(y*(touchButtonHeight)),
+                                touchButtonWidth*.9,touchButtonHeight*.9)
+                }else{
+                    touchAreaDownX.push((touchControlsLeftX+(x*(touchButtonWidth))))
+                    touchAreaDownY.push((touchControlsLeftY+(y*(touchButtonHeight*1.1))))
+                    touchAreaWidth.push(touchButtonWidth)
+                    touchAreaHeight.push(touchButtonHeight)
+                    
+                
+                }
+            }
+        }
+        if(setup==false)ctx.globalAlpha = 1
+    }
     function touchHandler(e){
 
-		if(e.type=="touchstart" && e.touches) {
-			var x = e.changedTouches[0].clientX;
-			var y = e.changedTouches[0].clientY;
+        if(e.type=="touchstart" && e.touches) {
+            var x = e.changedTouches[0].clientX;
+            var y = e.changedTouches[0].clientY;
+            lasttouchx = x;
+            lasttouchy = y;
 
-			movecamera=true;
+            for(var i=0;i<touchAreaDownX.length;i+=1){
+                if(rectsoverlap(touchAreaDownX[i],touchAreaDownY[i],touchAreaWidth[i],touchAreaHeight[i],
+                    x,y,1,1)){
+                        setController(i,true)
+                }
+            }
 
-      	    e.preventDefault();
-	    }
-		if(e.type=="touchmove" && e.touches) {
-			
-			var x = e.changedTouches[0].clientX;
-			var y = e.changedTouches[0].clientY;
+            e.preventDefault();
+        }
+       if(e.type=="touchmove" && e.touches) {
+            var x = e.changedTouches[0].clientX;
+            var y = e.changedTouches[0].clientY;
+            //touchDownX[i] = e.changedTouches[i].clientX
+            //touchDownY[i] = e.changedTouches[i].clientY    
+
+            for(var i=0;i<touchAreaDownX.length;i+=1){
+                if(rectsoverlap(touchAreaDownX[i],touchAreaDownY[i],touchAreaWidth[i],touchAreaHeight[i],
+                    x,y,1,1)==true){
+
+                        setController(i,true)
+                }
+            }
+
+//                touchDownX[i] = e.changedTouches[i].clientX
+//                touchDownY[i] = e.changedTouches[i].clientY    
+            
+        
+            e.preventDefault();
+        }        
+        if(e.type=="touchend" && e.touches) {
+            var x = e.changedTouches[0].clientX;
+            var y = e.changedTouches[0].clientY;
+            //touchDownX[i] = e.changedTouches[i].clientX
+            //touchDownY[i] = e.changedTouches[i].clientY    
+
+            for(var i=0;i<touchAreaDownX.length;i+=1){
+                if(rectsoverlap(touchAreaDownX[i],touchAreaDownY[i],touchAreaWidth[i],touchAreaHeight[i],
+                    x,y,1,1)==true){
+                        
+                        setController(i,false)
+                }
+            }
+
+//                touchDownX[i] = e.changedTouches[i].clientX
+//                touchDownY[i] = e.changedTouches[i].clientY    
+            
+        
+            e.preventDefault();
+        }
+
+    }
+    //
+    // Set controller from the touch handler (touch screen)
+    //
+    function setController(num,set){
+        Controller.Down=false;
+        //Controller.Left=false
+        //Controller.Right=false
+        Controller.Up=false
+        Controller.ShotGun=false
+        Controller.Grenade=false
+        Controller.LaserWall=false
+        Controller.Jump=false
+
+        
+        // typewriter style left top to right bottom
+
+        // left side controller
+        if(num==0){
+            Controller.Left=set
+            Controller.Up=set
+        }
+        if(num==1){
+            Controller.Up=set
+        }
+        if(num==2){            
+            Controller.Right=set
+            Controller.Up=set
+        }
+        if(num==3){
+            Controller.Left=set
+        }
+        if(num==5){
+            Controller.Right=set
+        }
+        if(num==6){
+            Controller.Left=set
+            Controller.Down=set
+        }
+        if(num==7){
+            Controller.Down=set
+        }
+        if(num==8){
+            Controller.Right=set
+            Controller.Down=set
+        }
+        //
+        // right side controller
+
+        if(num==15){
+            Controller.ShotGun=set
+        }
+        if(num==13){
+            Controller.Jump=set
+        }
+        if(num==10){
+            Controller.Grenade=set
+        }
+        if(num==17){
+            Controller.LaserWall=set
+        }
 
 
-      	    e.preventDefault();
-		}
-		
-	    if(e.type=="touchend" && e.touches) {
-			var x = e.changedTouches[0].clientX;
-			var y = e.changedTouches[0].clientY;
-
-
-          	e.preventDefault();
-		}
-
-	}		
-
+    }
 </script>
 </body>
 </html>
