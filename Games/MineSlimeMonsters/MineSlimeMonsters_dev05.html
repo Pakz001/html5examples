@@ -35,7 +35,7 @@ Use different browser.
     //
     // 
     // randomize grenade throwing a bit
-    // jump from ladder
+    // jump from ladder * test
     // add + turrets shoot slime + slime eats villagers + villagers can shoot +
     // eggs get eaten by slime.
     // possible bug ai bottom of slime can pass through slime.
@@ -2438,8 +2438,13 @@ Use different browser.
 
             }            
             //this.angle = angle;
-            this.mx = Math.cos(this.angle);
-            this.my = Math.sin(this.angle);
+            // Set the movement speed of the grenade. Add a bit of randomization
+            this.mx = Math.cos(this.angle)+randomRangeFloat(-0.15,0.15)
+            this.my = Math.sin(this.angle)+randomRangeFloat(-0.15,0.15)
+            // Make sure the grenade does not start inside the start location
+            // but a bit outside of the tile dimension
+            this.px+=Math.cos(this.angle)*(tilewidth/3)
+            this.py+=Math.sin(this.angle)*(tileheight/3)
         }
         update(){	
             
@@ -3307,7 +3312,7 @@ Use different browser.
                 
                 mygrenade.push(
                     new grenade(
-                        pcx,pcy,this.facing
+                        pcx,pcy-tileheight/6,this.facing
                         )
                 );
             }
