@@ -2430,21 +2430,23 @@ Use different browser.
             if(facing=="down"){
                 this.angle = Math.PI/2 + randomRangeFloat(-.2,.2);
             }
-            if(Controller.Left==true && Controller.Up==true){
+            if(facing=="leftup"){
+            //if(Controller.Left==true && Controller.Up==true){
                 this.angle = -Math.PI/1.2
                 
             }else
-                if(Controller.Right==true && Controller.Up==true){
+                //if(Controller.Right==true && Controller.Up==true){
+                if(facing=="rightup"){
                 this.angle = -Math.PI/4
             }else
 
-                if(Controller.Right==true && Controller.Down==true){
-                
+                //if(Controller.Right==true && Controller.Down==true){
+                if(facing=="rightdown"){
                 this.angle = Math.PI/4
             }else
 
-                if(Controller.Left==true && Controller.Down==true){
-                
+               // if(Controller.Left==true && Controller.Down==true){
+                if(facing=="leftdown"){
                 this.angle = Math.PI-Math.PI/4
 
             }            
@@ -3013,6 +3015,7 @@ Use different browser.
             this.tw=tilewidth;
             this.th=tileheight;
             this.facing="right";
+            this.facingVert="";
             this.gtkd=false; //grenade thrown key down
             this.sfkd=false; //shogun fire key down
             this.minedelay;
@@ -3307,11 +3310,15 @@ Use different browser.
                     }
                 }			
             }
+            
             if(Controller.Left==true)this.facing="left";//Keyboard.KeyDown(Key.Left) Then facing="left"
             if(Controller.Right==true)this.facing="right";//Keyboard.KeyDown(Key.Right) Then facing="right"
             if(Controller.Up==true)this.facing="up";//Keyboard.KeyDown(Key.Up) Then facing="up"
             if(Controller.Down==true)this.facing="down";//Keyboard.KeyDown(Key.Down) Then facing="down"
-
+            if(Controller.Left==true && Controller.Up==true)this.facing="leftup"
+            if(Controller.Left==true && Controller.Down==true)this.facing="leftdown"
+            if(Controller.Right==true && Controller.Up==true)this.facing="rightup"
+            if(Controller.Right==true && Controller.Down==true)this.facing="rightdown"
             // throw grenade
             if(Controller.Grenade==false)this.gtkd=false;//If Keyboard.KeyDown(Key.G) = False Then gtkd = False
             if(this.gtkd == false && Controller.Grenade==true){//Keyboard.KeyDown(Key.G)
@@ -3403,7 +3410,7 @@ Use different browser.
                     }
                 }
             }
-            if(this.facing == "up"){
+            if(this.facingVert == "up"){
                 for(var y=this.py;y>this.py-(tileheight*2);y-=1){// Step -1
                     var x2 = this.px / tilewidth;
                     var y2 = y / tileheight;
@@ -3414,7 +3421,7 @@ Use different browser.
                     }
                 }
             }	
-            if(this.facing == "down"){
+            if(this.facingVert == "down"){
                 for(var y=this.py;y<this.py+tileheight;y++){
                     var x2= this.px / tilewidth;
                     var y2= y / tileheight;
@@ -3620,7 +3627,7 @@ Use different browser.
             }
         }
         fireshotgun(){
-            console.log("Fire routine"+Controller.Left+","+Controller.Up)
+            //console.log("Fire routine"+Controller.Left+","+Controller.Up)
             var angle=0;
             if(this.facing=="left"){
                 angle = Math.PI;
@@ -3638,25 +3645,27 @@ Use different browser.
                 angle = Math.PI/2+randomRangeFloat(-0.2,0.2);
                 this.setAimDownAnimation()
             }
-            if(Controller.Left==true && Controller.Up==true){
+            if(this.facing=="leftup"){
+            //if(Controller.Left==true && Controller.Up==true){
                 
                 angle = -Math.PI/1.2
                 this.setAimRightUpAnimation()
                 
             }else
-                if(Controller.Right==true && Controller.Up==true){
+                //if(Controller.Right==true && Controller.Up==true){
+                    if(this.facing=="rightup"){
                 angle = -Math.PI/4
                 this.setAimRightUpAnimation()
             }else
 
-                if(Controller.Right==true && Controller.Down==true){
-                
+                //if(Controller.Right==true && Controller.Down==true){
+                if(this.facing=="rightdown"){
                 angle = Math.PI/4
                 this.setAimRightDownAnimation()
             }else
 
-                if(Controller.Left==true && Controller.Down==true){
-                
+                //if(Controller.Left==true && Controller.Down==true){
+                if(this.facing=="leftdown"){
                 angle = Math.PI-Math.PI/4
                 this.setAimRightDownAnimation()
 
@@ -3918,7 +3927,7 @@ Use different browser.
             //ctx.fillRect(this.pmx,this.pmy,this.pw,this.ph);
             this.drawpowerbar(this.pmx,this.pmy-6,this.hp,this.hpmax);
             var a = -1
-            if(Controller.Left==true || this.facing=="left"){
+            if(this.facing=="left" || this.facing=="leftdown" || this.facing=="leftup"){
                 a=-1
             }else{
                 a=1
@@ -5743,18 +5752,28 @@ Use different browser.
             //touchDownX[i] = e.changedTouches[i].clientX
             //touchDownY[i] = e.changedTouches[i].clientY    
 
+   
             for(var j=0;j<e.changedTouches.length;j+=1){
             x = e.changedTouches[j].clientX;
             y = e.changedTouches[j].clientY;
             for(var i=0;i<touchAreaDownX.length;i+=1){
                 if(rectsoverlap(touchAreaDownX[i],touchAreaDownY[i],touchAreaWidth[i],touchAreaHeight[i],
+                    x,y,1,1)==false){
+                        setController(i,false)
+                        
+                }
+            }
+            }
+                        for(var j=0;j<e.changedTouches.length;j+=1){
+            x = e.changedTouches[j].clientX;
+            y = e.changedTouches[j].clientY;
+            for(var i=0;i<touchAreaDownX.length;i+=1){
+                if(rectsoverlap(touchAreaDownX[i],touchAreaDownY[i],touchAreaWidth[i],touchAreaHeight[i],
                     x,y,1,1)==true){
-
                         setController(i,true)
                 }
             }
             }
-            
 
 
 //                touchDownX[i] = e.changedTouches[i].clientX
@@ -5768,7 +5787,7 @@ Use different browser.
             var y = e.changedTouches[0].clientY;
             //touchDownX[i] = e.changedTouches[i].clientX
             //touchDownY[i] = e.changedTouches[i].clientY    
-
+            if(Controller.MiniMap==true)Controller.MiniMap=false
             for(var i=0;i<touchAreaDownX.length;i+=1){
                 if(rectsoverlap(touchAreaDownX[i],touchAreaDownY[i],touchAreaWidth[i],touchAreaHeight[i],
                     x,y,1,1)==true){
@@ -5805,7 +5824,8 @@ Use different browser.
         if(num==0){
             if(Controller.Right==false)Controller.Left=set
             Controller.Up=set
-            console.log("set:"+Controller.Left+","+Controller.Up)
+            //myplayer.facing="left"
+            //console.log("set:"+Controller.Left+","+Controller.Up)
         }
         if(num==1){
             Controller.Up=set
@@ -5813,6 +5833,7 @@ Use different browser.
         if(num==2){            
             if(Controller.Left==false)Controller.Right=set
             Controller.Up=set
+            //if(set==false)myplayer.facing="right"
         }
         if(num==3){
             if(Controller.Right==false)Controller.Left=set
@@ -5821,8 +5842,9 @@ Use different browser.
             if(Controller.Left==false)Controller.Right=set
         }
         if(num==6){
-            Controller.Left=set
+            if(Controller.Right==false)Controller.Left=set
             Controller.Down=set
+            //if(set==true)myplayer.facing="left"
         }
         if(num==7){
             Controller.Down=set
@@ -5830,10 +5852,13 @@ Use different browser.
         if(num==8){
             if(Controller.Left==false)Controller.Right=set
             Controller.Down=set
+            //if(set==false)myplayer.facing="right"
         }
         //
         // right side controller
-
+        if(num==9){
+            Controller.MiniMap = set
+        }
         if(num==15){
             Controller.ShotGun=set
         }
@@ -5846,7 +5871,6 @@ Use different browser.
         if(num==17){
             Controller.LaserWall=set
         }
-console.log("inside"+Controller.Left+","+Controller.Up)
         
     }
 </script>
