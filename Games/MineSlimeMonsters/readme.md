@@ -7,6 +7,10 @@ Play current versionin browser - controller / keyboard only.<br>
 https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/
 <br><br>
 
+* Version :
+* Added touch screen controls (layout..form..gfx..testing needed)
+* bugsbugsbugs
+
 
 <br><br>
 <img src="https://cromdesi.home.xs4all.nl/images/linking/gif/dogsketch.gif" width=64 height=64><br>
