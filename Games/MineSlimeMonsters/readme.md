@@ -26,6 +26,17 @@ Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
 [Play game in browser - old / keyboard only -](https://cromdesi.home.xs4all.nl/emscripten/monstermineslime/Untitled1.html)
 <br><br>
 
+Rescue Mission : (One at start of mission)
+rescue villagers (mission?) - name:'Joe' has not got back from the mine yesterday. Could you go find him and bring him back? - 
+Path finding through flood fill path finding. npc follows player. Jump on ladder. Jump on off heights. Once up the mine shaft
+mission is completed.<br>
+Collide with slime (death)<br>
+Collide with monster (death)<br>
+self defense (shotgun at slime and monsters and eggs - slow shot)<br>
+No roam but waiting somewhere.<br>
+Text message system.<br>
+Player can not shoot or harm villager<br>
+Death message(drop down message system<br>
 
 
  <br><br>
@@ -37,7 +48,6 @@ Conversion project from my Monkey 2 game 'Mine Slime and Monsters'..
 * Radio controlled drones. Machine gun drone and Explosive drone and flame thrower drone.
 * flame thrower..
 * Talk to villagers.
-* rescue villagers (mission?)
 * Lighting system?
 * Ladder rider - tool for going up and down ladders faster (store:levels)
 * tile (globalAlpha) light fill around play to add some mood and eye candy
