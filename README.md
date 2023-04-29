@@ -20,8 +20,8 @@ Tools/BrushFactory. - phone(landscape/portait mode) - tablet (portrait/landscape
 <br>
 <br>
 
-<img src="Games/MineSlimeMonsters/Media/screenshot.png" width=50% height=50%></img><br>
-*(some of the level graphics of 'Mine Slime and Monsters' (games folder) that wil be used in the early version..)*
+<img src="Games/MineSlimeMonsters/Media/tweet.png" width=50% height=50%></img><br>
+*( screenshot of current version (games folder in this repo / has link to playable version on my site..)*
 
 
 <br><br>
