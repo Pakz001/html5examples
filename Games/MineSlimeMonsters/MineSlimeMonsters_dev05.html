@@ -3789,6 +3789,8 @@ Use different browser.
                             if(mygrowslime.map[Math.floor((x2*2)+x4)][Math.floor((y2*2)+y4)] == 10){
                                 //canvas.Color = Color.Green
                                 //canvas.DrawRect(x3+(x4*(mygrowslime.tw)),y3+(y4*(mygrowslime.th)),mygrowslime.tw,mygrowslime.th)
+                                // Draw the slime using the light flooding, but at .5 the effect
+                                ctx.globalAlpha = 1.0-(mymap.lightmap2[x2][y2]/2)
                                 ctx.fillStyle = 'green';
                                 ctx.fillRect(x3+(x4*(mygrowslime.tw)),y3+(y4*(mygrowslime.th)),mygrowslime.tw,mygrowslime.th);
                              }
