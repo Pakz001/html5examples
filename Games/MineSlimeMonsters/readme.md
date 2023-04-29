@@ -8,6 +8,7 @@ https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/
 <br><br>
 
 * Version :
+* Added cheap light flood fill(BF - globalAlpha map) on the background tiles starting from player location.
 * Added touch screen controls (layout..form..gfx..testing needed)
 * bugsbugsbugs
 
