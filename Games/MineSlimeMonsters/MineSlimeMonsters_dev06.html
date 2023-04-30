@@ -205,6 +205,10 @@ Use different browser.
         constructor(x,y,w,bw,bh,isshop){
             //this.image:Image
             //this.icanvas:Canvas
+            this.can = document.createElement("canvas")
+	        this.context = this.can.getContext("2d")            
+            
+            this.image = 
             this.px,this.py
             this.totalwidth
             this.blockhouse=1
@@ -247,7 +251,7 @@ Use different browser.
             var opy=this.py
             this.px=bw
             this.py=bh
-            this.bufferdraw(ctx)
+            this.bufferdraw(this.context)
             this.px = opx
             this.py = opy-bh
             //icanvas.Flush()
@@ -631,7 +635,7 @@ Use different browser.
         }
         draw(context,x,y){	
             //context.fillStyle = Color.White
-            //canvas.DrawImage(image,x,y)
+            context.drawImage(this.can,x,y)
         }
     }
 
@@ -4237,6 +4241,18 @@ Use different browser.
             }
 
 
+            // draw the buildings
+            ctx.globalAlpha = 1
+            for(var i=0;i<buildmap.length;i+=1){
+                console.log(distanceM(buildmap[i],10*tileheight,this.px,this.py))
+                if (distanceM(buildmap[i],10*tileheight,this.px,this.py)<screenwidth){
+                var x1=buildmap[i];
+                var y1=13*tileheight;
+                var x2=(x1-(this.mcx*this.tw))+this.mox;
+                var y2=(y1-(this.mcy*this.th))+this.moy;
+                mybuilding[i].draw(ctx,x2,y2)                    
+                }
+            }
 
             
 
@@ -5615,11 +5631,12 @@ Use different browser.
     var mylaserwall = [];
 
     var mybuilding = []
+    var buildmap = []
     
-    var stp = 96
-    for(var x=0;x<screenwidth;x+=stp){
-        mybuilding.push(new building(x,screenheight-200,2,stp/6,stp/4,randomRange(0,2)))
-    }
+    //var stp = 296
+    //for(var x=0;x<screenwidth;x+=stp){
+    //    mybuilding.push(new building(0,0,2,stp/6,stp/4,randomRange(0,2)))
+    //}
     
     //
     offscreenCanvas.width=window.innerWidth-32;
@@ -5655,16 +5672,24 @@ Use different browser.
             ctx.fillText("(Touch the screen to activate touch screen interface.)",0,35)
             touchControlsLeft(false)
             touchControlsRight(false)
-            ctx.globalAlpha = 1
-            for(var i=0;i<mybuilding.length;i+=1){
-                mybuilding[i].bufferdraw(ctx)
-            }
+            //ctx.globalAlpha = 1
+            //for(var i=0;i<mybuilding.length;i+=1){
+            //    mybuilding[i].draw(ctx,0,0)
+            //}
         }
         if(gamestate=="setup"){
             addonce = 1;
             myplayer=new player();
             myegg = []
             mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
+    var stp = 400
+    for(var x=0;x<mapwidth*tilewidth;x+=stp){
+        if(distanceM(x,0,(mapwidth*tilewidth)/2,0)>100){
+        mybuilding.push(new building(0,0,randomRange(1,4),tilewidth*3,tileheight*2,randomRange(0,2)))
+        buildmap.push(x)
+        }
+    }
+
             mymap.addAllEggsFromMap()
             mybullet = [];
             mygrenade = [];
