@@ -1,0 +1,295 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	//
+	// Create a small 4x4 tile map from a binary string. There is
+	// a function that adds up a inputted binary string. Now we
+	// can create every possible combination inside the tile map
+	// with 2 colors.
+	// This for pattern creation. In this case I wanted
+	// to isolate every pattern that is of one connected(flooded 8way)
+	// piece for drawing brush creation.(vegitation and such)
+	//
+	
+	var canvas=document.getElementById("myCanvas");
+	var ctx=canvas.getContext("2d");
+
+
+	// the tile map size and binary string length(w*h)
+	const w=h=5;
+	
+	const numRows = 3;
+	const numCols = 3;
+	const array2D = [];
+	for (let i = 0; i < numRows; i++) {
+	  const row = [];
+	  for (let j = 0; j < numCols; j++) {
+	    row.push(i * numCols + j + 1);
+	  }
+	  array2D.push(row);
+	}
+
+	
+	// Create our binary string in variable a
+	var a = "";// "0000000000000000";
+	// Create our iniiial binary string contents
+	for(var i=0;i<w*h;i++){
+		a+="0";
+	}
+	
+	/*
+	var binaryString = "1100111100001111";
+	for(var i=0;i<100000111;i++){
+		var isCircle = checkCircle(binaryString);
+		if(isCircle)console.log(isCircle); // true
+		binaryStringIncrement(binaryString);
+	
+	}
+	console.log(1);
+	*/
+	gameloop=setInterval(doGameLoop,15);
+	
+	
+	//var a = "0000";
+	//while(a.length<16){
+	//	a = binaryStringIncrement(a);
+	//}
+	var kaka = [];
+	var inputString;
+	//doGameLoop();
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,canvas.width,canvas.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		// If filled then restart
+		if(a.length>w*h){
+			a="";
+			for(var i=0;i<w*h;i++){
+				a+="0";
+			}
+		}
+		// increase a binary string
+		var b = binaryStringIncrement(a);
+		a = b;
+		
+		// draw a tile map on teh canvas
+		// with the a binary string. 0's are
+		// blue/ 1's are white
+		//floodFill(0);
+		//console.log(a);
+		//inputString = floodFill2(b);
+		//console.log(inputString);
+		var c = b;
+		//console.log(b);
+		//a = inputString;
+		var x = 0;
+		var y = 0;
+		for(var i=0;i<w*h;i++){
+			if(c[i]==0){
+			ctx.fillStyle="#0000AA";
+			}
+			if(c[i]==1){
+			ctx.fillStyle="#FFFFFF";
+			}
+			if(c[i]==2){
+			ctx.fillStyle="#444444";
+			}
+			ctx.fillRect(x*32,y*32,32,32);
+			x+=1;
+			if(x>w-1){
+				y+=1;
+				x=0;
+			}
+		}
+
+		//var inputArray = inputString.split('\n').map(row => row.split(''));
+		//console.log(inputArray.length);
+		
+	}
+
+function stringTo2DArray(inputString) {
+  const rows = inputString.trim().split(/\s+/);
+  const result = rows.map(row => row.split('').map(num => parseInt(num)));
+  return result;
+}
+
+	
+	// Poe chat - Sage function
+	function binaryStringIncrement(binaryString) {
+	  let carry = 1;
+	  let result = '';
+	  for (let i = binaryString.length - 1; i >= 0; i--) {
+	    if (binaryString[i] === '0' && carry === 1) {
+	      result = '1' + result;
+	      carry = 0;
+	    } else if (binaryString[i] === '1' && carry === 1) {
+	      result = '0' + result;
+	    } else {
+	      result = binaryString[i] + result;
+	    }
+	  }
+	  if (carry === 1) {
+	    result = '1' + result;
+	  }
+	  return result;
+	}
+
+	
+	function floodFill(val) {
+		if(val<0 || val>inputString.length)return;
+		if(inputString[val]!=0)return;
+		inputString[val]==2;
+		if(val+1<inputString.length && inputString[val+1]==0){
+			floodFill(val+1);
+		}	
+		if(val-1>=0 && inputString[val-1]==0){
+			floodFill(val-1);
+		}	
+		if(val+w<inputString.length && inputString[val+w]==0){
+			floodFill(val+w);
+		}	
+		if(val-w>=0 && inputString[val-w]==0){
+			floodFill(val-w);
+		}	
+		
+	}
+
+function floodFill2(inputString) {
+  // Convert input string to 2D array
+  const inputArray = inputString.split('\n').map(row => row.split(''));
+  
+  // Find first occurrence of 0 and replace with 2 using flood fill algorithm
+  const queue = [];
+  let found = false;
+  for (let i = 0; i < inputArray.length; i++) {
+    for (let j = 0; j < inputArray[i].length; j++) {
+      if (inputArray[i][j] === '0') {
+        inputArray[i][j] = '2';
+        queue.push([i, j]);
+        found = true;
+        break;
+      }
+    }
+    if (found) {
+      break;
+    }
+  }
+  if (!found) {
+    return 'No 0 found';
+  }
+  
+  while (queue.length > 0) {
+    const [i, j] = queue.shift();
+    
+    if (i > 0 && inputArray[i-1][j] === '0') { // Check top neighbor
+      inputArray[i-1][j] = '2';
+      queue.push([i-1, j]);
+    }
+    if (j > 0 && inputArray[i][j-1] === '0') { // Check left neighbor
+      inputArray[i][j-1] = '2';
+      queue.push([i, j-1]);
+    }
+    if (i < inputArray.length - 1 && inputArray[i+1][j] === '0') { // Check bottom neighbor
+      inputArray[i+1][j] = '2';
+      queue.push([i+1, j]);
+    }
+    if (j < inputArray[i].length - 1 && inputArray[i][j+1] === '0') { // Check right neighbor
+      inputArray[i][j+1] = '2';
+      queue.push([i, j+1]);
+    }
+  }
+  
+  // Convert 2D array back to string and return
+  return inputArray.map(row => row.join('')).join('\n');
+}
+
+//Sure, here's a JavaScript function that takes a binary string as input, creates a 2D array with half the size of the binary string, and checks if the 1's in the array form a circle:
+
+//```javascript
+function checkCircle(binaryString) {
+  // Convert binary string to array of 0s and 1s
+  const binaryArray = binaryString.split("").map(Number);
+
+  // Determine size of 2D array (half the length of binary string)
+  const size = Math.floor(binaryArray.length / 2);
+
+  // Create 2D array and populate with 0s and 1s from binaryArray
+  const arr = [];
+  for (let i = 0; i < size; i++) {
+    arr[i] = [];
+    for (let j = 0; j < size; j++) {
+      arr[i][j] = binaryArray[i * size + j];
+    }
+  }
+
+  // Check if 1's form a circle
+  let foundStart = false;
+  let startI, startJ;
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
+      if (arr[i][j] === 1) {
+        if (!foundStart) {
+          // Found starting point
+          foundStart = true;
+          startI = i;
+          startJ = j;
+        } else if (
+          (i === startI && Math.abs(j - startJ) === 1) ||
+          (j === startJ && Math.abs(i - startI) === 1)
+        ) {
+          // Found next point in circle
+          startI = i;
+          startJ = j;
+        } else {
+          // Found non-circle pattern
+          return false;
+        }
+      }
+    }
+  }
+
+  // Check if circle is closed
+  if (foundStart && startI === 0 && startJ === 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+//```
+
+//You can call this function with a binary string as input and it will return true if the 1's in the 2D array form a circle, //or false otherwise. For example:
+//
+//```javascript
+//const binaryString = "1100111100001111";
+//const isCircle = checkCircle(binaryString);
+//console.log(isCircle); // true
+//```	
+	
+</script>
+</body>
+</html>
+
