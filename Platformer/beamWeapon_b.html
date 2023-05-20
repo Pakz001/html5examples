@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+    //
+    // Video game beam weapon with 2x sinus rays and gamma background
+    //
+    //
+    //
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+    // beam is sized with tile width
+    var tileWidth = 16
+
+	gameloop=setInterval(doGameLoop,16);
+    // sin effect
+    var beamI = Math.PI/5
+    var beamM = 0.02
+    var beamU = Math.PI*2
+    var bs = 0
+    // direction
+    var angle=0
+    //
+    var beamDistance = 400
+
+    var twm = 0.4
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+        gunBeam(angle,beamI,bs,beamDistance)
+        // beam sin effects
+        beamI+=beamM
+        if(beamI>beamU || beamI<1)beamM=-beamM
+        bs-=0.1
+        angle+=0.01
+
+        tileWidth += twm
+        if(tileWidth>16 || tileWidth<6)twm=-twm
+
+	}
+    function gunBeam(angle,i,i2,beamDist){
+
+        //
+        //
+        // beam background
+        ctx.strokeStyle = 'red'
+        for(var j=1;j<(tileWidth*2);j+=4){
+            ctx.globalAlpha = 0.15          
+            if(j<5){
+                ctx.strokeStyle = 'white'
+                ctx.globalAlpha = 1
+            }else{
+                ctx.strokeStyle = 'red'
+            }
+            ctx.lineWidth = j    
+            x=window.innerWidth/2
+            y=window.innerHeight/2
+            ctx.beginPath()
+            ctx.moveTo(x,y)
+            x+=Math.cos(angle)*beamDist
+            y+=Math.sin(angle)*beamDist
+            ctx.lineTo(x,y)
+            ctx.stroke()
+        }
+
+        //
+        //
+        // beam sinus 1
+        var x = window.innerWidth/2
+        var y = window.innerHeight/2
+        ctx.fillStyle = "white"
+        ctx.lineWidth=2;
+        ctx.strokeStyle = 'yellow'
+        var increase = 90/180*Math.PI / (tileWidth/2)
+        var counter = i2
+        var cnt=90
+        var z=0
+        var v = 0
+        var v2 = 0.1
+        while(z<(beamDist-10)){
+            z+=1
+            var q = (tileWidth*.4)-((z/beamDist)*(tileWidth*.3))
+            ctx.lineWidth = q
+            ctx.beginPath()
+            ctx.moveTo(x,y)
+            x+=Math.cos(angle)
+            y+=Math.sin(angle)
+            y+=Math.sin(counter)
+            x+=Math.cos(counter)
+            counter+=increase
+            ctx.lineTo(x,y)
+            increase = cnt/180*Math.PI / (tileWidth/2)
+            ctx.globalAlpha = v/2
+            v+=v2
+            if(v>1 || v<0)v2=-v2
+            ctx.stroke();
+        }
+
+        //
+        //
+        // beam sinus 2
+        ctx.globalAlpha = 1
+        x=window.innerWidth/2
+        y=window.innerHeight/2
+        increase = 90/180*Math.PI / (tileWidth/2)
+        counter = i2+20
+        cnt=90
+        z=0
+        var v = 1
+        var v2 = -0.1
+        while(z<(beamDist-10)){
+            z+=1
+            var q = (tileWidth*.4)-((z/beamDist)*(tileWidth*.3))
+            ctx.lineWidth = q
+
+            ctx.beginPath()
+            ctx.moveTo(x,y)
+            x+=Math.cos(angle)
+            y+=Math.sin(angle)
+            y+=Math.sin(-counter)
+            x+=Math.cos(-counter)
+            counter+=increase
+            ctx.lineTo(x,y)
+            increase =cnt/180*Math.PI / (tileWidth/2)
+            ctx.globalAlpha = v/1.5
+            v+=v2
+            if(v>1 || v<0)v2=-v2
+            ctx.stroke();
+        }
+    }
+</script>
+</body>
+</html>
