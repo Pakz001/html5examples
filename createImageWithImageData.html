@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+    
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+
+	//gameloop=setInterval(doGameLoop,16);
+    var opacities = [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,3,5,5,7,4,4,1,1,0,1,0,0,0,0,0,1,0,0,17,27,41,52,56,34,23,15,11,4,9,5,1,0,0,0,0,0,0,1,45,63,57,45,78,66,52,41,34,37,23,20,0,1,0,0,0,0,1,43,62,66,64,67,115,112,114,56,58,47,33,18,12,10,0,0,0,0,39,50,63,76,87,107,105,112,128,104,69,64,29,18,21,15,0,0,0,7,42,52,85,91,103,126,153,128,124,82,57,52,52,24,1,0,0,0,2,17,41,67,84,100,122,136,159,127,78,69,60,50,47,25,7,1,0,0,0,34,33,66,82,113,138,149,168,175,82,142,133,70,62,41,25,6,0,0,0,18,39,55,113,111,137,141,139,141,128,102,130,90,96,65,37,0,0,0,2,15,27,71,104,129,129,158,140,154,146,150,131,92,100,67,26,3,0,0,0,0,46,73,104,124,145,135,122,107,120,122,101,98,96,35,38,7,2,0,0,0,50,58,91,124,127,139,118,121,177,156,88,90,88,28,43,3,0,0,0,0,30,62,68,91,83,117,89,139,139,99,105,77,32,1,1,0,0,0,0,0,16,21,8,45,101,125,118,87,110,86,64,39,0,0,0,0,0,0,0,0,0,1,28,79,79,117,122,88,84,54,46,11,0,0,0,0,0,0,0,0,0,1,0,6,55,61,68,71,30,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,23,25,20,12,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,12,9,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,2,2,0,0,0,0,0,0,0,0]
+
+    var smokeSpriteSize = 20
+
+    var smokeParticleImage = makeSmokeSprite('white')
+
+    doGameLoop()
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(50,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+        // Draw the image created in the smoke make function
+        for(var i=0;i<256;i++){
+            //ctx.globalAlpha = Math.random()
+            var z = 32+Math.random()*256
+            ctx.drawImage(smokeParticleImage, -128+Math.random()*window.innerWidth,-128+Math.random()*window.innerHeight,z,z)        
+        }
+
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+	}
+    //
+    // From the bijjection repo smoke.js
+    //
+    //
+    // Shows how to create a image using a create image data method and let it be drawn using
+    // the drawImage command.
+    //
+    //
+    // the particular function requires the smokespritesize and opacities variables (top)
+    function makeSmokeSprite(color){
+        color = color || [24, 46.8, 48.2]
+        var smokeSprite = document.createElement('canvas'),
+            ctx = smokeSprite.getContext('2d'),
+            data = ctx.createImageData(smokeSpriteSize, smokeSpriteSize),
+            d = data.data
+        // Set the image data
+        for(var i=0;i<d.length;i+=4){
+            d[i]=color[0]
+            d[i+1]=color[1]
+            d[i+2]=color[2]
+            d[i+3]=opacities[i / 4]
+        }
+
+        smokeSprite.width = smokeSpriteSize
+        smokeSprite.height = smokeSpriteSize
+
+        // put the image data into the created canvas element
+        ctx.putImageData(data,0,0)
+
+        //Return our new image
+        return smokeSprite
+    }
+    </script>
+</body>
+</html>
