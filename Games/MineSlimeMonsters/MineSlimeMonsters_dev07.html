@@ -192,13 +192,22 @@ Use different browser.
 
     var gamestate = "select" // menu and st
 
-    var touchControlsLeftX = screenwidth*.13
-    var touchControlsLeftY = screenheight*.66
-    var touchControlsRightX = screenwidth*.70
-    var touchControlsRightY = screenheight*.66
-
     var touchButtonWidth = screenwidth*.064
-    var touchButtonHeight = screenheight*.064
+    var touchButtonHeight = screenheight/16
+
+    var touchControlsLeftX = screenwidth*.13
+    var touchControlsLeftY = screenheight-(touchButtonHeight*3)-56//.66
+    var touchControlsRightX = screenwidth*.70
+    var touchControlsRightY = screenheight-(touchButtonHeight*3)-56//.66
+
+    //var touchControlsLeftX = screenwidth*.13
+    //var touchControlsLeftY = screenheight*.63//.66
+    //var touchControlsRightX = screenwidth*.70
+    //var touchControlsRightY = screenheight*.63//.66
+
+
+    //var touchButtonWidth = screenwidth*.064
+    //var touchButtonHeight = screenheight*.064
     var touchAreaDownX = []
     var touchAreaDownY = []
     var touchAreaWidth = []
@@ -6264,7 +6273,7 @@ Use different browser.
         
         if(setup==false){
             ctx.fillStyle = 'grey'
-            ctx.globalAlpha = 0.45
+            //ctx.globalAlpha = 0.78//.45
         } 
         var cnt=0
         for(var y=-1;y<=1;y+=1){
@@ -6279,8 +6288,8 @@ Use different browser.
                         tileAtlasIndex[tControlIconIndex[cnt]].x,
                         tileAtlasIndex[tControlIconIndex[cnt]].y,
                         tileImageCellSize , tileImageCellSize,
-                        touchControlsRightX+(x*(touchButtonWidth))+touchButtonWidth/4,
-                        touchControlsRightY+(y*(touchButtonHeight))+touchButtonHeight/6,
+                        touchControlsRightX+(x*(touchButtonWidth))+(touchButtonWidth/2-tilewidth/2),
+                        touchControlsRightY+(y*(touchButtonHeight))+(touchButtonHeight/2-tileheight/2),
                         tilewidth,tileheight
                         )                                    
                 }else{
@@ -6301,7 +6310,7 @@ Use different browser.
         //y1-=120
         if(setup==false){
             ctx.fillStyle = 'grey'
-            ctx.globalAlpha = 0.45
+            //ctx.globalAlpha = 0.78//.45
         }
         var cnt = 0
         for(var y=-1;y<=1;y+=1){
@@ -6317,8 +6326,8 @@ Use different browser.
                         tileAtlasIndex[tControlIconIndex[cnt]].x,
                         tileAtlasIndex[tControlIconIndex[cnt]].y,
                         tileImageCellSize , tileImageCellSize,
-                        touchControlsLeftX+(x*(touchButtonWidth))+touchButtonWidth/4,
-                        touchControlsLeftY+(y*(touchButtonHeight))+touchButtonHeight/6,
+                        touchControlsLeftX+(x*(touchButtonWidth))+(touchButtonWidth/2-tilewidth/2),
+                        touchControlsLeftY+(y*(touchButtonHeight))+(touchButtonHeight/2-tileheight/2),
                         tilewidth,tileheight
                         )
                 }else{
