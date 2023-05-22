@@ -4308,11 +4308,14 @@ Use different browser.
                     if(y2>16){
                         //if(mymap.tilemap[x2][y2]>30)console.log(mymap.tilemap[x2][y2])
                         //ctx.globalAlpha = mymap.[x2][y2]
-
-                        drawTile(x3,y3,mymap.tilemap[x2][y2])
+                        if(mymap.lightmap[x2][y2]==0){// && mymap.tilemap[x2][y2]!=21){
+                            drawTile(x3,y3,mymap.tilemap[x2][y2])
+                        }
+                        //if(Math.random ()<.01)console.log(mymap.tilemap[x2][y2])
                         if(mymap.lightmap[x2][y2]>0){
                             ctx.globalAlpha = 1.0-(mymap.lightmap[x2][y2])
-                            drawTile(x3,y3,20)
+                            drawTile(x3,y3,mymap.tilemap[x2][y2])
+                            //if(Math.random ()<.01)console.log(mymap.tilemap[x2][y2]) 
                             ctx.globalAlpha = 1
                         }
                         
@@ -4942,6 +4945,7 @@ Use different browser.
                     // cave solid
                     if(this.mapfinal[x][y]==this.tilesolid){
                         this.tilemap[x][y] = this.randomBag([20,21])
+                        
                     }
                 }
             }
@@ -5116,7 +5120,7 @@ Use different browser.
                             //console.log(z*z)
                             if(cnt>=mx){
                                 //console.log("aas")
-                                this.tilemap[x][y]=18
+                                //this.tilemap[x][y]=19//this.randomBag([20,21])//18
                                 this.lightmap[x][y]+=.33
                                 if(this.lightmap[x][y]>1)this.lightmap[x][y]=1
                             }
