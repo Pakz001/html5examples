@@ -165,7 +165,20 @@ Use different browser.
     window.addEventListener("touchmove", touchHandler,false);
     window.addEventListener("resize", resizeHandler,false);
     
+    document.addEventListener(
+    "keydown",
+    (e) => {
+        if (e.key === "Enter") {
+        toggleFullScreen();
+        }
+    },
+    false
+    );
+
+
     var touchControlVisible = false // press screen to activate touch screen controls...
+
+    var setToggleFullScreenMode = false
 
     // w and h of the tile image file
     var tileImageWidth = 640
@@ -961,8 +974,11 @@ Use different browser.
             //canvas.DrawImage(image,0,0)
             ctx2.fillStyle='white'
             ctx2.save()
-            ctx2.scale(2,2)
+            var msc = 2
+            if(screenwidth<1000)msc=1.3
+            ctx2.scale(msc,msc)
             ctx2.fillText("Use Cursor left and Right to select Button(fire) to Play",0,10)
+            ctx2.fillText("Toggle Fullscreen<return>",screenwidth/msc-200,10)
             ctx2.scale(1,1)
             ctx2.restore()
             //canvas.DrawText("Use Cursor left and Right to select Enter to Play",0,0)
@@ -5693,6 +5709,11 @@ Use different browser.
             //for(var i=0;i<mybuilding.length;i+=1){
             //    mybuilding[i].draw(ctx,0,0)
             //}
+            // Set to full screen or windowed mode
+            if(setToggleFullScreenMode == true){
+                setToggleFullScreenMode = false
+                toggleFullScreen()
+            }
         }
         if(gamestate=="setup"){
             addonce = 1;
@@ -5759,7 +5780,11 @@ Use different browser.
         
         if(gamestate=="play"){
                
-            
+            // Set to full screen or windowed mode
+            if(setToggleFullScreenMode == true){
+                setToggleFullScreenMode = false
+                toggleFullScreen()
+            }            
             //  UPDATES
             //
             // grow slime monster
@@ -6483,8 +6508,20 @@ Use different browser.
 //                touchDownX[i] = e.changedTouches[i].clientX
 //                touchDownY[i] = e.changedTouches[i].clientY    
             
-        
+
             e.preventDefault();
+
+            // This here is to toggle the full screen mode 0/1
+            var msc = 2
+            if(screenwidth<1000)msc=1.3
+            var x = e.changedTouches[0].clientX/msc;
+            var y = e.changedTouches[0].clientY/msc;            
+            //ctx2.fillText("Toggle Fullscreen",screenwidth/msc-128,10)
+            if(rectsoverlap(x,y,1,1,screenwidth/msc-200,10,200,16)){
+                //toggleFullScreen();
+                setToggleFullScreenMode = true
+            }
+
         }
 
     }
@@ -6587,6 +6624,13 @@ Use different browser.
         mymap.th = mymap.sh/mymap.mmh;
 
     } 
+    function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else if (document.exitFullscreen) {
+        document.exitFullscreen();
+    }
+    }    
 </script>
 </body>
 </html>
