@@ -8,6 +8,8 @@ https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/
 <br><br>
 
 * Version :
+* Added some icons created with the bing image creator. Had to resize and clean up.
+* ui work done - resize event added (needs deep testing)
 * Added cheap light flood fill(BF - globalAlpha map) on the background tiles starting from player location.
 * Added touch screen controls (layout..form..gfx..testing needed)
 * bugsbugsbugs
