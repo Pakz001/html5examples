@@ -991,8 +991,6 @@ Use different browser.
             var right = screenwidth-32
             ctx2.scale(1,1)
             ctx2.fillStyle = 'rgb(10,10,40)';
-            ctx2.strokeStyle = 'rgb(255,255,0)'
-            ctx2.lineWidth = 6
             //ctx2.globalAlpha = 0.5
             ctx2.beginPath();
             ctx2.moveTo(cornerSizeH,top+cornerSizeV);
@@ -1007,7 +1005,13 @@ Use different browser.
             ctx2.globalAlpha = 0.3
             ctx2.fill();      
             ctx2.globalAlpha = 1    
+            ctx2.strokeStyle = 'rgb(255,0,0)'
+            ctx2.lineWidth = 6
             ctx2.stroke()
+            ctx2.strokeStyle = 'rgb(255,255,255)'
+            ctx2.lineWidth = 1
+            ctx2.stroke()
+
             ctx2.globalAlpha = 1 
             //canvas.DrawText("Use Cursor left and Right to select Enter to Play",0,0)
             //canvas.PushMatrix()
@@ -1038,7 +1042,7 @@ Use different browser.
             y = (screenheight*.25)//100
             w = this.sw2
             var w=(screenwidth*.20)//this.sw1
-
+            
             h = 250
             h = ((screenheight/3.3)/250)*250
             if(this.index == 1){ 
@@ -1134,10 +1138,10 @@ Use different browser.
         }
         mydrawrect(x,y,w,h){
 
-            drawLine(x,y,x+w,y,'white',3,ctx2)
-            drawLine(x+w,y,x+w,y+h,'white',3,ctx2)
-            drawLine(x,y,x,y+h,'white',3,ctx2)
-            drawLine(x,y+h,x+w,y+h,'white',3,ctx2)
+            drawLine(x,y,x+w,y,'yellow',3,ctx2)
+            drawLine(x+w,y,x+w,y+h,'yellow',3,ctx2)
+            drawLine(x,y,x,y+h,'yellow',3,ctx2)
+            drawLine(x,y+h,x+w,y+h,'yellow',3,ctx2)
         }
     }
 
