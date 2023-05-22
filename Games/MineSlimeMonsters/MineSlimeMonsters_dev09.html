@@ -6579,6 +6579,12 @@ Use different browser.
         touchAreaHeight = []
         touchControlsLeft(true)
         touchControlsRight(true)
+        mymap.sw = screenwidth-48
+        mymap.sh = screenheight-48
+        mymap.numScreenTilesHor = Math.floor(screenwidth / tilewidth)
+        mymap.numScreenTilesVer = Math.floor(screenheight / tileheight)
+        mymap.tw = mymap.sw/mymap.mmw;
+        mymap.th = mymap.sh/mymap.mmh;
 
     } 
 </script>
