@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+    //
+    // I noticed this effect in a talkshow with Edgar Snowden. So I named it Snowden Balls
+    //
+    //
+    // Cellular automa algorithm creates a map.
+    // Each occupied space checks the shortest distance to a none occupied area and writes that down to serve as the
+    // size of the ball. (create edge transition effect)
+    //
+    //
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+    var mapwidth = 32;
+	var mapheight = 32;
+	var tilewidth = Math.floor(myCanvas.width/mapwidth)+1;
+	var tileheight = Math.floor(myCanvas.height/mapheight)+1;
+	var map = [];
+    var map2 = []
+	for(var i=0;i<mapwidth;i++){
+		map[i] = new Array();
+        map2[i] = new Array();
+		for(var j=0;j<mapheight;j++){
+			map[i][j]=0;
+            map2[i][j]=0;
+		}
+	}
+    doGameLoop()
+	gameloop=setInterval(doGameLoop,1000);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+    	tilewidth = Math.floor(myCanvas.width/mapwidth)+1;
+	    tileheight = Math.floor(myCanvas.height/mapheight)+1;
+
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+        makeca()
+        makedistances()
+        drawmap()
+	}
+    function drawmap(){
+        for(var y=0;y<mapheight;y+=1){
+        for(var x=0;x<mapwidth;x+=1){
+           if( map[x][y] ==1){
+                ctx.fillStyle="rgb(200,0,0)"
+                //ctx.fillRect(x*tilewidth,y*tileheight,tilewidth,tileheight)
+                ctx.beginPath();
+                ctx.arc(x*tilewidth,y*tilewidth,map2[x][y]*2, 0, 2 * Math.PI);
+                ctx.fill();
+
+           }
+        }
+        }
+
+    }
+    function makedistances(){
+        for(var y=0;y<mapheight;y+=1){
+        for(var x=0;x<mapwidth;x+=1){
+           if( map[x][y] ==1){
+                var d = 999
+                for(var y1=0;y1<mapheight;y1+=1){
+                for(var x1=0;x1<mapwidth;x1+=1){
+                    if(map[x1][y1]==0){
+                        var d2 = distance(x,y,x1,y1)
+                        if(d2<d)d=d2
+                    }
+                }
+                }
+                map2[x][y]=d
+           }
+        }
+        }
+
+    }
+    // not floored - Manhattan distance
+    function distance(x1,y1,x2,y2){
+        return Math.abs(x2-x1)+Math.abs(y2-y1);
+    }	
+    function makeca(){
+        
+        for(var y=0;y<mapheight;y+=1){
+        for(var x=0;x<mapwidth;x+=1){
+            map2[x][y] = 0
+            map[x][y] = Math.floor(Math.random()*2)
+        }
+        }
+        for(var i=0;i<6;i+=1){
+        // loop through the map
+        for(var y=0;y<mapheight;y+=1){
+        for(var x=0;x<mapwidth;x+=1){
+            //count the neigbouring 1's 
+            var cnt = 0
+            for(var y1=-1;y1<=1;y1+=1){
+            for(var x1=-1;x1<=1;x1+=1){
+                var x2=x+x1
+                var y2=y+y1
+                if(x2>=0 && y2>=0 && x2<mapwidth && y2<mapheight){
+                    if(map[x2][y2] == 1)cnt+=1
+                }
+            }
+            }
+            // if 3 walls and map is a wall then map x,y is not a wall anymore
+            if(cnt < 4 && map[x][y] == 1){
+                    map[x][y] = 0
+            }
+            // if more then 4 walls then map x,y is wall
+            if(cnt >= 5)map[x][y] = 1
+        }
+        }
+        }
+    }    
+</script>
+</body>
+</html>
