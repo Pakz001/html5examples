@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rock and Sand Texture</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="textureCanvas" width="800" height="600"></canvas>
+
+  <script>
+    window.addEventListener('load', () => {
+      const canvas = document.getElementById('textureCanvas');
+      const context = canvas.getContext('2d');
+
+      const colors = ['#C3B299', '#6B5846', '#A69E95', '#D1CDC4', '#B3A895'];
+
+      for (let i = 0; i < canvas.width; i += 2) {
+        for (let j = 0; j < canvas.height; j += 2) {
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          context.fillStyle = color;
+          context.fillRect(i, j, 2, 2);
+          if(Math.random()<.3){
+            context.fillRect(i-2, j-2, Math.random()*3, Math.random()*3);
+          }
+        }
+      }
+    //console.log("a")
+      const noiseIntensity = 40;
+
+      for (let i = 0; i < canvas.width; i++) {
+        for (let j = 0; j < canvas.height; j++) {
+          const noise = Math.floor(Math.random() * noiseIntensity) - noiseIntensity / 2;
+          const pixelData = context.getImageData(i, j, 1, 1).data;
+          const r = Math.max(0, Math.min(255, pixelData[0] + noise));
+          const g = Math.max(0, Math.min(255, pixelData[1] + noise));
+          const b = Math.max(0, Math.min(255, pixelData[2] + noise));
+          context.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          context.fillRect(i, j, 1, 1);
+        }
+      }
+      const patternSize = 1;
+      const patternColors = ['#E6E0B0', '#D0CCB5', '#BCB9B9'];
+
+      let currentX = Math.floor(Math.random() * canvas.width);
+      let currentY = Math.floor(Math.random() * canvas.height);
+
+      
+        for(var j=0;j<(canvas.width*canvas.height)*1.5;j+=1){
+          const patternColor = patternColors[Math.floor(Math.random() * patternColors.length)];
+          context.fillStyle = patternColor;
+          context.fillRect(currentX, currentY, patternSize, patternSize);
+
+        if(Math.random()<(Math.random()/1000)){
+            currentX = Math.floor(Math.random() * canvas.width);
+            currentY = Math.floor(Math.random() * canvas.height);
+            
+        }
+
+          const direction = Math.floor(Math.random() * 4); // 0: Up, 1: Right, 2: Down, 3: Left
+
+          switch (direction) {
+            case 0:
+              currentY -= patternSize;
+              break;
+            case 1:
+              currentX += patternSize;
+              break;
+            case 2:
+              currentY += patternSize;
+              break;
+            case 3:
+              currentX -= patternSize;
+              break;
+         }
+        //}
+
+        
+      }
+
+    //console.log("c")
+      //const blurAmount = 1;
+
+      //const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      //applyBlur(imageData, blurAmount);
+      //context.putImageData(imageData, 0, 0);
+    });
+
+    function applyBlur(imageData, blurAmount) {
+      const data = imageData.data;
+      const width = imageData.width;
+      const height = imageData.height;
+      const radius = blurAmount;
+
+      for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+          let r = 0;
+          let g = 0;
+          let b = 0;
+          let a = 0;
+
+          let count = 0;
+
+          for (let dx = -radius; dx <= radius; dx++) {
+            for (let dy = -radius; dy <= radius; dy++) {
+              const nx = x + dx;
+              const ny = y + dy;
+
+              if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                const index = (ny * width + nx) * 4;
+                r += data[index];
+                g += data[index + 1];
+                b += data[index + 2];
+                a += data[index + 3];
+                count++;
+              }
+            }
+          }
+
+          const index = (y * width + x) * 4;
+          data[index] = r / count;
+          data[index + 1] = g / count;
+          data[index + 2] = b / count;
+          data[index + 3] = a / count;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
