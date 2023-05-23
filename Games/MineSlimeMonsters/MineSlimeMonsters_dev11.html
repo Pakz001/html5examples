@@ -5546,30 +5546,39 @@ Use different browser.
             ctx2.save()
             ctx2.scale(.7,.7)
             ctx2.translate(screenwidth*.15,screenheight*.15)
+            var sw1=-1
+            var sw2=1
+                        //console.log(this.mapfinal[this.mmw-1][0])
+
             for(var y=2;y<this.mmh;y++){
                 for(var x=2;x<this.mmw;x++){
                     var a = this.mapfinal[x][y];
                     if(a==this.tileempty){
                         if(y>16){
                         ctx2.globalAlpha = 1;
-                        ctx2.fillStyle = 'rgb(50,20,5)';
-                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.fillStyle = 'rgb(38,35,61)'//'rgb(50,20,5)';
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw+1,this.th+1);
                         }
                     }
-                    if(a==this.tilesolid){
+                    if(a==this.tilesolid && y>16){
                         ctx2.globalAlpha = 1;
-                        ctx2.fillStyle = 'brown';
-                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        //ctx2.fillStyle = 'brown';
+                        if(sw1==-1 && sw2==-1){
+                        ctx2.fillStyle = 'rgb(74,53,60)'
+                        }else{
+                        ctx2.fillStyle = 'rgb(114,90,81)'
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw+1,this.th+1);
+                        }
                     }
                     if(a==this.tileegg){
                         ctx2.globalAlpha = 0.8;
                         ctx2.fillStyle = 'yellow';
-                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw+1,this.th+1);
                     }
                     if(a==this.tileturret){
                         ctx2.globalAlpha = 0.8;
                         ctx2.fillStyle = 'grey';
-                        ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
+                        ctx2.fillRect(x*this.tw,y*this.th,this.tw+1,this.th+1);
                     }
                     if(a==this.tilemineable){
                         
@@ -5577,7 +5586,9 @@ Use different browser.
                         ctx2.fillStyle = 'rgb(180,180,30)';
                         ctx2.fillRect(x*this.tw,y*this.th,this.tw,this.th);
                     }
+                    sw1=-sw1
                 }
+                sw2=-sw2
             }
             ctx2.restore()
             ctx2.scale(1,1)
@@ -6175,12 +6186,19 @@ Use different browser.
                     ctx2.scale(.7,.7)
                     ctx2.translate(screenwidth*.15,screenheight*.15)
                     
-                    ctx2.globalAlpha = 0.25
-                    ctx2.fillStyle = 'rgb(255,255,255)'
+                    
                     var x1=myplayer.mcx*mymap.tw
                     var y1=myplayer.mcy*mymap.th
+                    //ctx2.beginPath();
+                    //ctx2.arc(x1+((mymap.tw*myplayer.maptileswidth)/2),y1+((mymap.tw*myplayer.maptileswidth)/6),(mymap.tw*myplayer.maptileswidth)/3, 0, 2 * Math.PI);
+                    //ctx2.fill();
+                    ctx2.globalAlpha = 0.25
+                    ctx2.fillStyle = 'rgb(255,255,255)'
                     ctx2.fillRect(x1,y1,mymap.tw*myplayer.maptileswidth,mymap.th*myplayer.maptilesheight)
-
+                    ctx2.globalAlpha = 1
+                    ctx2.strokeStyle = 'rgb(255,255,255)'
+                    ctx2.rect(x1,y1,mymap.tw*myplayer.maptileswidth,mymap.th*myplayer.maptilesheight)
+                    ctx2.stroke()
                     ctx2.restore()
                     ctx2.scale(1,1)                
                 }
