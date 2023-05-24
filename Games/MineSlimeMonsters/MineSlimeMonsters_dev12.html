@@ -2875,6 +2875,7 @@ Use different browser.
                 if(this.kind == myplayer.playeritemnames[i]){
                     
                     myplayer.playeritem[i][1] += 1;
+                    myplayer.addPlayerParticleEffect()
                     return;
                 }
             }
@@ -3693,6 +3694,46 @@ Use different browser.
         }
     }
 
+    class playerGravityPoint{
+        constructor(x,y){
+            this.x = x
+            this.y = y
+        }
+    }
+
+    class playerParticle{
+        constructor(x,y){
+            this.deleteme=false
+            this.ds = randomRangeFloat(0.003,0.004)
+            this.alpha = 1
+            this.x = x
+            this.y = y
+            this.incx = (Math.random()*2)-1
+            this.incy = (Math.random()*2)-1
+        }
+        update(){
+            this.alpha-=this.ds
+            if(this.alpha<0)this.deleteme=true
+            for(var i=0;i<myPlayerGravityPoint.length;i+=1){
+                var a = this.getAngle(this.x,this.y,myPlayerGravityPoint[i].x,myPlayerGravityPoint[i].y)
+                this.incx+=Math.cos(a)/10
+                this.incy+=Math.sin(a)/10
+            }
+            this.x+=this.incx/4
+            this.y+=this.incy/4
+                        
+        }
+        draw(){
+            ctx.globalAlpha = 1
+            ctx.fillStyle="red"
+            ctx.fillRect(this.x,this.y,13,13)
+        }
+        getAngle(x1,y1,x2,y2){
+         var dx = x2 - x1
+         var dy = y2 - y1
+         return Math.atan2(dy,dx)//+360 % 360
+        }         
+    }
 
     // our player inc (drawmap game routine)
     class player{
@@ -3752,7 +3793,47 @@ Use different browser.
             this.animationDirection = 1
             this.animationCurrentTime = 0
             this.setStandingAnimation()
+            myPlayerParticle = []
+            myPlayerGravityPoint = []
+            this.createParticleEffect()
+            
            
+        }
+        addPlayerParticleEffect(){
+            if(myPlayerParticle.length>32)return
+            if(Math.random()<0.05){
+                
+                this.recreateParticleGravityPoints()
+            }
+            var x1 = ((Math.random()*tilewidth/2 ) ) +this.px+tilewidth/2
+            var y1 = ( ( Math.random()*tileheight/2 ) ) +(this.py+tileheight)
+            myPlayerParticle.push(new playerParticle (
+                x1,
+                y1
+                ))
+
+        }
+        createParticleEffect(){
+            for(var i=0;i<10;i+=1){
+                var x1 = ((Math.random()*tilewidth/2 ) ) +this.px+tilewidth/2
+                var y1 = ( ( Math.random()*tileheight/2 ) ) +(this.py+tileheight)
+                myPlayerParticle.push(new playerParticle (
+                    x1,
+                    y1
+                    ))
+                    
+            }
+            this.recreateParticleGravityPoints()
+        }
+        recreateParticleGravityPoints(){
+            myPlayerGravityPoint = []
+            for(var i=0;i<32;i+=1){
+                myPlayerGravityPoint.push(new playerGravityPoint(
+                    ( (Math.random()*tilewidth ) ) + this.px,
+                    ( (Math.random()*tileheight ) ) + this.py)
+                    )
+            }
+
         }
         setAimUpAnimation(){
             this.currentAnimation = "aimUp"
@@ -3869,6 +3950,15 @@ Use different browser.
         }
         updateplayercontrols(){
 
+            
+            // gravity effect pickup
+            for(var i=0;i<myPlayerParticle.length;i+=1){
+                myPlayerParticle[i].update()
+            }
+            // gravity effect pickup
+            for(var i=myPlayerParticle.length-1;i>=0;i-=1){
+                if(myPlayerParticle[i].deleteme==true)myPlayerParticle.pop()
+            }
 
             // Sprite Animation system
             //
@@ -4240,23 +4330,62 @@ Use different browser.
             }
         }
         scrollmap(x,y){ 
-            if(x==-1)this.mox+=1;
-            if(x==1)this.mox-=1;
-            if(y==-1)this.moy+=1;
-            if(y==1)this.moy-=1;
+            if(x==-1){
+                for(var i=0;i<myPlayerGravityPoint.length;i+=1){
+                    myPlayerGravityPoint[i].x-=1
+                }   
+                for(var i=0;i<myPlayerParticle.length;i+=1){
+                    myPlayerParticle[i].x-=1
+                }               
+                this.mox+=1;
+            }
+            if(x==1){
+                for(var i=0;i<myPlayerGravityPoint.length;i+=1){
+                    myPlayerGravityPoint[i].x+=1
+                }                
+                for(var i=0;i<myPlayerParticle.length;i+=1){
+                    myPlayerParticle[i].x+=1
+                }               
+
+                this.mox-=1;
+            }
+            if(y==-1){
+                for(var i=0;i<myPlayerGravityPoint.length;i+=1){
+                    myPlayerGravityPoint[i].y-=1
+                }                
+                for(var i=0;i<myPlayerParticle.length;i+=1){
+                    myPlayerParticle[i].y-=1
+                }               
+
+                this.moy+=1;
+            }
+            if(y==1){
+                for(var i=0;i<myPlayerGravityPoint.length;i+=1){
+                    myPlayerGravityPoint[i].y+=1
+                }                
+                for(var i=0;i<myPlayerParticle.length;i+=1){
+                    myPlayerParticle[i].y+=1
+                }               
+                
+                this.moy-=1;
+            }
             if(this.mox>this.tw-1){
+
                 this.mcx-=1;
                 this.mox=0;
             }
             if(this.mox<-(this.tw-1)){
+
                 this.mcx+=1;
                 this.mox=0;
             }
             if(this.moy>this.th-1){
+
                 this.mcy-=1;
                 this.moy=0;
             }
             if(this.moy<-(this.th-1)){
+      
                 this.mcy+=1;
                 this.moy=0;
             }
@@ -4652,6 +4781,22 @@ Use different browser.
             //ctx.filter = "brightness(100%)"
             //ctx.restore()
 
+  //
+            // Draw the player particle effect
+            //
+            ctx.fillStyle = "yellow"
+            ctx.globalAlpa = 0.5
+            for(var i=0;i<myPlayerParticle.length;i+=1){
+                var x1 = myPlayerParticle[i].x
+                var y1 = myPlayerParticle[i].y
+                var x2=(x1-(this.mcx*this.tw))+this.mox;
+                var y2=(y1-(this.mcy*this.th))+this.moy;
+                ctx.globalAlpha = myPlayerParticle[i].alpha
+                ctx.fillRect(x2,y2,2,2)
+
+    	      	//myPlayerParticle[i].draw()
+            }
+            ctx.globalAlpha=1
 
 
             // Draw the player
@@ -4670,8 +4815,7 @@ Use different browser.
             }            
             drawSprite(this.pmx,this.pmy,this.frame,a)
             
-
-
+          
             //draw flying monsters	
             for(var i=0;i<myflyingmonster.length;i++){
                 if(myflyingmonster[i].inRange==false)continue
@@ -5942,6 +6086,8 @@ Use different browser.
     var myegg = [];
     var mymap = new map(screenwidth-48,screenheight-48,mapwidth,mapheight);
     //var myc=new player();
+    var myPlayerParticle = []
+    var myPlayerGravityPoint = []
     var myplayer=new player();
     var mygrowslime = new growslime();
     var mybullet = [];
