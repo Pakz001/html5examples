@@ -1199,12 +1199,12 @@ Use different browser.
             drawLine(x,y,x,y+h,'yellow',12,ctx2)
             drawLine(x,y+h,x+w,y+h,'yellow',12,ctx2)
         }
-        drawBubbles(){
+        drawBubbles(col="rgb(200,0,0)"){
             ctx2.globalAlpha = 0.5
             for(var y=0;y<this.atmapheight;y+=1){
                 for(var x=0;x<this.atmapwidth;x+=1){
                     if( this.atmap[x][y] ==1){
-                            ctx2.fillStyle="rgb(200,0,0)"
+                            ctx2.fillStyle=col//"rgb(200,0,0)"
                             //ctx.fillRect(x*tilewidth,y*tileheight,tilewidth,tileheight)
                             ctx2.beginPath();
                             var s = this.atmap2[x][y]
@@ -5685,7 +5685,7 @@ Use different browser.
             //canvas.BlendMode = BlendMode.Opaque
             ctx2.fillStyle='black'
             ctx2.fillRect(0,0,screenwidth,screenheight)
-
+            mymenuselect.drawBubbles("rgb(100,100,100)")
             ctx2.save()
             ctx2.scale(.7,.7)
             ctx2.translate(screenwidth*.15,screenheight*.15)
@@ -6344,6 +6344,7 @@ Use different browser.
                 if(Math.random()<.1){
                     //ctx2.fillStyle = 'black'
                     //ctx.fillRect(0,0,ctx2.width,ctx2.height)
+                    
                     mymap.updateimage();    
                     mymap.drawladder();
                     mygrowslime.drawmap();
