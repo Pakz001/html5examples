@@ -3704,7 +3704,9 @@ Use different browser.
     class playerParticle{
         constructor(x,y){
             this.deleteme=false
-            this.ds = randomRangeFloat(0.003,0.004)
+            this.radius = Math.floor(Math.random()*2)+1
+            this.countDown=Math.floor(Math.random()*30)+60
+            this.ds = 0.0055*(Math.random()+.5)//0055
             this.alpha = 1
             this.x = x
             this.y = y
@@ -3712,8 +3714,14 @@ Use different browser.
             this.incy = (Math.random()*2)-1
         }
         update(){
-            this.alpha-=this.ds
-            if(this.alpha<0)this.deleteme=true
+            if(this.countDown>0)this.countDown-=1;
+            if(this.countDown==0){
+                this.alpha-=this.ds
+                if(this.alpha<0){
+                    this.deleteme=true
+                    this.alpha=0
+                }
+            }
             for(var i=0;i<myPlayerGravityPoint.length;i+=1){
                 var a = this.getAngle(this.x,this.y,myPlayerGravityPoint[i].x,myPlayerGravityPoint[i].y)
                 this.incx+=Math.cos(a)/10
@@ -3801,7 +3809,7 @@ Use different browser.
         }
         addPlayerParticleEffect(){
             if(myPlayerParticle.length>32)return
-            if(Math.random()<0.05){
+            if(Math.random()<0.5 && myPlayerParticle.length==0){
                 
                 this.recreateParticleGravityPoints()
             }
@@ -3957,7 +3965,10 @@ Use different browser.
             }
             // gravity effect pickup
             for(var i=myPlayerParticle.length-1;i>=0;i-=1){
-                if(myPlayerParticle[i].deleteme==true)myPlayerParticle.pop()
+                if(myPlayerParticle[i].deleteme==true){
+                    myPlayerParticle.pop()
+                    
+                }
             }
 
             // Sprite Animation system
@@ -4785,15 +4796,20 @@ Use different browser.
             // Draw the player particle effect
             //
             ctx.fillStyle = "yellow"
-            ctx.globalAlpa = 0.5
+            ctx.strokeStyle = 'yellow'
+            //ctx.globalAlpa = 0.5
             for(var i=0;i<myPlayerParticle.length;i+=1){
                 var x1 = myPlayerParticle[i].x
                 var y1 = myPlayerParticle[i].y
                 var x2=(x1-(this.mcx*this.tw))+this.mox;
                 var y2=(y1-(this.mcy*this.th))+this.moy;
                 ctx.globalAlpha = myPlayerParticle[i].alpha
-                ctx.fillRect(x2,y2,2,2)
-
+                //ctx.fillRect(x2,y2,2,2)
+                ctx.beginPath()
+                ctx.arc(x2,y2,myPlayerParticle[i].radius,0,2*Math.PI,false)
+                ctx.stroke()
+                ctx.fill()
+                ctx.closePath()
     	      	//myPlayerParticle[i].draw()
             }
             ctx.globalAlpha=1
