@@ -230,6 +230,23 @@ Use different browser.
     var touchAreaWidth = []
     var touchAreaHeight = []
 
+    // bubble background setup
+    var atmapwidth = 32;
+	var atmapheight = 32;
+	var attilewidth = Math.floor(myCanvas.width/atmapwidth)+1;
+	var attileheight = Math.floor(myCanvas.height/atmapheight)+1;
+	var atmap = [];
+    var atmap2 = []
+	for(var i=0;i<atmapwidth;i++){
+		atmap[i] = new Array();
+        atmap2[i] = new Array();
+		for(var j=0;j<atmapheight;j++){
+			atmap[i][j]=0;
+            atmap2[i][j]=0;
+		}
+	}
+
+
     class flash{
         constructor(x,y){ // pixel position
             this.x = x
@@ -897,6 +914,23 @@ Use different browser.
         //this.image:Image	
         //this.icanvas:Canvas
         constructor(){
+
+            this.atmapwidth = 32;
+            this.atmapheight = 32;
+            this.attilewidth = Math.floor(screenwidth/this.atmapwidth)+1;
+            this.attileheight = Math.floor(screenheight/this.atmapheight)+1;
+            this.atmap = [];
+            this.atmap2 = []
+            for(var i=0;i<this.atmapwidth;i++){
+                this.atmap[i] = new Array();
+                this.atmap2[i] = new Array();
+                for(var j=0;j<this.atmapheight;j++){
+                    this.atmap[i][j]=0;
+                    this.atmap2[i][j]=0;
+                }
+            }
+            this.makeca()
+            this.makedistances()
             //image=New Image(800,600)
             //image.Handle=New Vec2f( 0,0 )
             //icanvas=New Canvas( image )
@@ -986,6 +1020,11 @@ Use different browser.
             }
         }
         draw(){
+            ctx2.globalAlpha = 1
+            ctx2.fillStyle='black'
+            ctx2.fillRect(0,0,screenwidth,screenheight)            
+            this.drawBubbles()
+
             //canvas.DrawImage(image,0,0)
             ctx2.fillStyle='white'
             ctx2.save()
@@ -1087,9 +1126,10 @@ Use different browser.
             }
         }
         drawmap(){
+            
             ctx2.globalAlpha = 1
-            ctx2.fillStyle='black'
-            ctx2.fillRect(0,0,screenwidth,screenheight)
+            //ctx2.fillStyle='black'
+            //ctx2.fillRect(0,0,screenwidth,screenheight)
 
      
 
@@ -1151,13 +1191,91 @@ Use different browser.
                 }
             }
         }
+        
         mydrawrect(x,y,w,h){
-
-            drawLine(x,y,x+w,y,'yellow',3,ctx2)
-            drawLine(x+w,y,x+w,y+h,'yellow',3,ctx2)
-            drawLine(x,y,x,y+h,'yellow',3,ctx2)
-            drawLine(x,y+h,x+w,y+h,'yellow',3,ctx2)
+            
+            drawLine(x,y,x+w,y,'yellow',12,ctx2)
+            drawLine(x+w,y,x+w,y+h,'yellow',12,ctx2)
+            drawLine(x,y,x,y+h,'yellow',12,ctx2)
+            drawLine(x,y+h,x+w,y+h,'yellow',12,ctx2)
         }
+        drawBubbles(){
+            ctx2.globalAlpha = 0.5
+            for(var y=0;y<this.atmapheight;y+=1){
+                for(var x=0;x<this.atmapwidth;x+=1){
+                    if( this.atmap[x][y] ==1){
+                            ctx2.fillStyle="rgb(200,0,0)"
+                            //ctx.fillRect(x*tilewidth,y*tileheight,tilewidth,tileheight)
+                            ctx2.beginPath();
+                            var s = this.atmap2[x][y]
+                            s+=((this.attilewidth/2)/100)*45
+                            if(s>this.attilewidth)s=this.attilewidth
+                            ctx2.arc(x*this.attilewidth,y*this.attilewidth,s, 0, 2 * Math.PI);
+                            ctx2.fill();
+
+                    }
+                }
+            }
+            ctx2.globalAlpha = 1
+
+        }        
+        makedistances(){
+            for(var y=0;y<this.atmapheight;y+=1){
+                for(var x=0;x<this.atmapwidth;x+=1){
+                    if( this.atmap[x][y] ==1){
+                            var d = 999
+                            for(var y1=0;y1<this.atmapheight;y1+=1){
+                            for(var x1=0;x1<this.atmapwidth;x1+=1){
+                                if(this.atmap[x1][y1]==0){
+                                    var d2 = this.distanceat(x,y,x1,y1)
+                                    if(d2<d)d=d2
+                                }
+                            }
+                            }
+                            this.atmap2[x][y]=d
+                    }
+                }
+            }
+        }        
+        // not floored - Manhattan distance
+        distanceat(x1,y1,x2,y2){
+            return Math.abs(x2-x1)+Math.abs(y2-y1);
+        }	
+        makeca(){
+            
+            for(var y=0;y<this.atmapheight;y+=1){
+            for(var x=0;x<this.atmapwidth;x+=1){
+                this.atmap2[x][y] = 0
+                //map[x][y] = 0
+                this.atmap[x][y] = Math.floor(Math.random()*2)
+            }
+            }
+            for(var i=0;i<2;i+=1){
+            // loop through the map
+                for(var y=0;y<this.atmapheight;y+=1){
+                for(var x=0;x<this.atmapwidth;x+=1){
+                    //count the neigbouring 1's 
+                    var cnt = 0
+                    for(var y1=-1;y1<=1;y1+=1){
+                    for(var x1=-1;x1<=1;x1+=1){
+                        var x2=x+x1
+                        var y2=y+y1
+                        if(x2>=0 && y2>=0 && x2<this.atmapwidth && y2<this.atmapheight){
+                            if(this.atmap[x2][y2] == 1)cnt+=1
+                        }
+                    }
+                    }
+                    // if 3 walls and map is a wall then map x,y is not a wall anymore
+                    if(cnt < 4 && this.atmap[x][y] == 1){
+                            this.atmap[x][y] = 0
+                    }
+                    // if more then 4 walls then map x,y is wall
+                    if(cnt >= 5)this.atmap[x][y] = 1
+                }
+                }
+            }
+        }    
+     
     }
 
     //
@@ -5868,9 +5986,9 @@ Use different browser.
         if(gamestate=="select"){
             
             mymenuselect.update()
-            mymenuselect.drawmap()
             mymenuselect.draw()
-            mymenuselect.draw()   
+            mymenuselect.drawmap()
+            //mymenuselect.draw()   
             ctx.drawImage(offscreenCanvas,0,0)
             ctx.fillStyle="white"
             ctx.fillText("(Touch the screen to activate touch screen interface.)",0,35)
@@ -6838,6 +6956,9 @@ Use different browser.
         mymenuselect.y1 = (screenheight*.25)
         mymenuselect.y2 = (screenheight*.25)
         mymenuselect.y3 = (screenheight*.25)
+
+        mymenuselect.attilewidth = Math.floor(screenwidth/mymenuselect.atmapwidth)+1;
+        mymenuselect.attileheight = Math.floor(screenheight/mymenuselect.atmapheight)+1;
 
     } 
     function toggleFullScreen() {
