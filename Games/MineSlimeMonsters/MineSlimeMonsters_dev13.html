@@ -111,9 +111,14 @@ Use different browser.
             Controller.Grenade = false
             Controller.MiniMap = false
             Controller.LaserWall = false
+            Controller.PowerLine = false
             if(myGamepad.buttons[1].pressed==true){
                 Controller.LaserWall = true
             }
+            if(myGamepad.buttons[4].pressed==true){
+                Controller.PowerLine = true
+            }
+
             if(myGamepad.buttons[9].pressed==true){
                 Controller.MiniMap = true
             }
@@ -159,6 +164,7 @@ Use different browser.
         Mine:false,
         Jump:false,
         MiniMap:false,
+        PowerLine:false,
     } 
     window.addEventListener("touchend", touchHandler,false);
     window.addEventListener("touchstart", touchHandler,false);					
@@ -819,18 +825,58 @@ Use different browser.
     // sprite is touched the damage is done. 
     //
     class powerlines{
-        constructor(x,y){
-            this.deleteMe = false
-            this.leftX = x
-            this.rightX = x
+        constructor(){
+            this.timeOut = 60
+            this.deleteme = false
+            this.leftX = 0
+            this.rightX = 0
             this.left = []//{active:,y:0}
             this.right = []
-            this.inc = 1
+            this.inc = 12
+            this.createpowerlines()
+        }
+        createpowerlines(){
+            var x = myplayer.ptx
+            var y = myplayer.pty
+            this.leftX = x*tilewidth
+            this.rightX = x*tilewidth
+
+            for(var i=0;i<10;i+=1){
+                if(mymap.mapfinal[x][y-i]==mymap.tilesolid)break
+                this.left.push({active:true,y:(y-i)*tileheight})
+                this.right.push({active:true,y:(y-i)*tileheight})
+
+            }
+            for(var i=0;i<10;i+=1){
+                if(mymap.mapfinal[x][y+i]==mymap.tilesolid)break
+                this.left.push({active:true,y:(y+i)*tileheight})
+                this.right.push({active:true,y:(y+i)*tileheight})
+            }
 
         }
         update(){
+            this.timeOut-=1
+            if(this.timeOut<0){
+                this.deleteme=true
+            }
+
             this.leftX-=this.inc
             this.rightX+=this.inc
+            for(var y=0;y<this.left.length;y+=1){
+                if(this.left[y].active==true){
+                if(mymap.rectMapCollide(this.leftX,this.left[y].y,tilewidth,tileheight,0,0)==true){
+                    this.left[y].active=false
+                    //this.deleteMe=true
+                }
+                }
+            }
+            for(var y=0;y<this.right.length;y+=1){
+                if(mymap.rectMapCollide(this.rightX,this.right[y].y,tilewidth,tileheight,0,0)==true){
+                    this.right[y].active=false
+                    //this.deleteMe=true
+                }
+            }
+
         }
         // remove if touched enemy
         collideEnemy(){
@@ -3848,8 +3894,10 @@ Use different browser.
             myPlayerParticle = []
             myPlayerGravityPoint = []
             this.createParticleEffect()
+            this.ptx = Math.floor(this.px/this.tw)
+            this.pty = Math.floor(this.py/this.th)
             
-           
+            
         }
         addPlayerParticleEffect(){
             if(myPlayerParticle.length>32)return
@@ -4002,10 +4050,9 @@ Use different browser.
         }
         updateplayercontrols(){
             // get the camX and camY coordinates
-            //this.camX = (this.mcx*this.tw);
-            //this.camY = (this.mcy*this.th);
-            this.camX=(this.mcx*this.tw)+this.mox;
-            this.camY=(this.mcy*this.th)+this.moy;
+
+            this.camX=(this.mcx*this.tw)-this.mox;
+            this.camY=(this.mcy*this.th)-this.moy;
             
             // gravity effect pickup
             for(var i=0;i<myPlayerParticle.length;i+=1){
@@ -4082,6 +4129,12 @@ Use different browser.
 //            if(this.playerladdercollision(this.px,this.py) && this.currentAnimation!="ladderAnimation" && this.currentAnimation!="ladderClimbingAnimation"){
 //                this.setLadderAnimation()
 //            }
+
+            if(Controller.PowerLine==true && mypowerline.length==0){
+                
+                mypowerline.push(new powerlines())
+                Controller.PowerLine = false
+            }
 
             var isOnLadder  = this.playerladdercollision(this.px,this.py)
 
@@ -5059,6 +5112,29 @@ Use different browser.
                 ctx.fillStyle = 'yellow';
                 ctx.fillRect(x2-4,y2,8,4);
                 ctx.fillRect(x2-4,y2+h-4,8,4);
+            }
+            
+            // Draw the power lines
+            
+            //For Local i:=Eachin mylaserwall
+            for(var i=0;i<mypowerline.length;i++){
+                ctx.fillStyle = 'yellow';
+
+                for(var y=0;y<mypowerline[i].left.length;y+=1){
+                    if(mypowerline[i].left[y].active==true){
+                        var x2=mypowerline[i].leftX-this.mcx*this.tw+this.mox;
+                        var y2=mypowerline[i].left[y].y-this.mcy*this.th+this.moy;
+                        ctx.fillRect(x2,y2,tilewidth,tileheight);
+                    }
+                }
+                for(var y=0;y<mypowerline[i].right.length;y+=1){
+                    if(mypowerline[i].right[y].active==true){
+                        var x2=mypowerline[i].rightX-this.mcx*this.tw+this.mox;
+                        var y2=mypowerline[i].right[y].y-this.mcy*this.th+this.moy;
+                        ctx.fillRect(x2,y2,tilewidth,tileheight);
+                    }
+                }
+
             }
             
 
@@ -6147,9 +6223,16 @@ Use different browser.
             //y -= Math.random()*screenheight/2
             //x += Math.random()*screenwidth/2
             //y += Math.random()*screenheight/2
-
-            var camX = (myplayer.mcx*tilewidth)-myplayer.mox
-            var camY = (myplayer.mcy*tileheight)-myplayer.moy
+            
+            //
+            // If taken from screen position do this from the 2 lines below
+            // add camera position
+            //var camX = myplayer.camX
+            //var camY = myplayer.camY
+            var camX=0
+            var camY=0
+            //var camX = (myplayer.mcx*tilewidth)-myplayer.mox
+            //var camY = (myplayer.mcy*tileheight)-myplayer.moy
 //            var cx=Math.floor((x-camX)/tilewidth);
 //            var cy=Math.floor((y-camY)/tileheight);
             var cx=Math.floor((x+camX)/tilewidth);
@@ -6208,6 +6291,7 @@ Use different browser.
     var mytentacle = [];
     var mytownperson = [];
     var mylaserwall = [];
+    var mypowerline = [];
     var myflashingeffect = [];
     var mybuilding = []
     var buildmap = []
@@ -6322,6 +6406,7 @@ Use different browser.
             if(developmode)myplayer.setPositionNearSlimeMonster()
 
             gamestate = "play"
+            
         }
         
         if(gamestate=="play"){
@@ -6371,6 +6456,21 @@ Use different browser.
                     }
                 }		
             }
+            // update the power line
+            if(mypowerline.length>0){
+                //Update the laserwall
+                for(var i=0;i<mypowerline.length;i++){
+                    mypowerline[i].update();
+                
+                }
+                // remove laserwall from list
+                for(var i=mypowerline.length-1;i>=0;i-=1){
+                    if(mypowerline[i].deleteme == true){
+                        
+                        mypowerline.splice(i, 1);
+                    }
+                }		
+            }            
             // update the tentacles
             if(mytentacle.length>0){
                 //Update the tentacles
@@ -6553,32 +6653,19 @@ Use different browser.
                 //ctx.scale(1,1);
                 ctx.restore()
                 //ctx.fillStyle = 'black'
-                ctx.scale(1,1)
-                var x = Math.floor(debugTouchX)
-                var y = Math.floor(debugTouchY)
+                
+                //ctx.scale(1,1)
+                //var x = Math.floor(debugTouchX)
+                //var y = Math.floor(debugTouchY)
                 //console.log(x+','+y)
-                if(mymap.rectMapCollide(x,y,tilewidth,tileheight,0,0)==true){
-                ctx.fillStyle='red'
-                }else{
-                ctx.fillStyle='blue'
-                }
-                ctx.fillRect(x,y,tilewidth,tileheight)
+                // +camx + camy
+                //if(mymap.rectMapCollide(x,y,tilewidth,tileheight,0,0)==true){
+                //ctx.fillStyle='red'
+                //}else{
+                //ctx.fillStyle='blue'
+                //}
+                //ctx.fillRect(x,y,tilewidth,tileheight)
 
-                ctx.fillStyle='white'
-                ctx.globalAlpha=0.1
-                for(var i=0;i<debugArray.length;i+=1){
-                    var x = debugArray[i].x
-                    var y = debugArray[i].y
-                    var w = debugArray[i].w
-                    var h = debugArray[i].h
-                    var x2 = debugArray[i].x2
-                    var y2 = debugArray[i].y2
-                    var w2 = debugArray[i].w2
-                    var h2 = debugArray[i].h2
-                                        
-                    //console.log(""+x+", "+y+", "+w+", "+h+", "+x2+", "+y2+", "+w2+", "+h2)
-                    ctx.fillRect(x,y,w,h)
-                }
 
 
                 //
@@ -6781,6 +6868,7 @@ Use different browser.
     //
     // Keyboard events Key Up
     function ku(evt){
+        //console.log(evt.keyCode)// 76/l
         if(evt.keyCode==37){
             Controller.Left = false;
         }
@@ -6803,6 +6891,11 @@ Use different browser.
         if(evt.keyCode==67){ //c
             Controller.LaserWall = true;
         }
+        // Only trigger once..
+        if(evt.keyCode==76){ //p
+            Controller.PowerLine = true;
+        }
+
         if(evt.keyCode==86){ //v
             Controller.Mine = false;
         }
@@ -7206,6 +7299,9 @@ Use different browser.
         }
         //
         // right side controller
+        if(num==11){
+            Controller.PowerLine = set
+        }
         if(num==9){
             Controller.MiniMap = set
         }
