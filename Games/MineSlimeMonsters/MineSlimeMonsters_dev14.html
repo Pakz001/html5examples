@@ -75,6 +75,11 @@ Use different browser.
     var mediumIconImage = new Image();
     mediumIconImage.src = 'Data/mediumIcons.png';
 
+    // load the sprites..
+    var effectImage = new Image();
+    effectImage.src = 'Data/effects.png';
+
+
     // Add event listeners for reading keydown and keyup events from the keyboard..
     //
     window.addEventListener("keydown",kd,true);
@@ -844,14 +849,14 @@ Use different browser.
 
             for(var i=0;i<10;i+=1){
                 if(mymap.mapfinal[x][y-i]==mymap.tilesolid)break
-                this.left.push({active:true,y:(y-i)*tileheight})
-                this.right.push({active:true,y:(y-i)*tileheight})
+                this.left.push({active:true,y:(y-i)*tileheight,frame:Math.floor(Math.random()*2)})
+                this.right.push({active:true,y:(y-i)*tileheight,frame:Math.floor(Math.random()*2)})
 
             }
             for(var i=0;i<10;i+=1){
                 if(mymap.mapfinal[x][y+i]==mymap.tilesolid)break
-                this.left.push({active:true,y:(y+i)*tileheight})
-                this.right.push({active:true,y:(y+i)*tileheight})
+                this.left.push({active:true,y:(y+i)*tileheight,frame:Math.floor(Math.random()*2)})
+                this.right.push({active:true,y:(y+i)*tileheight,frame:Math.floor(Math.random()*2)})
             }
 
         }
@@ -5210,14 +5215,16 @@ Use different browser.
                     if(mypowerline[i].left[y].active==true){
                         var x2=mypowerline[i].leftX-this.mcx*this.tw+this.mox;
                         var y2=mypowerline[i].left[y].y-this.mcy*this.th+this.moy;
-                        ctx.fillRect(x2,y2,tilewidth,tileheight);
+                        //ctx.fillRect(x2,y2,tilewidth,tileheight);
+                        drawEffect(x2,y2,mypowerline[i].left[y].frame,false,false)
                     }
                 }
                 for(var y=0;y<mypowerline[i].right.length;y+=1){
                     if(mypowerline[i].right[y].active==true){
                         var x2=mypowerline[i].rightX-this.mcx*this.tw+this.mox;
                         var y2=mypowerline[i].right[y].y-this.mcy*this.th+this.moy;
-                        ctx.fillRect(x2,y2,tilewidth,tileheight);
+                        //ctx.fillRect(x2,y2,tilewidth,tileheight);
+                        drawEffect(x2,y2,mypowerline[i].right[y].frame,true,false)
                     }
                 }
 
@@ -7083,6 +7090,22 @@ Use different browser.
     function distanceM(x1,y1,x2,y2){
         return Math.abs(x2-x1)+Math.abs(y2-y1);
     }	
+    //
+    //
+    // sprite - Draw a effect from the effect atlas
+    function drawEffect(x,y,sprite,flipH=1,flipV=1){
+        if(flipH==-1){
+        ctx.save(); // Save the current state
+        ctx.scale(-1, 1); // Set scale to flip the image    
+        ctx.drawImage(effectImage,tileAtlasIndex[sprite].x,tileAtlasIndex[sprite].y, tileImageCellSize , tileImageCellSize,
+                        -x-tilewidth,y,tilewidth,tileheight);
+        ctx.restore();
+        }else{
+        ctx.drawImage(effectImage,tileAtlasIndex[sprite].x,tileAtlasIndex[sprite].y, tileImageCellSize , tileImageCellSize,
+                        x,y,tilewidth,tileheight);
+        }
+    }
+
     //
     //
     // sprite - Draw a sprite from the sprite atlas
