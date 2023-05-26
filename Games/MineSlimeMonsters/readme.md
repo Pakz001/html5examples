@@ -8,6 +8,9 @@ https://cromdesi.home.xs4all.nl/html5/MineSlimeMonsters/
 <br><br>
 
 * Version :
+* Added Power Line - based on turrican - (L key or controller left trigger)
+* Added flashing
+* Added particle pickup effect
 * Toggle fullscreen mode (touch/keyboard enter - top right)
 * Added some icons created with the bing image creator. Had to resize and clean up.
 * ui work done - resize event added (needs deep testing)
