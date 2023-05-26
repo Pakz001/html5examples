@@ -23,8 +23,12 @@ Use different browser.
 </canvas>
 <script>
 
-var lastLoop = new Date();
-    var developmode = false;
+    var secondsPassed;
+    var oldTimeStamp;
+    var fps;    
+    var developmode = true;
+    var developQuickSlime = false
+    var developStartNearSlime = false    
 
     //
     //
@@ -1649,7 +1653,7 @@ var lastLoop = new Date();
           
         }
         update(speed){
-            if(developmode==true)speed = "fast"
+            if(developmode==true && developQuickSlime)speed = "fast"
             var freq
             if(speed == "slow"){
                 freq = 120//120
@@ -4849,7 +4853,7 @@ var lastLoop = new Date();
 
             
 
-            if(developmode){
+            if(developmode && developQuickSlime){
                 for(var i=0;i<mygrowslime.openx.length;i++){
                     var x1=mygrowslime.openx[i]*tilewidth/2
                     var y1=mygrowslime.openy[i]*tileheight/2
@@ -6403,10 +6407,19 @@ var lastLoop = new Date();
     touchControlsLeft(true)
     touchControlsRight(true)
 
+    // The proper game loop
+    window.requestAnimationFrame(doGameLoop2);
+    //gameloop=setInterval(doGameLoop2,15);
     //
-    gameloop=setInterval(doGameLoop2,15);
-    //
-    function doGameLoop2(){
+    function doGameLoop2(timeStamp){
+
+        // Calculate the number of seconds passed since the last frame
+        secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+        oldTimeStamp = timeStamp;
+
+        // Calculate fps
+        fps = Math.round(1 / secondsPassed);
+                
         myCanvas.height = window.innerHeight-32;
         myCanvas.width = window.innerWidth-32;
         //tw = Math.floor(myCanvas.width,tmap[0].length); 	
@@ -6417,6 +6430,7 @@ var lastLoop = new Date();
 
 
         if(gamestate=="select"){
+
             
             mymenuselect.update()
             mymenuselect.draw()
@@ -6495,7 +6509,7 @@ var lastLoop = new Date();
             for(var i=0;i<10;i++){
                 //myegg.push(new egg(64-i,16))
             }
-            if(developmode)myplayer.setPositionNearSlimeMonster()
+            if(developmode && developStartNearSlime)myplayer.setPositionNearSlimeMonster()
 
             gamestate = "play"
             
@@ -6503,9 +6517,6 @@ var lastLoop = new Date();
         
         if(gamestate=="play"){
                
-            var thisLoop = new Date();
-            var fps = 1000 / (thisLoop - lastLoop);
-            lastLoop = thisLoop;
 
             // Set to full screen or windowed mode
             if(setToggleFullScreenMode == true){
@@ -6735,10 +6746,14 @@ var lastLoop = new Date();
 
                 ctx.save()
                 ctx.scale(2,1.5);
-                ctx.fillStyle='black'
-                //ctx.fillRect(screenwidth/3,0,164,164)
-                if(developmode)ctx.fillText(Math.floor(fps),screenwidth/3+70,130);//debug
-
+                
+                
+                if(developmode){
+                    ctx.fillStyle='black'
+                    ctx.fillRect(screenwidth/3+50,0,90,24)
+                    ctx.fillStyle = 'white'
+                    ctx.fillText(Math.floor(fps),screenwidth/3+70,20);//debug
+                }
                 //ctx.globalAlpha = 0.5;       
                 //ctx.fillStyle = 'black';
                 //ctx.fillRect(0,0,360,38);
@@ -6870,6 +6885,8 @@ var lastLoop = new Date();
                 ctx.scale(1,1)
             }
         }
+        window.requestAnimationFrame(doGameLoop2);
+
     }
    
 
