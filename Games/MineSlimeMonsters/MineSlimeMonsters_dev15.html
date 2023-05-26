@@ -26,7 +26,7 @@ Use different browser.
     var secondsPassed;
     var oldTimeStamp;
     var fps;    
-    var developmode = true;
+    var developmode = false;
     var developQuickSlime = false
     var developStartNearSlime = false    
 
@@ -64,7 +64,10 @@ Use different browser.
 	var offscreenCanvas = document.createElement("canvas");
 
 	var ctx2 = offscreenCanvas.getContext("2d")
+    	//gameloop=setInterval(doGameLoop,16);
+    var opacities = [0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,3,5,5,7,4,4,1,1,0,1,0,0,0,0,0,1,0,0,17,27,41,52,56,34,23,15,11,4,9,5,1,0,0,0,0,0,0,1,45,63,57,45,78,66,52,41,34,37,23,20,0,1,0,0,0,0,1,43,62,66,64,67,115,112,114,56,58,47,33,18,12,10,0,0,0,0,39,50,63,76,87,107,105,112,128,104,69,64,29,18,21,15,0,0,0,7,42,52,85,91,103,126,153,128,124,82,57,52,52,24,1,0,0,0,2,17,41,67,84,100,122,136,159,127,78,69,60,50,47,25,7,1,0,0,0,34,33,66,82,113,138,149,168,175,82,142,133,70,62,41,25,6,0,0,0,18,39,55,113,111,137,141,139,141,128,102,130,90,96,65,37,0,0,0,2,15,27,71,104,129,129,158,140,154,146,150,131,92,100,67,26,3,0,0,0,0,46,73,104,124,145,135,122,107,120,122,101,98,96,35,38,7,2,0,0,0,50,58,91,124,127,139,118,121,177,156,88,90,88,28,43,3,0,0,0,0,30,62,68,91,83,117,89,139,139,99,105,77,32,1,1,0,0,0,0,0,16,21,8,45,101,125,118,87,110,86,64,39,0,0,0,0,0,0,0,0,0,1,28,79,79,117,122,88,84,54,46,11,0,0,0,0,0,0,0,0,0,1,0,6,55,61,68,71,30,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,23,25,20,12,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,12,9,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,2,2,0,0,0,0,0,0,0,0]
 
+    var smokeSpriteSize = 20
     // load the tiles..
     var tileImage = new Image();
     tileImage.src = 'Data/tiles.png';
@@ -1209,10 +1212,12 @@ Use different browser.
         }
         draw(){
             ctx2.globalAlpha = 1
-            ctx2.fillStyle='black'
-            ctx2.fillRect(0,0,screenwidth,screenheight)            
+            ctx2.fillStyle='red'
+            ctx2.fillRect(0,0,screenwidth,screenheight)      
+            ctx2.drawImage(smokeBackgroundImage,0,0)      
             this.drawBubbles()
-
+            //ctx.fillStyle="white"
+            
             //canvas.DrawImage(image,0,0)
             ctx2.fillStyle='white'
             ctx2.save()
@@ -1314,6 +1319,7 @@ Use different browser.
                 ctx2.globalAlpha = 1
 
             }
+
         }
         drawmap(){
             
@@ -1389,8 +1395,8 @@ Use different browser.
             drawLine(x,y,x,y+h,'yellow',12,ctx2)
             drawLine(x,y+h,x+w,y+h,'yellow',12,ctx2)
         }
-        drawBubbles(col="rgb(200,0,0)"){
-            ctx2.globalAlpha = 0.5
+            drawBubbles(col="rgb(200,0,0)"){
+            ctx2.globalAlpha = .25
             for(var y=0;y<this.atmapheight;y+=1){
                 for(var x=0;x<this.atmapwidth;x+=1){
                     if( this.atmap[x][y] ==1){
@@ -5316,6 +5322,7 @@ Use different browser.
     class map{
 
         constructor(sw,sh,mw,mh,full=true){
+            this.smokeBackgroundImage = makeSmokeBackground()
             this.tw,this.th;
             this.mw,this.mh;
             this.sw,this.sh,this.mmh,this.mmw//'mmh is actual finalmap size
@@ -6085,9 +6092,10 @@ Use different browser.
             //canvas.BlendMode = BlendMode.Opaque	
             //canvas.Clear(Color.Black)
             //canvas.BlendMode = BlendMode.Opaque
-            ctx2.fillStyle='black'
+            ctx2.fillStyle='red'
             ctx2.fillRect(0,0,screenwidth,screenheight)
-            mymenuselect.drawBubbles("rgb(70,70,10)")
+            ctx2.drawImage(this.smokeBackgroundImage,0,0) 
+            mymenuselect.drawBubbles("rgb(150,10,10)")
             ctx2.save()
             ctx2.scale(.7,.7)
             ctx2.translate(screenwidth*.15,screenheight*.15)
@@ -6657,6 +6665,7 @@ myplayer.debug+=1
 
     }
     var consoleImage = makeConsole()
+    var smokeBackgroundImage = makeSmokeBackground()
     
     function doGameLoop2(timeStamp){
 
@@ -6680,7 +6689,9 @@ myplayer.debug+=1
 
             
             mymenuselect.update()
+
             mymenuselect.draw()
+            
             mymenuselect.drawmap()
             //mymenuselect.draw()   
             ctx.drawImage(offscreenCanvas,0,0)
@@ -6941,6 +6952,44 @@ myplayer.debug+=1
     }
    
 
+    function makeSmokeBackground(){
+        var smokeParticleImage = makeSmokeSprite('white')
+        var consoleSprite = document.createElement('canvas')
+        var ctx = consoleSprite.getContext('2d')
+        consoleSprite.width = screenwidth
+        consoleSprite.height = screenheight
+        for(var i=0;i<256;i++){
+            //ctx.globalAlpha = Math.random()
+            var z = 32+Math.random()*256
+            ctx.drawImage(smokeParticleImage, -128+Math.random()*window.innerWidth,-128+Math.random()*window.innerHeight,z,z)        
+        }
+        return consoleSprite
+    }
+
+
+    function makeSmokeSprite(color){
+        color = color || [24, 46.8, 48.2]
+        var smokeSprite = document.createElement('canvas'),
+            ctx = smokeSprite.getContext('2d'),
+            data = ctx.createImageData(smokeSpriteSize, smokeSpriteSize),
+            d = data.data
+        // Set the image data
+        for(var i=0;i<d.length;i+=4){
+            d[i]=color[0]
+            d[i+1]=color[1]
+            d[i+2]=color[2]
+            d[i+3]=opacities[i / 4]
+        }
+
+        smokeSprite.width = smokeSpriteSize
+        smokeSprite.height = smokeSpriteSize
+
+        // put the image data into the created canvas element
+        ctx.putImageData(data,0,0)
+
+        //Return our new image
+        return smokeSprite
+    }
     function makeConsole(){
         
         var consoleSprite = document.createElement('canvas')
