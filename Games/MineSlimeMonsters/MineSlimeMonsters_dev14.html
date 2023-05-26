@@ -7093,8 +7093,8 @@ Use different browser.
     //
     //
     // sprite - Draw a effect from the effect atlas
-    function drawEffect(x,y,sprite,flipH=1,flipV=1){
-        if(flipH==-1){
+    function drawEffect(x,y,sprite,flipH=false,flipV=false){
+        if(flipH==true){
         ctx.save(); // Save the current state
         ctx.scale(-1, 1); // Set scale to flip the image    
         ctx.drawImage(effectImage,tileAtlasIndex[sprite].x,tileAtlasIndex[sprite].y, tileImageCellSize , tileImageCellSize,
