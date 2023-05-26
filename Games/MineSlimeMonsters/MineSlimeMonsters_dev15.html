@@ -4910,7 +4910,7 @@ Use different browser.
                             //ctx.fillRect(x3,y3,this.tw,this.th);
                             //ctx.fillStyle = 'red';
                             //ctx.fillRect(x3+this.tw/6,y3,this.tw/4,this.th/3);
-                            
+                            ctx.globalAlpha = 1.0-(mymap.lightmap2[x2][y2]/1.25)
                             if(y2>16)ctx.drawImage(tileImage,0,0,32,32,x3,y3,tilewidth,tileheight);
                             ctx.drawImage(tileImage,416,48,32,32,x3,y3,tilewidth,tileheight);
 
@@ -4918,7 +4918,7 @@ Use different browser.
                     }
                 }
             }
-
+            ctx.globalAlpha=1
             /*
             '
             ''Draw the trees
