@@ -232,11 +232,18 @@ Use different browser.
     var tileheight=32;
 
     // random == 2
-    var egggrowspeed = 1000//1000
-    var egghatchspeed = 1000
+    var egggrowspeed = 10//1000
+    var egghatchspeed = 10//1000
     //var egghatchspeed= 0.1 //how fast eggs hatch
-    var egglayingfreq = 0.1 // lay lots of eggs 1 lay less eggs 0 '0 to 1
+    var egglayingfreq = 1 // 0.1lay lots of eggs 1 lay less eggs 0 '0 to 1
     var startingeggfreq = 0.2 //0 to 1 0 is none 1 is full
+    if(developmode==false){
+        egggrowspeed = 1000//1000
+        egghatchspeed = 1000//1000
+        //var egghatchspeed= 0.1 //how fast eggs hatch
+        egglayingfreq = 0.1 // 0.1lay lots of eggs 1 lay less eggs 0 '0 to 1
+    
+    }
     var maxflyingmonsters=30
     var maxwalkingmonsters=30
 
@@ -3604,7 +3611,7 @@ Use different browser.
                 
                 // Collision with bullet and walking monster
                 for(var i=0;i<mywalkingmonster.length;i++){
-                    if(mywalkingmonster[i].inRange==false)continue
+                    //if(mywalkingmonster[i].inRange==false)continue
                     if(distanceM(this.px,this.py,mywalkingmonster[i].px,mywalkingmonster[i].py) < tilewidth){ 
                         mywalkingmonster[i].hp -= 1;
                         mynumberfall.push(
@@ -3635,7 +3642,7 @@ Use different browser.
                 
                 // Collision with bullet and flying monster
                 for(var i=0;i<myflyingmonster.length;i++){
-                    if(myflyingmonster[i].inRange==false)continue
+                    //if(myflyingmonster[i].inRange==false)continue
                     if(distanceM(this.px,this.py,myflyingmonster[i].px,myflyingmonster[i].py) < tilewidth){
                         myflyingmonster[i].hp -= 1
                         mynumberfall.push(
@@ -4161,7 +4168,7 @@ Use different browser.
             return false
         }
         updateplayercontrols(){
-            this.debug+=1
+            //this.debug+=1
             // get the camX and camY coordinates
 
             this.camX=(this.mcx*this.tw)-this.mox;
@@ -6433,7 +6440,7 @@ Use different browser.
     gameloop=setInterval(doGameLogicLoop2,15); //15 is the game logic speed (1= max speed)
     //
     function doGameLogicLoop2(){
-myplayer.debug+=1
+            //myplayer.debug+=1
             // Set to full screen or windowed mode
             if(setToggleFullScreenMode == true){
                 setToggleFullScreenMode = false
