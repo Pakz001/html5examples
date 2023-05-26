@@ -204,6 +204,7 @@ Use different browser.
     var screenFlash = false
     var screenFlashTime = 1
     var screenFlashAlpha = 0.05
+    var screenFlashAlphaReset = 0.05
     var screenFlashCounter = 0;
     var screenFlashColor = 'white'
 
@@ -3358,6 +3359,7 @@ Use different browser.
                 if(this.countdown < 0){ 
                     // initiate the screen flash
                     screenFlash = true
+                    screenFlashAlpha = screenFlashAlphaReset
                     screenFlashCounter = 0
 
                     this.deleteme = true;
@@ -4743,6 +4745,9 @@ Use different browser.
                     angle = Pi/2+Rnd(-.2,.2)
             End Select
             */
+            screenFlash = true
+            screenFlashTime = 0
+            screenFlashAlpha = 0.02
             var posx = (this.px+this.pw/2)+(Math.cos(angle)*16)
             var posy = (this.py+this.ph/2)+(Math.sin(angle)*16)
             for(var i=0;i<7;i++){
