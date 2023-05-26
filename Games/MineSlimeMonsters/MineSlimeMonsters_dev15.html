@@ -200,6 +200,8 @@ Use different browser.
     var debugArray = []
     var debugTouchX,debugTouchY=0
 
+    var updateConsole = true
+
     // screen flash setup...
     var screenFlash = false
     var screenFlashTime = 1
@@ -3062,6 +3064,7 @@ Use different browser.
                     
                     myplayer.playeritem[i][1] += 1;
                     myplayer.addPlayerParticleEffect()
+                    updateConsole = true
                     return;
                 }
             }
@@ -3937,6 +3940,7 @@ Use different browser.
     class player{
         constructor(x,y){
             // Variable initialisation
+            this.debug = 1
             this.x=x;
             this.y=y;
             this.hp=100;
@@ -4151,6 +4155,7 @@ Use different browser.
             return false
         }
         updateplayercontrols(){
+            this.debug+=1
             // get the camX and camY coordinates
 
             this.camX=(this.mcx*this.tw)-this.mox;
@@ -4314,13 +4319,13 @@ Use different browser.
             }
                             
             for(var i=0;i<Math.ceil(this.movespeed);i++){
-                if(Controller.Right==true){//Keyboard.KeyDown(Key.Right)
+                if(Controller.Right==true && Controller.Left==false){//Keyboard.KeyDown(Key.Right)
                     if(this.playertilecollision(this.px+1,this.py) == false){
                         this.px+=1;
                         this.scrollmap(1,0);
                     }
                 }
-                if(Controller.Left==true){//Keyboard.KeyDown(Key.Left)
+                if(Controller.Left==true && Controller.Right==false){//Keyboard.KeyDown(Key.Left)
                     if(this.playertilecollision(this.px-1,this.py) == false){
                         this.px-=1;
                         this.scrollmap(-1,0);
@@ -6420,12 +6425,25 @@ Use different browser.
     gameloop=setInterval(doGameLogicLoop2,15); //15 is the game logic speed (1= max speed)
     //
     function doGameLogicLoop2(){
-
+myplayer.debug+=1
             // Set to full screen or windowed mode
             if(setToggleFullScreenMode == true){
                 setToggleFullScreenMode = false
                 toggleFullScreen()
             }            
+
+            if(Controller.MiniMap==false){
+                //var tp=false;
+                //If Keyboard.KeyDown(Key.LeftControl) 
+                //	myplayer.userscrollmap()
+                //	tp=True
+                //}
+                //if(tp==false){
+                myplayer.updateplayercontrols()
+                
+                //}
+            }      
+                
             //  UPDATES
             //
             // grow slime monster
@@ -6629,20 +6647,17 @@ Use different browser.
             //}
             //}
                       //mymap.draw();
-            if(Controller.MiniMap==false){
-                var tp=false;
-                //If Keyboard.KeyDown(Key.LeftControl) 
-                //	myplayer.userscrollmap()
-                //	tp=True
-                //}
-                if(tp==false){
-                    myplayer.updateplayercontrols()
-                }
-            }
+
+
+            if(updateConsole){
+                updateConsole=false
+                consoleImage = makeConsole()
+            }   
 
 
     }
-
+    var consoleImage = makeConsole()
+    
     function doGameLoop2(timeStamp){
 
         // Calculate the number of seconds passed since the last frame
@@ -6744,6 +6759,7 @@ Use different browser.
             if(developmode && developStartNearSlime)myplayer.setPositionNearSlimeMonster()
 
             gamestate = "play"
+            consoleImage = makeConsole()
             
         }
         
@@ -6762,21 +6778,26 @@ Use different browser.
                 // }
 
                 //canvas.Clear(Color.Black)
+                ctx.globalAlpha = 1.0
                 myplayer.draw()
                 // Draw the touch screen buttons
                 touchControlsLeft(false)
                 
                 touchControlsRight(false)
 
-                ctx.save()
-                ctx.scale(2,1.5);
                 
                 
                 if(developmode){
+                    ctx.save()
+                    ctx.scale(2,1.5);
                     ctx.fillStyle='black'
                     ctx.fillRect(screenwidth/3+50,0,90,24)
                     ctx.fillStyle = 'white'
                     ctx.fillText(Math.floor(fps),screenwidth/3+70,20);//debug
+                    ctx.fillText(Controller.Left+","+Controller.Right+","+Controller.Up+","+Controller.Down,screenwidth/3,90)
+                    ctx.fillText(myplayer.movespeed+','+myplayer.debug,screenwidth/3,100)
+                    
+                    ctx.restore()
                 }
                 //ctx.globalAlpha = 0.5;       
                 //ctx.fillStyle = 'black';
@@ -6786,7 +6807,6 @@ Use different browser.
                 //ctx.fillText("Cursors(move), z(shotgun), x(grenade), c(mine) space(jump) v(laserwall)..",0,30);
                 //ctx.fillText("",320,15);//debug
                 //ctx.scale(1,1);
-                ctx.restore()
                 //ctx.fillStyle = 'black'
                 
                 //ctx.scale(1,1)
@@ -6802,7 +6822,8 @@ Use different browser.
                 //ctx.fillRect(x,y,tilewidth,tileheight)
 
 
-
+                
+/*
                 //
                 // Set the scale - and smaller if the height is <500
                 var msc = 1.3
@@ -6855,7 +6876,12 @@ Use different browser.
                         screenFlashCounter = 0
                     }
                 }
+
+                */
+                ctx.globalAlpha = 1.0
+                ctx.drawImage(consoleImage,0,0)
             }
+            
             //ctx.drawImage(tileImage,0,0,32,32,0,0,32,32);
             //drawTile(0,0,52)
             if(Controller.MiniMap==true){
@@ -6915,8 +6941,77 @@ Use different browser.
     }
    
 
+    function makeConsole(){
+        
+        var consoleSprite = document.createElement('canvas')
+        var ctx = consoleSprite.getContext('2d')
+        consoleSprite.width = screenwidth
+        consoleSprite.height = screenheight
+
+        // put the image data into the created canvas element
+        //ctx.putImageData(data,0,0)
+
+                //
+                // Set the scale - and smaller if the height is <500
+                var msc = 1.3
+                if(screenheight<500)msc/=1.6
+                ctx.scale(msc,msc)//1.3,1.3
+                    ctx.globalAlpha = 1
+                    ctx.fillStyle = 'black'
+                    ctx.fillRect(0,0,screenwidth/1.7,68)
+                    ctx.globalAlpha = 1
+                    ctx.fillStyle = 'rgb(160,160,160)'
+                    ctx.fillRect(0,0,screenwidth/1.7,3)
+                    ctx.fillRect(0,62,screenwidth/1.7,3)
+                ctx.fillStyle = 'white'
+                var barWidth = screenwidth / 10
+                for(var i=0;i<6;i+=1){
+                    //ctx.fillText(myplayer.playeritemnames[i],(i*120)+40,32)
+                    ctx.fillStyle = 'rgb(20,10,40)'
+                    ctx.fillRect(i*barWidth,9,barWidth/1.6,16)
+                    ctx.fillStyle = 'white'
+                    ctx.fillText(myplayer.playeritem[i][1],i*barWidth+6,20)
+                    ctx.drawImage(mediumIconImage,tileAtlasIndex[i*2].x,tileAtlasIndex[i*2].y,
+                                    tileImageCellSize*2,tileImageCellSize*2,
+                                    (i*barWidth)+barWidth/2.4,0,
+                                    tilewidth,tileheight
+                                    )
+                }
+                for(var i=6;i<myplayer.playeritemnames.length;i+=1){
+                    //ctx.fillText(myplayer.playeritemnames[i],((i-6)*120)+40,45)
+                    ctx.fillStyle = 'rgb(20,10,40)'
+                    ctx.fillRect((i-6)*barWidth,40,barWidth/1.6,16)
+                    ctx.fillStyle = 'white'
+                    ctx.fillText(myplayer.playeritem[i][1],((i-6)*barWidth)+6,50)
+                    ctx.drawImage(mediumIconImage,tileAtlasIndex[(i*2)].x,tileAtlasIndex[(i*2)].y,
+                                    tileImageCellSize*2,tileImageCellSize*2,
+                                    ((i-6)*barWidth)+barWidth/2.4,32,
+                                    tilewidth,tileheight
+                                    )
+
+                }
+
+                ctx.globalAlpha = 1;
+                // screenFlash
+                if(screenFlash==true){
+                    screenFlashCounter+=1
+                    ctx.globalAlpha = screenFlashAlpha
+                    ctx.fillStyle = screenFlashColor
+                    ctx.fillRect(0,0,screenwidth,screenheight)
+                    if(screenFlashCounter>screenFlashTime){
+                        screenFlash = false
+                        screenFlashCounter = 0
+                    }
+                }
 
 
+
+
+
+
+        //Return our new image
+        return consoleSprite
+    }
 
     function rectmapcollide(x,y,w,h,offsetx,offsety){
 
