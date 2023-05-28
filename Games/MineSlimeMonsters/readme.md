@@ -48,6 +48,7 @@ Death message(drop down message system<br>
  <br><br>
 **Ideas :**
 * Replay - When you die the last few seconds are replayed showing how you died(zoomed in)
+* Regeneration Beam that is transparent. You step on a sort of thing and the beam adds up health. (kinda star trekky)
 * Scientist say matter can form out of nothingness. Taking this a notch further, "the spawning of devil eggs".
 * infinite sized maps? (Keep mining - save/load chunks)
 * Shops to sell loot and buy loads of ammo and guns and equipment.
