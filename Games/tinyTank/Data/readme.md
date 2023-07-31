@@ -4,5 +4,5 @@
 <br>
 
 <br>
-<img src="mockUp.png" width=100% height=100%><br>
+<img src="mockUp.png" width=200% height=200%><br>
 <br>
