@@ -12,3 +12,6 @@ Slightly based on a old game from the 16 bit Amiga computer called 'fire power'
 <br>
 <br>
 <a href = "https://cromdesi.home.xs4all.nl/emscripten/tinytank/Untitled1.html">Play/test (Monkey2) webversion</a>
+<br>
+<img src="Data/mockUp.png" width=100% height=100%><br>
+<br>
