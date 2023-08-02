@@ -15,3 +15,6 @@ Slightly based on a old game from the 16 bit Amiga computer called 'fire power'
 <br>
 <img src="Data/mockUp.png" width=100% height=100%><br>
 <br>
+<br>
+<img src="Data/tanks.png" width=100% height=100%><br>
+<br>
