@@ -9,7 +9,7 @@ Block then acts as one shape.<br>
 Weight of the other blocks affects its properties like jump height.<br>
 The control block can move the other blocks to form different shapes.<br>
 Move through tunnel?-Reassemble and form a flat surface.<br>
-another jump block found and connected to - more jump height.<br>
+another jump block found(build?) and connected to - more jump height.<br>
 Jet Block(fly),Gun block?,Drill Block?,Regular Block?,etc...<br>
 For huge shapes. Reorganize into useful surfaces<br>
 Disconnect from shapes and store in your base<br>
