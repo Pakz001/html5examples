@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charsetp="UTF-8">
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body bgcolor="black">
+ <style>
+    #myCanvas {touch-action: none;
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    -khtml-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    -webkit-tap-highlight-color:rgba(0,0,0,0);
+    }
+</style>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+  <script>
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+	c.addEventListener("touchend", touchHandler);
+	c.addEventListener("touchstart", touchHandler);
+	
+    var map = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,3,3,2,3,3,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,2,3,3,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1],
+            [1,3,3,2,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,2,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            ]
+
+    var [colx,coly,colw,colh] = [80,80,50,50];
+    var debug;
+    var lasttouchx,lasttouchy;
+    var autoscroll=false;
+    var tw,th;
+    var [camx,camy] = [0,0];
+
+    gameloop=setInterval(doGameLoop,16);
+
+    function doGameLoop(){
+        myCanvas.height = window.innerHeight-32;
+        myCanvas.width = window.innerWidth-32;
+        tw = Math.floor(myCanvas.width/map[0].length); 	th = Math.floor(myCanvas.height/map.length);
+        ctx.clearRect(0,0,c.width,c.height);
+        ctx.fillStyle="rgb(0,0,0)";
+        ctx.fillRect(0,0,c.width,c.height);
+
+
+        // Draw the tile map..
+        tw = 96;
+        th = 96;
+        // using the camx and camy variables.
+        // get the tile left and top and bottom and right
+        // of the screen. Draw between these tiles from the map.
+        var lt = Math.floor(-camx / tw);
+        var tt = Math.floor(-camy / th);
+        var rt = Math.floor((-camx / tw)+((myCanvas.width/tw)))+1;
+        var bt = Math.floor((-camy / th)+((myCanvas.height/th)))+1;
+        for(var y = tt; y < bt; ++y) {
+            for(var x = lt; x < rt; ++x) {
+                if(x>=0 && y>=0 && x<map[0].length && y<map.length){
+                    var dx = (x*tw)+camx;
+                    var dy = (y*th)+camy;
+
+                    if(map[y][x]==1){
+                        ctx.fillStyle = 'rgb(100,100,100)';
+                        ctx.fillRect(dx,dy,tw,th);
+                    }
+                    if(map[y][x]==0){
+                        ctx.fillStyle = 'rgb(10,4,1)';
+                        ctx.fillRect(dx,dy,tw,th);
+                    }
+
+                }
+            }
+        }
+        autoscr();
+
+        var z = rectmapcollide(colx,coly,colw,colh,0,0);
+        ctx.globalAlpha = .5;
+        if(z===false){
+            ctx.fillStyle='yellow';
+        }
+        if(z===true){
+            ctx.fillStyle='red';
+        }
+
+        ctx.fillRect(colx,coly,colw,colh);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle="rgb(255,255,255)";
+        ctx.fillText("Drawing a tilemap example."+debug,10,10); 
+
+    }
+
+
+
+
+
+	function touchHandler(e){
+		if(e.type=="touchstart" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			lasttouchx = x;
+			lasttouchy = y;
+			autoscroll = true;
+			colx = x-colw/2;
+			coly = y-colh/2;
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	    e.preventDefault();
+		}
+		if(e.type=="touchend" && e.touches) {
+			var x = e.changedTouches[0].clientX;
+			var y = e.changedTouches[0].clientY;
+			autoscroll = false;
+		
+			//myplayer.setdestination(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      	    e.preventDefault();
+		}
+
+	}
+
+    //
+    // Scroll the map and
+    // keep the edges of the map
+    // as the limit.
+    //
+    function autoscr(){
+        if(autoscroll==false)return;
+        var x = lasttouchx;
+        var y = lasttouchy;
+        
+        if(	x<myCanvas.width/2 && 
+                y>myCanvas.height/4 && 
+                y<myCanvas.height-myCanvas.height/4){
+            if(camx<=(tw*(map.length-2)-myCanvas.width))camx+=16;
+        }
+        
+        if(	x>myCanvas.width/2 &&
+                y>myCanvas.height/4 && 
+                y<myCanvas.height-myCanvas.height/4){
+            
+            if(camx>-((map[0].length*tw)-myCanvas.width))camx-=16;
+        }
+        
+        if(	y<myCanvas.height/4 ){
+            
+            if(camy<0)camy+=16;
+        }
+        
+        if(	y>myCanvas.height/4+myCanvas.height/2 ){
+        
+            if(camy>-((map.length*th)-myCanvas.height))camy-=16;
+        }
+
+    }
+
+    function rectmapcollide(x,y,w,h,offsetx,offsety){
+
+        var cx=Math.floor((x-camx)/tw);
+        var cy=Math.floor((y-camy)/th);
+
+        for(var y2=cy-1;y2<cy+3;y2++){
+            for(var x2=cx-1;x2<cx+3;x2++){	
+                if(x2>=0 && x2<map[0].length && y2>=0 && y2<map.length){
+                    if(map[y2][x2] == 1){
+                        var x3 = ((x2)*tw)+camx;
+                        var y3 = ((y2)*th)+camy;
+                        if(rectsoverlap(x+offsetx,y+offsety,w,h,x3,y3,tw,th)==true){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    function rectsoverlap(r1x1,r1y1,r1w,r1h,r2x1,r2y1,r2w,r2h){
+        var r1x2 = r1x1+r1w;
+        var r1y2 = r1y1+r1h;
+        var r2x2 = r2x1+r2w;
+        var r2y2 = r2y1+r2h;
+        
+        return (r1x1 < r2x2 && r1x2 > r2x1 && r1y1 < r2y2 && r1y2 > r2y1);
+
+    }
+</script>
+</body>
+</html>
