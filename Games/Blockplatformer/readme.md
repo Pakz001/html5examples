@@ -4,7 +4,7 @@ What is this 2d platformer ? Mechanics - block - tool - puzzle - build, assemble
 One regular 2d platformer.
 <br>
 A control block which acts as a regular platformer character.<br>
-Can connect to a other block.<br>
+Can connect to a other block(s).<br>
 Block then acts as one shape.<br>
 Weight of the other blocks affects its properties like jump height.<br>
 The control block can move the other blocks to form different shapes.<br>
