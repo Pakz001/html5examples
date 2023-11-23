@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q-Learning Pathfinding</title>
+  <style>
+    canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="mapCanvas" width="400" height="300"></canvas>
+
+  <script>
+    const canvas = document.getElementById('mapCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const numRows = 6;
+    const numCols = 8;
+    const cellSize = 50;
+
+    const map = [
+      [0, 0, 0, 0, 1, 0, 0, 0],
+      [0, 1, 1, 1, 1, 1, 1, 0],
+      [0, 1, 0, 0, 0, 0, 1, 0],
+      [0, 0, 0, 0, 0, 0, 1, 0],
+      [0, 1, 1, 1, 0, 0, 1, 0],
+      [0, 1, 0, 0, 0, 0, 0, 0],
+    ];
+
+    function drawMap() {
+      for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numCols; col++) {
+          ctx.fillStyle = map[row][col] === 1 ? '#000' : '#fff';
+          ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+          ctx.strokeRect(col * cellSize, row * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+
+    function drawPath(path) {
+      ctx.strokeStyle = '#00f';
+      ctx.lineWidth = 3;
+
+      for (let i = 0; i < path.length - 1; i++) {
+        const [row1, col1] = [Math.floor(path[i] / numCols), path[i] % numCols];
+        const [row2, col2] = [Math.floor(path[i + 1] / numCols), path[i + 1] % numCols];
+
+        ctx.beginPath();
+        ctx.moveTo(col1 * cellSize + cellSize / 2, row1 * cellSize + cellSize / 2);
+        ctx.lineTo(col2 * cellSize + cellSize / 2, row2 * cellSize + cellSize / 2);
+        ctx.stroke();
+      }
+    }
+
+    // Initialize Q-learning agent
+    const numStates = numRows * numCols;
+    const numActions = 4; // 4 possible movements: up, down, left, right
+    const qValues = Array.from({ length: numStates }, () => Array(numActions).fill(0));
+
+    // Training loop (simplified for demonstration)
+    const numEpisodes = 500;
+    const alpha = 0.1; // learning rate
+    const gamma = 0.9; // discount factor
+
+    for (let episode = 0; episode < numEpisodes; episode++) {
+      let currentState = 0; // Start from the top-left corner
+
+      while (currentState !== numStates - 1) {
+        const action = Math.floor(Math.random() * numActions);
+
+        const row = Math.floor(currentState / numCols);
+        const col = currentState % numCols;
+
+        let nextState;
+
+        switch (action) {
+          case 0: // Move up
+            nextState = (row > 0 && map[row - 1][col] !== 1) ? currentState - numCols : currentState;
+            break;
+          case 1: // Move down
+            nextState = (row < numRows - 1 && map[row + 1][col] !== 1) ? currentState + numCols : currentState;
+            break;
+          case 2: // Move left
+            nextState = (col > 0 && map[row][col - 1] !== 1) ? currentState - 1 : currentState;
+            break;
+          case 3: // Move right
+            nextState = (col < numCols - 1 && map[row][col + 1] !== 1) ? currentState + 1 : currentState;
+            break;
+          default:
+            nextState = currentState;
+        }
+
+        // Reward for reaching the goal
+        const reward = (nextState === numStates - 1) ? 1 : 0;
+
+        // Update Q-value (simplified)
+        qValues[currentState][action] += alpha * (reward + gamma * Math.max(...qValues[nextState]) - qValues[currentState][action]);
+
+        currentState = nextState;
+      }
+    }
+
+    // Visualize the map and learned path
+    drawMap();
+    const startState = 0;
+    const goalState = numStates - 1;
+
+    // Find optimal path using the learned Q-values
+    let currentState = startState;
+    const optimalPath = [currentState];
+
+    while (currentState !== goalState) {
+      const action = qValues[currentState].indexOf(Math.max(...qValues[currentState]));
+
+      switch (action) {
+        case 0: // Move up
+          currentState = (currentState > numCols - 1 && map[Math.floor((currentState - numCols) / numCols)][currentState % numCols] !== 1) ? currentState - numCols : currentState;
+          break;
+        case 1: // Move down
+          currentState = (currentState < numStates - numCols && map[Math.floor((currentState + numCols) / numCols)][currentState % numCols] !== 1) ? currentState + numCols : currentState;
+          break;
+        case 2: // Move left
+          currentState = (currentState % numCols > 0 && map[Math.floor(currentState / numCols)][(currentState - 1) % numCols] !== 1) ? currentState - 1 : currentState;
+          break;
+        case 3: // Move right
+          currentState = (currentState % numCols < numCols - 1 && map[Math.floor(currentState / numCols)][(currentState + 1) % numCols] !== 1) ? currentState + 1 : currentState;
+          break;
+        default:
+          currentState = currentState;
+      }
+
+      optimalPath.push(currentState);
+    }
+
+    drawPath(optimalPath);
+  </script>
+</body>
+</html>
