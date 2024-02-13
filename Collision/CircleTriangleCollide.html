@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Bouncing Circle and Triangles made with code llama</title>
+    <style>
+      #canvas {
+        border: 1px solid black;
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // Define the circle
+      const circle = {
+        x: 100,
+        y: 100,
+        radius: 20,
+        fillStyle: "red"
+      };
+
+      // Define the triangles
+      const triangle1 = {
+        x: 150,
+        y: 150,
+        width: 50,
+        height: 50,
+        fillStyle: "blue"
+      };
+
+      const triangle2 = {
+        x: 200,
+        y: 200,
+        width: 50,
+        height: 50,
+        fillStyle: "green"
+      };
+
+      // Define the collision function
+      function collisionDetection(circle, triangle) {
+        const distance = Math.sqrt(
+          (triangle.x - circle.x) ** 2 +
+          (triangle.y - circle.y) ** 2
+        );
+
+        //if (distance < circle.radius) {
+		if(
+		circleTriangleCollision(
+		{x:circle.x,y:circle.y},
+		circle.radius*2,
+		[
+		{x:triangle.x,						y:triangle.y},
+		{x:triangle.x + triangle.width,		y:triangle.y},
+		{x:triangle.x,						y:triangle.y + triangle.height},
+		]
+		)
+		){
+          // Flash the canvas for 50 milliseconds
+		  
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, canvas.width/10, canvas.height/10);
+          setTimeout(() => {
+            ctx.fillStyle = "black";
+			
+            ctx.fillRect(0, 0, canvas.width/10, canvas.height/10);
+          }, 1);
+        }
+      }
+	  
+
+	  
+
+	  
+	  
+      // Draw the circle and triangles
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.arc(circle.x, circle.y, circle.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = circle.fillStyle;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(triangle1.x, triangle1.y);
+        ctx.lineTo(triangle1.x + triangle1.width, triangle1.y);
+        ctx.lineTo(triangle1.x, triangle1.y + triangle1.height);
+        ctx.fillStyle = triangle1.fillStyle;
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(triangle2.x, triangle2.y);
+        ctx.lineTo(triangle2.x + triangle2.width, triangle2.y);
+        ctx.lineTo(triangle2.x, triangle2.y + triangle2.height);
+        ctx.fillStyle = triangle2.fillStyle;
+        ctx.fill();
+      }
+
+      // Update the circle and triangles positions
+	  var a=2
+	  var b=2
+	  var c=1.4
+	  var d=2
+	  var e=-2
+	  var f=-1
+      function update() {
+        circle.x += a;
+        circle.y += b;
+
+        triangle1.x += c;
+        triangle1.y += d;
+
+        triangle2.x += e;
+        triangle2.y += f;
+		if(circle.x>200)a=-a;
+		if(circle.y>200)b=-b;
+		if(circle.x<0)a=-a;
+		if(circle.y<0)b=-b;
+		if(triangle1.x>200)c=-c;
+		if(triangle1.y>200)d=-d;
+		if(triangle1.x<0)c=-c;
+		if(triangle1.y<0)d=-d;
+		if(triangle2.x>200)e=-e;
+		if(triangle2.y>200)f=-f;
+		if(triangle2.x<0)e=-e;
+		if(triangle2.y<0)f=-d;
+      }
+
+      // Main game loop
+      function gameLoop() {
+        update();
+        draw();
+        collisionDetection(circle, triangle1);
+        collisionDetection(circle, triangle2);
+        requestAnimationFrame(gameLoop);
+      }
+
+      gameLoop();
+	  
+	  
+	  function circleTriangleCollision(circleCenter, circleRadius, trianglePoints) {
+		  circleCenter.x-=circle.radius/2
+		  circleCenter.y-=circle.radius/2
+  const triangle = {
+    a: trianglePoints[0],
+    b: trianglePoints[1],
+    c: trianglePoints[2],
+  };
+
+  const circleToTriangleDistance = Math.sqrt(
+    (triangle.a.x - circleCenter.x) ** 2 +
+    (triangle.a.y - circleCenter.y) ** 2
+  );
+
+  const circleToTriangleSideDistance = Math.min(
+    Math.sqrt((triangle.b.x - circleCenter.x) ** 2 + (triangle.b.y - circleCenter.y) ** 2),
+    Math.sqrt((triangle.c.x - circleCenter.x) ** 2 + (triangle.c.y - circleCenter.y) ** 2)
+  );
+
+  return (
+    circleToTriangleDistance < circleRadius + 10 &&
+    circleToTriangleSideDistance < circleRadius + 10
+  );
+}
+	  
+	  
+    </script>
+  </body>
+</html>
