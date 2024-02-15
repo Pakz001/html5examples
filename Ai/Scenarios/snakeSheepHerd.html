@@ -69,16 +69,23 @@
 
             ctx.fillStyle = "black";
             for (let i = 1; i < snake.length; i++) {
+				ctx.alpha = 1
                 ctx.fillRect(snake[i].x+1, snake[i].y+1, blockSize+2, blockSize+2);
+				ctx.alpha = 0.1
 				if(i>1 && i<snake.length-2){
-					ctx.alpha = 0.5
+					
 					ctx.fillRect(snake[i].x+3, snake[i].y+3, blockSize+2, blockSize+2);
-					ctx.alpha = 1
+					
 				}
 				if(i>2 && i<snake.length-2){
-					ctx.alpha = 0.2
+					
 					ctx.fillRect(snake[i].x+5, snake[i].y+5, blockSize+4, blockSize+4);
-					ctx.alpha = 1
+					
+				}
+				if(i==Math.floor(snake.length/2)){
+					
+					ctx.fillRect(snake[i].x+7, snake[i].y+7, blockSize+5, blockSize+5);
+					
 				}
             }
             ctx.fillStyle = snakeColor;
