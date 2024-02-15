@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,8 +17,8 @@
         const blockSize = 12
         const moveRange = 5;
 
-        // Colors
-        const snakeColor = "darkred";
+        // Colors$
+        const snakeColor = "green";
         const tailColor = "rgb(200,20,20)";
 
         // Generate a random position within the canvas boundaries
@@ -70,7 +71,8 @@
             ctx.fillStyle = "black";
             for (let i = 1; i < snake.length; i++) {
 				ctx.globalAlpha = 0.5
-                ctx.fillRect(snake[i].x+1, snake[i].y+1, blockSize+2, blockSize+2);
+                //ctx.fillRect(snake[i].x+1, snake[i].y+1, blockSize+2, blockSize+2);
+				drawFilledCircle(ctx,snake[i].x+1, snake[i].y+1, blockSize-2,"black")
 				ctx.globalAlpha = 0.2
 				if(i>1 && i<snake.length-2){
 					
@@ -90,8 +92,8 @@
             }
 			ctx.globalAlpha = 1
             ctx.fillStyle = snakeColor;
-            ctx.fillRect(snake[0].x, snake[0].y, blockSize, blockSize);
-
+            //ctx.fillRect(snake[0].x, snake[0].y, blockSize, blockSize);
+			drawFilledCircle(ctx,snake[0].x, snake[0].y, blockSize,snakeColor)
 			
             //ctx.fillStyle = tailColor;
             //for (let i = 1; i < snake.length; i++) {
