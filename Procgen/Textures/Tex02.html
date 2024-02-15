@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10000 Greyscale Lines</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size to window dimensions
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    function drawLine(x1, y1, x2, y2, transparency,trig=0) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = `rgba(0, 0, 0, ${transparency})`;
+	  if(trig==1){
+		  ctx.strokeStyle = `rgba(250, 250, 255, ${transparency})`;
+	  }
+	  
+      ctx.stroke();
+    }
+
+    for (let i = 0; i < 10000; i++) {
+      // Generate random line coordinates and transparency
+      var x1 = Math.random() * (canvas.width); // Allow outside canvas
+      var y1 = Math.random() * (canvas.height);
+      //var x2 = Math.random() * (canvas.width + canvas.width);
+      //var y2 = Math.random() *(canvas.height + canvas.height);
+      const transparency = Math.random();
+		//x1 -= canvas.width/2
+		//y1-=canvas.height/2
+		//x2-=canvas.width/2
+		//y2-=canvas.height/2
+		x2=x1+((Math.random()*canvas.width))
+		y2=y1+((Math.random()*canvas.height))
+		x2-=canvas.width/2
+		y2-=canvas.height/2
+		ctx.lineWidth = Math.floor(Math.random()*2)
+      drawLine(x1, y1, x2, y2, transparency);
+    }
+	
+	for (let i = 0; i < 88888; i++) {
+      // Generate random line coordinates and transparency
+      var x1 = (Math.random() * (canvas.width + canvas.width))-canvas.width; // Allow outside canvas
+      var y1 =( Math.random() * (canvas.height + canvas.height))-canvas.height;
+      var x2 = x1+(Math.random()*25)-25
+      var y2 = y1+(Math.random()*25)-25
+      const transparency = Math.random();
+	  //		x1 -= canvas.width/2
+	//	y1-=canvas.height/2
+		//x2-=canvas.width/2
+	//	y2-=canvas.height/2
+		ctx.lineWidth = Math.random()*10+1
+		
+     drawLine(x1, y1, x2, y2, transparency,1);
+    }
+  </script>
+</body>
+</html>
