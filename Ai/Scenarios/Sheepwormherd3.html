@@ -1,5 +1,4 @@
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -64,7 +63,7 @@
         }
 
         // Draw the snake on the canvas
-        function drawSnake(snake) {
+        function drawSnake(snake,num=0) {
 			//ctx.fillStyle = "black";
             //ctx.fillRect(snake[0].x-1, snake[0].y-1, blockSize+2, blockSize+2);
 
@@ -93,7 +92,15 @@
 			ctx.globalAlpha = 1
             ctx.fillStyle = snakeColor;
             //ctx.fillRect(snake[0].x, snake[0].y, blockSize, blockSize);
-			drawFilledCircle(ctx,snake[0].x, snake[0].y, blockSize,snakeColor)
+			if(num%2===0){
+				ctx.globalAlpha=0.1
+			drawFilledCircle(ctx,snake[0].x, snake[0].y, blockSize,"white")
+		}else{
+			
+			ctx.globalAlpha=0.1
+			drawFilledCircle(ctx,snake[0].x, snake[0].y, blockSize,"white")
+			
+		}
 			
             //ctx.fillStyle = tailColor;
             //for (let i = 1; i < snake.length; i++) {
@@ -112,9 +119,18 @@
 				//ctx.fillStyle = "green"
 				
                 //ctx.fillRect(snake[i].x, snake[i].y, (blockSize-(i/2)), (blockSize-(i/2)));
+				if(num%2===0){
 				drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"green")
+			}else{
+				drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"orange")
+			}
+			ctx.globalAlpha=0.2
+			if(i==Math.floor(snake.length/2)){
+				drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"white")
+			}
             }
 			ctx.globalAlpha =1
+			
         }
 
         // Initialize an array of snakes
@@ -156,9 +172,11 @@
 			z=2;
 			}
 			z-=1;
+			var q=0
             for (const snake of snakes) {
                 //moveSnake(snake);
-                drawSnake(snake);
+                drawSnake(snake,q);
+				q+=1
             }
             requestAnimationFrame(animate);
         }
@@ -173,7 +191,24 @@
   context.fillStyle = color; // Sets the fill color
   context.fill(); // Fills the circle with the specified color
   context.closePath(); // Closes the path
-}
+  ctx.fillStyle="white"
+  ctx.globalAlpha = 0.1
+  ctx.fillRect(x,y,radius/4,radius/4,radius/4)
+  ctx.fillRect(x+radius/3,y,radius/4,radius/4)
+  ctx.globalAlpha = 0.05
+  ctx.fillRect(x+radius/2,y,radius/4,radius/4)
+  ctx.fillRect(x+radius/3,y+radius/3,radius/4,radius/4)
+  ctx.fillRect(x+radius/2,y+radius/3,radius/4,radius/4)
+  //ctx.fillRect(x,y,radius/4,radius/4,radius/4)
+  //ctx.fillRect(x+radius/2,y,radius/4,radius/4)
+  //ctx.fillRect(x+radius/4,y+radius/2,radius/4,radius/4,radius/4)
+  ctx.fillStyle="black"
+  ctx.globalAlpha = 0.15
+  //ctx.fillRect(x+radius/2+radius/4,y+radius/2,radius/4,radius/4)
+  ctx.fillRect(x+radius/2+radius/4,y+radius/2,radius/6,radius/6)
+  ctx.globalAlpha = 0.2
+  ctx.fillRect(x+radius/3+radius/4,y+radius/2,radius/4,radius/4)
+ }
     </script>
 </body>
 </html>
