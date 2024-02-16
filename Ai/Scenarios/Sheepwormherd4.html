@@ -14,6 +14,7 @@
 canvas.width=window.innerWidth
 			canvas.height=window.innerHeight
         // Block size and movement range
+		const snakeTailLength = 10
 		const numSnakes = 25
         const blockSize = 16
         const moveRange = 5;//speed
@@ -59,7 +60,7 @@ canvas.width=window.innerWidth
             if (!checkCollision(newHead)) {
                 snake.unshift(newHead);
 				//12
-                if (snake.length > 7) {
+                if (snake.length > snakeTailLength) {
 					
                     snake.pop();
                 }
@@ -73,7 +74,7 @@ canvas.width=window.innerWidth
 
             ctx.fillStyle = "black";
             for (let i = 1; i < snake.length; i++) {
-				ctx.globalAlpha = .8
+				ctx.globalAlpha = 1
                 //ctx.fillRect(snake[i].x+1, snake[i].y+1, blockSize+2, blockSize+2);
 				drawFilledCircle(ctx,snake[i].x+1, snake[i].y+1, blockSize-(i/2)-1,"black")
 				ctx.globalAlpha = .5
@@ -94,7 +95,7 @@ canvas.width=window.innerWidth
 				}
             }
 			// ring of holy
-			ctx.globalAlpha = 1
+			
             ctx.fillStyle = snakeColor;
             //ctx.fillRect(snake[0].x, snake[0].y, blockSize, blockSize);
 			if(num%2===0){
@@ -123,7 +124,7 @@ canvas.width=window.innerWidth
 			
 			
 			for (let i = 1; i < snake.length; i++) {
-				ctx.globalAlpha=0.1
+				ctx.globalAlpha=.2
 				//ctx.fillStyle = "green"
 				
                 //ctx.fillRect(snake[i].x, snake[i].y, (blockSize-(i/2)), (blockSize-(i/2)));
@@ -212,6 +213,7 @@ canvas.width=window.innerWidth
   context.fillStyle = color; // Sets the fill color
   context.fill(); // Fills the circle with the specified color
   context.closePath(); // Closes the path
+  
   ctx.fillStyle="white"
   ctx.globalAlpha = 0.1
   ctx.fillRect(x,y,radius/4,radius/4,radius/4)
