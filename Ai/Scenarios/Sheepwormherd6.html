@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Canvas</title>
+</head>
+<body>
+    <canvas id="myCanvas" width="800" height="600"></canvas>
+    <script>
+        // Get the canvas element
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+canvas.width=window.innerWidth
+			canvas.height=window.innerHeight
+        // Block size and movement range
+		const moveSpeed = 1
+		const snakeTailLength = 9
+		const numSnakes = 50
+        var blockSize = 22
+		const monsterVarSize = 10
+        const moveRange = 5;//speed
+
+        mycols = [  "red","green","blue","purple",
+                    "yellow","navy","orange","brown",
+                    "Black","white"]
+		
+		var oldx,oldy=0
+        // Colors$
+        const snakeColor = "green";
+        const tailColor = "rgb(200,20,20)";
+
+        // Generate a random position within the canvas boundaries
+        function getRandomPosition() {
+            return {
+                x: Math.floor(Math.random() * (canvas.width - blockSize)),
+                y: Math.floor(Math.random() * (canvas.height - blockSize))
+            };
+        }
+
+        // Check if a position collides with any existing snake tails
+        function checkCollision(position) {
+            for (const snake of snakes) {
+                for (let i = 1; i < snake.length; i++) {
+                    if (snake[i].x === position.x && snake[i].y === position.y) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Create a new snake object
+        function createSnake(colz=0,siz=blockSize) {
+            const head = getRandomPosition();
+            return [{ x: head.x, y: head.y, col:colz,size:siz}];
+        }
+
+        // Move the snake and add new position to tail
+        function moveSnake(snake) {
+			oldx= snake[0].x
+			oldy= snake[0].y
+            const direction = { x: Math.floor(Math.random() * 3) - 1, y: Math.floor(Math.random() * 3) - 1 };
+            const newHead = {
+                x: Math.min(Math.max(snake[0].x + direction.x * moveRange, 0), canvas.width - blockSize),
+                y: Math.min(Math.max(snake[0].y + direction.y * moveRange, 0), canvas.height - blockSize),
+                col:snake[0].col,
+				size:snake[0].size
+            };
+			// sometimes the blob gets stuck therefore a math.random is
+			// used to unstuck it. fix here
+            if (!checkCollision(newHead) || Math.random()<.08) {
+                snake.unshift(newHead);
+				//12
+                if (snake.length > snakeTailLength) {
+					
+                    snake.pop();
+                }
+            }else{
+				
+            }
+        }
+
+        // Draw the snake on the canvas
+        function drawSnake(snake,num=0) {
+			//ctx.fillStyle = "black";
+            //ctx.fillRect(snake[0].x-1, snake[0].y-1, blockSize+2, blockSize+2);
+			var oldBlocksize = blockSize
+			blockSize = snake[0].size
+            ctx.fillStyle = "black";
+            for (let i = 1; i < snake.length; i++) {
+				ctx.globalAlpha = 1
+                //ctx.fillRect(snake[i].x+1, snake[i].y+1, blockSize+2, blockSize+2);
+				
+				drawFilledCircle(ctx,snake[i].x+1, snake[i].y+1, blockSize-(i/2)-1,"black")
+				ctx.globalAlpha = .5
+				if(i>1 && i<snake.length-2){
+					
+					//ctx.fillRect(snake[i].x+3, snake[i].y+3, blockSize-(i/2)+2, blockSize-(i/2)+2);
+					drawFilledCircle(ctx,snake[i].x+3, snake[i].y+3, blockSize-(i/2)+1,"black")
+				}
+				if(i>2 && i<snake.length-2){
+					
+					//ctx.fillRect(snake[i].x+5, snake[i].y+5, blockSize-(i/2)+4, blockSize-(i/2)+4);
+					drawFilledCircle(ctx,snake[i].x+5, snake[i].y+5, blockSize-(i/2)+2,"black")
+				}
+				if(i==Math.floor(snake.length/2)){
+					
+					//ctx.fillRect(snake[i].x+7, snake[i].y+7, blockSize-(i/2)+5, blockSize-(i/2)+5);
+					drawFilledCircle(ctx,snake[i].x+5, snake[i].y+5, blockSize-(i/2)+3,"black")
+				}
+            }
+			// ring of holy
+			
+            ctx.fillStyle = snakeColor;
+            //ctx.fillRect(snake[0].x, snake[0].y, blockSize, blockSize);
+			if(num%2===0){
+				ctx.globalAlpha=0.1
+			drawFilledCircle(ctx,snake[0].x, snake[0].y, blockSize,"white")
+		}else{
+			
+			ctx.globalAlpha=0.1
+			drawFilledCircle(ctx,snake[0].x, snake[0].y, blockSize,"white")
+			
+		}
+			
+            //ctx.fillStyle = tailColor;
+            //for (let i = 1; i < snake.length; i++) {
+            //    ctx.fillRect(snake[i].x, snake[i].y, blockSize-(i/2), blockSize-(i/2));
+            //}
+			//ctx.fillStyle = tailColor;
+			ctx.globalAlpha = 1
+			for (let j = 1; j < 6; j+=1){
+            for (let i = 1; i < snake.length; i++) {
+				
+				ctx.fillStyle = 'rgb('+ j*60 +', '+ j*60+', '+ j*60 +')';
+                //ctx.fillRect(snake[i].x+j, snake[i].y+j, (blockSize-(i/2))-j*2, (blockSize-(i/2))-j*2);
+				drawFilledCircle(ctx,snake[i].x+j, snake[i].y+j, (blockSize-(i/2))-j*2,'rgb('+ j*60 +', '+ j*60+', '+ j*60 +')')
+            }}
+			
+			
+			for (let i = 1; i < snake.length; i++) {
+				ctx.globalAlpha=.2
+				//ctx.fillStyle = "green"
+				
+                //ctx.fillRect(snake[i].x, snake[i].y, (blockSize-(i/2)), (blockSize-(i/2)));
+				if(num%2===0){
+				//	drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"green")
+				}else{
+				//	drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"purple")
+				}
+                drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),mycols[snake[i].col])
+			 //ctx.fillRect(snake[i].x, snake[i].y, (blockSize-(i/2)), (blockSize-(i/2)));
+			 ctx.globalAlpha=.1
+				
+				drawFilledCircle(ctx,snake[i].x+blockSize/3, snake[i].y+blockSize/3, (blockSize/2-(i/2)),"black")
+					
+			
+			
+			
+			
+			ctx.globalAlpha=.16
+			if(i==Math.floor(snake.length/2-4)){
+				drawFilledCircle(ctx,snake[i].x+2, snake[i].y+2, (blockSize-(i/2)-4),"white")
+			}
+            }
+			ctx.globalAlpha =1
+			blockSize=oldBlocksize
+        }
+
+        // Initialize an array of snakes
+        const snakes = [];
+
+        // Add 50 snakes
+        for (let i = 0; i < numSnakes; i++) {
+            let newSnake = createSnake(Math.floor(Math.random()*10),blockSize+(Math.floor(Math.random()*monsterVarSize))-monsterVarSize);
+            while (checkCollision(newSnake[0])) {
+                newSnake = createSnake(Math.floor(Math.random()*10),blockSize+(Math.floor(Math.random()*monsterVarSize))-monsterVasrSize);
+            }
+            snakes.push(newSnake);
+        }
+
+		var z = 0
+        // Animation loop
+        function animate() {
+			canvas.width=window.innerWidth
+			canvas.height=window.innerHeight
+			ctx.fillStyle = "darkgrey"
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+			ctx.fillStyle = "navy"
+			ctx.globalAlpha = 0.2
+			ctx.fillRect(0,0,canvas.width,64)
+			ctx.fillRect(0,canvas.height-64,canvas.width,64)
+			ctx.globalAlpha = 0.5
+			ctx.fillStyle="white"
+			ctx.fillRect(canvas.width/2,0,2,canvas.height)
+			ctx.fillStyle="black"
+			ctx.fillRect(canvas.width/2+2,0,2,canvas.height)
+			ctx.fillStyle="white"
+			ctx.fillRect(0,canvas.height/2,canvas.width,2)
+			ctx.fillStyle="black"
+			ctx.fillRect(0,canvas.height/2+2,canvas.width,2)
+			
+		if (z==0){
+            for (const snake of snakes) {
+				for(var zz=0;zz<moveSpeed;zz+=1){
+                moveSnake(snake);
+				}
+                //drawSnake(snake);
+            }
+			z=2;
+			}
+			z-=1;
+			var q=0
+            for (const snake of snakes) {
+                //moveSnake(snake);
+                drawSnake(snake,q);
+				q+=1
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+		
+		
+		function drawFilledCircle(context, x, y, radius, color) {
+			if(radius<1)return
+			if(radius<0)radius=2
+  context.beginPath();
+  context.arc(x+radius/2, y+radius/2, radius, 0, 2 * Math.PI); // Draws a complete circle
+  context.fillStyle = color; // Sets the fill color
+  context.fill(); // Fills the circle with the specified color
+  context.closePath(); // Closes the path
+  
+  ctx.fillStyle="white"
+  ctx.globalAlpha = 0.1
+  ctx.fillRect(x,y,radius/4,radius/4,radius/4)
+  ctx.fillRect(x+radius/3,y,radius/4,radius/4)
+  ctx.globalAlpha = 0.05
+  ctx.fillRect(x+radius/2,y,radius/4,radius/4)
+  ctx.fillRect(x+radius/3,y+radius/3,radius/4,radius/4)
+  ctx.fillRect(x+radius/2,y+radius/3,radius/4,radius/4)
+  //ctx.fillRect(x,y,radius/4,radius/4,radius/4)
+  //ctx.fillRect(x+radius/2,y,radius/4,radius/4)
+  //ctx.fillRect(x+radius/4,y+radius/2,radius/4,radius/4,radius/4)
+  ctx.fillStyle="black"
+  ctx.globalAlpha = 0.15
+  //ctx.fillRect(x+radius/2+radius/4,y+radius/2,radius/4,radius/4)
+  ctx.fillRect(x+radius/2+radius/4,y+radius/2,radius/6,radius/6)
+  ctx.globalAlpha = 0.2
+  ctx.fillRect(x+radius/3+radius/4,y+radius/2,radius/4,radius/4)
+ }
+    </script>
+</body>
+</html>
