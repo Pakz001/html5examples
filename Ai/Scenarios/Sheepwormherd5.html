@@ -15,11 +15,14 @@ canvas.width=window.innerWidth
 			canvas.height=window.innerHeight
         // Block size and movement range
 		const moveSpeed = 1
-		const snakeTailLength = 12
-		const numSnakes = 25
-        const blockSize = 32
+		const snakeTailLength = 9
+		const numSnakes = 16
+        const blockSize = 16
         const moveRange = 5;//speed
 
+        mycols = [  "red","green","blue","purple",
+                    "yellow","navy","orange","brown",
+                    "Black","white"]
 		
 		var oldx,oldy=0
         // Colors$
@@ -47,9 +50,9 @@ canvas.width=window.innerWidth
         }
 
         // Create a new snake object
-        function createSnake() {
+        function createSnake(colz=0) {
             const head = getRandomPosition();
-            return [{ x: head.x, y: head.y }];
+            return [{ x: head.x, y: head.y, col:colz }];
         }
 
         // Move the snake and add new position to tail
@@ -59,7 +62,8 @@ canvas.width=window.innerWidth
             const direction = { x: Math.floor(Math.random() * 3) - 1, y: Math.floor(Math.random() * 3) - 1 };
             const newHead = {
                 x: Math.min(Math.max(snake[0].x + direction.x * moveRange, 0), canvas.width - blockSize),
-                y: Math.min(Math.max(snake[0].y + direction.y * moveRange, 0), canvas.height - blockSize)
+                y: Math.min(Math.max(snake[0].y + direction.y * moveRange, 0), canvas.height - blockSize),
+                col:snake[0].col
             };
 			// sometimes the blob gets stuck therefore a math.random is
 			// used to unstuck it. fix here
@@ -138,10 +142,11 @@ canvas.width=window.innerWidth
 				
                 //ctx.fillRect(snake[i].x, snake[i].y, (blockSize-(i/2)), (blockSize-(i/2)));
 				if(num%2===0){
-					drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"green")
+				//	drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"green")
 				}else{
-					drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"purple")
+				//	drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),"purple")
 				}
+                drawFilledCircle(ctx,snake[i].x, snake[i].y, (blockSize-(i/2)),mycols[snake[i].col])
 			 //ctx.fillRect(snake[i].x, snake[i].y, (blockSize-(i/2)), (blockSize-(i/2)));
 			 ctx.globalAlpha=.1
 				
@@ -165,9 +170,9 @@ canvas.width=window.innerWidth
 
         // Add 50 snakes
         for (let i = 0; i < numSnakes; i++) {
-            let newSnake = createSnake();
+            let newSnake = createSnake(Math.floor(Math.random()*10));
             while (checkCollision(newSnake[0])) {
-                newSnake = createSnake();
+                newSnake = createSnake(Math.floor(Math.random()*10));
             }
             snakes.push(newSnake);
         }
