@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Sliders</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f0f0f0;
+  }
+  canvas {
+    border: 1px solid black;
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight / 2;
+  canvas.style.position = "absolute";
+  canvas.style.bottom = "0";
+
+  // Slider properties
+  const sliderWidth = canvas.width * 0.8;
+  const sliderHeight = 20;
+  const sliderGap = 30;
+  const sliderX = (canvas.width - sliderWidth) / 2;
+  let sliders = [
+    { y: canvas.height / 2, value: sliderWidth / 2 },
+    { y: canvas.height / 2 + sliderHeight + sliderGap, value: sliderWidth / 2 },
+    { y: canvas.height / 2 + 2 * (sliderHeight + sliderGap), value: sliderWidth / 2 },
+    { y: canvas.height / 2 + 3 * (sliderHeight + sliderGap), value: sliderWidth / 2 }
+  ];
+
+  function drawSlider(slider) {
+    ctx.fillStyle = '#ddd';
+    ctx.fillRect(sliderX, slider.y, sliderWidth, sliderHeight); // Slider track
+
+    // Slider handle
+    const sliderHandleWidth = 10;
+    const sliderHandleX = sliderX + slider.value - sliderHandleWidth / 2;
+    ctx.fillStyle = '#666';
+    ctx.fillRect(sliderHandleX, slider.y, sliderHandleWidth, sliderHeight);
+  }
+
+  function drawSliders() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sliders.forEach(drawSlider);
+  }
+
+  function getTouchSlider(touchY) {
+    return sliders.find(slider => 
+      touchY > slider.y && touchY < slider.y + sliderHeight
+    );
+  }
+
+  function updateSliderValue(slider, touchX) {
+    const value = touchX - sliderX;
+    if (value >= 0 && value <= sliderWidth) {
+      slider.value = value;
+    }
+  }
+
+  canvas.addEventListener('touchstart', function(event) {
+    const touchY = event.touches[0].clientY - canvas.getBoundingClientRect().top;
+    const touchX = event.touches[0].clientX - canvas.getBoundingClientRect().left;
+    const slider = getTouchSlider(touchY);
+    if (slider) {
+      updateSliderValue(slider, touchX);
+      drawSliders();
+    }
+  });
+
+  canvas.addEventListener('touchmove', function(event) {
+    event.preventDefault();
+    const touchY = event.touches[0].clientY - canvas.getBoundingClientRect().top;
+    const touchX = event.touches[0].clientX - canvas.getBoundingClientRect().left;
+    const slider = getTouchSlider(touchY);
+    if (slider) {
+      updateSliderValue(slider, touchX);
+      drawSliders();
+    }
+  }, { passive: false });
+
+  window.addEventListener('resize', function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight / 2;
+    drawSliders();
+  });
+
+  drawSliders();
+</script>
+</body>
+</html>
