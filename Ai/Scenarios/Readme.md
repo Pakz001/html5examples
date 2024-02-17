@@ -13,4 +13,4 @@ youtube worklog video of the code here. 'Bake a snake'. Turning a simple 'snake'
 Procgen ai character npc creation code directory.
 <br>
 <br>
-<img src="Media/socoder.png" width="50%"></img><br>
+<img src="Media/socoder.png" width="90%"></img><br>
