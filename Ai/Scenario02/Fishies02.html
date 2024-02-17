@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worms with Random Walk Movement</title>
+<style>
+  body, html {
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="wormCanvas"></canvas>
+<script>
+  const canvas = document.getElementById('wormCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const numWorms = 100;
+  const maxTailSize = 50;
+  const minTailSize = 20;
+  const maxTailWidth = 8; // Max tail circle radius
+  const minTailWidth = 1; // Min tail circle radius
+  const maxSpeed = 4; // Max speed for random walk
+  const minSpeed = 1; // Min speed for random walk
+
+  class Worm {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.tail = [];
+      this.tailSize = minTailSize + Math.random() * (maxTailSize - minTailSize);
+      this.angle = Math.random() * Math.PI * 2;
+      this.speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
+      this.turnSpeed = Math.random() * 0.1 - 0.05;
+	  this.maxTail = Math.floor(Math.random()*10)+8
+	  //if(Math.random()<.5)this.tailSize*=1.2
+	      this.stepsAhead = [];
+    this.populateStepsAhead();
+    }
+	
+	populateStepsAhead() {
+    	while (this.stepsAhead.length < 50) {
+     // this.turnSpeed += Math.random() * 0.2 - 0.1; // Adjust turn speed
+	       // Randomly change turn speed
+      this.turnSpeed += (Math.random() * 0.2 - 0.1);
+	        this.turnSpeed += (Math.random() * 0.1 - 0.05);
+			      this.turnSpeed += (Math.random() * 0.1 - 0.05);
+				  this.turnSpeed += (Math.random() * 0.1 - 0.05);
+  	 if(Math.abs(this.turnSpeed)>.15  ){
+		 this.turnSpeed/=2
+
+	  }
+      this.angle += this.turnSpeed;
+      const step = {
+        x: Math.cos(this.angle) * this.speed,
+        y: Math.sin(this.angle) * this.speed
+      };
+      this.stepsAhead.push(step);
+    }
+	  	for(var q=0;q<this.stepsAhead.length;q+=1){
+		this.stepsAhead[q].x+=Math.random()-.5
+		this.stepsAhead[q].y+=Math.random()-.5
+	}
+  }
+
+  move() {
+
+    if (this.stepsAhead.length > 0) {
+      const step = this.stepsAhead.shift(); // Take the next step from the array
+
+      // Keep worms within canvas bounds
+      const nextX = this.x + step.x;
+      const nextY = this.y + step.y;
+      if (nextX < 0 || nextX > canvas.width || nextY < 0 || nextY > canvas.height) {
+        this.angle += Math.PI;
+      } else {
+        this.x = nextX;
+        this.y = nextY;
+      }
+
+      this.tail.unshift({x: this.x, y: this.y});
+      if (this.tail.length > this.tailSize) {
+        this.tail.pop();
+      }
+    }
+
+    this.populateStepsAhead(); // Refresh the steps array
+  }
+  
+    move2() {
+      // Randomly change turn speed
+      this.turnSpeed += (Math.random() * 0.2 - 0.1);
+	        this.turnSpeed += (Math.random() * 0.1 - 0.05);
+			      this.turnSpeed += (Math.random() * 0.1 - 0.05);
+				  this.turnSpeed += (Math.random() * 0.1 - 0.05);
+  	 if(Math.abs(this.turnSpeed)>.2  ){
+		 this.turnSpeed/=2
+
+	  }
+      // Randomly change speed within the min and max range
+      this.speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
+
+      this.angle += this.turnSpeed;
+
+      // Keep worms within canvas bounds
+      const nextX = this.x + Math.cos(this.angle) * this.speed;
+      const nextY = this.y + Math.sin(this.angle) * this.speed;
+      if (nextX < 0 || nextX > canvas.width || nextY < 0 || nextY > canvas.height) {
+        this.angle += Math.PI;
+      } else {
+        this.x = nextX;
+        this.y = nextY;
+      }
+
+      this.tail.unshift({x: this.x, y: this.y});
+      if (this.tail.length > this.tailSize) {
+        this.tail.pop();
+      }
+    }
+
+    draw() {
+      for (let i = 0; i < this.tail.length-16; i++) {
+        const opacity = 1 - i / this.tail.length;
+        //var tailWidth = maxTailWidth - (maxTailWidth - minTailWidth) * (i / this.tail.length);
+		var tailWidth = this.maxTail - (this.maxTail - minTailWidth) * (i / this.tail.length);
+		tailWidth-=i/3;
+		if(tailWidth<1)tailWidth=1
+        ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.tail[i].x, this.tail[i].y, tailWidth, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  const worms = [];
+  for (let i = 0; i < numWorms; i++) {
+    worms.push(new Worm());
+	
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    worms.forEach(worm => {
+      worm.move();
+      worm.draw();
+    });
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+</script>
+</body>
+</html>
