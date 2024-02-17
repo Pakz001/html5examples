@@ -22,12 +22,12 @@
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  const numWorms = 50;
+  const numWorms = 32;
   const maxTailSize = 40;
-  const minTailSize = 30;
-  const maxTailWidth = 8; // Max tail circle radius
-  const minTailWidth = 3; // Min tail circle radius
-  const maxSpeed = 4; // Max speed for random walk
+  const minTailSize = 10;
+  const maxTailWidth = 20; // Max tail circle radius
+  const minTailWidth = 8; // Min tail circle radius
+  const maxSpeed = 8; // Max speed for random walk
   const minSpeed = 1; // Min speed for random walk
 
   
@@ -36,8 +36,8 @@
   
   // Define the base color (you can adjust these values)
 //const baseColor = { r: 100, g: 60, b: 40 };
-const baseColor = { r: 200, g: 110, b: 40 };
-
+//const baseColor = { r: 200, g: 110, b: 40 };
+const baseColor = { r: 100, g: 100, b: 150 };
 // Define the mixing ratio (values between 0 and 1)
 const mixRatio = .76; // This mixes colors halfway between original and base
 
@@ -81,7 +81,7 @@ mycolz.forEach((color, index) => {
       this.turnSpeed = Math.random() * 0.1 - 0.05;
 	  this.maxTail = Math.floor(Math.random()*10)+8
 	  this.col = Math.floor(Math.random()*10)
-	  
+	  //this.col = 2
 	  //if(Math.random()<.5)this.tailSize*=1.2
 	      this.stepsAhead = [];
     this.populateStepsAhead();
@@ -168,7 +168,7 @@ mycolz.forEach((color, index) => {
     }
 
     draw() {
-		var tailWidth = this.tailSize/3
+		var tailWidth = this.tailSize
       //for (let i = 0; i < this.tail.length-16; i++) {
        // const opacity = 1 - i / this.tail.length;
         //var tailWidth = maxTailWidth - (maxTailWidth - minTailWidth) * (i / this.tail.length);
@@ -192,6 +192,8 @@ mycolz.forEach((color, index) => {
             ctx.fillStyle = "black";
             for (let i = 1; i < this.tail.length; i+=1) {
 				ctx.globalAlpha = 1
+				tailWidth-=i/3;
+				if(tailWidth<1)tailWidth=1
                 //ctx.fillRect(this.tail[i].x+1, this.tail[i].y+1, tailWidth+2, tailWidth+2);
 				
 				//drawFilledCircleBlack(ctx,this.tail[i].x+1, this.tail[i].y+1, tailWidth-(i/2)-1)
@@ -232,17 +234,21 @@ mycolz.forEach((color, index) => {
             //}
 			//ctx.fillStyle = this.tailColor;
 			ctx.globalAlpha = 1
+			tailWidth=oldTailWidth
 			for (let j = 1; j < 6; j+=1){
             for (let i = 1; i < this.tail.length; i+=1) {
-				
+				tailWidth-=i/3;
+				if(tailWidth<1)tailWidth=1
 				ctx.fillStyle = 'rgb('+ j*60 +', '+ j*60+', '+ j*60 +')';
                 //ctx.fillRect(this.tail[i].x+j, this.tail[i].y+j, (tailWidth-(i/2))-j*2, (tailWidth-(i/2))-j*2);
 				drawFilledCircle(ctx,this.tail[i].x+j, this.tail[i].y+j, (tailWidth-(i/2))-j*2,'rgb('+ j*60 +', '+ j*60+', '+ j*60 +')')
             }}
 			
-			
+			tailWidth=oldTailWidth
 			for (let i = 1; i < this.tail.length; i+=1) {
 				ctx.globalAlpha=.2
+				tailWidth-=i/3;
+				if(tailWidth<1)tailWidth=1
 				//ctx.fillStyle = "green"
 				
                 //ctx.fillRect(this.tail[i].x, this.tail[i].y, (tailWidth-(i/2)), (tailWidth-(i/2)));
@@ -289,7 +295,7 @@ mycolz.forEach((color, index) => {
   }
 
   function loop() {
-	  ctx.fillStyle="darkgrey"
+	  ctx.fillStyle="tan"
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     worms.forEach(worm => {
