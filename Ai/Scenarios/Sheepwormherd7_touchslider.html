@@ -16,7 +16,7 @@ canvas.width=window.innerWidth
         // Block size and movement range
 		var moveSpeed = 1
 		//const snakeTailLength = 9
-		var numSnakes = 30
+		var numSnakes = 20
         var blockSize = 20
 		var monsterVarSize = blockSize/3
 		var snakeTailLength = blockSize/2
@@ -212,22 +212,22 @@ mycolz.forEach((color, index) => {
 				ctx.globalAlpha = 1
                 //ctx.fillRect(snake[i].x+1, snake[i].y+1, blockSize+2, blockSize+2);
 				
-				drawFilledCircle(ctx,snake[i].x+1, snake[i].y+1, blockSize-(i/2)-1,"black")
+				drawFilledCircle2(ctx,snake[i].x+1, snake[i].y+1, blockSize-(i/2)-1,"black")
 				ctx.globalAlpha = .5
 				if(i>1 && i<snake.length-2){
 					
 					//ctx.fillRect(snake[i].x+3, snake[i].y+3, blockSize-(i/2)+2, blockSize-(i/2)+2);
-					drawFilledCircle(ctx,snake[i].x+3, snake[i].y+3, blockSize-(i/2)+1,"black")
+					drawFilledCircle2(ctx,snake[i].x+3, snake[i].y+3, blockSize-(i/2)+1,"black")
 				}
 				if(i>2 && i<snake.length-2){
 					
 					//ctx.fillRect(snake[i].x+5, snake[i].y+5, blockSize-(i/2)+4, blockSize-(i/2)+4);
-					drawFilledCircle(ctx,snake[i].x+5, snake[i].y+5, blockSize-(i/2)+2,"black")
+					drawFilledCircle2(ctx,snake[i].x+5, snake[i].y+5, blockSize-(i/2)+2,"black")
 				}
 				if(i==Math.floor(snake.length/2)){
 					
 					//ctx.fillRect(snake[i].x+7, snake[i].y+7, blockSize-(i/2)+5, blockSize-(i/2)+5);
-					drawFilledCircle(ctx,snake[i].x+5, snake[i].y+5, blockSize-(i/2)+3,"black")
+					drawFilledCircle2(ctx,snake[i].x+5, snake[i].y+5, blockSize-(i/2)+3,"black")
 				}
             }
 			// ring of holy
@@ -387,7 +387,17 @@ mycolz.forEach((color, index) => {
   ctx.fillRect(x+radius/3+radius/4,y+radius/2,radius/4,radius/4)
  }
  
-
+		function drawFilledCircle2(context, x, y, radius, color) {
+			if(radius<1)return
+			if(radius<0)radius=2
+  context.beginPath();
+  context.arc(x+radius/2, y+radius/2, radius, 0, 2 * Math.PI); // Draws a complete circle
+  context.fillStyle = "black"; // Sets the fill color
+  context.fill(); // Fills the circle with the specified color
+  context.closePath(); // Closes the path
+  
+ }
+ 
 
 
 
