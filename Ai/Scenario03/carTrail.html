@@ -20,7 +20,7 @@
   const context = canvas.getContext('2d');
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
-  var gameSpeed = 6
+  var gameSpeed = 8
 	
   var waveDelay=0
   var waveDistance=16
@@ -76,16 +76,22 @@
 
   // Draw the tail
   function drawTail(context, tail) {
-    context.beginPath//();
+    //context.beginPath//();
+    var al = 0
     for (let i = tail.length - 1; i >= 0; i--) {
-      const opacity = i / tail.length;
-      context.fillStyle = `rgba(0, 0, 0, ${opacity})`;
-      const size = (1 - opacity) * 5;
+      //const opacity = i / tail.length;
+      context.fillStyle = `rgb(0, 0, 0)`;
+      //const size = (1 - opacity) * 5;
       //context.rect(tail[i].x - size / 2, tail[i].y - size / 2, size, size);
-      //context.fill();
+      context.fill();
 	  if(i>0){
-		context.globalAlpha=1-(i/tail.length)
+        var a = ((1/tail.length)*al)
+        if(a<0)a=0
+        if(a>1)a=1
+		context.globalAlpha=a
+        
 	  drawHalfCircle(context,tail[i].x , tail[i].y, 10,tail[i].angle,10)
+    al+=1  
   }
     }
   }
@@ -120,6 +126,7 @@
   // Animation function
   function animate() {
     // Clear the canvas
+    context.globalAlpha = 1
 	context.fillStyle="grey"
     context.fillRect(0, 0, canvas.width, canvas.height);
 
