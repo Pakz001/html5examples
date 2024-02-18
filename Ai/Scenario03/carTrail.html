@@ -20,7 +20,7 @@
   const context = canvas.getContext('2d');
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
-  var gameSpeed = 8
+  var gameSpeed = 7
 	
   var waveDelay=0
   var waveDistance=16
@@ -77,13 +77,13 @@
   // Draw the tail
   function drawTail(context, tail) {
     //context.beginPath//();
+    context.fillStyle = 'rgb(0,0,0)';
     var al = 0
     for (let i = tail.length - 1; i >= 0; i--) {
       //const opacity = i / tail.length;
-      context.fillStyle = `rgb(0, 0, 0)`;
       //const size = (1 - opacity) * 5;
       //context.rect(tail[i].x - size / 2, tail[i].y - size / 2, size, size);
-      context.fill();
+      //context.fill();
 	  if(i>0){
         var a = ((1/tail.length)*al)
         if(a<0)a=0
