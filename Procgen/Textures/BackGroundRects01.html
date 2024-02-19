@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Half Circle with Moving Point and Tail</title>
+<style>
+  canvas {
+    border: 1px solid black;
+  }
+</style>
+</head>
+<body style="background-color:black";>
+<canvas id="canvas" width="600" height="400" "></canvas>
+
+<script>
+	
+  // Get the canvas and context
+  const canvas = document.getElementById('canvas');
+  const context = canvas.getContext('2d');
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+  var gameSpeed = 1200
+	
+  var waveDelay=0
+  var waveDistance=12
+  var tailLength = 17000
+  // Function to draw a half circle
+  var myNoiseImage = createNoiseImage(canvas.width,canvas.height);
+
+  // Point object that keeps track of its position
+  const point = {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    angle: Math.random() * Math.PI * 2 // Random initial direction
+  };
+
+  // Function to update the point's position in a fluid, organic direction
+  function updatePointPosition(point) {
+    // Update the point's angle slightly
+    point.angle += (Math.random() - 0.5) * 0.2;
+
+    // Move the point in the new direction
+    point.x += Math.cos(point.angle) * 2;
+    point.y += Math.sin(point.angle) * 2;
+
+    // Wrap around the edges of the canvas
+    if (point.x < 0) point.x = canvas.width;
+    if (point.x > canvas.width) point.x = 0;
+    if (point.y < 0) point.y = canvas.height;
+    if (point.y > canvas.height) point.y = 0;
+  }
+
+  // Tail is an array of points
+  let tail = [];
+
+  // Update the tail with the current position of the point
+  function updateTail(tail, point) {
+	  waveDelay-=1
+	  
+	  if(waveDelay>0){
+		  //console.log(waveDelay)
+		  
+		  return
+	  }
+	  //console.log("@")
+    // Add the current position to the start of the tail
+	var s = 1+Math.random()*10
+	if(Math.random()<.3)s/=4
+	if(Math.random()<.1)s*=1.5
+    tail.unshift({ x: point.x, y: point.y ,angle:point.angle-Math.PI/2,radius:s,a:Math.random()});
+
+    // Remove the oldest segments of the tail
+    if (tail.length > tailLength) {
+      tail.pop();
+    }
+	waveDelay=waveDistance
+  }
+
+  // Draw the tail
+  function drawTail(context, tail) {
+    //context.beginPath//();
+    context.fillStyle = 'rgb(0,0,0)';
+    var al = 0
+    for (let i = tail.length - 1; i >= 0; i--) {
+      //const opacity = i / tail.length;
+      //const size = (1 - opacity) * 5;
+      //context.rect(tail[i].x - size / 2, tail[i].y - size / 2, size, size);
+      //context.fill();
+	  if(i>0){
+        var a = ((1/tail.length)*al)
+		a*=.5
+		a +=tail[i].a/9
+        if(a<0)a=0
+        if(a>1)a=1
+		context.globalAlpha=a
+        //context.fillStyle = 'rgb('+tail[i].r+','+tail[i].g+','+tail[i].b+')'
+	  drawHalfCircle(context,tail[i].x , tail[i].y, tail[i].radius,tail[i].angle,10)
+    al+=1  
+  }
+    }
+  }
+
+  
+   function drawHalfCircle(context, centerX, centerY, radius, angle, numRects) {
+    const radiansPerRect = Math.PI / numRects; // Half circle in radians
+    var halfRectWidth = (radius * Math.PI) / numRects * 2; // Estimate width of each rectangle
+    
+
+    for (let i = 0; i < numRects; i++) {
+		if(i<numRects/2)radius+=(3)
+		if(i>numRects/2)radius-=(3)
+      // Calculate the angle for each rectangle
+      const rectAngle = i * radiansPerRect + angle;
+
+      // Calculate the position of the rectangle
+      const rectX = centerX + radius * Math.cos(rectAngle) - halfRectWidth;
+      const rectY = centerY + radius * Math.sin(rectAngle) - halfRectWidth;
+
+      // Set the rotation and draw the rectangle
+      context.save();
+      context.translate(rectX, rectY);
+      context.rotate(rectAngle);
+	  
+      //context.fillStyle = 'rgba(0, 0, 0, 0.5)'; // Semi-transparent black
+      context.fillRect(-halfRectWidth, -halfRectWidth, 2 * (halfRectWidth), 2 * (halfRectWidth));
+      context.restore();
+    }
+  }
+  
+  
+  var cnt = 0
+  var r,g,b=50
+      r = Math.random()*255
+      g = Math.random()*255
+      b = Math.random()*255
+	  while(r<255 && g<255 && b<255){
+		  r+=1
+		  b+=1
+		  g+=1
+	  }
+	  var display = false
+  // Animation function
+  function animate() {
+	  
+	  
+	  
+    cnt+=1
+    if(cnt==100){
+      //cnt=0
+	  copyPixels(canvas,90000)
+	 	adjustContrast(canvas,50)
+	  bloomCanvas()
+	 
+	  context.fillStyle = "orange"
+	  r = Math.random()*255
+      g = Math.random()*255
+      b = Math.random()*255
+	  while(r<255 && g<255 && b<255){
+		  r+=1
+		  b+=1
+		 g+=1
+	  }
+	  context.fillStyle="rgb("+r+","+g+","+b+")"
+	  
+	  context.globalAlpha = .5// (Math.random()/2)
+	  //context.fillRect(0,0,canvas.width,canvas.height)
+	  applyVignette(canvas,1)
+	  
+	 
+	  
+	  display=true
+ 
+    }
+	if(cnt>600){
+		console.log("@")
+		cnt=0
+		display=false
+		     r = Math.random()*255
+      g = Math.random()*255
+      b = Math.random()*255
+      tail = []
+	}
+	if(display){
+		 requestAnimationFrame(animate);
+		 return
+	}
+    // Clear the canvas
+    context.globalAlpha = 1
+	context.fillStyle="rgb("+r+","+g+","+b+")"
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+	for(var s=0;s<gameSpeed;s+=1){
+    // Update the point's position
+    updatePointPosition(point);
+
+    // Update and draw the tail
+    updateTail(tail, point);
+}
+
+    drawTail(context, tail);
+	
+	var showit=false
+	if(showit){
+      // shadow
+    for(var z=0;z<5;z+=1){
+        var a = point.angle
+        var ax = Math.cos(a)*(z*5);
+        var ay = Math.sin(a)*(z*5);
+        var zz=.6
+        var zzz=22
+        if(z==4){
+          zz=1
+          zzz=22
+        }
+    drawCircleWithLine(context, point.x-ax+2, point.y-ay+2, zzz, "black", "black", 2,zz, point.angle - Math.PI / 2) 
+    }
+
+        // Draw the half circle on top of the point
+      context.fillStyle="red"
+        //drawHalfCircle(context, point.x, point.y, 16, point.angle - Math.PI / 2, 20);
+      for(var z=0;z<6;z+=1){
+        var a = point.angle
+        var ax = Math.cos(a)*(z*6);
+        var ay = Math.sin(a)*(z*6);
+    drawCircleWithLine(context, point.x-ax, point.y-ay, 20, "yellow", "red", 2,1- ((1.0/5)*z), point.angle - Math.PI / 2) 
+    }
+    drawCircleWithLine(context, point.x, point.y, 20, "blue", "yellow", 2, .2, point.angle - Math.PI / 2) 
+      }
+	  context.globalAlpha = 0.03
+context.drawImage(myNoiseImage,0,0)
+//drawTiledImage(myNoiseImage,canvas,0.05)
+    // Request the next animation frame
+	
+	
+    requestAnimationFrame(animate);
+  }
+
+
+  // Start the animation
+  animate();
+  
+  function drawCircleWithLine(canvasId, centerX, centerY, radius, fillColor, lineColor, lineWidth, alpha, startAngle) {
+	  var ctx = canvasId
+    // Get the canvas element and its context
+    //const canvas = document.getElementById(canvasId);
+    //const ctx = canvas.getContext('2d');
+
+    // Set the alpha for the fill color
+    ctx.globalAlpha = alpha
+
+    // Draw the filled circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+
+    // Reset the globalAlpha to draw the line with no transparency
+    //ctx.globalAlpha = alpha;
+
+    // Draw the thick line on the edge
+    ctx.beginPath();
+    // Starting point of the line (angle in radians)
+    ctx.arc(centerX, centerY, radius, startAngle, startAngle + Math.PI, false);
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = lineColor;
+    ctx.stroke();
+}
+
+
+function createNoiseImage(width, height) {
+  // Create a canvas element
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d');
+
+  // Generate random black and white pixels
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const intensity = Math.floor(Math.random() * 256); // Random intensity between 0 and 255
+      context.fillStyle = `rgb(${intensity}, ${intensity}, ${intensity})`;
+      context.fillRect(x, y, 1, 1);
+    }
+  }
+
+  // Create an image element from the canvas and return it
+  const image = new Image();
+  image.src = canvas.toDataURL();
+  return image;
+}
+
+// Helper function for applying a box blur
+function stackBoxBlur(imageData, radius) {
+  const blurImageData = context.createImageData(
+    imageData.width,
+    imageData.height
+  );
+  const pixels = imageData.data;
+  const blurPixels = blurImageData.data;
+
+  // Apply horizontal blur
+  for (let y = 0; y < imageData.height; y++) {
+    for (let x = 0; x < imageData.width; x++) {
+      let r = 0,
+        g = 0,
+        b = 0,
+        count = 0;
+      for (let cx = x - radius; cx <= x + radius; cx++) {
+        const index = (y * imageData.width + cx) * 4;
+        if (cx >= 0 && cx < imageData.width) {
+          r += pixels[index];
+          g += pixels[index + 1];
+          b += pixels[index + 2];
+          count++;
+        }
+      }
+      const blurIndex = (y * imageData.width + x) * 4;
+      blurPixels[blurIndex] = r / count;
+      blurPixels[blurIndex + 1] = g / count;
+      blurPixels[blurIndex + 2] = b / count;
+      blurPixels[blurIndex + 3] = pixels[blurIndex + 3];
+    }
+  }
+
+  // Apply vertical blur
+  for (let x = 0; x < imageData.width; x++) {
+    for (let y = 0; y < imageData.height; y++) {
+      let r = 0,
+        g = 0,
+        b = 0,
+        count = 0;
+      for (let cy = y - radius; cy <= y + radius; cy++) {
+        const index = (cy * imageData.width + x) * 4;
+        if (cy >= 0 && cy < imageData.height) {
+          r += blurPixels[index];
+          g += blurPixels[index + 1];
+          b += blurPixels[index + 2];
+          count++;
+        }
+      }
+      const blurIndex = (y * imageData.width + x) * 4;
+      blurPixels[blurIndex] = r / count;
+      blurPixels[blurIndex + 1] = g / count;
+      blurPixels[blurIndex + 2] = b / count;
+      blurPixels[blurIndex + 3] = pixels[blurIndex + 3];
+    }
+  }
+
+  return blurImageData;
+}
+  
+  
+function bloomCanvas(){
+// Extract the bright areas
+const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+const brightThreshold = 100; // Adjust this threshold to determine what is considered bright 200
+
+for (let i = 0; i < imageData.data.length; i += 4) {
+  const brightness =
+    (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
+  if (brightness > brightThreshold) {
+    imageData.data[i] = 255; // Red channel
+    imageData.data[i + 1] = 255; // Green channel
+    imageData.data[i + 2] = 255; // Blue channel
+  }
+}
+
+// Apply a blur filter
+const blurRadius = 100; // Adjust this value to control the blur strength 5 100
+const blurImageData = stackBoxBlur(imageData, blurRadius);
+
+// Combine the bloom effect with the original image
+const finalImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+for (let i = 0; i < finalImageData.data.length; i += 4) {
+  finalImageData.data[i] += blurImageData.data[i];
+  finalImageData.data[i + 1] += blurImageData.data[i + 1];
+  finalImageData.data[i + 2] += blurImageData.data[i + 2];
+}
+
+// Render the final image
+context.putImageData(finalImageData, 0, 0);
+
+
+
+}
+
+
+function adjustContrast(canvas, contrast) {
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  var data = imageData.data;
+
+  // Convert contrast value to a multiplier
+  var contrastFactor = (contrast + 255) / 255 / (1 - contrast / 255);
+
+  for (var i = 0; i < data.length; i += 4) {
+    // Apply contrast adjustment to each color channel
+    data[i] = contrastFactor * (data[i] - 128) + 128;         // Red channel
+    data[i + 1] = contrastFactor * (data[i + 1] - 128) + 128; // Green channel
+    data[i + 2] = contrastFactor * (data[i + 2] - 128) + 128; // Blue channel
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+
+
+// Usage example:
+
+function applyVignette(canvas, intensity) {
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  var data = imageData.data;
+  var centerX = canvas.width / 2;
+  var centerY = canvas.height / 2;
+
+  for (var y = 0; y < canvas.height; y++) {
+    for (var x = 0; x < canvas.width; x++) {
+      var index = (y * canvas.width + x) * 4;
+
+      var dx = x - centerX;
+      var dy = y - centerY;
+      var distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Calculate the vignette value based on the distance from the center
+      var vignette = 1 - (distance / Math.sqrt(centerX * centerX + centerY * centerY)) * intensity;
+
+      // Apply the vignette effect by multiplying the RGB channels' intensity
+      data[index] *= vignette;         // Red channel
+      data[index + 1] *= vignette;     // Green channel
+      data[index + 2] *= vignette;     // Blue channel
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
+
+
+function applyVignette2(canvas, intensity) {
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  var data = imageData.data;
+  var centerX = canvas.width / 2;
+  var centerY = canvas.height / 2;
+
+  for (var y = 0; y < canvas.height; y++) {
+    for (var x = 0; x < canvas.width; x++) {
+      var index = (y * canvas.width + x) * 4;
+
+      var dx = x - centerX;
+      var dy = y - centerY;
+      var distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Calculate the vignette value based on the distance from the center
+      var vignette = (1 - distance / (canvas.width / 2)) * intensity;
+
+      // Apply the vignette effect by reducing the RGB channels' intensity
+      data[index] *= vignette;       // Red channel
+      data[index + 1] *= vignette;   // Green channel
+      data[index + 2] *= vignette;   // Blue channel
+    }
+  }
+
+  context.putImageData(imageData, 0, 0);
+}
+
+
+  
+
+
+function copyPixels(canvas, count) {
+  const ctx = canvas.getContext('2d');
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const pixels = imageData.data;
+  
+  for (let i = 0; i < count; i++) {
+    const randomX = Math.floor(Math.random() * canvas.width);
+    const randomY = Math.floor(Math.random() * canvas.height);
+    var destinationX =0
+	var destinationY=0
+    const pixelIndex = (randomY * canvas.width + randomX) * 4;
+    const pixel = [
+      pixels[pixelIndex],       // red
+      pixels[pixelIndex + 1],   // green
+      pixels[pixelIndex + 2],   // blue
+      pixels[pixelIndex + 3]    // alpha
+    ];
+	var bs = Math.floor((Math.random()*9)+2)
+	if(Math.random()<.98)bs=1
+    for(var x1=-bs;x1<bs;x1+=1){
+		for(var y1=-bs;y1<bs;y1+=1){
+    
+     destinationX = randomX + (Math.random() < 0.5 ? -x1 : x1);
+     destinationY = randomY + (Math.random() < 0.5 ? -y1 : y1);
+    
+    if (destinationX < 0 || destinationX >= canvas.width || destinationY < 0 || destinationY >= canvas.height) {
+      continue; // Skip if destination is outside the canvas boundaries
+    }
+	
+	
+    
+    const destinationIndex = (destinationY * canvas.width + destinationX) * 4;
+    
+    pixels[destinationIndex] = pixel[0];        // red
+    pixels[destinationIndex + 1] = pixel[1];    // green
+    pixels[destinationIndex + 2] = pixel[2];    // blue
+    pixels[destinationIndex + 3] = pixel[3];    // alpha
+}}
+  }
+  
+  ctx.putImageData(imageData, 0, 0);
+}
+
+
+
+
+</script>
+</body>
+</html>
