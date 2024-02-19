@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Particle Explosion</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <script>
+		
+		
+	var gameSpeed = 80
+      // Particle class
+      class Particle {
+        constructor(x, y, radius, color, velocity,mainVel) {
+          this.x = x;
+          this.y = y;
+          this.radius = radius;
+		  this.drawRadius = 10
+          this.color = color;
+          this.velocity = velocity;
+		  this.drawRadius = 4
+		  this.angle = 0
+		  this.mainvelocity = mainVel
+		  
+		  this.angle = Math.atan2(targetY - y, targetX - x)
+        }
+
+        draw(ctx) {
+			 ctx.globalAlpha = 0.8
+          ctx.beginPath();
+		  
+          ctx.arc(this.x, this.y, this.drawRadius, 0, Math.PI * 2, false);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+
+        update() {
+          this.draw(ctx);
+          this.x += this.velocity.x;
+          this.y += this.velocity.y;
+		  if(this.drawRadius>4)this.drawRadius-=0.1
+		  this.isCloseTo()
+		  
+		  //this.velocity.y+=0.2
+
+		  
+		  this.velocity.x+=(Math.cos(this.angle)*this.mainvelocity)
+		  this.velocity.y+=(Math.sin(this.angle)*this.mainvelocity)
+		  this.velocity.y/=4
+		  this.velocity.x/=4
+		  
+		  if(this.mainVelocity>2)this.mainVelocity=2
+		  if(this.mainVelocity<-2)this.mainVelocity=-2
+		  
+		  		  if(this.velocity.y>2)this.velocity.y=2
+		  if(this.velocity.y<-2)this.velocity.y=-2
+		  		  
+		 	if(this.velocity.x>2)this.velocity.x=2
+		  if(this.velocity.x<-2)this.velocity.x=-2
+        }
+		isCloseTo(){
+			var close=false
+			particles.forEach((particle) => {
+            if (particle !== this) {
+              const dx = this.x - particle.x;
+              const dy = this.y - particle.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+			  //this.velocity.y -= (distance/2000)
+              // If particles are close, perform an interaction
+              if (distance < this.radius*2+ particle.radius*2) {
+				  //if(Math.random()<.00001)console.log(distance)
+				  //this.drawRadius = Math.max(1,this.radius*4-(distance))
+				  if(this.drawRadius<10)this.drawRadius+=.01
+				  close=true
+				  //this.mainVelocity-=Math.random()/100
+				  this.color = "blue"
+				  //this.velocity.y+=0.00005
+				  
+                // Add interaction logic here
+                // For example, you can change the color or velocity of the particles
+                // based on the collision or proximity
+              }else{
+				  //this.mainVelocity+=0.1
+				  //this.drawRadius-=0.0001
+				  //if(this.drawRadius<2)this.drawRadius=4
+				  //this.color = "lightblue"
+              }
+            }
+          });
+		  if(close==false)this.drawRadius=-0.5
+		  if(this.drawRadius<1)this.drawRadius=1
+		}
+		
+		
+      }
+
+      // Create canvas and get context
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+	var targetX = canvas.width/2
+	var targetY = -50
+      // Create particles
+      var particles = [];
+	  newParticles(Math.random()*canvas.width,canvas.height/2+Math.random()*canvas.height/2)
+	  
+	  function newParticles(x1,y1){
+	  	particles = []
+      for (let i = 0; i < 50; i++) {
+        const x = (canvas.width / 20)+((Math.random()-.5)*32);
+        const y = (canvas.height / 20)+((Math.random()-.5)*32);
+        const radius = Math.random() * 5 + 1;
+        const color = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${
+          Math.random() * 255
+        })`;
+        const velocity = {
+          x: 0,//((Math.random() - 0.5) * .5)/5,
+          y: 0,//((Math.random() /5))+.8,
+        };
+        particles.push(new Particle(x+x1, y+y1, radius, color, velocity,1-(i/200)));
+      }
+}
+      // Animation loop
+	  var timeOut = 0
+	  var maxTimeOut = 80
+      function animate() {
+		  timeOut+=1
+		  if(timeOut>maxTimeOut){
+			  timeOut=0
+			  maxTimeOut = Math.random()*50+20
+			  newParticles((Math.random()*canvas.width),canvas.height+Math.random()*canvas.height/2)
+		  }
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+for (var i=0;i<gameSpeed;i+=1){
+        particles.forEach((particle) => {
+          particle.update();
+        });
+	}
+	
+	
+	
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
