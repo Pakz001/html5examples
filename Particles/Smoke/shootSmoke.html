@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Particle Cloud Canvas</title>
+<style>
+  canvas {
+    border: 1px solid black;
+    display: block; /* Removes the default margin. */
+    margin: 0 auto; /* Centers the canvas element. */
+  }
+</style>
+</head>
+<body>
+<canvas id="particleCanvas"></canvas>
+
+<script>
+	
+	var gameSpeed = 5
+class Particle {
+  constructor(x, y, targetX, targetY) {
+    this.x = x;
+    this.y = y;
+    this.targetX = targetX;
+    this.targetY = targetY;
+    this.size = 10;
+    this.speed = 1 + Math.random() * 0.3; // Constant speed with slight variation
+  }
+
+  update(particles) {
+    let dx = this.targetX - this.x;
+    let dy = this.targetY - this.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+    let velX = (dx / distance) * this.speed;
+    let velY = (dy / distance) * this.speed;
+
+    if (distance < 5) {
+      this.x = this.targetX;
+      this.y = this.targetY;
+    } else {
+      this.x += velX;
+      this.y += velY;
+    }
+
+    // Update size based on proximity to other particles
+    //this.size = 1;
+    for (let i = 0; i < particles.length; i++) {
+      let other = particles[i];
+      if (other !== this) {
+        let otherDx = this.x - other.x;
+        let otherDy = this.y - other.y;
+        let otherDistance = Math.sqrt(otherDx * otherDx + otherDy * otherDy);
+        if (otherDistance < 32) { // Proximity threshold
+          if(this.size<20)this.size += 0.0001; // Increase size a bit for each close particle
+        }else{
+			if(this.size>1)this.size -=0.0002
+        }
+      }
+    }
+  }
+
+  draw(ctx) {
+	  ctx.fillStyle="black"
+	  ctx.globalAlpha =0.01
+    ctx.beginPath();
+    ctx.ellipse(this.x, this.y, this.size * 2, this.size, 0, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function createParticleCloud(count, width, height, clusterSize) {
+  let particles = [];
+  var b = generateRandomCoordinate(-100,canvas.width+100,-100,canvas.height+100,[0,0,width,height])
+  
+  let centerX = b.x
+  let centerY = b.y
+  //console.log(centerY+"-"+centerY)
+  let targetX = Math.random() * width;
+  let targetY = Math.random() * height;
+
+  for (let i = 0; i < count; i++) {
+    // Create particles in a cluster around the center
+    let angle = Math.random() * Math.PI * 2;
+    let radius = Math.random() * clusterSize;
+    let x = centerX + radius * Math.cos(angle);
+    let y = centerY + radius * Math.sin(angle);
+    particles.push(new Particle(x, y, targetX, targetY));
+  }
+  return particles;
+}
+
+// Setup canvas and particles
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+	
+// Initialize multiple particle clouds
+  let clouds = [
+  createParticleCloud(20, canvas.width, canvas.height, 50),
+  createParticleCloud(20, canvas.width, canvas.height, 50),
+  createParticleCloud(20, canvas.width, canvas.height, 50),
+  createParticleCloud(20, canvas.width, canvas.height, 50),
+  createParticleCloud(20, canvas.width, canvas.height, 50),
+  createParticleCloud(20, canvas.width, canvas.height, 50),
+  createParticleCloud(20, canvas.width, canvas.height, 50),
+  createParticleCloud(20, canvas.width, canvas.height, 50),
+    // Add more clouds if needed
+  ];
+	  
+function loop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+clouds.forEach((particles, index) => {
+      for (var ii = 0; ii < gameSpeed; ii += 1) {
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update(particles);
+          particles[i].draw(ctx);
+        }
+      }
+
+      if (particles.every(particle => particle.x === particle.targetX && particle.y === particle.targetY)) {
+        // All particles in the cloud have reached the target, create a new cloud
+        clouds[index] = createParticleCloud(100, canvas.width, canvas.height, 50);
+        //gameSpeed = 8 + Math.random() * 10;
+      }
+    });
+
+  requestAnimationFrame(loop);
+}
+
+loop();
+
+function generateRandomCoordinate(minX, maxX, minY, maxY, region) {
+	//console.log(maxX)
+  let x, y;
+      x = Math.random() * (maxX - minX) + minX;
+    y = Math.random() * (maxY - minY) + minY
+  do {
+    x = Math.random() * (maxX - minX) + minX;
+    y = Math.random() * (maxY - minY) + minY;
+
+  } while (x>0 && x<canvas.width && y>0 && y<canvas.height)y
+  return { x, y };
+}
+
+function isInsideRegion(x, y, region) {
+  const [regionXMin, regionXMax, regionYMin, regionYMax] = region;
+  return x <= regionXMin && x >= regionXMax && y <= regionYMin && y >= regionYMax;
+}
+
+</script>
+</body>
+</html>
+
+
