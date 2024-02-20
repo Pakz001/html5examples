@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas Button Interaction</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    background: #f0f0f0;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let buttons = [];
+  let buttonWidth = 100;
+  let buttonHeight = 50;
+  let initialX = 10;
+  let initialY = 10;
+  let color = 'green';
+
+  // Initial button setup
+  addButton(initialX, initialY, color);
+
+  function addButton(x, y, color) {
+    buttons.push({
+      x: x,
+      y: y,
+      color: color
+    });
+    drawButtons();
+  }
+
+  function drawButtons() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    buttons.forEach(button => {
+      ctx.fillStyle = button.color;
+      ctx.fillRect(button.x, button.y, buttonWidth, buttonHeight);
+    });
+  }
+
+  function buttonIndexAtPosition(x, y) {
+    for (let i = 0; i < buttons.length; i++) {
+      let button = buttons[i];
+      if (x >= button.x && x <= button.x + buttonWidth &&
+          y >= button.y && y <= button.y + buttonHeight) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  canvas.addEventListener('touchstart', function(event) {
+    const touch = event.touches[0];
+    const mouseX = touch.clientX;
+    const mouseY = touch.clientY;
+    const index = buttonIndexAtPosition(mouseX, mouseY);
+
+    if (index !== -1) {
+      if (index === 0){//buttons.length - 1) {
+        // Rightmost button is pressed; move it to the right and add a new button to the left.
+        buttons[index].x += buttonWidth;
+        addButton(initialX + (buttons.length - 1) * buttonWidth, initialY, color);
+		console.log("@")
+      } else {
+        // Any other button is pressed; change its color.
+        buttons[index].color = buttons[index].color === 'green' ? 'red' : 'green';
+      }
+      drawButtons();
+    }
+
+    event.preventDefault();
+  }, false);
+
+  // Resize canvas when window is resized
+  window.addEventListener('resize', function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drawButtons();
+  });
+
+</script>
+
+</body>
+</html>
