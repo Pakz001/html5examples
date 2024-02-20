@@ -40,7 +40,7 @@ var editLayer = 1
 // Get the canvas element
 const canvas = document.getElementById('triangleCanvas');
 const ctx = canvas.getContext('2d');
-ctx.imageSmoothingEnabled=true
+ctx.imageSmoothingEnabled=false
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
@@ -127,12 +127,15 @@ canvas.height = window.innerHeight
 //drawSquare(ctx);
 //drawTGrid(320,200,64,64)
 
+
+var tileSize = 120
+
 function loop() {
 	ctx.globalAlpha = 1
 	//ctx.fillStyle = "blue"
   //ctx.fillRect(0, 0, canvas.width, canvas.height);
   //ctx.fillStyle = "white"
-  drawSquare(ctx);
+  drawSquare(ctx,tileSize);
         drawButtons();
       updateButtonColors();
 
@@ -184,7 +187,7 @@ function drawSquare(ctx,s=96) {
 			drawTGrid(i * squareSizeH+squareSizeH/2, j * squareSizeV+squareSizeV/2, squareSizeH/2, squareSizeV/2,num)
             //ctx.rect(i * squareSizeH, j * squareSizeV, squareSizeH, squareSizeV);
 			num+=4
-            ctx.stroke();
+            //ctx.stroke();
         }
     }
 	
@@ -203,7 +206,7 @@ function drawSquare(ctx,s=96) {
 			drawTGrid(i * squareSizeH+squareSizeH/2, j * squareSizeV+squareSizeV/2, squareSizeH/2, squareSizeV/2,num)
             //ctx.rect(i * squareSizeH, j * squareSizeV, squareSizeH, squareSizeV);
 			num+=4
-            ctx.stroke();
+            //ctx.stroke();
         }
     }
 	
@@ -261,6 +264,7 @@ function drawTriangle(ctx,coords,rec=false,tileWidth,num) {
 		ctx.strokeStyle = colGrid[num].col
 		ctx.strokeWidth=5
 		ctx.lineWidth=0
+		//ctx.miterLimit = 0
 	}
 	
     ctx.beginPath();
@@ -270,9 +274,8 @@ function drawTriangle(ctx,coords,rec=false,tileWidth,num) {
     ctx.closePath();
 	//ctx.lineWidth = 0
 	ctx.fill();
-	//ctx.stroke()
-    
 	
+	//ctx.stroke()
 }
 
 
@@ -302,7 +305,7 @@ function drawTriangle(ctx,coords,rec=false,tileWidth,num) {
 			
 		var triangle = colGrid[i].coords
 		
-        if (editLayer==1 && colGrid[i].tileWidth==96/2 && isPointInTriangle(touchX, touchY, triangle)) {
+        if (editLayer==1 && colGrid[i].tileWidth==tileSize/2 && isPointInTriangle(touchX, touchY, triangle)) {
 			
 			//console.log(colGrid[i].col)
 			if(colGrid[i].col==="red"){
@@ -325,7 +328,7 @@ function drawTriangle(ctx,coords,rec=false,tileWidth,num) {
         }
 		
 		
-		if (editLayer==2 && colGrid[i].tileWidth==96/4 && isPointInTriangle(touchX, touchY, triangle)) {
+		if (editLayer==2 && colGrid[i].tileWidth==tileSize/4 && isPointInTriangle(touchX, touchY, triangle)) {
 			//ctx.globalAlpha = 0.5
 			//console.log(colGrid[i].col)
 			if(colGrid[i].col==="red"){
