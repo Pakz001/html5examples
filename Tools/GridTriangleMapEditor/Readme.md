@@ -1,4 +1,5 @@
-touch device tap to switch between 3 colors per triangle.
+touch device tap to switch between 3 colors per triangle.<br><br>
+2 layers of 2 resolutions, one double. Triangles. 3 base colors. The double resolution has a .5 globalAlpha set for shadiung effects.
 <br><br>
 <img src="Media/IMG_3058.png" width="90%"></img><br>
 <br>
