@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,8 +25,8 @@ class Particle {
     this.y = y;
     this.targetX = targetX;
     this.targetY = targetY;
-    this.size = 10;
-    this.speed = 1 + Math.random() * 0.3; // Constant speed with slight variation
+    this.size = 14;
+    this.speed = 1 + Math.random() * 0.25; // Constant speed with slight variation
   }
 
   update(particles) {
@@ -52,7 +53,7 @@ class Particle {
         let otherDy = this.y - other.y;
         let otherDistance = Math.sqrt(otherDx * otherDx + otherDy * otherDy);
         if (otherDistance < 32) { // Proximity threshold
-          if(this.size<20)this.size += 0.0001; // Increase size a bit for each close particle
+          if(this.size<14)this.size += 0.0001; // Increase size a bit for each close particle
         }else{
 			if(this.size>1)this.size -=0.0002
         }
@@ -61,8 +62,8 @@ class Particle {
   }
 
   draw(ctx) {
-	  ctx.fillStyle="black"
-	  ctx.globalAlpha =0.01
+	  ctx.fillStyle="white"
+	  ctx.globalAlpha =0.005
     ctx.beginPath();
     ctx.ellipse(this.x, this.y, this.size * 2, this.size, 0, 0, Math.PI * 2);
     ctx.closePath();
@@ -98,20 +99,29 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 	
 // Initialize multiple particle clouds
+var numClouds = 150
+var clustSize=60
   let clouds = [
-  createParticleCloud(20, canvas.width, canvas.height, 50),
-  createParticleCloud(20, canvas.width, canvas.height, 50),
-  createParticleCloud(20, canvas.width, canvas.height, 50),
-  createParticleCloud(20, canvas.width, canvas.height, 50),
-  createParticleCloud(20, canvas.width, canvas.height, 50),
-  createParticleCloud(20, canvas.width, canvas.height, 50),
-  createParticleCloud(20, canvas.width, canvas.height, 50),
-  createParticleCloud(20, canvas.width, canvas.height, 50),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+    createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
+  createParticleCloud(numClouds, canvas.width, canvas.height, clustSize),
     // Add more clouds if needed
   ];
 	  
 function loop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.globalAlpha = 1
+	ctx.fillStyle = "blue"
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "white"
 clouds.forEach((particles, index) => {
       for (var ii = 0; ii < gameSpeed; ii += 1) {
         for (let i = 0; i < particles.length; i++) {
@@ -153,5 +163,4 @@ function isInsideRegion(x, y, region) {
 </script>
 </body>
 </html>
-
 
