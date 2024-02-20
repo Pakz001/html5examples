@@ -47,18 +47,27 @@ canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
     var buttons = [
-      { x: 10, y: 10, width: 80, height: 80, color: "red", tapped: false,id:"editLayer" },
-      { x: 100, y: 10, width: 80, height: 80, color: "green", tapped: false,id:"aa"  },
-      { x: 10, y: 100, width: 80, height: 80, color: "blue", tapped: false,id:"bb" },
-      { x: 100, y: 100, width: 80, height: 80, color: "yellow", tapped: false,id:"cc" }
+      { x: 10, y: 10, width: 80, height: 80, color: "red", tapped: false,id:"editLayer" ,active:false},
+      { x: 100, y: 10, width: 80, height: 80, color: "green", tapped: false,id:"aa" ,active:true },
+      { x: 10, y: 100, width: 80, height: 80, color: "blue", tapped: false,id:"bb",active:false },
+      { x: 100, y: 100, width: 80, height: 80, color: "yellow", tapped: false,id:"cc" ,active:false}
     ];
-
+var lastButtonPressed = 0
 
     // Draw the buttons on the canvas
     function drawButtons() {
+		ctx.globalAlpha = 1
       buttons.forEach(function(button) {
         ctx.fillStyle = button.color;
-        ctx.fillRect(button.x, button.y, button.width, button.height);
+		ctx.lineWidth = 4
+	
+		if(button.active==false)ctx.strokeStyle = "black"
+		if(button.active==true)ctx.strokeStyle = "white"
+		ctx.beginPath()
+        ctx.rect(button.x, button.y, button.width, button.height);
+		ctx.closePath()
+		ctx.stroke()
+		ctx.fill()
       });
     }
 
@@ -94,10 +103,14 @@ canvas.height = window.innerHeight
     // Update the button colors
     function updateButtonColors() {
       buttons.forEach(function(button) {
+		if(lastButtonPressed!=button.id)button.active=false
         if (button.tapped) {
           button.color = getRandomColor();
           button.tapped = false;
+		  button.active=true
+		  if(button.id!="editLayer")lastButtonPressed=button.id
 		  if(button.id=="editLayer"){
+			  button.active=true
 			  showGridTime=100
 		  	if(editLayer===1){
 				editLayer=2
@@ -138,8 +151,8 @@ var tileSize = 120
 function loop() {
 	ctx.globalAlpha = 1
 	if(showGridTime>0)showGridTime-=1
-	//ctx.fillStyle = "blue"
-  //ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "blue"
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   //ctx.fillStyle = "white"
   drawSquare(ctx,tileSize);
         drawButtons();
