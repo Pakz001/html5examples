@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triangle Grid</title>
+<style>
+    body {
+		background-color:  brown  
+    }
+    canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+<canvas id="triangleCanvas" width="600" height="520"></canvas>
+
+<script>
+//
+// Tile editor with multiple resolution layers. This to add shadows and various effects seen in video
+// games and such. triangle layers. one larger at the moment and one double resolution. Button
+// Top right does the layer switch. 
+// Stil early in development.
+//
+// Based on a Gauntlet Atari 1985 screenshot at the moment.
+// Touch only and tested on a iPad only. Browser 
+//
+	
+	
+// Create a canvas element
+
+var sol=true // records collision coorinates
+
+
+// Set the size for the triangles
+//const size = 60;
+var editLayer = 1
+var showGridTime = 100
+var showGridSize = 0
+
+// Get the canvas element
+const canvas = document.getElementById('triangleCanvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled=false
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+    var buttons = [
+      { x: 10, y: 10, width: 80, height: 80, color: "white", tapped: false,id:"editLayer" ,active:false},
+	  
+      { x: 100, y: 10, width: 80, height: 80, color: "brown", tapped: false,id:"aa" ,active:false },
+      { x: 10, y: 100, width: 80, height: 80, color: "firebrick", tapped: false,id:"bb",active:false },
+      { x: 100, y: 100, width: 80, height: 80, color: "lightslateblue", tapped: false,id:"cc" ,active:false},
+	  { x: 10, y: 200, width: 80, height: 80, color: "darkslateblue", tapped: false,id:"dd",active:false },
+      { x: 100, y: 200, width: 80, height: 80, color: "slateblue", tapped: false,id:"ee" ,active:false},
+	  { x: 10, y: 300, width: 80, height: 80, color: "white", tapped: false,id:"ff",active:false },
+      { x: 100, y: 300, width: 80, height: 80, color: "black", tapped: false,id:"gg" ,active:false},
+	  { x: 10, y: 400, width: 80, height: 80, color: "lavender", tapped: false,id:"gg" ,active:false},
+	  { x: 100, y: 400, width: 80, height: 80, color: "slategrey", tapped: false,id:"gg" ,active:false}
+    ];
+var lastButtonPressed = 0
+
+    // Draw the buttons on the canvas
+    function drawButtons() {
+		ctx.globalAlpha = 1
+      	buttons.forEach(function(button) {
+        ctx.fillStyle = button.color;
+		ctx.lineWidth = 4
+	
+		if(button.active==false)ctx.strokeStyle = "black"
+		if(button.active==true)ctx.strokeStyle = "white"
+		ctx.beginPath()
+        ctx.rect(button.x, button.y, button.width, button.height);
+		ctx.closePath()
+		ctx.stroke()
+		ctx.fill()
+      });
+    }
+
+    // Check if the touch event occurred on a button
+    function checkButtonTapped(touchX, touchY) {
+      buttons.forEach(function(button) {
+        if (touchX >= button.x &&
+            touchX <= button.x + button.width &&
+            touchY >= button.y &&
+            touchY <= button.y + button.height) {
+          button.tapped = true;
+        }
+      });
+    }
+
+    // Handle touch events
+    canvas.addEventListener("touchstart", function(event) {
+      var touch = event.touches[0];
+      var touchX = touch.pageX - canvas.offsetLeft;
+      var touchY = touch.pageY - canvas.offsetTop;
+
+      checkButtonTapped(touchX, touchY);
+    });
+
+    // Handle click events for non-touch devices
+    canvas.addEventListener("click", function(event) {
+      var clickX = event.pageX - canvas.offsetLeft;
+      var clickY = event.pageY - canvas.offsetTop;
+
+      checkButtonTapped(clickX, clickY);
+    });
+
+    // Update the button colors
+    function updateButtonColors() {
+      buttons.forEach(function(button) {
+		if(lastButtonPressed!=button.id)button.active=false
+        if (button.tapped) {
+          //button.color = getRandomColor();
+          button.tapped = false;
+		  button.active=true
+		  if(button.id!="editLayer")lastButtonPressed=button.id
+		  if(button.id=="editLayer"){
+			  button.active=true
+			  showGridTime=100
+		  	if(editLayer===1){
+				editLayer=2
+				showGridSize=tileSize/4
+			}else{
+				editLayer=1
+				showGridSize=tileSize/2
+			}
+		  }
+        }
+      });
+    }
+
+    // Generate a random color
+    function getRandomColor() {
+      var letters = "0123456789ABCDEF";
+      var color = "#";
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+
+	  // Event listener for touchstart event
+      canvas.addEventListener('touchstart', handleTouch);
+	  canvas.addEventListener('touchmove', handleTouch);
+	// 
+	  var colGrid = [];
+
+// Draw the triangle grid on the canvas
+//drawTriangleGrid(canvas, size, getColor);
+//drawSquare(ctx);
+//drawTGrid(320,200,64,64)
+
+
+var tileSize = 100
+
+function loop() {
+	ctx.globalAlpha = 1
+	if(showGridTime>0)showGridTime-=1
+	ctx.fillStyle = "brown"
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  //ctx.fillStyle = "white"
+  drawSquare(ctx,tileSize);
+        drawButtons();
+      updateButtonColors();
+
+  requestAnimationFrame(loop);
+}
+
+loop();
+
+	
+	
+
+	  
+	  
+
+
+
+
+
+
+// Function to get colors for the triangles
+function getColor(row, col, upsideDown) {
+    // Simple function to alternate colors; replace with your own logic
+    const baseColorValue = 255 - (row % 2) * 128 - (col % 2) * 128;
+    const colorOffset = upsideDown ? 0 : 128;
+    const baseColor = `rgb(${baseColorValue}, ${baseColorValue - colorOffset}, 255)`;
+    return baseColor;
+}
+
+function drawSquare(ctx,s=96) {
+    // Set the size of the canvas
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height
+
+    // Set the size of the square
+    var squareSizeH = s;
+	var squareSizeV = s
+
+    // Calculate the number of rows and columns
+    const rows = canvasWidth / squareSizeH;
+    const columns = canvasHeight / squareSizeV;
+
+	ctx.globalAlpha = 1
+	var num=0
+    // Loop through rows and columns to draw the grid
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < columns; j++) {
+            //ctx.beginPath();
+			
+			drawTGrid(i * squareSizeH+squareSizeH/2, j * squareSizeV+squareSizeV/2, squareSizeH/2, squareSizeV/2,num)
+            //ctx.rect(i * squareSizeH, j * squareSizeV, squareSizeH, squareSizeV);
+			num+=4
+            //ctx.stroke();
+        }
+    }
+	
+	
+	// 2nd shadow or color layer
+	ctx.globalAlpha = .5
+	squareSizeH/=2
+	squareSizeV/=2
+	squareSizeH=Math.ceil(squareSizeH)
+	squareSizeV=Math.ceil(squareSizeV)
+	 // Loop through rows and columns to draw the grid
+	 for (let i = 0; i < rows*2; i++) {
+        for (let j = 0; j < columns*2; j++) {
+            //ctx.beginPath();
+			
+			drawTGrid(i * squareSizeH+squareSizeH/2, j * squareSizeV+squareSizeV/2, squareSizeH/2, squareSizeV/2,num)
+            //ctx.rect(i * squareSizeH, j * squareSizeV, squareSizeH, squareSizeV);
+			num+=4
+            //ctx.stroke();
+        }
+    }
+	
+	sol = false
+}
+
+function drawTGrid(cenX,cenY,tw,th,num){
+	cenX=Math.ceil(cenX)
+	cenY=Math.ceil(cenY)
+	//ctx.globalAlpha = Math.random()/2+.5
+	var center  = {x:cenX,y:cenY}
+	var leftTop = {x:cenX-tw,y:cenY-th}
+	var midTop = {x:cenX,y:cenY-th}
+	var rightTop = {x:cenX+tw,y:cenY-th}
+	var leftMid = {x:cenX-tw,y:cenY}
+	var rightMid = {x:cenX+tw,y:cenY}
+	var leftBottom = {x:cenX-tw,y:cenY+th}
+	var midBottom = {x:cenX,y:cenY+th}
+	var rightBottom = {x:cenX+tw,y:cenY+th}
+	
+	//ctx.fillStyle="green"
+	//ctx.strokeStyle = "green"
+	
+	
+	//left
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+	drawTriangle(ctx,[leftTop.x,leftTop.y,leftBottom.x,leftBottom.y,center.x,center.y],sol,tw,num)
+	//top
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+	drawTriangle(ctx,[leftTop.x,leftTop.y,rightTop.x,rightTop.y,center.x,center.y],sol,tw,num+1)
+	//bottom
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+	//
+	drawTriangle(ctx,[leftBottom.x,leftBottom.y,rightBottom.x,rightBottom.y,center.x,center.y],sol,tw,num+2)
+	//right
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+	drawTriangle(ctx,[rightTop.x,rightTop.y,rightBottom.x,rightBottom.y,center.x,center.y],sol,tw,num+3)
+	
+	
+
+}
+
+function drawTriangle(ctx,coords,rec=false,tileWidth,num,showGrid=false) {
+    // Set the fill color of the triangle
+    //ctx.fillStyle = "blue";
+
+	
+	if(rec)colGrid.push({coords:coords,col:"brown",tileWidth:tileWidth,num:num})
+	
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+    // Draw the triangle
+	
+	if(!sol){
+		ctx.fillStyle= colGrid[num].col
+		ctx.strokeStyle = "black"//colGrid[num].col
+		ctx.strokeWidth=5
+		ctx.lineWidth=2
+		//ctx.miterLimit = 0
+	}
+	
+    ctx.beginPath();
+    ctx.moveTo(coords[0], coords[1]);
+    ctx.lineTo(coords[2], coords[3]);
+    ctx.lineTo(coords[4], coords[5]);
+    ctx.closePath();
+	//ctx.lineWidth = 0
+	ctx.fill();
+	if(showGridTime>0 && showGridSize==tileWidth){
+	ctx.stroke()
+}
+}
+
+
+// Check if a point is inside the triangle using barycentric coordinates
+      function isPointInTriangle(x, y, triangle) {
+        var p0 = {x:triangle[0],y:triangle[1]};
+        var p1 = {x:triangle[2],y:triangle[3]};
+        var p2 = {x:triangle[4],y:triangle[5]};
+
+        var area = 0.5 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
+        var s = 1 / (2 * area) * (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * x + (p0.x - p2.x) * y);
+        var t = 1 / (2 * area) * (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * x + (p1.x - p0.x) * y);
+
+        return s > 0 && t > 0 && (1 - s - t) > 0;
+      }
+// Call the drawTriangle function to draw the filled triangle
+//drawTriangle(ctx);
+
+	function getActiveButtonColor(){
+		for(var i=1;i<buttons.length;i+=1){
+			if(buttons[i].active)return buttons[i].color
+		}
+	}
+// Change color when tapped inside the triangle
+      function handleTouch(e) {
+		  e.preventDefault()
+        var touchX = e.touches[0].clientX;
+        var touchY = e.touches[0].clientY;
+
+		for(var i=0;i<colGrid.length;i+=1){
+			
+		var triangle = colGrid[i].coords
+		
+        if (editLayer==1 && colGrid[i].tileWidth==tileSize/2 && isPointInTriangle(touchX, touchY, triangle)) {
+			colGrid[i].col=getActiveButtonColor()
+			/*
+			//console.log(colGrid[i].col)
+			if(colGrid[i].col==="red"){
+				ctx.fillStyle = "black"//colGrid[i].col
+				ctx.strokeStyle = "black"
+				ctx.lineWidth = 0
+				colGrid[i].col ="black"
+			}else if(colGrid[i].col==="black"){
+				ctx.fillStyle = "green"
+				ctx.strokeStyle = "green"
+				ctx.lineWidth = 0
+				colGrid[i].col ="green"
+			}else if(colGrid[i].col==="green"){
+				ctx.fillStyle = "red"
+				ctx.strokeStyle = "red"
+				ctx.lineWidth = 0
+				colGrid[i].col ="red"
+			}
+			//drawTriangle(ctx,triangle)	  
+			*/
+        }
+		
+		
+		if (editLayer==2 && colGrid[i].tileWidth==tileSize/4 && isPointInTriangle(touchX, touchY, triangle)) {
+			
+			colGrid[i].col=getActiveButtonColor()
+			//ctx.globalAlpha = 0.5
+			//console.log(colGrid[i].col)
+			/*
+			if(colGrid[i].col==="red"){
+				ctx.fillStyle = "black"//colGrid[i].col
+				ctx.strokeStyle = "black"
+				ctx.lineWidth = 0
+				colGrid[i].col ="black"
+			}else if(colGrid[i].col==="black"){
+				ctx.fillStyle = "green"
+				ctx.strokeStyle = "green"
+				ctx.lineWidth = 0
+				colGrid[i].col ="green"
+			}else if(colGrid[i].col==="green"){
+				ctx.fillStyle = "red"
+				ctx.strokeStyle = "red"
+				ctx.lineWidth = 0
+				colGrid[i].col ="red"
+			}
+			//drawTriangle(ctx,triangle)	  
+			//ctx.globalAlpha = 1
+			*/
+        }
+		
+		
+		}
+		
+      }
+
+
+</script>
+</body>
+</html>
