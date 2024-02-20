@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Triangle Grid</title>
+<style>
+    body {
+		background-color:  green
+    }
+    canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+<canvas id="triangleCanvas" width="600" height="520"></canvas>
+
+<script>
+	
+
+	  
+	  
+function drawTriangle(ctx, x, y, size, color, upsideDown) {
+    ctx.beginPath();
+    if (upsideDown) {
+        ctx.moveTo(x - size / 2, y);
+        ctx.lineTo(x + size / 2, y);
+        ctx.lineTo(x, y - Math.sqrt(3) / 2 * size);
+    } else {
+        ctx.moveTo(x - size / 2, y);
+        ctx.lineTo(x + size / 2, y);
+        ctx.lineTo(x, y + Math.sqrt(3) / 2 * size);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+}
+
+function drawTriangleGrid(canvas, size, getColor) {
+    
+    const height = Math.sqrt(3) / 2 * size;
+    const rows = Math.ceil(canvas.height / height);
+    const cols = Math.ceil(canvas.width / size) * 2; // Multiplied by 2 for the offset columns
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            // Calculate the x and y coordinates for the center of the hexagon
+            let x = col * size / 2;
+            let y = row * height;
+            if (col % 2 === 1) {
+                y += height / 2;
+            }
+            // Colors for the upward and downward facing triangles
+            let color1 = getColor(row, col, true);
+            let color2 = getColor(row, col, false);
+
+            // Draw two triangles (upward and downward) to fill the space
+            drawTriangle(ctx, x, y, size, color1, false);
+            drawTriangle(ctx, x, y, size, color2, true);
+        }
+    }
+}
+
+// Function to get colors for the triangles
+function getColor(row, col, upsideDown) {
+    // Simple function to alternate colors; replace with your own logic
+    const baseColorValue = 255 - (row % 2) * 128 - (col % 2) * 128;
+    const colorOffset = upsideDown ? 0 : 128;
+    const baseColor = `rgb(${baseColorValue}, ${baseColorValue - colorOffset}, 255)`;
+    return baseColor;
+}
+
+function drawSquare(ctx) {
+    // Set the size of the canvas
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height
+
+    // Set the size of the square
+    const squareSizeH = 96;
+	const squareSizeV = 96
+
+    // Calculate the number of rows and columns
+    const rows = canvasWidth / squareSizeH;
+    const columns = canvasHeight / squareSizeV;
+
+    // Loop through rows and columns to draw the grid
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < columns; j++) {
+            ctx.beginPath();
+			
+			drawTGrid(i * squareSizeH+squareSizeH/2, j * squareSizeV+squareSizeV/2, squareSizeH/2, squareSizeV/2)
+            //ctx.rect(i * squareSizeH, j * squareSizeV, squareSizeH, squareSizeV);
+			
+            ctx.stroke();
+        }
+    }
+	sol = false
+}
+
+// Create a canvas element
+
+var sol=true // records collision coorinates
+
+
+// Set the size for the triangles
+const size = 60;
+
+// Get the canvas element
+const canvas = document.getElementById('triangleCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+	  // Event listener for touchstart event
+      canvas.addEventListener('touchstart', handleTouch);
+	
+	  var colGrid = [];
+
+// Draw the triangle grid on the canvas
+//drawTriangleGrid(canvas, size, getColor);
+drawSquare(ctx);
+//drawTGrid(320,200,64,64)
+
+function drawTGrid(cenX,cenY,tw,th){
+	//ctx.globalAlpha = Math.random()/2+.5
+	var center  = {x:cenX,y:cenY}
+	var leftTop = {x:cenX-tw,y:cenY-th}
+	var midTop = {x:cenX,y:cenY-th}
+	var rightTop = {x:cenX+tw,y:cenY-th}
+	var leftMid = {x:cenX-tw,y:cenY}
+	var rightMid = {x:cenX+tw,y:cenY}
+	var leftBottom = {x:cenX-tw,y:cenY+th}
+	var midBottom = {x:cenX,y:cenY+th}
+	var rightBottom = {x:cenX+tw,y:cenY+th}
+	
+	ctx.fillStyle="green"
+	ctx.strokeStyle = "green"
+	
+	//left
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+	drawTriangle(ctx,[leftTop.x,leftTop.y,leftBottom.x,leftBottom.y,center.x,center.y],sol)
+	//top
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+	drawTriangle(ctx,[leftTop.x,leftTop.y,rightTop.x,rightTop.y,center.x,center.y],sol)
+	//bottom
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+	drawTriangle(ctx,[leftBottom.x,leftBottom.y,rightBottom.x,rightBottom.y,center.x,center.y],sol)
+	//right
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+	drawTriangle(ctx,[rightTop.x,rightTop.y,rightBottom.x,rightBottom.y,center.x,center.y],sol)
+	
+	
+}
+
+function drawTriangle(ctx,coords,rec=false) {
+    // Set the fill color of the triangle
+    //ctx.fillStyle = "blue";
+
+	
+	if(rec)colGrid.push({coords:coords,num:colGrid.length,col:"green"})
+	
+	//ctx.fillStyle = "hsl(" + Math.random() * 360 + ", 100%, 50%)";
+    // Draw the triangle
+	
+    ctx.beginPath();
+    ctx.moveTo(coords[0], coords[1]);
+    ctx.lineTo(coords[2], coords[3]);
+    ctx.lineTo(coords[4], coords[5]);
+    ctx.closePath();
+	//ctx.lineWidth = 0
+    ctx.fill();
+	ctx.stroke()
+}
+
+
+// Check if a point is inside the triangle using barycentric coordinates
+      function isPointInTriangle(x, y, triangle) {
+        var p0 = {x:triangle[0],y:triangle[1]};
+        var p1 = {x:triangle[2],y:triangle[3]};
+        var p2 = {x:triangle[4],y:triangle[5]};
+
+        var area = 0.5 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
+        var s = 1 / (2 * area) * (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * x + (p0.x - p2.x) * y);
+        var t = 1 / (2 * area) * (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * x + (p1.x - p0.x) * y);
+
+        return s > 0 && t > 0 && (1 - s - t) > 0;
+      }
+// Call the drawTriangle function to draw the filled triangle
+//drawTriangle(ctx);
+
+
+// Change color when tapped inside the triangle
+      function handleTouch(e) {
+		  e.preventDefault()
+        var touchX = e.touches[0].clientX;
+        var touchY = e.touches[0].clientY;
+
+		for(var i=0;i<colGrid.length;i+=1){
+			
+		var triangle = colGrid[i].coords
+		
+        if (isPointInTriangle(touchX, touchY, triangle)) {
+			//console.log(colGrid[i].col)
+			if(colGrid[i].col==="red"){
+				ctx.fillStyle = "black"//colGrid[i].col
+				ctx.strokeStyle = "black"
+				ctx.lineWidth = 0
+				colGrid[i].col ="black"
+			}else if(colGrid[i].col==="black"){
+				ctx.fillStyle = "green"
+				ctx.strokeStyle = "green"
+				ctx.lineWidth = 0
+				colGrid[i].col ="green"
+			}else if(colGrid[i].col==="green"){
+				ctx.fillStyle = "red"
+				ctx.strokeStyle = "red"
+				ctx.lineWidth = 0
+				colGrid[i].col ="red"
+			}
+			drawTriangle(ctx,triangle)
+			
+          //ctx.clearRect(0, 0, canvas.width, canvas.height);
+		  //ctx.fillstyle = colGrid[i].col
+          //ctx.beginPath();
+          //ctx.moveTo(triangle[0], triangle[1]);
+          //ctx.lineTo(triangle[2], triangle[3]);
+          //ctx.lineTo(triangle[4], triangle[5]);
+          //ctx.closePath();
+          //ctx.fillStyle = 'red';
+          //ctx.fill();
+		  //ctx.fillRect(0,0,100,200)
+        }
+		
+		
+		}
+		
+      }
+
+
+</script>
+</body>
+</html>
