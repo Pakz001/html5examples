@@ -1,3 +1,5 @@
+
+<br>touch device browser only atm*<br>
 now the new tile map is a 2d isometric map using polygons and with raise and lower terrain feature. This was done by creating a wireframe version and have each connection point connect with the neighbors. by raising or lowering one point the neighbors can adjust and reconnect to those points. since using polygons that are filled, this makes it look like in populous or powermonger from back in the commodore amiga days.
 <bt><br>
 no texture fill or shading or drawn tile set yet. making a screenshot and drawing ontop of that would allow for these being made.<br><br>
