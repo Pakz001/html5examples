@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isometric Tile Map</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    background-color: #f0f0f0;
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="isometricCanvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('isometricCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Set the size of the canvas
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Tile configuration
+  const tileWidth = 100;
+  const tileHeight = 50;
+  const mapWidth = 15;
+  const mapHeight = 15;
+  
+  var fubar = 0
+
+  // 2D Array to store the coordinates
+  let tileCoordinates = [];
+
+  // Function to calculate and store tile coordinates
+  function calculateCoordinates() {
+    for (let x = 0; x < mapWidth; x++) {
+      tileCoordinates[x] = [];
+      for (let y = 0; y < mapHeight; y++) {
+        // Calculate the center coordinates of the tile
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const baseHeight = centerY - (mapHeight * tileHeight / 2);
+        const left = centerX + (x - y) * tileWidth / 2;
+        const top = baseHeight + (x + y) * tileHeight / 2;
+
+        // Calculate and store the center coordinates of each edge
+        tileCoordinates[x][y] = {
+          centerTop: { x: left, y: top },
+          centerRight: { x: left + tileWidth / 2, y: top + tileHeight / 2 },
+          centerBottom: { x: left, y: top + tileHeight },
+          centerLeft: { x: left - tileWidth / 2, y: top + tileHeight / 2 },
+		  col:  `rgb(${Math.floor(Math.random() * 20)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 20)})`
+        };
+		
+      }
+    }
+  }
+  
+  function manipPoint(x,y,val){
+	  
+	  tileCoordinates[x][y].centerLeft.y-=fubar
+	  if(x-1>=0 && y+1<mapHeight)tileCoordinates[x-1][y+1].centerRight.y-=fubar
+	  if(x>=0 && y+1<mapHeight)tileCoordinates[x][y+1].centerTop.y-=fubar
+	  if(x-1>=0 && y<mapHeight)tileCoordinates[x-1][y].centerBottom.y-=fubar
+	  
+	  //tileCoordinates[1][1].centerLeft.y-=fubar
+	  //tileCoordinates[0][2].centerRight.y-=fubar
+	 // tileCoordinates[1][2].centerTop.y-=fubar
+	  //tileCoordinates[0][1].centerBottom.y-=fubar
+  }
+
+  // Function to draw the entire tile map from stored coordinates
+  function drawMap() {
+
+	var x = Math.floor(Math.random()*mapWidth)
+	var y = Math.floor(Math.random()*mapHeight)
+	  manipPoint(x,y,fubar)
+  
+	  
+    for (let x = 0; x < mapWidth; x++) {
+      for (let y = 0; y < mapHeight; y++) {
+        const tile = tileCoordinates[x][y];
+
+        // Draw tile using stored coordinates
+        ctx.beginPath();
+        ctx.moveTo(tile.centerTop.x, tile.centerTop.y); // Center-Top
+        ctx.lineTo(tile.centerRight.x, tile.centerRight.y); // Center-Right
+        ctx.lineTo(tile.centerBottom.x, tile.centerBottom.y); // Center-Bottom
+        ctx.lineTo(tile.centerLeft.x, tile.centerLeft.y); // Center-Left
+        ctx.closePath();
+
+        // Fill and stroke the tile
+        ctx.fillStyle = 'rgba(150, 200, 150, 0.7)';
+		ctx.fillStyle = tile.col
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+  }
+
+  
+  var jar=-2
+  calculateCoordinates()
+  // Render loop
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    fubar+=jar
+	if(fubar<-8)jar=.1
+	if(fubar>8)jar=-0.1
+
+  // Calculate coordinates and draw the map
+  //calculateCoordinates();
+  drawMap();
+    
+    requestAnimationFrame(render);
+  }
+
+  render();
+  
+  
+</script>
+</body>
+</html>
