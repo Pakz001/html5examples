@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isometric Tile Map</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    background-color: #f0f0f0;
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="isometricCanvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('isometricCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Set the size of the canvas
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Tile configuration
+  const tileWidth = 100;
+  const tileHeight = 50;
+  const mapWidth = 15;
+  const mapHeight = 15;
+  
+  var fubar = 0
+
+  // 2D Array to store the coordinates
+  let tileCoordinates = [];
+
+  // Function to calculate and store tile coordinates
+  function calculateCoordinates() {
+    for (let x = 0; x < mapWidth; x++) {
+      tileCoordinates[x] = [];
+      for (let y = 0; y < mapHeight; y++) {
+        // Calculate the center coordinates of the tile
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const baseHeight = centerY - (mapHeight * tileHeight / 2);
+        const left = centerX + (x - y) * tileWidth / 2;
+        const top = baseHeight + (x + y) * tileHeight / 2;
+
+        // Calculate and store the center coordinates of each edge
+        tileCoordinates[x][y] = {
+          centerTop: { x: left, y: top },
+          centerRight: { x: left + tileWidth / 2, y: top + tileHeight / 2 },
+          centerBottom: { x: left, y: top + tileHeight },
+          centerLeft: { x: left - tileWidth / 2, y: top + tileHeight / 2 },
+		  //col:  `rgb(${Math.floor(Math.random() * 20)}, ${Math.floor(Math.random() * 26)+230}, ${Math.floor(Math.random() * 20)})`
+		  r:Math.floor(Math.random() * 20),
+		  g:Math.floor(Math.random() * 26)+230,
+		  b:Math.floor(Math.random() * 20)
+        };
+		
+      }
+    }
+  }
+  
+  function manipPoint(x,y,val){
+	  
+	  tileCoordinates[x][y].centerLeft.y-=val
+	  if(x-1>=0 && y+1<mapHeight)tileCoordinates[x-1][y+1].centerRight.y-=val
+	  if(x>=0 && y+1<mapHeight)tileCoordinates[x][y+1].centerTop.y-=val
+	  if(x-1>=0 && y<mapHeight)tileCoordinates[x-1][y].centerBottom.y-=val
+	 
+	  val/=2
+	  tileCoordinates[x][y].r+=val
+	  if(x-1>=0 && y+1<mapHeight)tileCoordinates[x-1][y+1].r+=val
+	  if(x>=0 && y+1<mapHeight)tileCoordinates[x][y+1].r+=val
+	  if(x-1>=0 && y<mapHeight)tileCoordinates[x-1][y].r+=val
+	  tileCoordinates[x][y].g+=val
+	  if(x-1>=0 && y+1<mapHeight)tileCoordinates[x-1][y+1].g+=val
+	  if(x>=0 && y+1<mapHeight)tileCoordinates[x][y+1].g+=val
+	  if(x-1>=0 && y<mapHeight)tileCoordinates[x-1][y].g+=val
+	  tileCoordinates[x][y].b+=val
+	  if(x-1>=0 && y+1<mapHeight)tileCoordinates[x-1][y+1].b+=val
+	  if(x>=0 && y+1<mapHeight)tileCoordinates[x][y+1].b+=val
+	  if(x-1>=0 && y<mapHeight)tileCoordinates[x-1][y].b+=val
+	  
+  }
+
+  // Function to draw the entire tile map from stored coordinates
+  function drawMap() {
+
+	var x = Math.floor(Math.random()*mapWidth)
+	var y = Math.floor(Math.random()*mapHeight)
+	  //manipPoint(x,y,fubar)
+  
+	  
+    for (let x = 0; x < mapWidth; x++) {
+      for (let y = 0; y < mapHeight; y++) {
+        const tile = tileCoordinates[x][y];
+
+        // Draw tile using stored coordinates
+        ctx.beginPath();
+        ctx.moveTo(tile.centerTop.x, tile.centerTop.y); // Center-Top
+        ctx.lineTo(tile.centerRight.x, tile.centerRight.y); // Center-Right
+        ctx.lineTo(tile.centerBottom.x, tile.centerBottom.y); // Center-Bottom
+        ctx.lineTo(tile.centerLeft.x, tile.centerLeft.y); // Center-Left
+        ctx.closePath();
+
+        // Fill and stroke the tile
+        //ctx.fillStyle = 'rgba(150, 200, 150, 0.7)';
+        ctx.fillStyle = 'rgba('+tileCoordinates[x][y].r+','+tileCoordinates[x][y].g+','+ tileCoordinates[x][y].b+', 1)';
+		
+		//ctx.fillStyle = tile.col
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+  }
+
+  
+  
+  
+  
+   // Function to change the tile color on touch
+  function changeTileColorOnTouch(touchX, touchY) {
+    // Find the tile that was touched
+    for (let x = 0; x < mapWidth; x++) {
+      for (let y = 0; y < mapHeight; y++) {
+        const tile = tileCoordinates[x][y];
+
+        // Check if the touch is within the bounds of the tile
+        ctx.beginPath();
+        ctx.moveTo(tile.centerTop.x, tile.centerTop.y);
+        ctx.lineTo(tile.centerRight.x, tile.centerRight.y);
+        ctx.lineTo(tile.centerBottom.x, tile.centerBottom.y);
+        ctx.lineTo(tile.centerLeft.x, tile.centerLeft.y);
+        ctx.closePath();
+
+        // If the touch is within the tile, change its color
+        if (ctx.isPointInPath(touchX, touchY)) {
+          //tile.col = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+		  tile.r = 255
+		  tile.g = 255
+		  tile.b = 255
+          return; // Stop checking after the first tile is found and changed
+        }
+      }
+    }
+  }
+
+  // Add touch event listener to the canvas
+  canvas.addEventListener('touchstart', function(event) {
+    // Prevent the default touch behavior like scrolling
+    event.preventDefault();
+
+    // Get the touch coordinates relative to the canvas
+    const touchX = event.touches[0].clientX - canvas.offsetLeft;
+   const touchY = event.touches[0].clientY - canvas.offsetTop;
+
+    // Call the function to change the tile color
+    changeTileColorOnTouch(touchX, touchY);
+  });
+  
+  
+  
+  
+  
+  var jar=-2
+  calculateCoordinates()
+  
+
+  raiseTerrainArea(1,6,32,0,0)
+  raiseTerrainArea(3,2,128,1,1)
+  raiseTerrainArea(5,5,32,6,6)
+  raiseTerrainArea(7,7,64,2,2)
+  
+  
+  raiseTerrainArea(0,mapHeight-4,-64,mapWidth-1,3)
+  // Render loop
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //fubar+=jar
+	//if(fubar<-8)jar=.1
+	//if(fubar>8)jar=-0.1
+
+  // Calculate coordinates and draw the map
+  //calculateCoordinates();
+  drawMap();
+    
+    requestAnimationFrame(render);
+  }
+
+  render();
+  
+  function raiseTerrainArea(x,y,val=2,w,h){
+	for(var x1=0;x1<w+1;x1+=1){
+		for(var y1=0;y1<h+1;y1+=1){
+	  manipPoint(x+x1,y+y1,val)
+	  //manipPoint(x-1+x1,y+1+y1,val)
+	  //manipPoint(x+x1,y+1+y1,val)
+	  //manipPoint(x-1+x1,y+y1,val)
+	  }}
+  }  
+  
+  function raiseTerrain(x,y,val=2){
+	  manipPoint(x,y,val)
+	  manipPoint(x-1,y+1,val)
+	  manipPoint(x,y+1,val)
+	  manipPoint(x-1,y,val)
+	  
+  }  
+ 
+  
+  
+</script>
+</body>
+</html>
