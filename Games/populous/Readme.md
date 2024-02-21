@@ -4,7 +4,7 @@ no texture fill or shading or drawn tile set yet. making a screenshot and drawin
 chat gpt4 was used to create small isometric tile maps. then asking it to do various things. until i. figured out to just connect each point to each point. store everything in a array.
 
 <br><br><br>
-<img src="3D/threeTest/Test/Media/4ACEC619-2702-465D-912C-B3C9FCB2B23E.png" width="50%"></img><br>
+<img src="Media/IMG_3081.png" width="50%"></img><br>
 <br><br>
 touch device only atm.
 
