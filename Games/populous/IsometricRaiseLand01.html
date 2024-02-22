@@ -48,6 +48,26 @@
 
     var raiseValue = 32
 
+var colGrid = [];
+
+
+
+
+
+
+
+    // Tile configuration
+    const tileWidth = 100;
+    const tileHeight = 50;
+    const mapWidth = 15;
+    const mapHeight = 15;
+
+    var fubar = 0
+
+    // 2D Array to store the coordinates
+    let tileCoordinates = [];
+    let tileCoordinatesTemp = [];
+
 
     var buttons = [
       { x: 10, y: 10, width: 80, height: 80, color: "white", tapped: false, id: "editLayer", active: false },
@@ -78,6 +98,16 @@
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
+        if(button.id==="editLayer"){
+          //ctx.fillStyle="blue"
+          //ctx.fillRect(button.x, button.y, button.width, button.height)
+          ctx.globalAlpha = 1
+          ctx.fillStyle="black"
+          if(raiseValue>=0)drawScaledText(ctx,"R", 10,10,80,80)
+          if(raiseValue<0)drawScaledText(ctx,"L", 10,10,80,80)
+
+          //drawScaledText(context, text, x, y, maxWidth, maxHeight)
+        }
       });
     }
 
@@ -149,26 +179,7 @@
     canvas.addEventListener('touchstart', handleTouch);
     canvas.addEventListener('touchmove', handleTouch);
     // 
-    var colGrid = [];
-
-
-
-
-
-
-
-    // Tile configuration
-    const tileWidth = 100;
-    const tileHeight = 50;
-    const mapWidth = 15;
-    const mapHeight = 15;
-
-    var fubar = 0
-
-    // 2D Array to store the coordinates
-    let tileCoordinates = [];
-    let tileCoordinatesTemp = [];
-
+    
     // Function to calculate and store tile coordinates
     function calculateCoordinates() {
       for (let x = 0; x < mapWidth; x++) {
@@ -357,12 +368,12 @@ function clamp(value, minValue, maxValue) {
             //tile.r = 255
             //tile.g = 255
             //tile.b = 255'
-            if(!(lastTileX===x && lastTileY ===y)){
+            //if(!(lastTileX===x && lastTileY ===y)){
               //console.log(lastTileX+","+lastTileY +"zz"+x+","+y)
-            lastTileX = x
-            lastTileY = y
+            //lastTileX = x
+            //lastTileY = y
             raiseTerrainArea(x, y - 1, raiseValue, 1, 1)
-            }
+            //}
             return; // Stop checking after the first tile is found and changed
           }
         }
@@ -571,6 +582,40 @@ function clamp(value, minValue, maxValue) {
       }
     }
   }
+
+function drawScaledText(context, text, x, y, maxWidth, maxHeight) {
+  // Calculate initial font size based on desired height
+  const initialFontSize = Math.min(maxHeight, 72); // Start with large font, adjust later
+
+  // Set initial font
+  context.font = `${initialFontSize}px sans-serif`;
+
+  // Measure text width with the initial font
+  const textWidth = context.measureText(text).width;
+
+  // Check if text fits within maxWidth without scaling
+  if (textWidth <= maxWidth) {
+    // Text fits, just draw it
+    context.fillText(text, x+(maxWidth/6), y+(maxHeight/1.2));
+    return;
+  }
+
+  // Text needs scaling, find scaling factor
+  const scaleFactor = Math.min(maxWidth / textWidth, maxHeight / initialFontSize);
+
+  // Apply scaling to font size and context
+  context.font = `${initialFontSize * scaleFactor}px sans-serif`;
+  context.scale(scaleFactor, scaleFactor);
+
+  // Draw the scaled text at adjusted coordinates
+  const adjustedX = x - (textWidth - maxWidth) / 2;
+  const adjustedY = y + initialFontSize * 0.8; // Adjust for baseline offset
+  context.fillText(text, adjustedX, adjustedY);
+
+  // Reset scaling
+  context.scale(1 / scaleFactor, 1 / scaleFactor);
+}
+
 
   </script>
 </body>
