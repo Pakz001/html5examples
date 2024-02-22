@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+  <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -182,7 +183,7 @@ var lastButtonPressed = 0
           centerBottom: { x: left, y: top + tileHeight },
           centerLeft: { x: left - tileWidth / 2, y: top + tileHeight / 2 },
 		  //col:  `rgb(${Math.floor(Math.random() * 20)}, ${Math.floor(Math.random() * 26)+230}, ${Math.floor(Math.random() * 20)})`
-		  r:Math.floor(Math.random() * 20),
+		  r:Math.floor(Math.random() * 160),
 		  g:Math.floor(Math.random() * 26)+230,
 		  b:Math.floor(Math.random() * 20)
         };
@@ -521,12 +522,14 @@ function fillShapeWithTexture(canvasId, shapePoints) {
   //  shapeData[i + 2] += noise;
  // }
   for (var i = 0; i < shapeData.length; i += 4) {
-		if(Math.random()<.05){	
-		 var noiseSize = Math.floor(Math.random()*2)+1
-		    for (var j = 0; j < noiseSize; j++) {
+		if(Math.random()<.03){	
+		 var noiseSize = Math.floor(Math.random()*6)+1
+		 var noise = Math.random() * 60-30; // Adjust the noise level as desired	
+		 if(Math.random()<.8)noiseSize=1
+		    for (var j = 0; j < 2; j++) {
 		      for (var k = 0; k < noiseSize; k++) {
 		        var pixelIndex = i + (j * shapeCanvas.width + k) * 4;
-		var noise = Math.random() * 100-50; // Adjust the noise level as desired		
+			
 
 				shapeData[pixelIndex] += noise;
 		        shapeData[pixelIndex + 1] += noise;
