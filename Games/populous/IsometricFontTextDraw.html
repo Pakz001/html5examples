@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isometric Tile Map</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    background-color: #f0f0f0;
+	background-color: #000000;
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="isometricCanvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('isometricCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Set the size of the canvas
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  
+	 	canvasId = 'isometricCanvas'
+  var mainCanvas = document.getElementById(canvasId);
+  var mainCtx = mainCanvas.getContext('2d');
+
+  // Create a separate canvas for the polygon shape
+  var shapeCanvas = document.createElement('canvas');
+  shapeCanvas.width = mainCanvas.width;
+  shapeCanvas.height = mainCanvas.height;
+  var shapeCtx = shapeCanvas.getContext('2d');
+  var pattern = 0
+  
+  
+  
+  var raiseValue = 32
+  
+  
+      var buttons = [
+      { x: 10, y: 10, width: 80, height: 80, color: "white", tapped: false,id:"editLayer" ,active:false},
+	  
+      { x: 100, y: 10, width: 80, height: 80, color: "brown", tapped: false,id:"aa" ,active:false },
+      { x: 10, y: 100, width: 80, height: 80, color: "firebrick", tapped: false,id:"bb",active:false },
+      { x: 100, y: 100, width: 80, height: 80, color: "lightslateblue", tapped: false,id:"cc" ,active:false},
+	  { x: 10, y: 200, width: 80, height: 80, color: "darkslateblue", tapped: false,id:"dd",active:false },
+      { x: 100, y: 200, width: 80, height: 80, color: "slateblue", tapped: false,id:"ee" ,active:false},
+	  { x: 10, y: 300, width: 80, height: 80, color: "white", tapped: false,id:"ff",active:false },
+      { x: 100, y: 300, width: 80, height: 80, color: "black", tapped: false,id:"gg" ,active:false},
+	  { x: 10, y: 400, width: 80, height: 80, color: "lavender", tapped: false,id:"gg" ,active:false},
+	  { x: 100, y: 400, width: 80, height: 80, color: "slategrey", tapped: false,id:"gg" ,active:false}
+    ];
+var lastButtonPressed = 0
+
+    // Draw the buttons on the canvas
+    function drawButtons() {
+		ctx.globalAlpha = 1
+      	buttons.forEach(function(button) {
+        ctx.fillStyle = button.color;
+		ctx.lineWidth = 4
+	
+		if(button.active==false)ctx.strokeStyle = "black"
+		if(button.active==true)ctx.strokeStyle = "white"
+		ctx.beginPath()
+        ctx.rect(button.x, button.y, button.width, button.height);
+		ctx.closePath()
+		ctx.stroke()
+		ctx.fill()
+      });
+    }
+
+    // Check if the touch event occurred on a button
+    function checkButtonTapped(touchX, touchY) {
+      buttons.forEach(function(button) {
+        if (touchX >= button.x &&
+            touchX <= button.x + button.width &&
+            touchY >= button.y &&
+            touchY <= button.y + button.height) {
+          button.tapped = true;
+        }
+      });
+    }
+
+    // Handle touch events
+    canvas.addEventListener("touchstart", function(event) {
+      var touch = event.touches[0];
+      var touchX = touch.pageX - canvas.offsetLeft;
+      var touchY = touch.pageY - canvas.offsetTop;
+
+      checkButtonTapped(touchX, touchY);
+    });
+
+    // Handle click events for non-touch devices
+    canvas.addEventListener("click", function(event) {
+      var clickX = event.pageX - canvas.offsetLeft;
+      var clickY = event.pageY - canvas.offsetTop;
+
+      checkButtonTapped(clickX, clickY);
+    });
+
+    // Update the button colors
+    function updateButtonColors() {
+      buttons.forEach(function(button) {
+		if(lastButtonPressed!=button.id)button.active=false
+        if (button.tapped) {
+          //button.color = getRandomColor();
+          button.tapped = false;
+		  button.active=true
+		  if(button.id!="editLayer")lastButtonPressed=button.id
+		  if(button.id=="editLayer"){
+			  button.active=true
+			  showGridTime=100
+		  	if(raiseValue===32){
+				raiseValue=-32
+				//showGridSize=tileSize/4
+			}else{
+				raiseValue=32
+				//showGridSize=tileSize/2
+			}
+		  }
+        }
+      });
+    }
+
+    // Generate a random color
+    function getRandomColor() {
+      var letters = "0123456789ABCDEF";
+      var color = "#";
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+
+	  // Event listener for touchstart event
+      canvas.addEventListener('touchstart', handleTouch);
+	  canvas.addEventListener('touchmove', handleTouch);
+	// 
+	  var colGrid = [];
+
+  
+  
+  
+  
+  
+  
+  // Tile configuration
+  const tileWidth = 20;
+  const tileHeight = 20;
+  const mapWidth = 48;
+  const mapHeight = 48;
+  
+  var fubar = 0
+
+  // 2D Array to store the coordinates
+  let tileCoordinates = [];
+
+  // Function to calculate and store tile coordinates
+  function calculateCoordinates() {
+    for (let x = 0; x < mapWidth; x++) {
+      tileCoordinates[x] = [];
+      for (let y = 0; y < mapHeight; y++) {
+        // Calculate the center coordinates of the tile
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const baseHeight = centerY - (mapHeight * tileHeight / 2);
+        const left = centerX + (x - y) * tileWidth / 2;
+        const top = baseHeight + (x + y) * tileHeight / 2;
+
+        // Calculate and store the center coordinates of each edge
+        tileCoordinates[x][y] = {
+          centerTop: { x: left, y: top },
+          centerRight: { x: left + tileWidth / 2, y: top + tileHeight / 2 },
+          centerBottom: { x: left, y: top + tileHeight },
+          centerLeft: { x: left - tileWidth / 2, y: top + tileHeight / 2 },
+		  //col:  `rgb(${Math.floor(Math.random() * 20)}, ${Math.floor(Math.random() * 26)+230}, ${Math.floor(Math.random() * 20)})`
+		  r:Math.floor(Math.random() * 160/4),
+		  g:Math.floor(Math.random() * 26)+230,
+		  b:Math.floor(Math.random() * 20)
+        };
+		
+      }
+    }
+  }
+  
+  function manipPoint(x,y,val){
+	  var val2 = val/2
+
+
+	  if(x>=0 && x<mapWidth && y>=0 && y<mapHeight){//right side
+		  tileCoordinates[x][y].centerLeft.y-=val
+		  tileCoordinates[x][y].r-=val2
+		  tileCoordinates[x][y].g-=val2
+		  tileCoordinates[x][y].b-=val2
+		  // shade right side on step further
+		  if(x+1<mapWidth){
+		  tileCoordinates[x+1][y].r-=val2
+		  tileCoordinates[x+1][y].g-=val2
+		  tileCoordinates[x+1][y].b-=val2
+			}
+			// shade right side two steps further
+			if(x+2<mapWidth){
+		  tileCoordinates[x+2][y].r-=val2
+		  tileCoordinates[x+2][y].g-=val2
+		  tileCoordinates[x+2][y].b-=val2
+		  }
+	  }
+	  if(x-1>=0 && x-1<mapWidth && y>=0 && y+1<mapHeight){//left side top
+		  tileCoordinates[x-1][y+1].centerRight.y-=val
+tileCoordinates[x-1][y+1].r+=val2		  
+tileCoordinates[x-1][y+1].g+=val2		  
+tileCoordinates[x-1][y+1].b+=val2
+		  
+	  }
+	  if(x>=0 && x<mapWidth && y>= 0 && y+1<mapHeight){//front side
+		  tileCoordinates[x][y+1].centerTop.y-=val
+tileCoordinates[x][y+1].r-=val2
+tileCoordinates[x][y+1].g-=val2
+tileCoordinates[x][y+1].b-=val2
+
+	  }
+	  if(x-1>=0 && x<mapWidth && y>=0 && y<mapHeight){//top back
+		  tileCoordinates[x-1][y].centerBottom.y-=val
+tileCoordinates[x-1][y].r+=val2
+tileCoordinates[x-1][y].g+=val2
+tileCoordinates[x-1][y].b+=val2
+		  
+	  }
+	 
+	  /*
+	  val/=2
+	  tileCoordinates[x][y].r+=val
+	  if(x-1>=0 && y+1<mapHeight)tileCoordinates[x-1][y+1].r+=val
+	  if(x>=0 && y+1<mapHeight)tileCoordinates[x][y+1].r+=val
+	  if(x-1>=0 && y<mapHeight)tileCoordinates[x-1][y].r+=val
+	  tileCoordinates[x][y].g+=val
+	  if(x-1>=0 && y+1<mapHeight)tileCoordinates[x-1][y+1].g+=val
+	  if(x>=0 && y+1<mapHeight)tileCoordinates[x][y+1].g+=val
+	  if(x-1>=0 && y<mapHeight)tileCoordinates[x-1][y].g+=val
+	  tileCoordinates[x][y].b+=val
+	  if(x-1>=0 && y+1<mapHeight)tileCoordinates[x-1][y+1].b+=val
+	  if(x>=0 && y+1<mapHeight)tileCoordinates[x][y+1].b+=val
+	  if(x-1>=0 && y<mapHeight)tileCoordinates[x-1][y].b+=val
+	*/  
+  }
+
+  // Function to draw the entire tile map from stored coordinates
+  function drawMap() {
+	  
+	  var x = Math.floor(Math.random()*mapWidth)
+	var y = Math.floor(Math.random()*mapHeight)
+	  //manipPoint(x,y,fubar)
+	  
+    for (let x = 0; x < mapWidth; x++) {
+      for (let y = 0; y < mapHeight; y++) {
+		
+        const tile = tileCoordinates[x][y];
+		
+        // Draw tile using stored coordinates
+        ctx.beginPath();
+        ctx.moveTo(tile.centerTop.x, tile.centerTop.y); // Center-Top
+        ctx.lineTo(tile.centerRight.x, tile.centerRight.y); // Center-Right
+        ctx.lineTo(tile.centerBottom.x, tile.centerBottom.y); // Center-Bottom
+        ctx.lineTo(tile.centerLeft.x, tile.centerLeft.y); // Center-Left
+        ctx.closePath();
+
+        // Fill and stroke the tile
+        //ctx.fillStyle = 'rgba(150, 200, 150, 0.7)';
+		
+        //ctx.fillStyle = 'rgba('+tileCoordinates[x][y].r+','+tileCoordinates[x][y].g+','+ tileCoordinates[x][y].b+', 1)';
+		//ctx.strokeStyle='rgba('+tileCoordinates[x][y].r+','+tileCoordinates[x][y].g/2+','+ tileCoordinates[x][y].b+', 1)';
+		ctx.lineWidth=1
+		
+		ctx.fillStyle = pattern
+		//ctx.strokeStyle = pattern
+		//ctx.strokeStyle = 'white'
+		ban=1
+		var ban = ((tileCoordinates[x][y].r+tileCoordinates[x][y].g+ tileCoordinates[x][y].b)/255)/3
+		if(ban<0)ban=0
+		if(ban>1)ban=1
+		//if(Math.random()<0.001)console.log(ban)
+
+		
+		//ctx.globalAlpha = ban
+		//ctx.globalAlpha=1
+		//ctx.fillStyle = tile.col
+        //ctx.stroke();
+        ctx.fill();
+		ctx.fillStyle = 'rgba('+tileCoordinates[x][y].r+','+tileCoordinates[x][y].g+','+ tileCoordinates[x][y].b+','+ ban+')';
+		ctx.fill()
+
+		
+		
+		//fillShapeWithTexture(canvas,coo)
+      }
+    }
+  }
+
+  
+  
+  
+  
+   // Function to change the tile color on touch
+  function changeTileColorOnTouch(touchX, touchY) {
+	  
+	  // to not have the collision be fromn back to front we reverse the drawing order
+	  // so the front most tile gets collided with (z-ordering)
+    // Find the tile that was touched
+//    for (let x = 0; x < mapWidth; x++) {
+    for (let x = mapWidth-1; x >= 0; x-=1) {	
+//      for (let y = 0; y < mapHeight; y++) {
+      for (let y = mapHeight-1;y>=0; y-=1) {
+
+	const tile = tileCoordinates[x][y];
+
+        // Check if the touch is within the bounds of the tile
+        ctx.beginPath();
+        ctx.moveTo(tile.centerTop.x, tile.centerTop.y);
+        ctx.lineTo(tile.centerRight.x, tile.centerRight.y);
+        ctx.lineTo(tile.centerBottom.x, tile.centerBottom.y);
+        ctx.lineTo(tile.centerLeft.x, tile.centerLeft.y);
+        ctx.closePath();
+
+        // If the touch is within the tile, change its color
+        if (ctx.isPointInPath(touchX, touchY)) {
+          //tile.col = `rgb(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255})`;
+		  //tile.r = 255
+		  //tile.g = 255
+		  //tile.b = 255
+		  raiseTerrainArea(x,y-1,raiseValue,1,1)
+		  
+          return; // Stop checking after the first tile is found and changed
+        }
+      }
+    }
+  }
+
+  // Add touch event listener to the canvas
+  canvas.addEventListener('touchstart', function(event) {
+    // Prevent the default touch behavior like scrolling
+    event.preventDefault();
+
+    // Get the touch coordinates relative to the canvas
+    const touchX = event.touches[0].clientX - canvas.offsetLeft;
+   const touchY = event.touches[0].clientY - canvas.offsetTop;
+
+    // Call the function to change the tile color
+    changeTileColorOnTouch(touchX, touchY);
+  });
+  
+  
+  
+  
+  
+  var jar=-2
+  calculateCoordinates()
+  /*
+  var tile = tileCoordinates[0][0];
+	  
+		var coo = [
+		{ x:tile.centerTop.x, y:tile.centerTop.y},
+		{ x:tile.centerRight.x, y:tile.centerRight.y},
+		{ x:tile.centerBottom.x, y:tile.centerBottom.y},
+		{ x:tile.centerLeft.x, y:tile.centerLeft.y}
+		]
+	*/  
+	//fillShapeWithTexture(canvas,coo)
+  
+
+  //raiseTerrainArea(1,6,32,0,0)
+  //raiseTerrainArea(3,2,128,1,1)
+  //raiseTerrainArea(5,5,32,6,6)
+  //raiseTerrainArea(7,7,64,2,2)
+  
+  
+  
+  var grayscaleArray = stringToGrayscaleArray("talk");
+  //console.log(grayscaleArray)
+  for(var y=0;y<grayscaleArray.length;y+=1){
+	  for(var x=0;x<grayscaleArray[0].length;x+=1){
+		  if(grayscaleArray[y][x]===255){
+			  if(x<mapWidth && y<mapHeight){
+			  tileCoordinates[x][y].r=200
+			  tileCoordinates[x][y].g=255
+			  tileCoordinates[x][y].b=200
+			  }
+		  }else{
+			  if(x<mapWidth && y<mapHeight){
+			  //tileCoordinates[x][y].r=0
+			  //tileCoordinates[x][y].g=200
+			  //tileCoordinates[x][y].b=0
+			  }
+		  }
+	  }
+  }
+  
+  //raiseTerrainArea(0,mapHeight-4,-64,mapWidth-1,3)
+  // Render loop
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //fubar+=jar
+	//if(fubar<-8)jar=.1
+	//if(fubar>8)jar=-0.1
+
+  // Calculate coordinates and draw the map
+  //calculateCoordinates();
+  ctx.lineWidth=0
+  ctx.strokeSize=0
+  
+drawMap();
+         drawButtons();
+      updateButtonColors();
+
+    requestAnimationFrame(render);
+  }
+
+  render();
+  
+  function raiseTerrainArea(x,y,val=2,w,h){
+	 val/=4 
+	for(var x1=0;x1<w+1;x1+=1){
+		for(var y1=0;y1<h+1;y1+=1){
+	  manipPoint(x+x1,y+y1,val)
+	  //manipPoint(x-1+x1,y+1+y1,val)
+	  //manipPoint(x+x1,y+1+y1,val)
+	  //manipPoint(x-1+x1,y+y1,val)
+	  }}
+  }  
+  
+  function raiseTerrain(x,y,val=2){
+	  val/=4
+	  manipPoint(x,y,val)
+	  manipPoint(x-1,y+1,val)
+	  manipPoint(x,y+1,val)
+	  manipPoint(x-1,y,val)
+	  
+  }  
+ 
+  
+  
+  
+  function handleTouch(e) {
+		  e.preventDefault()
+        var touchX = e.touches[0].clientX;
+        var touchY = e.touches[0].clientY;
+
+		for(var i=0;i<colGrid.length;i+=1){
+			
+		var triangle = colGrid[i].coords
+		
+        if (editLayer==1 && colGrid[i].tileWidth==tileSize/2 && isPointInTriangle(touchX, touchY, triangle)) {
+			colGrid[i].col=getActiveButtonColor()
+			/*
+			//console.log(colGrid[i].col)
+			if(colGrid[i].col==="red"){
+				ctx.fillStyle = "black"//colGrid[i].col
+				ctx.strokeStyle = "black"
+				ctx.lineWidth = 0
+				colGrid[i].col ="black"
+			}else if(colGrid[i].col==="black"){
+				ctx.fillStyle = "green"
+				ctx.strokeStyle = "green"
+				ctx.lineWidth = 0
+				colGrid[i].col ="green"
+			}else if(colGrid[i].col==="green"){
+				ctx.fillStyle = "red"
+				ctx.strokeStyle = "red"
+				ctx.lineWidth = 0
+				colGrid[i].col ="red"
+			}
+			//drawTriangle(ctx,triangle)	  
+			*/
+        }
+		
+		
+		if (editLayer==2 && colGrid[i].tileWidth==tileSize/4 && isPointInTriangle(touchX, touchY, triangle)) {
+			
+			colGrid[i].col=getActiveButtonColor()
+			//ctx.globalAlpha = 0.5
+			//console.log(colGrid[i].col)
+			/*
+			if(colGrid[i].col==="red"){
+				ctx.fillStyle = "black"//colGrid[i].col
+				ctx.strokeStyle = "black"
+				ctx.lineWidth = 0
+				colGrid[i].col ="black"
+			}else if(colGrid[i].col==="black"){
+				ctx.fillStyle = "green"
+				ctx.strokeStyle = "green"
+				ctx.lineWidth = 0
+				colGrid[i].col ="green"
+			}else if(colGrid[i].col==="green"){
+				ctx.fillStyle = "red"
+				ctx.strokeStyle = "red"
+				ctx.lineWidth = 0
+				colGrid[i].col ="red"
+			}
+			//drawTriangle(ctx,triangle)	  
+			//ctx.globalAlpha = 1
+			*/
+        }
+		
+		
+		}
+		
+      }
+  
+	  
+function fillShapeWithTexture(canvasId, shapePoints) {
+
+
+  // Draw the shape on the separate canvas
+  //shapeCtx.fillStyle = 'black'
+  shapeCtx.fillStyle = 'green'
+  shapeCtx.fillRect(0,0,canvas.width,canvas.height)
+  shapeCtx.beginPath();
+  shapeCtx.moveTo(shapePoints[0].x, shapePoints[0].y);
+  
+  for (var i = 1; i < shapePoints.length; i++) {
+    shapeCtx.lineTo(shapePoints[i].x, shapePoints[i].y);
+  }
+  
+  shapeCtx.closePath();
+  shapeCtx.fillStyle = '#000'; // Set a solid color for the shape
+  //shapeCtx.fillStyle = 'green' 
+  shapeCtx.fill();
+
+  // Add random noise to the shape
+  var shapeImageData = shapeCtx.getImageData(0, 0, shapeCanvas.width, shapeCanvas.height);
+  var shapeData = shapeImageData.data;
+  
+  //for (var i = 0; i < shapeData.length; i += 4) {
+  //  var noise = Math.random() * 50; // Adjust the noise level as desired
+  //  shapeData[i] += noise;
+  //  shapeData[i + 1] += noise;
+  //  shapeData[i + 2] += noise;
+ // }
+  for (var i = 0; i < shapeData.length; i += 4) {
+		if(Math.random()<.03){	
+		 var noiseSize = Math.floor(Math.random()*6)+1
+		 var noise = Math.random() * 60-30; // Adjust the noise level as desired	
+		 if(Math.random()<.8)noiseSize=1
+		    for (var j = 0; j < 2; j++) {
+		      for (var k = 0; k < noiseSize; k++) {
+		        var pixelIndex = i + (j * shapeCanvas.width + k) * 4;
+			
+
+				shapeData[pixelIndex] += noise;
+		        shapeData[pixelIndex + 1] += noise;
+		        shapeData[pixelIndex + 2] += noise;
+		      }
+		    }
+		}
+  }
+ 
+  
+  shapeCtx.putImageData(shapeImageData, 0, 0);
+
+  // Draw the filled shape on the main canvas
+  mainCtx.drawImage(shapeCanvas, 0, 0);
+
+  // Add the texture pattern to the filled shape
+  pattern = mainCtx.createPattern(shapeCanvas, 'repeat');
+  ctx.fillStyle = pattern;
+  ctx.fill();
+}
+
+
+
+function stringToGrayscaleArray(str) {
+// Create an offline canvas
+//str="Q"
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  // Set the canvas size based on the string dimensions
+  const fontSize = 28; // Adjust the font size as needed
+  const width = str.length * fontSize;
+  const height = fontSize;
+
+  canvas.width = width;
+  canvas.height = height;
+
+  // Set font properties
+  context.font = `${fontSize}px arial`;//monospace
+  context.textBaseline = 'top';
+
+  // Draw the string onto the canvas
+  context.clearRect(0, 0, width, height);
+  context.fillStyle="white"
+  context.fillText(str, 0, 0);
+
+  // Get the pixel data of the canvas
+  const imageData = context.getImageData(0, 0, width, height).data;
+
+  // Convert the pixel data to grayscale array
+  const grayscaleArray = [];
+
+  for (let i = 0; i < imageData.length; i += 4) {
+    const r = imageData[i];
+    const g = imageData[i + 1];
+    const b = imageData[i + 2];
+
+    // Convert RGB values to grayscale using a common formula
+    const grayscale = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+
+    grayscaleArray.push(r);
+  }
+  
+
+  // Convert the 1D grayscale array to a 2D array
+  const rows = height;
+  const cols = width;
+  const grayscale2DArray = [];
+
+  for (let row = 0; row < rows; row++) {
+    const start = row * cols;
+    const end = start + cols;
+    grayscale2DArray.push(grayscaleArray.slice(start, end));
+  }
+
+  return grayscale2DArray;
+}
+
+// Example usage:
+
+//const grayscaleArray = stringToGrayscaleArray(str);
+
+
+
+
+</script>
+</body>
+</html>
