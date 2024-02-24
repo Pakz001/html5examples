@@ -25,7 +25,7 @@ Tools/BrushFactory. - phone(landscape/portait mode) - tablet (portrait/landscape
 
 
 <br><br>
-<img src="Media/A8B4083E-3FC8-47F8-A9FD-8F913AF3A322.jpeg" width="50%"></img><br>
+<img src="Games/populous/Media/git.png" width="50%"></img><br>
 *(Populous Amiga tiles made with moveTo lineTo commands)*
 <br><br><br>
 Dotate to author of this code repo. (Insert coin for book fund and productivity aim) <a href="https://www.paypal.me/RudyvanEtten/1">Donate on paypal</a>
