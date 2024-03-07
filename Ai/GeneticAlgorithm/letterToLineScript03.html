@@ -160,8 +160,8 @@ function convertToGrayscale(imageData) {
 
         var adds = false
         // add a random line
-        if(numOfLines<16 && Math.random()<.02){
-            var ll=Math.floor(Math.random()*3)
+        if(numOfLines<32 && Math.random()<.08){
+            var ll=Math.floor(Math.random()*1)
             for(var j=0;j<ll;j+=1){
             //numOfLines+=1
             adds=true
@@ -249,7 +249,7 @@ function convertToGrayscale(imageData) {
 
 
             // connect one point to a different point
-            if(Math.random()<.3){
+            if(Math.random()<.09){
             var s = Math.floor((Math.random()*numOfLines)*5)
             var e = Math.floor((Math.random()*numOfLines)*5)
             
@@ -257,12 +257,12 @@ function convertToGrayscale(imageData) {
             //var e = 3
             //s+=1
             //e+=1
-            if(Math.random()<.5){
+            //if(Math.random()<.5){
                 //s+=2;
-            }
-            if(Math.random()<.5){
+            //}
+            //if(Math.random()<.5){
                 //e+=2;
-            }
+            //}
 
             var xx0 = topPopulation[loc][s]            
             var yy0 = topPopulation[loc][s+1]
@@ -294,19 +294,19 @@ function convertToGrayscale(imageData) {
             var yy0 = y0;
             var xx1 = x1;
             var yy1 = y1;
-            if(Math.random()<.02){
+            if(Math.random()<.01){
                 xx0+=Math.abs((x1-x0))
                 mirrored = true
             }
-            if(Math.random()<.02){
+            if(Math.random()<.01){
                 xx1+=Math.abs((x1-x0))
                 mirrored = true
             }
-            if(Math.random()<.02){
+            if(Math.random()<.01){
                 xx0-=Math.abs((x1-x0))
                 mirrored = true
             }
-            if(Math.random()<.02){
+            if(Math.random()<.01){
                 xx1-=Math.abs((x1-x0))
                 mirrored = true
             }
@@ -349,7 +349,7 @@ function convertToGrayscale(imageData) {
 
             // every now and then skip a line
             var nolin=true
-            if(Math.random()<.02)nolin=false
+            if(Math.random()<.1)nolin=false
             if(nolin){
             script.push(x0)
             script.push(y0)
@@ -422,14 +422,14 @@ function gameLoop() {
   // Update game state
 
 
-    for(var i=0;i<100;i+=1){
+    for(var i=0;i<3000;i+=1){
         // Get the array from the letter canvas
         const letterArray = canvasToArray(ctxLetter);
 
         // Draw random lines on the second canvas
         if(topPopulation.length>48)topPopulation.shift()
         const randomLines = Math.floor(Math.random() * 5) + 1; // 1 to 10 random lines
-        if(topPopulation.length>4 && Math.random()<.95){
+        if(topPopulation.length>4 && Math.random()<.99){
             drawLinesTopPopulation(ctxLines,Math.floor(Math.random()*topPopulation.length))
         }else{
         drawLines(ctxLines, randomLines);
