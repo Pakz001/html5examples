@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Draw and Compare</title>
+</head>
+<body>
+    <canvas id="canvasLetter" width="32" height="32" style="border:1px solid #000;"></canvas>
+    <canvas id="canvasLines" width="32" height="32" style="border:1px solid #000;"></canvas>
+    <canvas id="canvasHighest" width="32" height="32" style="border:1px solid #000;"></canvas>
+    <canvas id="canvasProgress" width="32" height="32" style="border:1px solid #000;"></canvas>
+    <br>
+    <textarea id="myTextareaId" rows="15" cols="48"></textarea>
+    <script>
+    //document.addEventListener('DOMContentLoaded', function() {
+    const canvasLetter = document.getElementById('canvasLetter');
+    const ctxLetter = canvasLetter.getContext('2d');
+    const canvasLines = document.getElementById('canvasLines');
+    const ctxLines = canvasLines.getContext('2d');
+    const canvasHighest = document.getElementById('canvasHighest');
+    const ctxHighest = canvasHighest.getContext('2d');
+    const canvasProgress = document.getElementById('canvasProgress');
+    const ctxProgress = canvasProgress.getContext('2d');
+
+    const myTextarea = document.getElementById('myTextareaId');
+    myTextarea.value = "(lineCount:x1,y1,x2,y2,lineWidth,,,) \n\nScript Output.. :"; 
+
+function calculateSimilarity(arr1, arr2) {
+  if (arr1.length !== arr2.length) {
+    throw new Error("Input arrays must have the same length.");
+  }
+
+  let count = 0;
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] === arr2[i]) {
+      count++;
+    }
+  }
+
+  const similarityPercentage = count / arr1.length;
+  return similarityPercentage;
+}
+
+function convertToGrayscale(imageData) {
+  for (let i = 0; i < imageData.length; i++) {
+    const pixel = imageData[i];
+
+    // Extract the red, green, and blue components from the pixel
+    const red = (pixel >> 16) & 0xff;
+    const green = (pixel >> 8) & 0xff;
+    const blue = pixel & 0xff;
+
+    // Calculate the grayscale value using the luminosity method
+    const grayscale = Math.round(0.299 * red + 0.587 * green + 0.114 * blue);
+
+    // Create a new pixel value with equal RGB components
+    var newPixel = (grayscale << 16) | (grayscale << 8) | grayscale;
+
+    // Replace the original pixel with the new grayscale pixel
+    if(newPixel<1000){
+    newPixel = 5
+    }else{
+        newPixel = 16777215
+    }
+    imageData[i] = newPixel;
+  }
+
+  return imageData;
+}
+
+    // Function to draw a letter on a canvas
+    function drawLetter(ctx, letter) {
+        ctx.fillStyle = "white"
+        ctx.fillRect(0,0,32,32)
+        ctx.fillStyle = "#000";
+        ctx.font = "28px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(letter, canvasLetter.width / 2, canvasLetter.height / 2);
+    }
+
+    var script = [0,0,0,0,0]
+    // Function to draw random lines on a canvas
+    function drawHighest(ctx, loc=0) {
+        ctxProgress.fillStyle = 'red';
+        ctxProgress.fillRect(0, 0, 32, 32); 
+        // Progress rectangle
+        ctxProgress.fillStyle = 'blue';
+        const progressWidth = (32/1*(highest-.95))*10
+        ctxProgress.fillRect(0, 0, progressWidth, 32);
+
+        ctx.fillStyle = "white"
+        ctx.fillRect(0,0,32,32)
+        ctx.fillStyle = "#000";
+        var l = script[0]
+        //if(Math.random()<.001)console.log(topPopulation[loc]+","+loc)
+        var numOfLines = l
+        //if(Math.random()<0.01)console.log(numOfLines)
+
+
+
+        var num = 0
+        //script.push(numOfLines)
+        for (let i = 0; i < numOfLines; i++) {
+            //const x0 = Math.random() * canvasLines.width;
+            //const y0 = Math.random() * canvasLines.height;
+            //const x1 = Math.random() * canvasLines.width;
+            //const y1 = Math.random() * canvasLines.height;
+            //script.push(x0)
+            //script.push(y0)
+            //script.push(x1)
+            //script.push(y1)
+
+
+            num+=1
+            var x0 = script[num]//+(Math.floor(Math.random()*2)-2)
+            num+=1
+            var y0 = script[num]//+(Math.floor(Math.random()*2)-2)
+            num+=1
+            var x1 = script[num]//+(Math.floor(Math.random()*2)-2)
+            num+=1
+            var y1 = script[num]//+(Math.floor(Math.random()*2)-2)
+
+
+            num+=1
+            var lw = script[num]
+            //ctx.fillStyle = "#000";
+            ctx.lineWidth = lw//+//Math.floor(Math.random()*3)
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.stroke();
+        }
+    }
+
+    function drawLines(ctx, numOfLines) {
+        ctx.fillStyle = "white"
+        ctx.fillRect(0,0,32,32)
+        ctx.fillStyle = "#000";
+        script = []
+        script.push(numOfLines)
+        for (let i = 0; i < numOfLines; i++) {
+            const x0 = Math.random() * canvasLines.width;
+            const y0 = Math.random() * canvasLines.height;
+            var a = x0+(Math.cos(Math.random()*(Math.PI)))*Math.random()*12
+            var b = y0+(Math.sin(Math.random()*(Math.PI)))*Math.random()*12
+
+            const x1 = a*=2//Math.random() * canvasLines.width;
+            const y1 = b+=2//Math.floor(Math.random()*12-11)//Math.random() * canvasLines.height;
+            script.push(Math.floor(x0))
+            script.push(Math.floor(y0))
+            script.push(Math.floor(x1))
+            script.push(Math.floor(y1))
+            //ctx.fillStyle = "#000";
+            var lw = 2//Math.floor(Math.random()*2+1)
+            ctx.lineWidth = lw
+            script.push(Math.floor(lw))
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.stroke();
+        }
+    }
+// Function to draw random lines on a canvas
+    function drawLinesTopPopulation(ctx,loc=0) {
+        ctx.fillStyle = "white"
+        ctx.fillRect(0,0,32,32)
+        ctx.fillStyle = "#000";
+        var l = topPopulation[loc][0]
+        //if(Math.random()<.001)console.log(topPopulation[loc]+","+loc)
+        var numOfLines = l
+        //if(l===NaN)return
+        //if(script.length+1/5<script[0]){
+        //    script.length=(script[0]+1)*5
+       // }
+        //if(Math.random()<0.01)console.log(numOfLines)
+        script = []
+        script.push(numOfLines)
+
+        var gof = .97
+        if(Math.random()<.5)gof=0
+        //pick a line point and add a random destination
+        if(highest>gof && numOfLines<32 && highest<.995 && Math.random()<.4){
+
+            var s = Math.floor(Math.random()*(numOfLines-1)*5)
+            //s+=1
+            var xx0 = topPopulation[loc][s]            
+            var yy0 = topPopulation[loc][s+1]
+        
+            var xx1 = xx0+Math.random()*9-8           
+            var yy1 = yy0+Math.random()*9-8
+            //if(Math.random()<.001)console.log(yy0 + ":-"+topPopulation[loc])
+            script[0]+=1
+            script.push(Math.floor(xx0))
+            script.push(Math.floor(yy0))
+            script.push(Math.floor(xx1))
+            script.push(Math.floor(yy1))
+            //num+=1
+            var lw = 2
+            script.push(Math.floor(lw))
+        }
+
+
+        var adds = false
+        // add a random line
+        if(numOfLines<32 && highest<.985 && Math.random()<.1){ //0.2
+            //if(Math.random()<0.001)console.log("sdfs")
+            //var ll=Math.floor(Math.random()*2)
+            //for(var j=0;j<ll;j+=1){
+            //numOfLines+=1
+            //adds=true
+            var xx0 = Math.random() * canvasLines.width;
+            var yy0 = Math.random() * canvasLines.height;
+            
+            var xx1 = 0//Math.random() * canvasLines.width;
+            var yy1 = 0//Math.random() * canvasLines.height;
+            //if(Math.random()<.99){
+            xx1=xx0+Math.random()*17-16
+            yy1=yy0+Math.random()*17-16
+            //}
+            script[0]+=1
+            script.push(Math.floor(xx0))
+            script.push(Math.floor(yy0))
+            script.push(Math.floor(xx1))
+            script.push(Math.floor(yy1))
+            var lw = 2//Math.floor(Math.random()*2+1)
+            //ctx.fillStyle = "#000";
+            ctx.lineWidth = lw//+//Math.floor(Math.random()*3)
+            //if(Math.random()<.1)lw+=Math.floor(Math.random()*3-3)
+            script.push(Math.floor(lw))
+            ctx.fillStyle = 'black'
+            ctx.beginPath();
+            ctx.moveTo(xx0, yy0);
+            ctx.lineTo(xx1, yy1);
+            ctx.stroke();
+            //}
+        }
+
+        //script.push(numOfLines)
+        //return
+        var num = 0
+        //script.push(numOfLines)
+        for (let i = 0; i < numOfLines+1; i++) {
+            
+            //const x0 = Math.random() * canvasLines.width;
+            //const y0 = Math.random() * canvasLines.height;
+            //const x1 = Math.random() * canvasLines.width;
+            //const y1 = Math.random() * canvasLines.height;
+            //script.push(x0)
+            //script.push(y0)
+            //script.push(x1)
+            //script.push(y1)
+
+            // every now and then shrink list
+            
+            if(Math.random()<.0000010 && numOfLines>1){//0015
+                //num+=5
+                //numOfLines-=1
+                //console.log("mirror")
+
+                script[0]-=1
+                script.splice(i,5)
+            }
+            if(highest>0.99 && Math.random()<.0000025 && numOfLines>1){//0015
+                //num+=5
+                //numOfLines-=1
+                //console.log("mirror")
+
+                script[0]-=1
+                script.splice(i,5)
+            }
+
+            num+=1
+            var x0 = topPopulation[loc][num]//+(Math.floor(Math.random()*2)-2)
+            num+=1
+            var y0 = topPopulation[loc][num]//+(Math.floor(Math.random()*2)-2)
+            num+=1
+            var x1 = topPopulation[loc][num]//+(Math.floor(Math.random()*2)-2)
+            num+=1
+            var y1 = topPopulation[loc][num]//+(Math.floor(Math.random()*2)-2)
+
+
+            // find angle between line and lengthen
+            if(Math.random()<0.004 || (highest>.99 && Math.random()<0.1)){//005
+                
+                const dx = x1 - x0;
+                const dy = y1 - y0;
+                var an = Math.atan2(dy, dx)// * 180 / Math.PI; // Result in degrees
+                if(Math.random()<.5){
+                if(Math.random()<.5){
+                    x1-=Math.cos(an)*(Math.random()*7)//10
+                    y1-=Math.sin(an)*(Math.random()*7)
+                    
+                }else{
+                    x0-=Math.cos(an)*(Math.random()*7)
+                    y0-=Math.sin(an)*(Math.random()*10)
+                
+                }                
+                }else{
+                if(Math.random()<.5){
+                    x1+=Math.cos(an)*(Math.random()*7)
+                    y1+=Math.sin(an)*(Math.random()*7)
+                    
+                }else{
+                    x0+=Math.cos(an)*(Math.random()*7)
+                    y0+=Math.sin(an)*(Math.random()*7)
+                
+                }}
+            }
+
+            // connect one point to a random point
+            if(highest<0.99 && Math.random()<.0005){//001 .. 0005
+                        
+
+            var s = Math.floor(Math.random()*(numOfLines-1)*5)
+            s+=1
+            var xx0 = topPopulation[loc][s]            
+            var yy0 = topPopulation[loc][s+1]
+            
+            var xx1 = xx0+Math.random()*6-5            
+            var yy1 = yy0+Math.random()*6-5
+            script[0]+=1
+            script.push(Math.floor(xx0))
+            script.push(Math.floor(yy0))
+            script.push(Math.floor(xx1))
+            script.push(Math.floor(yy1))
+            //num+=1
+            var lw = 1
+            //ctx.fillStyle = "#000";
+            ctx.lineWidth = lw//+//Math.floor(Math.random()*3)
+            //if(lw<3 && lw>1 && Math.random()<.1)lw+=Math.floor(Math.random()*3-1.5)
+            //if(lw>4)lw=2
+            script.push(Math.floor(lw))
+            ctx.lineWidth = lw
+            ctx.fillStyle = 'black'
+            ctx.beginPath();
+            ctx.moveTo(xx0, yy0);
+            ctx.lineTo(xx1, yy1);
+            ctx.stroke();                
+
+            }       
+
+
+
+            // connect one point to a different point
+            if(numOfLines>4 && highest>.95 && highest<.998 && Math.random()<.005){//0.05
+            var s = Math.floor((Math.random()*numOfLines)*5)
+            var e = Math.floor((Math.random()*numOfLines)*5)
+            
+            //var s = 1
+            //var e = 3
+            //s+=1
+            //e+=1
+            //if(Math.random()<.5){
+                //s+=2;
+            //}
+            //if(Math.random()<.5){
+                //e+=2;
+            //}
+            s+=1
+            e+=1
+            //if(Math.random()<0.001)console.log(topPopulation[loc][s])
+            var xx0 = topPopulation[loc][s]            
+            var yy0 = topPopulation[loc][s+1]
+            var xx1 = topPopulation[loc][0]            
+            var yy1 = topPopulation[loc][1]
+            if(Math.random()<.01){
+            
+            //console.log(xx0+","+yy0+","+xx1+","+yy1+":"+loc)
+            //console.log(topPopulation[loc])
+            //console.log("S:"+script)
+            }
+            script[0]+=1
+            script.push(Math.floor(xx0))
+            script.push(Math.floor(yy0))
+            script.push(Math.floor(xx1))
+            script.push(Math.floor(yy1))
+            //num+=1
+            var lw = 1
+            //ctx.fillStyle = "#000";
+            ctx.lineWidth = lw//+//Math.floor(Math.random()*3)
+            if(lw<3 && lw>1 && Math.random()<.1)lw+=Math.floor(Math.random()*3-1.5)
+            if(lw>3)lw=2
+            script.push(Math.floor(lw))
+            ctx.lineWidth = lw
+            ctx.fillStyle = 'black'
+            ctx.beginPath();
+            ctx.moveTo(xx0, yy0);
+            ctx.lineTo(xx1, yy1);
+            ctx.stroke();                
+
+            }
+            
+            //mirror x
+            if(highest > .975 && highest<0.99 && y0!=y1){
+                
+            var mirrored = false;
+            var xx0 = x0;
+            var yy0 = y0;
+            var xx1 = x1;
+            var yy1 = y1;
+            if(Math.random()<.000001){
+                xx0+=Math.abs((x1-x0))
+                mirrored = true
+                
+            }
+            if(Math.random()<.000001){
+                xx1+=Math.abs((x1-x0))
+                mirrored = true
+            }
+            if(Math.random()<.000001){
+                xx0-=Math.abs((x1-x0))
+                mirrored = true
+            }
+            if(Math.random()<.000001){
+                xx1-=Math.abs((x1-x0))
+                mirrored = true
+                
+            }
+            if(mirrored && numOfLines<32){
+            script[0]+=1
+            script.push(Math.floor(xx0))
+            script.push(Math.floor(yy0))
+            script.push(Math.floor(xx1))
+            script.push(Math.floor(yy1))
+            //num+=1
+            var lw = 1//topPopulation[loc][num]
+            //ctx.fillStyle = "#000";
+            ctx.lineWidth = lw//+//Math.floor(Math.random()*3)
+            if(lw<3 && lw>1 && Math.random()<.1)lw+=Math.floor(Math.random()*3-1.5)
+            if(lw>3)lw=2
+            script.push(Math.floor(lw))
+            ctx.lineWidth = lw
+            ctx.fillStyle = 'black'
+            ctx.beginPath();
+            ctx.moveTo(xx0, yy0);
+            ctx.lineTo(xx1, yy1);
+            ctx.stroke();                
+            }
+            }
+
+            // randomize
+            if(highest<0.985){
+            if(Math.random()<.0003){
+                x0+=Math.floor(Math.random()*17)-8
+            }
+            if(Math.random()<.0003){
+                y0+=Math.floor(Math.random()*17)-8
+                
+            }
+            if(Math.random()<.0003){
+                x1+=Math.floor(Math.random()*17)-8
+                
+            }
+            if(Math.random()<.0003){
+                y1+=Math.floor(Math.random()*17)-8
+                
+            }
+            }
+            // randomize short (grow lines(or dots) into a better fit)
+            if(Math.random()<.05){
+                x0+=Math.floor(Math.random()*2)-1
+            }
+            if(Math.random()<.05){
+                y0+=Math.floor(Math.random()*2)-1
+                
+            }
+            if(Math.random()<.05){
+                x1+=Math.floor(Math.random()*2)-1
+                
+            }
+            if(Math.random()<.05){
+                y1+=Math.floor(Math.random()*2)-1
+                
+            }
+
+            // every now and then skip a line
+            //var nolin=true
+            //if(Math.random()<.00001)nolin=false
+            //if(nolin){
+            script.push(Math.floor(x0))
+            script.push(Math.floor(y0))
+            script.push(Math.floor(x1))
+            script.push(Math.floor(y1))
+            num+=1
+            var lw = topPopulation[loc][num]
+            //ctx.fillStyle = "#000";
+            ctx.lineWidth = lw//+//Math.floor(Math.random()*3)
+            if(lw>0 && Math.random()<.005)lw+=Math.floor(Math.random()*3-1.5)
+            if(Math.random()<.01)lw=1
+            if(lw>3)lw=2
+            if(lw<1)lw=1
+            script.push(Math.floor(lw))
+            ctx.lineWidth = lw
+            ctx.fillStyle = 'black'
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.stroke();
+            //}else{
+            //    script[0]-=1
+            //}
+
+        }
+        // clean script
+        while(isNaN(script[script.length-1])){
+            script.length=script.length-1
+            //console.log("werwer")
+        }
+        for(var i=0;i<script.length;i+=1){
+            if(isNaN(script[i])){
+                script.length=0
+                ctx.clearRect(0,0,32,32)
+            }
+        }
+        //if(Math.random()<.00001)console.log(script)
+
+    }
+    
+
+    // Function to convert canvas content to an array
+    function canvasToArray(ctx) {
+        const imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+        var arr = new Uint32Array(imgData.data.buffer);
+        arr = convertToGrayscale(arr)
+        //console.log(arr)
+        return arr;
+    }
+
+    // Function to check if two arrays are identical
+    function arraysMatch(arr1, arr2) {
+        if (arr1.length !== arr2.length) return false;
+        for (let i = 0; i < arr1.length; i++) {
+            if (arr1[i] !== arr2[i]) return false;
+        }
+        return true;
+    }
+
+
+    //
+    // Here you place the letter of the alphabet(or ??) and
+    // then the genetic algorithm code wil try and turn
+    // that letter into drawing instruction. This using up to 10+/-
+    // lines of various width.
+    // It might take 10 million passes at this point of development
+    // (Graphics to drawing instructions - genetic algorithm)
+    // (Letter to line script.)
+    //
+    // Draw a letter 'A' on the first canvas
+    //drawLetter(ctxLetter, 'A');
+
+    var linesArray = []
+    var highest = .7
+    var topPopulation = []
+    const alphabet = [
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+    "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" ,
+    "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "=", 
+    "+", "[", "]", "{", "}", "|", ";", ":", "'", "\"", ",", "<", ".",
+    ">", "/", "?"
+
+    ];
+
+    function newLetter(num){
+        
+        if(num>alphabet.length-1)return false
+
+        cnt=0
+        linesArray = []
+        highest = .7
+        topPopulation = []
+        drawLetter(ctxLetter, alphabet[num]);
+        return true
+    }
+
+    //});
+    //drawLinesTopPopulation(ctxLines,topPopulation.length-1)
+    //console.log(i)
+    //console.log(linesArray)
+
+var cnt=0//count the amounts of passes
+var letterCount = 0; // Which letter are we at
+newLetter(letterCount)
+function gameLoop() {
+  // Update game state
+
+ 
+    for(var i=0;i<15000;i+=1){
+        // Get the array from the letter canvas
+        const letterArray = canvasToArray(ctxLetter);
+
+        // Draw random lines on the second canvas
+        if(topPopulation.length>48)topPopulation.shift()
+        const randomLines = Math.floor(Math.random() * 5) + 1; // 1 to 10 random lines
+        if(topPopulation.length>4 && highest>0.93){
+            drawLinesTopPopulation(ctxLines,Math.floor(Math.random()*topPopulation.length))
+        }else{
+        drawLines(ctxLines, randomLines);
+        }
+        // Get the array from the lines canvas
+        linesArray = canvasToArray(ctxLines);
+
+        // Check if both arrays are identical and return the result
+        const result = arraysMatch(letterArray, linesArray);
+        //const result = arraysMatch(letterArray, letterArray);
+        var t = calculateSimilarity(letterArray, linesArray)
+        //if(t>highest){
+            var doit=false
+            if(Math.random()<0.000001 && t>.986 && t>highest-0.025)doit=true
+            if(t>highest){
+                doit=true
+                highest = t
+                drawHighest(ctxHighest);                
+            }
+            if(t===highest && Math.random()<0.0001) {
+                doit=true
+                highest = t
+                drawHighest(ctxHighest);                
+            }
+        if(doit){
+            
+            topPopulation.push(script)
+            topPopulation.push(script)
+            if(highest>0.98){
+                topPopulation.push(script)
+                topPopulation.push(script)
+                topPopulation.push(script)
+                topPopulation.push(script)
+                topPopulation.push(script)
+            }
+            drawLinesTopPopulation(ctxLines,topPopulation.length-1)
+            console.log("New highest at :" + t + " num : "+topPopulation.length+" script len "+script.length)
+        }
+            if(result===true)console.log('Are the two canvas arrays identical?', result);
+        if(Math.random()<0.000005)console.log(cnt)
+        cnt+=1
+        }
+//drawLinesTopPopulation(ctxLines,topPopulation.length-1)
+  // Render game graphics
+        //if(highest>0.999){
+        if(highest>0.999){    
+            console.log("close at :"+t);
+            myTextarea.value+="script:"+alphabet[letterCount]+"\n"+script+"\n\n\n"
+            drawLinesTopPopulation(ctxLines,topPopulation.length-1)
+            letterCount+=1
+            if(newLetter(letterCount)){
+                requestAnimationFrame(gameLoop);
+            }
+        }else{
+
+  requestAnimationFrame(gameLoop);
+        }
+}
+
+// Start the game loop
+requestAnimationFrame(gameLoop);
+
+    </script>
+</body>
+</html>
