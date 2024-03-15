@@ -1,5 +1,7 @@
 Some examples of the output of the 'canvas 2 line coordinates' tool.\
 
+These below are not tested to see if these actually contained the result. Needs some parsing to use. put the line coordinates into use. x1,y1,x2,y2,lineWidth. The first number in a script is the number of lines sets.
+
 (lineCount:x1,y1,x2,y2,lineWidth,,,) 
 
 Script Output.. :script:A
