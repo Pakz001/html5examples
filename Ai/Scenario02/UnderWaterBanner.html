@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worms with Random Walk Movement</title>
+<style>
+  body, html {
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<canvas id="wormCanvas"></canvas>
+<script>
+  const canvas = document.getElementById('wormCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight/8;
+
+  const numWorms = 14;
+  const maxTailSize = 50;//50
+  const minTailSize = 25
+  const maxTailWidth = (window.innerHeight+window.innerWidth)/80; // 20 Max tail circle radius
+  const minTailWidth = (window.innerHeight+window.innerWidth)/200; // 9 Min tail circle radius
+  const maxSpeed = 5; // Max speed for random walk
+  const minSpeed = 1; // Min speed for random walk
+
+  
+  
+  
+  
+  // Define the base color (you can adjust these values)
+//const baseColor = { r: 100, g: 60, b: 40 };
+//const baseColor = { r: 200, g: 110, b: 40 };
+const baseColor = { r: 30, g: 144, b: 255 };
+// Define the mixing ratio (values between 0 and 1)
+const mixRatio = .93; // This mixes colors halfway between original and base
+
+// Create the mycols array with 10 colors and mix with base color
+const mycolz = [
+  { r: 255, g: 0, b: 0 }, // red
+  { r: 0, g: 255, b: 0 }, // green
+  { r: 0, g: 0, b: 255 }, // blue
+  { r: 128, g: 0, b: 128 }, // purple
+  { r: 255, g: 255, b: 0 }, // yellow
+  { r: 0, g: 0, b: 128 }, // navy
+  { r: 255, g: 165, b: 0 }, // orange
+  { r: 139, g: 69, b: 19 }, // brown
+  { r: 0, g: 0, b: 0 }, // black
+  { r: 255, g: 255, b: 255 }, // white
+].map((color) => {
+  return {
+    r: Math.round(color.r * (1 - mixRatio) + baseColor.r * mixRatio),
+    g: Math.round(color.g * (1 - mixRatio) + baseColor.g * mixRatio),
+    b: Math.round(color.b * (1 - mixRatio) + baseColor.b * mixRatio),
+  };
+});
+
+var mycols =[]
+
+mycolz.forEach((color, index) => {
+  mycols.push( `rgb(${color.r}, ${color.g}, ${color.b})`)
+});
+  
+  
+  
+  
+  class Worm {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.tail = [];
+      this.size = minTailWidth + Math.random() * (maxTailWidth - minTailWidth);
+      this.tailSize = minTailSize + Math.random() * (maxTailSize - minTailSize);
+      this.angle = Math.random() * Math.PI * 2;
+      this.speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
+      this.turnSpeed = Math.random() * 0.1 - 0.05;
+	  this.maxTail = Math.floor(Math.random()*10)+8
+	  this.col = Math.floor(Math.random()*10)
+	  //this.col = 2
+      this.tailSize=200
+	  //if(Math.random()<.5)this.tailSize*=1.2
+	      this.stepsAhead = [];
+    this.populateStepsAhead();
+    }
+	
+	populateStepsAhead() {
+    	while (this.stepsAhead.length < 50) {
+     // this.turnSpeed += Math.random() * 0.2 - 0.1; // Adjust turn speed
+	       // Randomly change turn speed
+      this.turnSpeed += (Math.random() * 0.2 - 0.1);
+	        this.turnSpeed += (Math.random() * 0.1 - 0.05);
+			      this.turnSpeed += (Math.random() * 0.1 - 0.05);
+				  this.turnSpeed += (Math.random() * 0.1 - 0.05);
+  	 if(Math.abs(this.turnSpeed)>.15  ){
+		 this.turnSpeed/=2
+
+	  }
+      this.angle += this.turnSpeed;
+      const step = {
+        x: Math.cos(this.angle) * this.speed,
+        y: Math.sin(this.angle) * this.speed
+      };
+      this.stepsAhead.push(step);
+    }
+	  	for(var q=0;q<this.stepsAhead.length;q+=7){
+		this.stepsAhead[q].x+=Math.random()-.5
+		this.stepsAhead[q].y+=Math.random()-.5
+	}
+  }
+
+  move() {
+
+    if (this.stepsAhead.length > 0) {
+      const step = this.stepsAhead.shift(); // Take the next step from the array
+
+      // Keep worms within canvas bounds
+      const nextX = this.x + step.x;
+      const nextY = this.y + step.y;
+      if (nextX < 0 || nextX > canvas.width || nextY < 0 || nextY > canvas.height) {
+        this.angle += Math.PI;
+      } else {
+        this.x = nextX;
+        this.y = nextY;
+      }
+
+      this.tail.unshift({x: this.x, y: this.y});
+      if (this.tail.length > this.tailSize) {
+        this.tail.pop();
+      }
+    }
+
+    this.populateStepsAhead(); // Refresh the steps array
+  }
+  
+    move2() {
+      // Randomly change turn speed
+      this.turnSpeed += (Math.random() * 0.2 - 0.1);
+	        this.turnSpeed += (Math.random() * 0.1 - 0.05);
+			      this.turnSpeed += (Math.random() * 0.1 - 0.05);
+				  this.turnSpeed += (Math.random() * 0.1 - 0.05);
+  	 if(Math.abs(this.turnSpeed)>.2  ){
+		 this.turnSpeed/=2
+
+	  }
+      // Randomly change speed within the min and max range
+      this.speed = minSpeed + Math.random() * (maxSpeed - minSpeed);
+
+      this.angle += this.turnSpeed;
+
+      // Keep worms within canvas bounds
+      const nextX = this.x + Math.cos(this.angle) * this.speed;
+      const nextY = this.y + Math.sin(this.angle) * this.speed;
+      if (nextX < 0 || nextX > canvas.width || nextY < 0 || nextY > canvas.height) {
+        this.angle += Math.PI;
+      } else {
+        this.x = nextX;
+        this.y = nextY;
+      }
+
+      this.tail.unshift({x: this.x, y: this.y})//col:Math.floor(Math.random()*10)});
+      if (this.tail.length > this.tailSize) {
+        this.tail.pop();
+      }
+    }
+
+    draw() {
+		var tailWidth = this.size
+      //for (let i = 0; i < this.tail.length-16; i++) {
+       // const opacity = 1 - i / this.tail.length;
+        //var tailWidth = maxTailWidth - (maxTailWidth - minTailWidth) * (i / this.tail.length);
+		//var tailWidth = this.maxTail - (this.maxTail - minTailWidth) * (i / this.tail.length);
+		//tailWidth-=i/3;
+		//if(tailWidth<1)tailWidth=1
+        //ctx.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        //ctx.beginPath();
+        //ctx.arc(this.tail[i].x, this.tail[i].y, tailWidth, 0, Math.PI * 2);
+        //ctx.fill();
+		//}
+		
+		
+		
+		
+		//for (let i = 0; i < this.tail.length-16; i+=1) {
+			//ctx.fillStyle = "black";
+            //ctx.fillRect(this.tail[0].x-1, this.tail[0].y-1, tailWidth+2, tailWidth+2);
+			var oldTailWidth = tailWidth
+			//tailWidth = this.tail[0].size
+            ctx.fillStyle = "black";
+            for (let i = 1; i < this.tail.length; i+=1) {
+				ctx.globalAlpha = .5
+				tailWidth-=1
+				if(tailWidth<1)tailWidth=1
+                //ctx.fillRect(this.tail[i].x+1, this.tail[i].y+1, tailWidth+2, tailWidth+2);
+				
+				drawFilledCircleBlack(ctx,this.tail[i].x+1, this.tail[i].y+1, tailWidth-(i/2)-1)
+				ctx.globalAlpha = .05
+				if(i>1 && i<this.tail.length-2){
+					
+					//ctx.fillRect(this.tail[i].x+3, this.tail[i].y+3, tailWidth-(i/2)+2, tailWidth-(i/2)+2);
+					drawFilledCircleBlack(ctx,this.tail[i].x+3, this.tail[i].y+3, tailWidth-(i/2)+1)
+				}
+				if(i>2 && i<this.tail.length/2){
+					
+					//ctx.fillRect(this.tail[i].x+5, this.tail[i].y+5, tailWidth-(i/2)+4, tailWidth-(i/2)+4);
+					drawFilledCircleBlack(ctx,this.tail[i].x+5, this.tail[i].y+5, tailWidth-(i/2)+2)
+				}
+				if(i==Math.floor(this.tail.length/10)){
+					
+					//ctx.fillRect(this.tail[i].x+7, this.tail[i].y+7, tailWidth-(i/2)+5, tailWidth-(i/2)+5);
+					drawFilledCircleBlack(ctx,this.tail[i].x+5, this.tail[i].y+5, tailWidth-(i/2)+3)
+				}
+            }
+			// ring of holy
+			
+            ctx.fillStyle = this.tailColor;
+            //ctx.fillRect(this.tail[0].x, this.tail[0].y, tailWidth, tailWidth);
+			//if(num%2===0){
+				//ctx.globalAlpha=0.1
+			//drawFilledCircle(ctx,this.tail[0].x, this.tail[0].y, tailWidth,"white")
+		//}else{
+			
+			ctx.globalAlpha=0.1
+			drawFilledCircle(ctx,this.tail[0].x, this.tail[0].y, tailWidth,"white")
+			
+		//}
+			
+            //ctx.fillStyle = this.tailColor;
+            //for (let i = 1; i < this.tail.length; i++) {
+            //    ctx.fillRect(this.tail[i].x, this.tail[i].y, tailWidth-(i/2), tailWidth-(i/2));
+            //}
+			//ctx.fillStyle = this.tailColor;
+			ctx.globalAlpha = 1
+			tailWidth=oldTailWidth
+			for (let j = 1; j < 6; j+=1){
+            for (let i = 1; i < this.tail.length; i+=1) {
+				tailWidth-=1
+				if(tailWidth<1)tailWidth=1
+				ctx.fillStyle = 'rgb('+ j*60 +', '+ j*60+', '+ j*60 +')';
+                //ctx.fillRect(this.tail[i].x+j, this.tail[i].y+j, (tailWidth-(i/2))-j*2, (tailWidth-(i/2))-j*2);
+				drawFilledCircle(ctx,this.tail[i].x+j, this.tail[i].y+j, (tailWidth-(i/2))-j*2,'rgb('+ j*60 +', '+ j*60+', '+ j*60 +')')
+            }}
+			
+			tailWidth=oldTailWidth
+			for (let i = 1; i < this.tail.length; i+=1) {
+				ctx.globalAlpha=.2
+				tailWidth-=1
+				if(tailWidth<1)tailWidth=1
+				//ctx.fillStyle = "green"
+				
+                //ctx.fillRect(this.tail[i].x, this.tail[i].y, (tailWidth-(i/2)), (tailWidth-(i/2)));
+				//if(num%2===0){
+				//	drawFilledCircle(ctx,this.tail[i].x, this.tail[i].y, (tailWidth-(i/2)),"green")
+				//}else{
+				//	drawFilledCircle(ctx,this.tail[i].x, this.tail[i].y, (tailWidth-(i/2)),"purple")
+				//}
+                drawFilledCircle(ctx,this.tail[i].x, this.tail[i].y, (tailWidth-(i/2)),mycols[this.col])
+				//ctx.globalAlpha = 0.08
+				//drawFilledCircle(ctx,this.tail[i].x, this.tail[i].y, (tailWidth-(i/2)),"grey")
+			 //ctx.fillRect(this.tail[i].x, this.tail[i].y, (tailWidth-(i/2)), (tailWidth-(i/2)));
+			 	ctx.globalAlpha=.1
+				
+				drawFilledCircle(ctx,this.tail[i].x+tailWidth/3, this.tail[i].y+tailWidth/3, (tailWidth/2-(i/2)),"black")
+					
+			
+			
+			
+			
+			
+			ctx.globalAlpha=.16
+			if(i==Math.floor(this.tail.length/2-4)){
+				//
+
+			drawFilledCircle(ctx,this.tail[i].x+2, this.tail[i].y+2, (tailWidth-(i/2)-4),"white")
+			}
+            }
+			ctx.globalAlpha =1
+			tailWidth=oldTailWidth
+		
+		
+		
+		
+		
+		
+		
+      }
+    //}
+  }
+
+  const worms = [];
+  for (let i = 0; i < numWorms; i++) {
+    worms.push(new Worm());
+	
+  }
+ctx.font = "50px serif";
+  function loop() {
+	  ctx.fillStyle="dodgerblue"
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    worms.forEach(worm => {
+      worm.move();
+      worm.draw();
+    });
+    ctx.fillStyle = "white"
+		ctx.fillText("Welcome",window.innerWidth/4,
+		window.innerHeight/12)
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+  
+  
+  
+  
+  
+  
+  function drawFilledCircle(context, x, y, radius, color) {
+			if(radius<4)return
+			if(radius<0)radius=2
+  context.beginPath();
+  context.arc(x+radius/2, y+radius/2, radius, 0, 2 * Math.PI); // Draws a complete circle
+  context.fillStyle = color; // Sets the fill color
+  context.fill(); // Fills the circle with the specified color
+  context.closePath(); // Closes the path
+  //if(color==="black")return
+  ctx.fillStyle="white"
+  ctx.globalAlpha = 0.1
+  ctx.fillRect(x,y,radius/4,radius/4,radius/4)
+  ctx.fillRect(x+radius/3,y,radius/4,radius/4)
+  ctx.globalAlpha = 0.05
+  ctx.fillRect(x+radius/2,y,radius/4,radius/4)
+  ctx.fillRect(x+radius/3,y+radius/3,radius/4,radius/4)
+  ctx.fillRect(x+radius/2,y+radius/3,radius/4,radius/4)
+  
+
+  
+  //ctx.fillRect(x,y,radius/4,radius/4,radius/4)
+  //ctx.fillRect(x+radius/2,y,radius/4,radius/4)
+  //ctx.fillRect(x+radius/4,y+radius/2,radius/4,radius/4,radius/4)
+  ctx.fillStyle="black"
+  ctx.globalAlpha = 0.15
+  //ctx.fillRect(x+radius/2+radius/4,y+radius/2,radius/4,radius/4)
+  ctx.fillRect(x+radius/2+radius/4,y+radius/2,radius/6,radius/6)
+  ctx.globalAlpha = 0.2
+  ctx.fillRect(x+radius/3+radius/4,y+radius/2,radius/4,radius/4)
+ }
+ function drawFilledCircleBlack(context, x, y, radius) {
+			if(radius<4)return
+			if(radius<0)radius=2
+  context.beginPath();
+  context.arc(x+radius/2, y+radius/2, radius, 0, 2 * Math.PI); // Draws a complete circle
+  context.fillStyle = "black"; // Sets the fill color
+  context.fill(); // Fills the circle with the specified color
+  context.closePath(); // Closes the path
+  
+ }
+  
+  
+</script>
+</body>
+</html>
