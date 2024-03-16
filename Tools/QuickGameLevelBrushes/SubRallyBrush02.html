@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brown Canvas Drawing</title>
+    <style>
+        body { margin: 0; }
+        canvas {touch-action: none; /* Prevent scrolling on touch */ }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+        // Set canvas background color
+        ctx.fillStyle = 'rgb(155,66,0)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        var myScaleX = 5
+        var myScaleY = 5
+        ctx.scale(myScaleX,myScaleY)
+
+        var brushTrail = []
+
+        var brushRadius = 8
+
+        var currentBrush = 1
+
+
+
+        // Button properties
+        const buttonX = 10; // X-coordinate of the button top-left corner
+        const buttonY = 10; // Y-coordinate of the button top-left corner
+        const buttonWidth = 50; // Button width
+        const buttonHeight = 25; // Button height
+        const buttonText = "Br:"; // Button text
+        const textColor = "white"; // Text color
+        const buttonColor = "peru"; // Button background color
+        var buttonCount = 0
+     const timerId = setInterval(function() {
+        buttonCount +=1
+}, 10);    
+
+                // Track button state
+        let isButtonPressed = false;
+
+
+        // Check if a point is inside a rectangle
+        function isInsideButton(x, y) {
+            return (x >= buttonX && x <= buttonX + buttonWidth &&
+                    y >= buttonY && y <= buttonY + buttonHeight);
+        }
+        // Define drawing variables
+        let isDrawing = false;
+        let lastX, lastY;
+        let strokeColor = 'moccasin'; // Light brown
+
+        // Event listeners for touch and mouse input
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('touchmove', draw);
+
+        function startDrawing(e) {
+            
+            isDrawing = true;
+            //lastX = e.offsetX || e.touches[0].clientX;
+            //lastY = e.offsetY || e.touches[0].clientY;
+            var x=-1
+            var y=-1
+if (e.clientX && e.clientY) {
+                            x = e.offsetX
+                y = e.offsetY
+				LastX = x/myScaleX;
+				LastY = y/myScaleY;
+
+}
+			// get the last touch coordinates
+            //                x = e.offsetX
+            //    y = e.offsetY
+            if (e.touches) {
+            //if(e.changedTouches){
+			for(var i=0;i<e.changedTouches.length;i++){	
+				x = e.changedTouches[i].clientX;
+				y = e.changedTouches[i].clientY;				
+				LastX = x/myScaleX;
+				LastY = y/myScaleY;
+				//uiTouchStart = true;
+			}
+            //}else{
+            //    lastX = e.offsetX/myScaleX
+            //    lastY = e.offsetY/myScaleY
+            }
+
+            if (buttonCount>32 && isInsideButton(x/myScaleX,y/myScaleY)) {
+                
+                buttonCount = 0
+                isButtonPressed = true;
+                // Call a function for button press action (if needed)
+                //console.log("Button Clicked!"); // Example action
+                if(currentBrush===1){
+                    currentBrush = 2
+                }else if(currentBrush===2){
+                    currentBrush = 3
+                }else{
+					currentBrush =1
+                }
+
+                drawButton()
+                // Optional: Change button appearance on press (visual feedback)
+                // ctx.fillStyle = 'darkorange'; // Change button color on press
+                // ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight); // Redraw button
+            }
+
+
+
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            brushTrail = []
+
+
+
+        }
+
+
+        
+        var bwm=0.5 // brush width modifier
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.beginPath();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 5;
+
+            var currentX = e.offsetX || e.touches[0].clientX;
+            var currentY = e.offsetY || e.touches[0].clientY;
+            currentX /= myScaleX
+            currentY /= myScaleY
+
+            brushTrail.push({x:currentX,y:currentY})
+            // Draw an oval with slight offset for smoother trail
+            //ctx.moveTo(lastX + 2, lastY + 2);
+            //ctx.bezierCurveTo(lastX + currentX / 2, lastY, currentX, lastY + currentY / 2, currentX - 2, currentY - 2);
+            //ctx.bezierCurveTo(currentX, currentY - currentY / 2, lastX + currentX / 2, currentY, lastX, lastY);
+            //ctx.stroke();
+
+
+            if(currentBrush===1){
+            brush1(currentX,currentY)
+            }else if(currentBrush===2){
+            brush2(currentX,currentY)
+            }else{
+			brush3(currentX,currentY)
+            }
+            
+            lastX = currentX;
+            lastY = currentY;
+        }
+
+        // Draw the button on the canvas
+        function drawButton() {
+            ctx.fillStyle = buttonColor;
+            ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+
+            ctx.fillStyle = textColor;
+            ctx.font = "16px Arial";
+            const textX = buttonX + (buttonWidth - ctx.measureText(buttonText).width) / 2; // Center text
+            const textY = buttonY + buttonHeight / 2 + 5; // Center text vertically
+            ctx.fillText(buttonText+currentBrush, textX, textY);
+            
+        }
+
+        // Call draw function initially and on animation frame
+        drawButton();
+        window.requestAnimationFrame(drawButton);
+
+	function brush3(currentX,currentY){
+		var x,y
+		var bag = [1,1,1,1,2,2,2,2,3,4]
+		for(var i=0;i<2;i+=1){
+		x=currentX+=Math.random()*8-3
+		y=currentY+=Math.random()*8-3
+		
+		var a = bag[Math.floor(Math.random()*bag.length)]
+		
+		if(a===1){
+		ctx.fillStyle = 'rgb(253,136,1)'
+		ctx.fillRect(x,y,1,1)
+		ctx.fillStyle = 'rgb(112,30,1)'
+		ctx.fillRect(x+1,y+1,1,1)
+		}
+		if(a===2){
+		ctx.fillStyle = 'rgb(253,136,1)'
+		ctx.fillRect(x,y,1,1)
+		ctx.fillStyle = 'rgb(112,30,1)'
+		ctx.fillRect(x+1,y,1,1)
+		}
+		if(a===3){
+		ctx.fillStyle = 'rgb(253,136,1)'
+		ctx.fillRect(x,y,2,1)
+		ctx.fillStyle = 'rgb(112,30,1)'
+		ctx.fillRect(x+1,y+1,2,1)
+		}
+		if(a===4){
+		ctx.fillStyle = 'rgb(253,136,1)'
+		ctx.fillRect(x,y,2,1)
+		ctx.fillRect(x,y,1,2)
+		ctx.fillStyle = 'rgb(112,30,1)'
+		ctx.fillRect(x+1,y+1,2,1)
+		}
+	}
+		
+	}
+		
+function brush1(currentX,currentY){
+    
+            ctx.fillStyle = 'rgb(209,100,7)'
+            
+            for(var i=0;i<12;i+=1){            
+                drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius*(Math.random()))*bwm,.8*Math.random())
+                drawCircularPixelPattern(ctx,currentX-brushRadius,currentY,(brushRadius*(Math.random()))*bwm,Math.random()/150)
+
+            }
+            ctx.fillStyle = 'rgb(253,136,1)'
+            for(var i=0;i<9;i+=1){            
+                drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius/2)*bwm,.7)
+            }
+
+
+            if(Math.random()<.1){
+            bwm = Math.random()/2
+            bwm+=.5
+        }
+            if(brushTrail.length>7){
+                ctx.fillStyle = 'rgb(253,136,1)'
+                for(var j=0;j<brushTrail.length-5;j+=1){
+                if(Math.random()<.9){
+                    for(var i=0;i<14;i+=1){            
+                        drawCircularPixelPattern(ctx,brushTrail[j].x,brushTrail[j].y,((brushRadius/2.4)*(Math.random()))*bwm,.4)
+                    }
+                }
+                }
+                
+                for(var i=0;i<4;i+=1){
+                    brushTrail.shift()
+                }
+                
+            }
+}
+
+function brush2(currentX,currentY){
+    
+            ctx.fillStyle = 'rgb(84,17,3)'
+            
+            for(var i=0;i<12;i+=1){            
+                drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius*(Math.random()))*bwm,.8*Math.random())
+                drawCircularPixelPattern(ctx,currentX-brushRadius,currentY,(brushRadius*(Math.random()))*bwm,Math.random()/150)
+
+            }
+            ctx.fillStyle = 'rgb(112,30,1)'
+            for(var i=0;i<9;i+=1){            
+                drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius/2)*bwm,.7)
+            }
+
+
+            if(Math.random()<.1){
+            bwm = Math.random()/2
+            bwm+=.5
+        }
+            if(brushTrail.length>7){
+                //ctx.fillStyle = 'rgb(253,136,1)'
+                for(var j=0;j<brushTrail.length-5;j+=1){
+                if(Math.random()<.9)ctx.fillStyle = 'rgb(84,17,3)'
+                if(Math.random()<.2)ctx.fillStyle = 'rgb(112,30,1)'
+    
+                if(Math.random()<.8){
+                    for(var i=0;i<14;i+=1){            
+                        drawCircularPixelPattern(ctx,brushTrail[j].x,brushTrail[j].y,((brushRadius/2.4)*(Math.random()))*bwm,.4)
+                    }
+                }
+                }
+                
+                for(var i=0;i<4;i+=1){
+                    brushTrail.shift()
+                }
+                
+            }
+}
+
+
+
+function drawCircularPixelPattern(ctx, centerX, centerY, radius, density) {
+    // Clamp density value between 0 and 1
+    density = Math.max(0, Math.min(1, density)); 
+
+    const maxDist = radius;
+
+    // Iterate over potential pixel positions within the circle
+    for (let y = -radius; y <= radius; y++) {
+        for (let x = -radius; x <= radius; x++) {
+            const distance = Math.sqrt(x * x + y * y); // Distance of pixel from center
+
+            // Calculate a 'randomness' factor based on distance and desired density
+            const randomness = (maxDist - distance) / maxDist * density; 
+            if (Math.random() < randomness) {
+                // Draw the pixel
+                ctx.fillRect(centerX + x, centerY + y, 1, 1); 
+            }
+        }
+    }
+}
+    </script>
+</body>
+</html>
