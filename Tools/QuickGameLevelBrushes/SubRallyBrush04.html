@@ -52,6 +52,14 @@ class Button {
         ctx.font = "10px Arial";
         ctx.textAlign = "center";
         ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2 + 5); 
+        ctx.fillStyle = "rgb(255,255,255,.5)"
+        if(currentBrush==1 && this.text=="Edge")ctx.fillStyle = "rgb(255,255,255,1)"
+        if(currentBrush==2 && this.text=="Dark")ctx.fillStyle = "rgb(255,255,255,1)"
+        if(currentBrush==3 && this.text=="Rocks")ctx.fillStyle = "rgb(255,255,255,1)"
+        if(currentBrush==4 && this.text=="Darkest")ctx.fillStyle = "rgb(255,255,255,1)"
+
+        ctx.fillRect(this.x,this.y,this.width,2)
+        ctx.fillRect(this.x,this.y-2+this.height,this.width,2)
     }
 
     isClicked(x, y) {
@@ -64,11 +72,11 @@ class Button {
 
 // Create buttons
 const buttons = [
-    new Button(0, 2, 40, 16, "Edge", 'red'),
-    new Button(40, 2, 40, 16, "Dark", 'blue'),
-    new Button(80, 2, 40, 16, "Rocks", 'green'),
-    new Button(120, 2, 40, 16, "Darkest", 'blue'),
-    new Button(160, 2, 40, 16, "Clear", 'lightgray')
+    new Button(0, 2, 40, 16, "Edge", 'rgb(195,66,0)'),
+    new Button(40, 2, 40, 16, "Dark", 'rgb(215,66,0)'),
+    new Button(80, 2, 40, 16, "Rocks", 'rgb(235,66,0)'),
+    new Button(120, 2, 40, 16, "Darkest", 'rgb(255,66,0)'),
+    new Button(160, 2, 40, 16, "Clear", 'rgb(220,120,0)')
 ];
 
 
