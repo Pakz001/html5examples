@@ -40,6 +40,10 @@
         const buttonText = "Br:"; // Button text
         const textColor = "white"; // Text color
         const buttonColor = "peru"; // Button background color
+        var buttonCount = 0
+     const timerId = setInterval(function() {
+        buttonCount +=1
+}, 10);    
 
                 // Track button state
         let isButtonPressed = false;
@@ -64,26 +68,39 @@
         canvas.addEventListener('touchmove', draw);
 
         function startDrawing(e) {
+            
             isDrawing = true;
             //lastX = e.offsetX || e.touches[0].clientX;
             //lastY = e.offsetY || e.touches[0].clientY;
-
-			// get the last touch coordinates
-            if(e.changedTouches){
-			for(var i=0;i<e.changedTouches.length;i++){	
-				var x = e.changedTouches[i].clientX;
-				var y = e.changedTouches[i].clientY;				
+            var x=-1
+            var y=-1
+if (e.clientX && e.clientY) {
+                            x = e.offsetX
+                y = e.offsetY
 				LastX = x/myScaleX;
 				LastY = y/myScaleY;
-				uiTouchStart = true;
+
+}
+			// get the last touch coordinates
+            //                x = e.offsetX
+            //    y = e.offsetY
+            if (e.touches) {
+            //if(e.changedTouches){
+			for(var i=0;i<e.changedTouches.length;i++){	
+				x = e.changedTouches[i].clientX;
+				y = e.changedTouches[i].clientY;				
+				LastX = x/myScaleX;
+				LastY = y/myScaleY;
+				//uiTouchStart = true;
 			}
-            }else{
-                lastX = e.offsetX/myScaleX
-                lastY = e.offsetY/myScaleY
+            //}else{
+            //    lastX = e.offsetX/myScaleX
+            //    lastY = e.offsetY/myScaleY
             }
 
-
-            if (isInsideButton(x/myScaleX, y/myScaleY)) {
+            if (buttonCount>10 && isInsideButton(x/myScaleX,y/myScaleY)) {
+                
+                buttonCount = 0
                 isButtonPressed = true;
                 // Call a function for button press action (if needed)
                 //console.log("Button Clicked!"); // Example action
@@ -92,6 +109,7 @@
                 }else{
                     currentBrush = 1
                 }
+
                 drawButton()
                 // Optional: Change button appearance on press (visual feedback)
                 // ctx.fillStyle = 'darkorange'; // Change button color on press
@@ -99,11 +117,15 @@
             }
 
 
+
         }
 
         function stopDrawing() {
             isDrawing = false;
             brushTrail = []
+
+
+
         }
 
 
@@ -148,6 +170,7 @@
             const textX = buttonX + (buttonWidth - ctx.measureText(buttonText).width) / 2; // Center text
             const textY = buttonY + buttonHeight / 2 + 5; // Center text vertically
             ctx.fillText(buttonText+currentBrush, textX, textY);
+            
         }
 
         // Call draw function initially and on animation frame
@@ -212,7 +235,10 @@ function brush2(currentX,currentY){
             if(brushTrail.length>7){
                 //ctx.fillStyle = 'rgb(253,136,1)'
                 for(var j=0;j<brushTrail.length-5;j+=1){
-                if(Math.random()<.9){
+                if(Math.random()<.9)ctx.fillStyle = 'rgb(84,17,3)'
+                if(Math.random()<.2)ctx.fillStyle = 'rgb(112,30,1)'
+    
+                if(Math.random()<.8){
                     for(var i=0;i<14;i+=1){            
                         drawCircularPixelPattern(ctx,brushTrail[j].x,brushTrail[j].y,((brushRadius/2.4)*(Math.random()))*bwm,.4)
                     }
