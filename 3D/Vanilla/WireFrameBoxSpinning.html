@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rotating 3D Cross</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const points = [
+      [-50, -50, -50],
+      [50, -50, -50],
+      [50, 50, -50],
+      [-50, 50, -50],
+      [-50, -50, 50],
+      [50, -50, 50],
+      [50, 50, 50],
+      [-50, 50, 50]
+    ];
+
+    function rotateX(point, angle) {
+      const [x, y, z] = point;
+      const rad = angle * Math.PI / 180;
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+      return [x, y * cos - z * sin, y * sin + z * cos];
+    }
+
+    function rotateY(point, angle) {
+      const [x, y, z] = point;
+      const rad = angle * Math.PI / 180;
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+      return [x * cos + z * sin, y, -x * sin + z * cos];
+    }
+
+    function rotateZ(point, angle) {
+      const [x, y, z] = point;
+      const rad = angle * Math.PI / 180;
+      const cos = Math.cos(rad);
+      const sin = Math.sin(rad);
+      return [x * cos - y * sin, x * sin + y * cos, z];
+    }
+
+    function project(point) {
+      const [x, y, z] = point;
+      const distance = 200;
+      const projectedX = (x * distance) / (z + distance) + centerX;
+      const projectedY = (y * distance) / (z + distance) + centerY;
+      return [projectedX, projectedY];
+    }
+
+    function drawLine(p1, p2) {
+      const [x1, y1] = project(p1);
+      const [x2, y2] = project(p2);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    function render(angle) {
+      ctx.clearRect(0, 0, width, height);
+
+      const rotatedPoints = points.map(point => {
+        let rotated = rotateX(point, angle);
+        rotated = rotateY(rotated, angle);
+        rotated = rotateZ(rotated, angle);
+        return rotated;
+      });
+
+      drawLine(rotatedPoints[0], rotatedPoints[1]);
+      drawLine(rotatedPoints[1], rotatedPoints[2]);
+      drawLine(rotatedPoints[2], rotatedPoints[3]);
+      drawLine(rotatedPoints[3], rotatedPoints[0]);
+      drawLine(rotatedPoints[4], rotatedPoints[5]);
+      drawLine(rotatedPoints[5], rotatedPoints[6]);
+      drawLine(rotatedPoints[6], rotatedPoints[7]);
+      drawLine(rotatedPoints[7], rotatedPoints[4]);
+      drawLine(rotatedPoints[0], rotatedPoints[4]);
+      drawLine(rotatedPoints[1], rotatedPoints[5]);
+      drawLine(rotatedPoints[2], rotatedPoints[6]);
+      drawLine(rotatedPoints[3], rotatedPoints[7]);
+    }
+
+    let angle = 0;
+    function animate() {
+      angle += 1;
+      render(angle);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
