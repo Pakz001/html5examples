@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brown Canvas Drawing</title>
+    <style>
+        body { margin: 0; }
+        canvas {touch-action: none; /* Prevent scrolling on touch */ }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+
+        var myScaleX = 5
+        var myScaleY = 5
+        ctx.scale(myScaleX,myScaleY)
+
+
+        // Set canvas background color
+        ctx.fillStyle = 'rgb(155,66,0)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+				ctx.fillStyle = 'rgb(0,0,0,.2)';
+				ctx.fillRect(0, (canvas.height/myScaleY)/1.12, canvas.width, canvas.height);
+
+
+        var brushTrail = []
+
+        var brushRadius = 8
+
+        var currentBrush = 1
+
+
+class CanvasSlider {
+  constructor(canvas, x, y, width, height, min, max, initialValue) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.min = min;
+    this.max = max;
+    this.value = initialValue; 
+
+    this.isDragging = false;
+
+    // Event listeners
+    this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
+    this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
+    this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
+    this.canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
+    this.canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
+    this.canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
+
+    this.draw(); 
+  }
+
+  // Calculate slider handle position based on value
+  getHandleX() {
+    const normalizedVal = (this.value - this.min) / (this.max - this.min);
+    return (this.x/myScaleX) + normalizedVal * (this.width/myScaleX);
+  }
+
+  // Handle mouse/touch down events
+  onMouseDown(event) {
+	  	  var currentX = event.offsetX || event.touches[0].clientX;
+      var currentY = event.offsetY || event.touches[0].clientY;
+      currentX /= myScaleX
+      currentY /= myScaleY
+	if(this.rectsOverlap(currentX,currentY,1,1,this.x/myScaleX, this.y/myScaleY, this.width/myScaleX, this.height/myScaleY)==true){
+    this.isDragging = true;
+    this.updateValueFromPosition(event.clientX/myScaleX);
+}
+  }
+  onTouchStart(event) {
+	  var currentX = event.offsetX || event.touches[0].clientX;
+      var currentY = event.offsetY || event.touches[0].clientY;
+      currentX /= myScaleX
+      currentY /= myScaleY
+	if(this.rectsOverlap(currentX,currentY-6,1,12,this.x/myScaleX, this.y/myScaleY, this.width/myScaleX, this.height/myScaleY)==true){
+		
+    this.isDragging = true; 
+    this.updateValueFromPosition(event.touches[0].clientX/myScaleX);
+}
+  }
+
+  // Handle mouse/touch move events
+  onMouseMove(event) {
+    if (this.isDragging) {
+      this.updateValueFromPosition(event.clientX/myScaleX);
+    }
+  }
+  onTouchMove(event) {
+    if (this.isDragging) {
+      this.updateValueFromPosition(event.touches[0].clientX/myScaleX);
+    }
+  }
+
+  // Handle mouse/touch up events
+  onMouseUp() {
+    this.isDragging = false;
+  }
+  onTouchEnd() {
+    this.isDragging = false;
+  }
+
+  // Update slider value based on mouse/touch position
+  updateValueFromPosition(x) {
+    const relativeX = x - this.canvas.getBoundingClientRect().left - (this.x/myScaleX); 
+    let newValue = relativeX / (this.width/myScaleX) * (this.max - this.min) + this.min;
+    newValue = Math.max(this.min, Math.min(this.max, newValue)); 
+    this.value = newValue;
+    this.draw(); 
+  }
+
+  // Draw the slider
+  draw() {
+    const ctx = this.ctx;
+	ctx.fillStyle = 'rgb(155,155,155)'
+    ctx.fillRect((this.x-8)/myScaleX, this.y/myScaleY, (this.width+16)/myScaleX, this.height/myScaleY);
+	ctx.fillStyle = 'rgb(155,66,0)'
+    ctx.fillRect(this.x/myScaleX, this.y/myScaleY, this.width/myScaleX, this.height/myScaleY);
+
+    // Slider track
+    ctx.fillStyle = '#ddd';
+    ctx.fillRect(this.x/myScaleX, (this.y /myScaleY)+ (this.height/myScaleY) / 2 - 2, (this.width/myScaleX), 4);
+
+    // Slider handle
+    ctx.fillStyle = '#428bca';
+    const handleX = this.getHandleX();
+    ctx.beginPath();
+    ctx.arc(handleX, (this.y /myScaleY)+ (this.height/myScaleY) / 2, 8/myScaleX, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+  
+  rectsOverlap(x1, y1, w1, h1, x2, y2, w2, h2) {
+  // Check if the rectangles do not overlap on the x or y axis
+  if (x1 + w1 <= x2 || x2 + w2 <= x1 || y1 + h1 <= y2 || y2 + h2 <= y1) {
+    return false; 
+  } else {
+    return true; // The rectangles overlap
+  }
+}
+
+
+}
+
+
+
+
+class Button {
+    constructor(x, y, width, height, text, color) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.text = text;
+        this.color = color;
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = 'black'; // Text color
+        ctx.font = "10px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2 + 3); 
+        ctx.fillStyle = "rgb(255,255,255,.5)"
+        if(currentBrush==1 && this.text=="Edge")ctx.fillStyle = "rgb(255,255,255,1)"
+        if(currentBrush==2 && this.text=="Dark")ctx.fillStyle = "rgb(255,255,255,1)"
+        if(currentBrush==3 && this.text=="Rocks")ctx.fillStyle = "rgb(255,255,255,1)"
+        if(currentBrush==4 && this.text=="Darkest")ctx.fillStyle = "rgb(255,255,255,1)"
+
+        ctx.fillRect(this.x,this.y,this.width,2)
+        ctx.fillRect(this.x,this.y-2+this.height,this.width,2)
+    }
+
+    isClicked(x, y) {
+        x/=myScaleX
+        y/=myScaleY
+        return (x >= this.x && x <= this.x + this.width &&
+                y >= this.y && y <= this.y + this.height);
+    }
+}
+
+// Create buttons
+const buttons = [
+    new Button(0, 2, 40, 12, "Edge", 'rgb(195,66,0)'),
+    new Button(40, 2, 40, 12, "Dark", 'rgb(215,66,0)'),
+    new Button(80, 2, 40, 12, "Rocks", 'rgb(235,66,0)'),
+    new Button(120, 2, 40, 12, "Darkest", 'rgb(255,66,0)'),
+    new Button(160, 2, 40, 12, "Clear", 'rgb(220,120,0)')
+];
+
+
+// Event listeners for both click and touch
+canvas.addEventListener('click', handleInput);
+canvas.addEventListener('touchstart', handleInput);
+
+function handleInput(e) {
+    // Prevent touch events from also triggering mouse defaults
+    e.preventDefault();
+
+    const clickX = e.offsetX || e.touches[0].clientX;
+    const clickY = e.offsetY || e.touches[0].clientY;
+
+    for (const button of buttons) {
+        if (button.isClicked(clickX, clickY)) {
+            if (button.text === 'Clear') {
+                ctx.fillStyle = 'rgb(155,66,0)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+				ctx.fillStyle = 'rgb(0,0,0,.2)';
+				ctx.fillRect(0, (canvas.height/myScaleY)/1.12, canvas.width, canvas.height);
+				
+            } 
+            if (button.text === 'Edge') {
+                currentBrush = 1
+            } 
+            if (button.text === 'Dark') {
+                currentBrush = 2
+            } 
+            if (button.text === 'Rocks') {
+                currentBrush = 3
+            } 
+            if (button.text === 'Darkest') {
+                currentBrush = 4
+            } 
+
+
+
+        }
+    }
+}
+
+
+
+        // Define drawing variables
+        let isDrawing = false;
+        let lastX, lastY;
+        let strokeColor = 'moccasin'; // Light brown
+
+        // Event listeners for touch and mouse input
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('touchmove', draw);
+
+        function startDrawing(e) {
+            
+            isDrawing = true;
+            //lastX = e.offsetX || e.touches[0].clientX;
+            //lastY = e.offsetY || e.touches[0].clientY;
+            var x=-1
+            var y=-1
+if (e.clientX && e.clientY) {
+                            x = e.offsetX
+                y = e.offsetY
+				LastX = x/myScaleX;
+				LastY = y/myScaleY;
+
+}
+			// get the last touch coordinates
+            //                x = e.offsetX
+            //    y = e.offsetY
+            if (e.touches) {
+            //if(e.changedTouches){
+			for(var i=0;i<e.changedTouches.length;i++){	
+				x = e.changedTouches[i].clientX;
+				y = e.changedTouches[i].clientY;				
+				LastX = x/myScaleX;
+				LastY = y/myScaleY;
+				//uiTouchStart = true;
+			}
+            //}else{
+            //    lastX = e.offsetX/myScaleX
+            //    lastY = e.offsetY/myScaleY
+            }
+
+
+
+
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+            brushTrail = []
+
+
+
+        }
+
+
+        
+        var bwm=0.5 // brush width modifier
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.beginPath();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 5;
+
+            var currentX = e.offsetX || e.touches[0].clientX;
+            var currentY = e.offsetY || e.touches[0].clientY;
+			
+			if(currentY<slider1.y-24 && currentY>100){
+	            currentX /= myScaleX
+            currentY /= myScaleY
+			
+
+            brushTrail.push({x:currentX,y:currentY})
+            // Draw an oval with slight offset for smoother trail
+            //ctx.moveTo(lastX + 2, lastY + 2);
+            //ctx.bezierCurveTo(lastX + currentX / 2, lastY, currentX, lastY + currentY / 2, currentX - 2, currentY - 2);
+            //ctx.bezierCurveTo(currentX, currentY - currentY / 2, lastX + currentX / 2, currentY, lastX, lastY);
+            //ctx.stroke();
+
+
+            if(currentBrush===1){
+            brush1(currentX,currentY)
+            }else if(currentBrush===2){
+            brush2(currentX,currentY)
+            }else if(currentBrush==3){
+			brush3(currentX,currentY)
+            }else if(currentBrush===4){
+			brush4(currentX,currentY)
+            }
+            
+            lastX = currentX;
+            lastY = currentY;
+		}
+        }
+
+
+let slider1 = new CanvasSlider(canvas, 50, window.innerHeight/1.1, 200, 10, 3, 16, 6); 
+
+        render()
+
+        function render() { 
+            // ... other drawing logic ...
+
+            // Draw buttons
+            for (const button of buttons) {
+                button.draw();
+            }
+			slider1.draw()
+            requestAnimationFrame(render);
+        }
+
+		function brush4(currentX,currentY){
+    		brushRadius = slider1.value
+            ctx.fillStyle = 'rgb(84,17,3)'
+            
+            for(var i=0;i<12;i+=1){            
+                drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius*(Math.random()))*bwm,.8*Math.random())
+                drawCircularPixelPattern(ctx,currentX+brushRadius,currentY,(brushRadius*(Math.random()))*bwm,Math.random()/150)
+
+            }
+			ctx.fillStyle = 'rgb(8,3,1)'
+			for(var i=0;i<12;i+=1){            
+                drawCircularPixelPattern(ctx,currentX+4,currentY,(brushRadius*(Math.random()))*bwm,.8*Math.random())
+                drawCircularPixelPattern(ctx,currentX+brushRadius,currentY,(brushRadius*(Math.random()))*bwm,Math.random()/150)
+
+            }
+            ctx.fillStyle = 'rgb(112,30,1)'
+			if(Math.random()<.2){
+            for(var i=0;i<9;i+=1){            
+                drawCircularPixelPatternGrid(ctx,currentX,currentY,(brushRadius/2)*bwm,.7)
+            }}
+
+
+            if(Math.random()<.1){
+            bwm = Math.random()/2
+            bwm+=.5
+        }
+            if(brushTrail.length>7){
+                //ctx.fillStyle = 'rgb(253,136,1)'
+                for(var j=0;j<brushTrail.length-5;j+=1){
+                if(Math.random()<.9)ctx.fillStyle = 'rgb(84,17,3)'
+                if(Math.random()<.7)ctx.fillStyle = 'rgb(112,30,1)'
+    
+                if(Math.random()<.22){
+                    for(var i=0;i<14;i+=1){            
+                        //drawCircularPixelPattern(ctx,brushTrail[j].x,brushTrail[j].y,((brushRadius)*(Math.random()))*bwm,.4)
+						drawCircularPixelPatternGrid(ctx,brushTrail[j].x,brushTrail[j].y,((brushRadius)*(Math.random()))*bwm,.4)
+                    }
+                }
+                }
+                
+                for(var i=0;i<4;i+=1){
+                    brushTrail.shift()
+                }
+                
+            }
+}
+		
+		
+		
+	function brush3(currentX,currentY){
+		brushRadius = slider1.value
+        if(Math.random()*slider1.max>slider1.value)return
+		var x,y
+		var bag = [1,1,1,1,2,2,2,2,3,4]
+		for(var i=0;i<2;i+=1){
+		x=currentX+=Math.random()*8-3
+		y=currentY+=Math.random()*8-3
+		
+		var a = bag[Math.floor(Math.random()*bag.length)]
+		
+		if(a===1){
+		ctx.fillStyle = 'rgb(253,136,1)'
+		ctx.fillRect(x,y,1,1)
+		ctx.fillStyle = 'rgb(112,30,1)'
+		ctx.fillRect(x+1,y+1,1,1)
+		}
+		if(a===2){
+		ctx.fillStyle = 'rgb(253,136,1)'
+		ctx.fillRect(x,y,1,1)
+		ctx.fillStyle = 'rgb(112,30,1)'
+		ctx.fillRect(x+1,y,1,1)
+		}
+		if(a===3){
+		ctx.fillStyle = 'rgb(253,136,1)'
+		ctx.fillRect(x,y,2,1)
+		ctx.fillStyle = 'rgb(112,30,1)'
+		ctx.fillRect(x+1,y+1,2,1)
+		}
+		if(a===4){
+		ctx.fillStyle = 'rgb(253,136,1)'
+		ctx.fillRect(x,y,2,1)
+		ctx.fillRect(x,y,1,2)
+		ctx.fillStyle = 'rgb(112,30,1)'
+		ctx.fillRect(x+1,y+1,2,1)
+		}
+	}
+		
+	}
+		
+function brush1(currentX,currentY){
+    		brushRadius = slider1.value
+            ctx.fillStyle = 'rgb(209,100,7)'
+            
+            for(var i=0;i<6;i+=1){            
+                drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius*(Math.random()))*bwm,.8*Math.random())
+                drawCircularPixelPattern(ctx,currentX-brushRadius,currentY,(brushRadius*(Math.random()))*bwm,Math.random()/150)
+                //drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius*(Math.random()))*bwm,.8*Math.random())
+                //drawCircularPixelPattern(ctx,currentX-brushRadius,currentY,(brushRadius*(Math.random()))*bwm,Math.random()/150)
+
+            }
+            ctx.fillStyle = 'rgb(253,136,1)'
+            for(var i=0;i<3;i+=1){            
+                drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius/1.76)*bwm,(.5)+((.5/slider1.max)*brushRadius))
+            }
+
+
+            if(Math.random()<.1){
+            bwm = Math.random()/3
+            bwm+=.75
+        }
+            if(brushTrail.length>12){
+                ctx.fillStyle = 'rgb(253,136,1)'
+                for(var j=0;j<brushTrail.length-6;j+=1){
+                if(Math.random()<.4){
+                    for(var i=0;i<4;i+=1){            
+                        drawCircularPixelPattern(ctx,brushTrail[j].x,brushTrail[j].y,((brushRadius/1.76)*(Math.random()))*bwm,(.1)+((.5/slider1.max)*brushRadius))
+                    }
+                }
+                }
+                
+                for(var i=0;i<4;i+=1){
+                    brushTrail.shift()
+                }
+                
+            }
+}
+
+function brush2(currentX,currentY){
+    		brushRadius = slider1.value
+            ctx.fillStyle = 'rgb(84,17,3)'
+            
+            for(var i=0;i<12;i+=1){            
+                drawCircularPixelPattern(ctx,currentX,currentY,(brushRadius*(Math.random()))*bwm,.8*Math.random())
+                drawCircularPixelPattern(ctx,currentX+brushRadius,currentY,(brushRadius*(Math.random()))*bwm,Math.random()/150)
+
+            }
+            ctx.fillStyle = 'rgb(112,30,1)'
+			if(Math.random()<.2){
+            for(var i=0;i<9;i+=1){            
+                drawCircularPixelPatternGrid(ctx,currentX,currentY,(brushRadius/2)*bwm,.7)
+            }}
+
+
+            if(Math.random()<.1){
+            bwm = Math.random()/3
+            bwm+=.75
+        }
+            if(brushTrail.length>7){
+                //ctx.fillStyle = 'rgb(253,136,1)'
+                for(var j=0;j<brushTrail.length-5;j+=1){
+                if(Math.random()<.9)ctx.fillStyle = 'rgb(84,17,3)'
+                if(Math.random()<.7)ctx.fillStyle = 'rgb(112,30,1)'
+    
+                if(Math.random()<.22){
+                    for(var i=0;i<14;i+=1){            
+                        //drawCircularPixelPattern(ctx,brushTrail[j].x,brushTrail[j].y,((brushRadius)*(Math.random()))*bwm,.4)
+						drawCircularPixelPatternGrid(ctx,brushTrail[j].x,brushTrail[j].y,((brushRadius)*(Math.random()))*bwm,.4)
+                    }
+                }
+                }
+                
+                for(var i=0;i<4;i+=1){
+                    brushTrail.shift()
+                }
+                
+            }
+}
+
+function drawCircularPixelPatternGrid(ctx, centerX, centerY, radius, density) {
+    // Clamp density value between 0 and 1
+    density = Math.max(0, Math.min(1, density)); 
+
+    const maxDist = radius;
+	//ctx.fillStyle ="white"
+	var sw=0
+	var cnt=0
+    // Iterate over potential pixel positions within the circle
+    for (let y = -radius; y <= radius; y++) {
+        for (let x = -radius; x <= radius; x++) {
+            const distance = Math.sqrt(x * x + y * y); // Distance of pixel from center
+
+            // Calculate a 'randomness' factor based on distance and desired density
+            const randomness = (maxDist - distance) / maxDist * density; 
+            if (Math.random() < randomness) {
+                // Draw the pixel
+				var a=Math.abs(Math.floor((centerX+x)))
+				if(a % 2 === 0){
+					cnt=0
+				}else{
+					cnt=1
+				}
+				//console.log(cnt)
+				var b=Math.abs(Math.floor((centerY+y)))
+				if(b % 2 === 0){
+					sw=0
+				}else{
+					sw=1
+				}
+                if(cnt===0)ctx.fillRect(centerX + sw+x, centerY + y, 1, 1); 
+				
+            }
+			//cnt+=1
+			//if(cnt===2)cnt=0
+        }
+		//sw+=1
+		//if(sw===2)sw=0
+    }
+}
+
+function drawCircularPixelPattern(ctx, centerX, centerY, radius, density) {
+    // Clamp density value between 0 and 1
+    density = Math.max(0, Math.min(1, density)); 
+
+    const maxDist = radius;
+
+    // Iterate over potential pixel positions within the circle
+    for (let y = -radius; y <= radius; y++) {
+        for (let x = -radius; x <= radius; x++) {
+            const distance = Math.sqrt(x * x + y * y); // Distance of pixel from center
+
+            // Calculate a 'randomness' factor based on distance and desired density
+            const randomness = (maxDist - distance) / maxDist * density; 
+            if (Math.random() < randomness) {
+                // Draw the pixel
+                ctx.fillRect(centerX + x, centerY + y, 1, 1); 
+            }
+        }
+    }
+}
+    </script>
+</body>
+</html>
