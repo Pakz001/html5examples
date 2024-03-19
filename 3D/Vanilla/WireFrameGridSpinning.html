@@ -21,11 +21,11 @@
     const centerY = height / 2;
 
     const points = [
-      [-50, -50, -50],
-      [50, -50, -50],
-      [50, 50, -50],
-      [-50, 50, -50],
-	  [-50, -50, -50],
+      //[-50, -50, -50],
+      //[50, -50, -50],
+      //[50, 50, -50],
+      //[-50, 50, -50],
+	  //[-50, -50, -50],
 	  
 	  //[-25, -25, -50],
       //[25, -25, -50],
@@ -37,17 +37,20 @@
       //[50, 50, 50],
       //[-50, 50, 50]
     ];
+    var gridSize = 50
 	var go=true
 	if(go){
 	var z=0
-	for(var x=-50;x<50;x+=25){
-		for(var y=-50;y<50;y+=25){
+	for(var x=-gridSize;x<gridSize;x+=10){
+		for(var y=-gridSize;y<gridSize;y+=10){
+            if(Math.random()<.5){
 			//for(var z=-50;z<50;z+=10){
-			points.push([-50+x, -50+y, -50+z])
-			points.push([50+x, -50+y, -50+z])
-			points.push([50+x, 50+y, -50+z])
-			points.push([-50+x, 50+y, -50+z])
-			points.push([-50+x, -50+y, -50+z])
+			points.push([-5+x, -5+y, -5+z])
+			points.push([5+x, -5+y, -5+z])
+			points.push([5+x, 5+y, -5+z])
+			points.push([-5+x, 5+y, -5+z])
+			points.push([-5+x, -5+y, -5+z])
+            }
 			//}
 		}
 	}
