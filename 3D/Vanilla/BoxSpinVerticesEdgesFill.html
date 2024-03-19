@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>3D Spinning Box</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const vertices = [
+      [-1, -1, -1],
+      [1, -1, -1],
+      [1, 1, -1],
+      [-1, 1, -1],
+      [-1, -1, 1],
+      [1, -1, 1],
+      [1, 1, 1],
+      [-1, 1, 1]
+    ];
+
+    const faces = [
+      [0, 1, 2, 3], // Front face
+      [4, 5, 6, 7], // Back face
+      [0, 1, 5, 4], // Top face
+      [2, 3, 7, 6], // Bottom face
+      [0, 3, 7, 4], // Left face
+      [1, 2, 6, 5]  // Right face
+    ];
+
+    const colors = [
+      'rgba(255, 0, 0, 0.7)',   // Front face - Red
+      'rgba(0, 255, 0, 0.7)',   // Back face - Green
+      'rgba(0, 0, 255, 0.7)',   // Top face - Blue
+      'rgba(255, 255, 0, 0.7)', // Bottom face - Yellow
+      'rgba(255, 0, 255, 0.7)', // Left face - Magenta
+      'rgba(0, 255, 255, 0.7)'  // Right face - Cyan
+    ];
+
+    function rotateX(angle) {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [
+        [1, 0, 0],
+        [0, cos, -sin],
+        [0, sin, cos]
+      ];
+    }
+
+    function rotateY(angle) {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [
+        [cos, 0, sin],
+        [0, 1, 0],
+        [-sin, 0, cos]
+      ];
+    }
+
+    function multiplyMatrixVector(matrix, vector) {
+      const result = [];
+      for (let i = 0; i < matrix.length; i++) {
+        let sum = 0;
+        for (let j = 0; j < vector.length; j++) {
+          sum += matrix[i][j] * vector[j];
+        }
+        result.push(sum);
+      }
+      return result;
+    }
+
+    function drawBox(angle) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const rotatedVertices = vertices.map(vertex => {
+        let rotated = multiplyMatrixVector(rotateY(angle), vertex);
+        rotated = multiplyMatrixVector(rotateX(angle), rotated);
+        return rotated;
+      });
+
+      const projectedVertices = rotatedVertices.map(vertex => {
+        const scale = 100;
+        const distance = 3;
+        const x = vertex[0] * scale / (vertex[2] + distance) + canvas.width / 2;
+        const y = vertex[1] * scale / (vertex[2] + distance) + canvas.height / 2;
+        const z = vertex[2];
+        return [x, y, z];
+      });
+
+      // Sort faces based on average z-value (depth)
+      const facesWithDepth = faces.map((face, index) => {
+        const depth = face.reduce((sum, vertexIdx) => sum + projectedVertices[vertexIdx][2], 0) / face.length;
+        return { face, depth, color: colors[index] };
+      });
+      facesWithDepth.sort((a, b) => b.depth - a.depth);
+
+      // Draw faces with z-buffering
+      facesWithDepth.forEach(({ face, color }) => {
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.moveTo(projectedVertices[face[0]][0], projectedVertices[face[0]][1]);
+        for (let i = 1; i < face.length; i++) {
+          ctx.lineTo(projectedVertices[face[i]][0], projectedVertices[face[i]][1]);
+        }
+        ctx.closePath();
+        ctx.fill();
+      });
+    }
+
+    let angle = 0;
+    function animate() {
+      angle += 0.01;
+      drawBox(angle);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
