@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+	<textarea id="myTextareaId" rows="5" cols="80"></textarea>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	//
+	// Create a small 4x4 tile map from a binary string. There is
+	// a function that adds up a inputted binary string. Now we
+	// can create every possible combination inside the tile map
+	// with 2 colors.
+	// This for pattern creation. In this case I wanted
+	// to isolate every pattern that is of one connected(flooded 8way)
+	// piece for drawing brush creation.(vegitation and such)
+	//
+	
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+const myTextarea = document.getElementById('myTextareaId');
+	// the tile map size and binary string length(w*h)
+	const w=h=6
+	
+	// Create our binary string in variable a
+	var a = "";// "0000000000000000";
+	
+	// Create our iniiial binary string contents
+	for(var i=0;i<w*h;i++){
+		a+="0";
+    }
+	//a = "000000010110101001100010101100010000" 
+	
+	gameloop=setInterval(doGameLoop,1);
+	
+	
+	//var a = "0000";
+	//while(a.length<16){
+	//	a = binaryStringIncrement(a);
+	//}
+	
+	var dx = 0
+	var dy = 200
+	
+	var fail=false
+	//doGameLoop();
+	myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+    function doGameLoop(){
+        for(var i=0;i<10000;i+=1){
+            doGameLoop2()
+        }
+    }
+    var cntX = 0
+	function doGameLoop2(){
+		
+		//ctx.fillStyle="rgb(0,0,0)";
+		//ctx.fillRect(0,0,c.width,10);
+		//ctx.fillStyle="rgb(255,255,255)";
+		//ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		// If filled then restart
+		if(a.length>w*h){
+			a="";
+			for(var i=0;i<w*h;i++){
+				a+="0";
+			}
+		}
+		
+		// increase a binary string
+		if(fail==false) a = binaryStringIncrement(a);
+		//if(Math.random()<.01)console.log(a)
+		fail=true
+		var b = stringTo2DArray(a,w)
+		//if(Math.random()<.01)console.log(b)
+		var l = []
+		var l2 = []
+        if(b.len==0)return
+		for(var y=0;y<h;y+=1){
+			for(var x=0;x<w;x+=1){
+				if(b[x][y]==='1'){
+					if(x+1<w && y-1>=0 && b[x][y]==='1' && b[x+1][y]==='1' && b[x+1][y-1]==='1'){
+						l.push(1)
+						l2.push(1)
+                        //console.log("w")
+					}
+                    if(x+1<w && y+1<h && b[x][y]==='1' && b[x+1][y]==='1' && b[x][y+1]==='1'){
+						l.push(1)
+						l2.push(1)
+                        //console.log("w")
+					}
+                    if(x+1<w && y+1<h && b[x][y]==='1' && b[x+1][y]==='1' && b[x+1][y+1]==='1'){
+						l.push(1)
+						l2.push(1)
+					}                    
+					if(x+1<w && y-1>=0 && b[x+1][y]==='1' && b[x][y]==='1' && b[x][y-1]==='1'){
+						l.push(1)
+						l2.push(1)
+					}
+					if(x+1<w && y+1<h && y-1>=0 && b[x+1][y]==='1' && b[x][y]==='1' && b[x][y+1]==='1'){
+						l.push(1)
+						l2.push(1)
+					}                    
+                    
+                    l.push(1)
+					//console.log("@")
+					var cnt=0
+					for(var y1=y-1;y1<=y+1;y1+=1){
+					for(var x1=x-1;x1<=x+1;x1+=1){
+						if(x1>=0 && y1>=0 && x1<w && y1<h){
+							if(b[x1][y1]==='1')cnt+=1
+						}
+					}}
+					//console.log(cnt)
+					//if(cnt===3){
+						l2.push(cnt)
+					//}
+				}
+			}
+		}
+		//if(l.length!=l2.length)fail=false
+		
+		//console.log(l.length+","+l2[0]+","+l2[1]+","+l2[2])
+		for(var i=0;i<l.length;i+=1){
+			if(l2[i]!=3)fail=false
+		}
+        var cobo = false
+		if(fail==true){
+			myTextarea.value+="["+a+"]\n"
+            cobo = true
+			fail=false
+			dx+=5*w
+			if(dx+w*9>c.width){
+				dx=0
+				dy+=5*h
+			}
+		}
+		//console.log(fail)
+		// draw a tile map on teh canvas
+		// with the a binary string. 0's are
+		// blue/ 1's are white
+		cntX+=1
+        if(cobo || cntX>1000000){
+            cntX=0
+            var x = 0;
+            var y = 0;
+            for(var i=0;i<w*h;i++){
+                if(a[i]==0){
+                ctx.fillStyle="#0000AA";
+                }else{
+                ctx.fillStyle="#FFFFFF";
+                }
+                ctx.fillRect(x*16,y*16,16,16);
+                ctx.fillRect((x*4)+dx,(y*4)+dy,4,4);
+                x+=1;
+                if(x>w-1){
+                    y+=1;
+                    x=0;
+                }
+            }
+        }
+		
+	}
+
+	
+		//for(var i=0;i<511110;i+=1){
+			//doGameLoop()
+	//}
+	
+	function stringTo2DArray(string, width) {
+  // Split the string into a character array
+  const charList = string.split('');
+
+  // Calculate the required number of rows
+  const height = Math.ceil(charList.length / width);
+
+  // Create the 2D array with padding
+  const array = [];
+  for (let i = 0; i < height; i++) {
+    array.push(charList.splice(0, width).fill(' ', width));
+  }
+
+  return array;
+}
+	
+	// Poe chat - Sage function
+	function binaryStringIncrement(binaryString) {
+	  let carry = 1;
+	  let result = '';
+	  for (let i = binaryString.length - 1; i >= 0; i--) {
+	    if (binaryString[i] === '0' && carry === 1) {
+	      result = '1' + result;
+	      carry = 0;
+	    } else if (binaryString[i] === '1' && carry === 1) {
+	      result = '0' + result;
+	    } else {
+	      result = binaryString[i] + result;
+	    }
+	  }
+	  if (carry === 1) {
+	    result = '1' + result;
+	  }
+	  return result;
+	}
+
+</script>
+</body>
+</html>
