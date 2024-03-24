@@ -1,2 +1,2 @@
 
-<br><img src="Media/PixelArtPoster.png" width="10%"><br><br>
+<br><img src="Media/pixelArtPoster.png" width="100%"><br><br>
