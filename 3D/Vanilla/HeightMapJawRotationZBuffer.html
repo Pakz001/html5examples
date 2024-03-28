@@ -1,0 +1,217 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>3D Spinning Height Map</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas" width="400" height="400"></canvas>
+
+  <script>
+    // ... (previous code remains the same)
+ const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const gridSize = 16;
+    const cellSize = 2 / (gridSize - 1);
+
+    function createGrid() {
+      const vertices = [];
+      const colors = [];
+		var n=false
+		var nc=0
+      for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+          const x = -1 + j * cellSize;
+          const y = -1 + i * cellSize;
+          var z = Math.random() * 0.2; // Random height between 0 and 0.5
+		  if(Math.random()<.1)z=-.2
+          vertices.push([x, y, z]);
+
+          const color = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`;
+		  
+		  
+          colors.push(color);
+		  
+        }
+      }
+	  
+	
+      return { vertices, colors };
+    }
+
+    const { vertices, colors } = createGrid();
+
+    function rotateX(angle) {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [
+        [1, 0, 0],
+        [0, cos, -sin],
+        [0, sin, cos]
+      ];
+    }
+
+    function rotateY(angle) {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [
+        [cos, 0, sin],
+        [0, 1, 0],
+        [-sin, 0, cos]
+      ];
+    }
+	
+	function rotateZ(angle) {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return [
+        [cos, -sin, 0],
+        [sin, cos, 0],
+        [0, 0, 1]
+      ];
+    }
+
+    function multiplyMatrixVector(matrix, vector) {
+      const result = [];
+      for (let i = 0; i < matrix.length; i++) {
+        let sum = 0;
+        for (let j = 0; j < vector.length; j++) {
+          sum += matrix[i][j] * vector[j];
+        }
+        result.push(sum);
+      }
+      return result;
+    }
+
+	
+	//function createZBuffer(width, height) {
+  //return new Float32Array(width * height).fill(Infinity);
+//}
+    function createZBuffer(width, height) {
+      return new Array(width * height).fill(Infinity);
+    }
+
+    function drawHeightMap(angle1, angle2, jawAngle) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const zBuffer = createZBuffer(canvas.width, canvas.height);
+
+      const rotatedVertices = vertices.map(vertex => {
+        let rotated = multiplyMatrixVector(rotateZ(jawAngle), vertex);
+        rotated = multiplyMatrixVector(rotateY(angle1), rotated);
+        rotated = multiplyMatrixVector(rotateX(angle2), rotated);
+        return rotated;
+      });
+
+	  
+	  
+	  
+	  
+      const projectedVertices = rotatedVertices.map(vertex => {
+        const scale = 200;
+        const distance = 2;
+        const x = vertex[0] * scale / (vertex[2] + distance) + canvas.width / 2;
+        const y = vertex[1] * scale / (vertex[2] + distance) + canvas.height / 2;
+        const z = vertex[2];
+        return [x, y, z];
+      });
+
+      for (let i = 0; i < gridSize - 1; i++) {
+        for (let j = 0; j < gridSize - 1; j++) {
+          const index = i * gridSize + j;
+          const v1 = projectedVertices[index];
+          const v2 = projectedVertices[index + 1];
+          const v3 = projectedVertices[index + gridSize + 1];
+          const v4 = projectedVertices[index + gridSize];
+
+          const triangles = [
+            [v1, v2, v3],
+            [v1, v3, v4]
+          ];
+
+          triangles.forEach(triangle => {
+            const [p1, p2, p3] = triangle;
+
+            // Calculate bounding box for the triangle
+            const minX = Math.min(p1[0], p2[0], p3[0]);
+            const maxX = Math.max(p1[0], p2[0], p3[0]);
+            const minY = Math.min(p1[1], p2[1], p3[1]);
+            const maxY = Math.max(p1[1], p2[1], p3[1]);
+
+            // Iterate over pixels inside the bounding box
+            for (let y = minY; y <= maxY; y++) {
+              for (let x = minX; x <= maxX; x++) {
+                // Check if the pixel is inside the triangle
+                if (isInsideTriangle(x, y, p1, p2, p3)) {
+                  // Calculate the depth (z-value) of the pixel
+                  const depth = calculateDepth(x, y, p1, p2, p3);
+
+                  // Compare depth with the value in the z-buffer
+                  const zIndex = Math.floor(y) * canvas.width + Math.floor(x);
+                  if (depth < zBuffer[zIndex]) {
+                    // Update z-buffer and draw the pixel
+                    zBuffer[zIndex] = depth;
+                    ctx.fillStyle = colors[index];
+                    ctx.fillRect(x, y, 2, 2);
+                  }
+                }
+              }
+            }
+          });
+        }
+      }
+    }
+
+    function isInsideTriangle(x, y, p1, p2, p3) {
+      const [x1, y1] = p1;
+      const [x2, y2] = p2;
+      const [x3, y3] = p3;
+
+      const area = 0.5 * (-y2 * x3 + y1 * (-x2 + x3) + x1 * (y2 - y3) + x2 * y3);
+      const sign = area < 0 ? -1 : 1;
+
+      const s = (y1 * x3 - x1 * y3 + (y3 - y1) * x + (x1 - x3) * y) * sign;
+      const t = (x1 * y2 - y1 * x2 + (y1 - y2) * x + (x2 - x1) * y) * sign;
+
+      return s > 0 && t > 0 && s + t < 2 * area * sign;
+    }
+
+	
+	
+	
+    function calculateDepth(x, y, p1, p2, p3) {
+      const [x1, y1, z1] = p1;
+      const [x2, y2, z2] = p2;
+      const [x3, y3, z3] = p3;
+
+      const det = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
+      const lambda1 = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / det;
+      const lambda2 = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / det;
+      const lambda3 = 1 - lambda1 - lambda2;
+
+      return lambda1 * z1 + lambda2 * z2 + lambda3 * z3;
+    }
+let angle1 = 0;
+	let angle2 = -Math.PI/4
+    let jawAngle = 0;
+    function animate() {
+	  jawAngle += 0.01;
+      drawHeightMap(angle1,angle2, jawAngle);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+    // ... (remaining code remains the same)
+  </script>
+</body>
+</html>
