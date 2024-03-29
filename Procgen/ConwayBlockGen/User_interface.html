@@ -32,24 +32,25 @@
         const darkerColor = this.darkenColor(this.color, 20);
 
         // Draw the rectangle
+		ctx.globalAlpha=1
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
-
+		
         // Draw the lighter borders on the left and top
         ctx.strokeStyle = lighterColor;
         ctx.lineWidth = 6;
         ctx.beginPath();
-        ctx.moveTo(this.x, this.y + this.height);
-        ctx.lineTo(this.x, this.y);
-        ctx.lineTo(this.x + this.width, this.y);
+        ctx.moveTo(this.x, this.y -3+ this.height);
+        ctx.lineTo(this.x, this.y+3);
+        ctx.lineTo(this.x + this.width, this.y+3);
         ctx.stroke();
 
         // Draw the darker borders on the right and bottom
         ctx.strokeStyle = darkerColor;
         ctx.beginPath();
-        ctx.moveTo(this.x-6 + this.width, this.y);
-        ctx.lineTo(this.x -6+ this.width, this.y-6 + this.height);
-        ctx.lineTo(this.x, this.y -6+ this.height);
+        ctx.moveTo(this.x-3 + this.width, this.y);
+        ctx.lineTo(this.x -3+ this.width, this.y-3+ this.height);
+        ctx.lineTo(this.x, this.y -3+ this.height);
         ctx.stroke();
 		
       }
@@ -57,14 +58,23 @@
 			for (let i = 0; i < 6; i++) { 
   				this.drawRandomRoundShape(ctx,Math.random()*myCanvas.width,Math.random()*myCanvas.height,15,"black");
 			}
-			for (let i = 0; i < 2; i++) { 
+			for (let i = 0; i < 4; i++) { 
   				this.drawRandomRoundShape(ctx,Math.random()*myCanvas.width,Math.random()*myCanvas.height,3,"white");
 			}
+			ctx.fillStyle="white"
+			for (let i = 0; i < myCanvas.width*1.5; i++) {
+				ctx.globalAlpha=Math.random()/7
+				ctx.fillRect(Math.random()*myCanvas.width,Math.random()*myCanvas.height,3,3)
+		}
+		for (let i = 0; i < myCanvas.width*10; i++) {
+				ctx.globalAlpha=Math.random()/29
+				ctx.fillRect(Math.random()*myCanvas.width,Math.random()*myCanvas.height,3,3)
+		}
 		}
 	  drawRandomRoundShape(ctx, x,y,scale = 1, fillColor = 'rgba(0, 0, 0, 1)') {
   ctx.save(); 
-  ctx.globalAlpha = .1+(Math.random()/12); 
-  if(fillColor=="black")ctx.globalAlpha=.3
+  ctx.globalAlpha = .06//+(Math.random()/12); 
+  if(fillColor=="black")ctx.globalAlpha=.2
   //if(Math.random()<.5)fillColor="white"
  // if(fillColor=="white")scale/=4
   ctx.scale(scale, scale); 
@@ -81,7 +91,7 @@
   for (let i = 0; i < numSegments; i++) {
     const angle = Math.random() * Math.PI * 2;
     const radius = 70 + Math.random() * 10; // Varying radius for lengthwise shape
-    const controlRadius = 20 + Math.random() * 20; // Control points for curvature
+    const controlRadius = 50 + Math.random() * 20; // Control points for curvature
     const endX = x + radius * Math.cos(angle);
     const endY = y + radius * Math.sin(angle);
 
@@ -126,19 +136,35 @@
     myCanvas.width = window.innerWidth;
     myCanvas.height = window.innerHeight;
 
+	doGameLoop()
+	gameloop=setInterval(doGameLoop,1000);
     // Create a new rectangle instance
+	function doGameLoop(){
+		ctx.globalAlpha=1
+		ctx.fillStyle="black"
+		ctx.fillRect(0,0,myCanvas.width,myCanvas.height)
     const rectangle = []
-	
+	var sx=128
 	for(y=0;y<myCanvas.height;y+=128){
-		for(x=0;x<myCanvas.width;x+=128){
-	rectangle.push(new Rectangle(x, y, 128, 128, '#406080'))
-}}
+		for(x=0;x<myCanvas.width;x+=sx){
+			if(Math.random()<.8){
+	rectangle.push(new Rectangle(x, y, sx, 128, '#406080'))
+}else{
+	rectangle.push(new Rectangle(x, y, sx, 128, '#000000'))
+}
+}
+sx=32+Math.random()*256
+}
 	
     // Draw the rectangle on the canvas
 	for(i=0;i<rectangle.length;i+=1){
     rectangle[i].draw(ctx);
 	}
 	rectangle[0].makeTrans(ctx)
+	for(i=0;i<rectangle.length;i+=1){
+    if(rectangle[i].color=='#000000')rectangle[i].draw(ctx);
+	}
+}
   </script>
 </body>
 </html>
