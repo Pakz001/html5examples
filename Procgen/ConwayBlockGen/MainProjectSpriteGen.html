@@ -509,7 +509,7 @@ const myGrid = new ToggleGrid(myCanvas, 16, 16, w, h);
 			for(var j=0;j<allA.length;j+=1){
 				x=0
 				y=0
-            for(var i=0;i<w*h;i++){
+            for(var i=0;i<mapTotalIndex;i++){
                 if(allA[j][i]==0){
                 ctx.fillStyle="#0000AA";
                 }else{
@@ -524,7 +524,7 @@ const myGrid = new ToggleGrid(myCanvas, 16, 16, w, h);
                 }
             }
 			dx2+=5*w
-			if(dx2+w*5>c.width){
+			if(dx2+w*5>myCanvas.width){
 				dx2=0
 				dy2+=5*h
 			}
