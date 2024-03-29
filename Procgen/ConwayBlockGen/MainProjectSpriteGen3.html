@@ -1,0 +1,904 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+
+    body {
+      margin: 0;
+      overflow: auto;
+    }
+  
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+	<textarea id="myTextareaId" rows="5" cols="80" style="background-color: rgb(0, 0, 0); color: rgb(132, 132, 140)"></textarea>
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	//
+	// Create a small 4x4 tile map from a binary string. There is
+	// a function that adds up a inputted binary string. Now we
+	// can create every possible combination inside the tile map
+	// with 2 colors.
+	// This for pattern creation. In this case I wanted
+	// to isolate every pattern that is of one connected(flooded 8way)
+	// piece for drawing brush creation.(vegitation and such)
+	//
+	
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+const myTextarea = document.getElementById('myTextareaId');
+	// the tile map size and binary string length(w*h)
+	var w=h=5 // size of the sprite to be generated
+	var mapTotalIndex = w*h
+	var tileWidth
+	var tileHeight
+
+	// Skip when these grids are occupied
+	// reads from left bottom to right bottom (exit loop do not continue list)
+	let skipFilter = create2DArray(w,h,0)
+	
+	// Create our binary string in variable a
+	//var a = "";// "0000000000000000";
+	var b = create2DArray(w,w,0)
+
+
+
+    class Rectangle {
+      constructor(x, y, width, height, color) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+		
+      }
+
+      draw(ctx) {
+        // Calculate lighter and darker border colors
+        var lighterColor = this.lightenColor(this.color, 40);
+		
+        var darkerColor = this.darkenColor(this.color, 20);
+		if(this.color=='#000000'){
+			lighterColor = this.lightenColor(this.color, 10);
+			darkerColor = this.darkenColor(this.color, -20);
+		}
+        // Draw the rectangle
+		ctx.globalAlpha=1
+		
+		ctx.fillStyle = this.lightenColor(this.color, 20)
+        if(this.color=='#000000')ctx.fillStyle = this.color//this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+		
+        // Draw the lighter borders on the left and top
+        ctx.strokeStyle = lighterColor;
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y -3+ this.height);
+        ctx.lineTo(this.x, this.y+3);
+        ctx.lineTo(this.x + this.width, this.y+3);
+        ctx.stroke();
+
+        // Draw the darker borders on the right and bottom
+        ctx.strokeStyle = darkerColor;
+        ctx.beginPath();
+        ctx.moveTo(this.x-3 + this.width, this.y);
+        ctx.lineTo(this.x -3+ this.width, this.y-3+ this.height);
+        ctx.lineTo(this.x, this.y -3+ this.height);
+        ctx.stroke();
+		
+      }
+		makeTrans(ctx){
+            ctx.beginPath()
+            ctx.rect(0,0,myCanvas.width,255)
+            ctx.closePath()
+            ctx.save()
+            ctx.clip();
+			for (let i = 0; i < 6; i++) { 
+  				this.drawRandomRoundShape(ctx,Math.random()*myCanvas.width,Math.random()*myCanvas.height,15,"black");
+			}
+			for (let i = 0; i < 4; i++) { 
+  				this.drawRandomRoundShape(ctx,Math.random()*myCanvas.width,Math.random()*myCanvas.height,3,"white");
+			}
+			ctx.fillStyle="white"
+			for (let i = 0; i < myCanvas.width*1.5; i++) {
+				ctx.globalAlpha=Math.random()/7
+				ctx.fillRect(Math.random()*myCanvas.width,Math.random()*myCanvas.height,3,3)
+            }
+            for (let i = 0; i < myCanvas.width*10; i++) {
+                    ctx.globalAlpha=Math.random()/29
+                    ctx.fillRect(Math.random()*myCanvas.width,Math.random()*myCanvas.height,3,3)
+            }
+            ctx.restore()
+		}
+	  drawRandomRoundShape(ctx, x,y,scale = 1, fillColor = 'rgba(0, 0, 0, 1)') {
+        ctx.save(); 
+        ctx.globalAlpha = .16//+(Math.random()/12); 
+        if(fillColor=="black")ctx.globalAlpha=.2
+        //if(Math.random()<.5)fillColor="white"
+        // if(fillColor=="white")scale/=4
+        ctx.scale(scale, scale); 
+        x/=scale
+        y/=scale
+
+        const numSegments = 256; // Number of curve segments 
+        //let x = Math.random() * 100;  // Start position
+        //let y = Math.random() * 100;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        for (let i = 0; i < numSegments; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 70 + Math.random() * 10; // Varying radius for lengthwise shape
+            const controlRadius = 50 + Math.random() * 20; // Control points for curvature
+            const endX = x + radius * Math.cos(angle);
+            const endY = y + radius * Math.sin(angle);
+
+            const controlX = x + controlRadius * Math.cos(angle - Math.PI / 2);
+            const controlY = y + controlRadius * Math.sin(angle - Math.PI / 2);
+
+            ctx.bezierCurveTo(controlX, controlY, endX, endY, endX, endY);
+
+            x = endX;
+            y = endY;
+        }
+
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+        ctx.restore(); 
+    }
+	  
+      lightenColor(color, percent) {
+        const num = parseInt(color.slice(1), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        return `#${(0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1)}`;
+      }
+
+      darkenColor(color, percent) {
+        const num = parseInt(color.slice(1), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) - amt;
+        const G = (num >> 8 & 0x00FF) - amt;
+        const B = (num & 0x0000FF) - amt;
+        return `#${(0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1)}`;
+      }
+    }
+
+
+
+const button = { //toggle pause 
+  x: (w+1)*16,
+  y: 20,
+  width: 100,
+  height: 50,
+  text: 'Pauze',
+  isToggled: true
+}
+const button2 = { //toggle reset 
+  x: (w+1)*16+108,
+  y: 20,
+  width: 100,
+  height: 50,
+  text: 'Reset',
+  isToggled: true
+}
+const button3 = { //toggle pause 
+  x: (w+1)*16,
+  y: 72,
+  width: 100,
+  height: 50,
+  text: '-',
+  isToggled: true
+}
+const button4 = { //toggle reset 
+  x: (w+1)*16+108,
+  y: 72,
+  width: 100,
+  height: 50,
+  text: '+',
+  isToggled: true
+}
+
+let myButtons = []
+myButtons.push(button)
+myButtons.push(button2)
+myButtons.push(button3)
+myButtons.push(button4)
+
+function drawButtons(){
+	for(var i=0;i<myButtons.length;i+=1){
+	ctx.fillStyle = myButtons[i].isToggled ? 'green' : 'gray';
+  	ctx.fillRect(myButtons[i].x, myButtons[i].y, myButtons[i].width, myButtons[i].height);
+
+  	ctx.fillStyle = 'black'; // Text color
+  	ctx.font = '18px Arial'; 
+  	ctx.textAlign = 'center'; 
+  	ctx.textBaseline = 'middle'; 
+  	ctx.fillText(myButtons[i].text, myButtons[i].x + myButtons[i].width / 2, myButtons[i].y + myButtons[i].height / 2);
+	}
+}
+
+
+
+function handleInteraction(event) {
+  let x, y;
+
+  if (event.touches) { // Touch event
+    event.preventDefault();
+    const touch = event.touches[0];
+    x = touch.clientX - myCanvas.offsetLeft;
+    y = touch.clientY - myCanvas.offsetTop;
+  } else { // Mouse event
+    x = event.offsetX;
+    y = event.offsetY;
+  } 
+
+  var execu=-1//which button was pressed
+  for(var i=0;i<myButtons.length;i+=1){
+  	if (x >= myButtons[i].x && x <= myButtons[i].x + myButtons[i].width &&
+      	y >= myButtons[i].y && y <= myButtons[i].y + myButtons[i].height) {
+    	myButtons[i].isToggled = !myButtons[i].isToggled;
+		execu=i
+    	drawButtons();
+ 	}
+  }
+// Optional: Do something based on the button's toggle state
+    if (execu==0) {
+      //console.log('Button toggled ON');
+    } else {
+      //console.log('Button toggled OFF');
+    }
+	if (execu==1) {
+      //console.log('Button toggled ON');
+	  b = create2DArray(w,h,0)
+      //console.log('Button toggled OFF');
+    }
+	if (execu==2 && w>4) {
+      //console.log('Button toggled ON');
+	        	//console.log('Button toggled ON');
+		w-=1
+		h-=1// size of the sprite to be generated
+		mapTotalIndex = w*h
+		skipFilter = create2DArray(w,h,0)
+		
+		//myCanvas.style.top=(currentTop+tileHeight)+"px"
+		ctx.fillStyle = "black"
+		ctx.fillRect(0,0,255,255)
+		// Create our binary string in variable a
+		//var a = "";// "0000000000000000";
+		b = create2DArray(w,h,0)
+		
+		tileWidth = ((250)/w)
+		tileHeight = tileWidth
+		
+		
+		myGrid.cellWidth = tileWidth;
+    	myGrid.cellHeight = tileHeight;
+    	myGrid.numCellsWidth = w;
+    	myGrid.numCellsHeight = h;
+    	myGrid.gridData = myGrid.createEmptyGrid();
+		
+		
+		updateUI()
+		
+      //console.log('Button toggled OFF');
+    }
+	if (execu==3 && w<9) {
+		
+      	//console.log('Button toggled ON');
+		w+=1
+		h+=1// size of the sprite to be generated
+		mapTotalIndex = w*h
+		skipFilter = create2DArray(w,h,0)
+		
+		//myCanvas.style.top=(currentTop+tileHeight)+"px"
+		ctx.fillStyle = "black"
+		ctx.fillRect(0,0,255,255)
+		// Create our binary string in variable a
+		//var a = "";// "0000000000000000";
+		b = create2DArray(w,h,0)
+		
+		tileWidth = ((250)/w)
+		tileHeight = tileWidth
+		
+		
+		myGrid.cellWidth = tileWidth;
+    	myGrid.cellHeight = tileHeight;
+    	myGrid.numCellsWidth = w;
+    	myGrid.numCellsHeight = h;
+    	myGrid.gridData = myGrid.createEmptyGrid();
+		
+		
+		updateUI()
+		
+    }
+}
+
+
+myCanvas.addEventListener('mousedown', handleInteraction);
+myCanvas.addEventListener('touchstart', handleInteraction);
+
+
+class ToggleGrid {
+  constructor(canvas, cellWidth, cellHeight, numCellsWidth, numCellsHeight) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+	
+    this.cellWidth = cellWidth;
+    this.cellHeight = cellHeight;
+    this.numCellsWidth = numCellsWidth;
+    this.numCellsHeight = numCellsHeight;
+    this.gridData = this.createEmptyGrid();
+
+    this.selectedState = 1; // You can customize what represents a 'selected' cell
+
+    this.addCanvasListeners();
+  }
+
+  createEmptyGrid() {
+    // Initialize a 2D array representing the grid with your initial cell value
+    return new Array(this.numCellsHeight).fill(null).map(() => 
+             new Array(this.numCellsWidth).fill(0) 
+           );
+  }
+
+  addCanvasListeners() {
+    this.canvas.addEventListener('mousedown', this.handleMouseInteraction.bind(this));
+    this.canvas.addEventListener('touchstart', this.handleTouchInteraction.bind(this));
+  }
+
+  handleMouseInteraction(event) {
+    this.toggleCell(event.offsetX, event.offsetY);
+  }
+
+  handleTouchInteraction(event) {
+    // Prevent default touch behaviors that might interfere
+    event.preventDefault();
+
+    const touch = event.touches[0];
+    this.toggleCell(touch.clientX - this.canvas.offsetLeft, touch.clientY - this.canvas.offsetTop);
+  }
+
+  toggleCell(x, y) {
+    const col = Math.floor(x / this.cellWidth);
+    const row = Math.floor(y / this.cellHeight);
+
+    if (col >= 0 && col < this.numCellsWidth && row >= 0 && row < this.numCellsHeight) {
+      //this.gridData[row][col] = this.gridData[row][col] === 0 ? this.selectedState : 0;
+      if(this.gridData[row][col] === 0){
+        this.gridData[row][col] = 1
+        skipFilter[col][row]=1
+      }else if(this.gridData[row][col] === 1){
+        this.gridData[row][col] = 2
+        skipFilter[col][row]=2
+        b[col][row]=1
+        
+      
+      }else if(this.gridData[row][col] === 2){
+        this.gridData[row][col] = 0
+        skipFilter[col][row]=0
+        b[col][row]=0
+      }
+
+      this.drawGrid();
+    }
+  }
+
+  drawGrid() {
+    //this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    //this.ctx.fillStyle = "black"
+    //this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    for (let row = 0; row < this.numCellsHeight; row++) {
+      for (let col = 0; col < this.numCellsWidth; col++) {
+        if (this.gridData[row][col] === 1) {
+          this.ctx.fillStyle = 'red'; // Fill color for selected cells
+          this.ctx.globalAlpha = .8;
+        } else if (this.gridData[row][col] === 2){
+          this.ctx.fillStyle = 'green'; // Fill color for normal cells
+          this.ctx.globalAlpha = 0.8
+        
+        } else if (this.gridData[row][col] === 0){
+          this.ctx.fillStyle = 'white'; // Fill color for normal cells
+          this.ctx.globalAlpha = 0.1
+        }
+
+        this.ctx.fillRect(col * this.cellWidth, row * this.cellHeight, this.cellWidth, this.cellHeight);
+      }
+    }
+    this.ctx.globalAlpha = 1;
+    
+  }
+}
+
+
+
+
+
+
+	/*
+	for(var i=0;i<10000;i+=1){
+		b = binaryArrayIncrement2(b)
+	}
+			var a = ""
+			//for(var y=h-1;y>=0;y-=1){
+			//for(var x=w-1;x>=0;x-=1){
+			for(var y=0;y<h;y+=1){
+			for(var x=0;x<w;x+=1){
+				a+=b[x][y]
+			}}
+	console.log(a)
+	*/
+	
+	/*
+	// Create our iniiial binary string contents
+	for(var i=0;i<w*h;i++){
+		a+="0";
+    }
+	//a = "000000010110101001100010101100010000" 
+	*/
+
+
+
+
+	
+	
+	
+	//var a = "0000";
+	//while(a.length<16){
+	//	a = binaryStringIncrement(a);
+	//}
+	
+	var dx = 0
+	var dy = 256
+	var allA = []
+	var fail=false
+	//doGameLoop();
+	myCanvas.height = 600//9000///window.innerHeight-32;
+	myCanvas.width = window.innerWidth-32;
+    myTextarea.style.width = window.innerWidth-32+"px"
+	tileWidth = ((250)/w)
+	tileHeight = tileWidth
+	//button.x = (myCanvas.width/8)+w*3
+	//button2.x = ((myCanvas.width/8)+w*3)+button.width+2
+	myButtons[0].x = (250)+w*3
+	myButtons[1].x = ((250)+w*3)+myButtons[0].width+2
+	myButtons[2].x = myButtons[0].x
+	myButtons[3].x = myButtons[1].x
+	drawButtons()
+	//drawButton2()
+	var myGrid = new ToggleGrid(myCanvas, tileWidth, tileHeight, w, h); 
+
+    const rectangle = []
+    rectangle.push(new Rectangle(255,0,myCanvas.width-255,255, '#406080'))
+    rectangle.push(new Rectangle(0,0,260,255, '#000000'))
+
+    rectangle.push(new Rectangle(myButtons[0].x-8,myButtons[0].y-8,myButtons[0].width*2+16,myButtons[0].height*2+16, '#000000'))
+    
+            // Draw the rectangle on the canvas
+            for(i=0;i<rectangle.length;i+=1){
+                rectangle[i].draw(myGrid.ctx);
+            }
+            rectangle[0].makeTrans(myGrid.ctx)
+
+    gameloop=setInterval(doGameLoop,1);
+
+    function doGameLoop(){
+        for(var i=0;i<10000;i+=1){//10000
+            doGameLoop2()
+        }
+    }
+    var cntX = 0
+				var a = ""
+    //var startTime = 0;
+
+	function doGameLoop2(){
+
+        // Draw the control area and current position area
+
+        if(b[w-1][h-1]==1){
+                    var cnt=0;
+            for(var y=0;y<h;y+=1){
+                for(var x=0;x<w;x+=1){
+                if(b[x][y]==1)cnt+=1
+            }}
+            if(cnt>=mapTotalIndex){
+                myButtons[0].isToggled=true
+                b = create2DArray(w,h,0)
+            }
+
+        }
+
+
+		cntX+=1
+        if(cntX>200000){
+
+			updateUI()
+        }
+
+
+
+        if(button.isToggled==false){
+
+
+		//ctx.fillStyle="rgb(0,0,0)";
+		//ctx.fillRect(0,0,c.width,10);
+		//ctx.fillStyle="rgb(255,255,255)";
+		//ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		// If filled then restart
+		
+		/*
+		if(a.length>mapTotalIndex){
+			return
+			a="";
+			for(var i=0;i<mapTotalIndex;i++){
+				a+="0";
+			}
+		}
+		*/
+		// increase a binary string
+		
+		if(fail==false) b = binaryArrayIncrement2(b);
+		
+		//if(Math.random()<.01)console.log(a)
+		fail=true
+		//var b = stringTo2DArray(a,w)
+		
+		
+		//if(Math.random()<.01)console.log(b)
+		var l = []
+		var l2 = []
+		var overfail = false
+        //if(b.len==0)return
+
+        //if(b.len==0)return
+        var phase1 = false
+        for(var y=0;y<h;y+=1){
+			for(var x=0;x<w;x+=1){
+                if(skipFilter[x][y]==1 && b[x][y]==1){
+                    phase1 = true
+                    overfail = true
+                    //break
+                }
+                if(skipFilter[x][y]==2 && b[x][y]==0){
+                    phase1 = true
+                    overfail = true
+                }
+
+        }
+        //if(phase1==true)break
+        }
+        
+        if(phase1==false){
+		for(var y=0;y<h;y+=1){
+			for(var x=0;x<w;x+=1){
+                //if(skipFilter[x][y]==1){
+                //    overfail=true
+                    //continue
+                //}
+				if(b[x][y]===1){
+					if(x+1<w && y-1>=0 && b[x][y]===1 && b[x+1][y]===1 && b[x+1][y-1]===1){
+						overfail = true
+						//l.push(1)
+						//l2.push(1)
+                        //console.log("w")
+					}
+                    if(x+1<w && y+1<h && b[x][y]===1 && b[x+1][y]===1 && b[x][y+1]===1){
+						overfail = true
+					}
+                    if(x+1<w && y+1<h && b[x][y]===1 && b[x+1][y]===1 && b[x+1][y+1]===1){
+						overfail = true
+					}                    
+					if(x+1<w && y-1>=0 && b[x+1][y]===1 && b[x][y]===1 && b[x][y-1]===1){
+						overfail = true
+					}
+					if(x+1<w && y+1<h  && b[x+1][y]===1 && b[x][y]===1 && b[x][y+1]===1){
+						overfail = true
+					}     
+                    if(x+1<w && y+1<h && b[x][y]===1 && b[x+1][y]===1 && b[x][y+1]===1 && b[x+1][y+1]===1){
+						overfail = true
+					}               
+                    if(overfail){
+						//console.log("asd")
+						break
+					}
+                    l.push(1)
+					//console.log("@")
+					var cnt=0
+					for(var y1=y-1;y1<=y+1;y1+=1){
+					for(var x1=x-1;x1<=x+1;x1+=1){
+						if(x1>=0 && y1>=0 && x1<w && y1<h){
+							if(b[x1][y1]===1)cnt+=1
+						}
+					}}
+					//console.log(cnt)
+					//if(cnt===3){
+						l2.push(cnt)
+					//}
+				}
+			}
+			if(overfail)break
+		
+        }}
+		//if(l.length!=l2.length)fail=false
+		
+		//console.log(l.length+","+l2[0]+","+l2[1]+","+l2[2])
+		if(overfail){
+			fail=false
+		}else{
+		for(var i=0;i<l.length;i+=1){
+			if(l2[i]!=3){
+                fail=false
+                //console.log("a")
+            }
+		}
+		}
+		
+        var cobo = false
+		//fail=true
+		if(fail==true){
+			//b[0][0]=Math.floor(Math.random())
+			//allA.push(b)
+
+			
+
+			//console.log("a:"+allA.length)
+			//console.log("b:"+allA[0].length)
+			//console.log("c:"+allA[0][0].length)
+
+
+			//if(allA.length>1){
+			//	console.log(allA)
+			//	for(var y=0;y<h;y+=1){
+			//		for(var x=0;x<w;x+=1){
+			//			if(allA[0][x][y]!=allA[1][x][y]){
+			//				console.log("diff")
+			//			}
+			//		}
+			//	}
+			//}
+
+
+			//for(var y=h-1;y>=0;y-=1){
+			//for(var x=w-1;x>=0;x-=1){
+			var a=""
+			for(var y=0;y<h;y+=1){
+			for(var x=0;x<w;x+=1){
+				a+=b[x][y]
+			}}
+			allA.push(a)
+            //console.log(l+",}}."+l2)
+			
+			myTextarea.value+="["+a+"]\n"
+            
+
+
+
+            cobo = true
+			fail = false
+//			dx+=5*w
+//			if(dx+w*5>c.width){
+//				dx=0
+//				dy+=5*h
+//			}
+            //ctx.beginPath()
+            //ctx.rect(0,0,myCanvas.width,myCanvas.height+1000)
+           //ctx.closePath()
+            //ctx.clip();
+            ctx.globalAlpha = 1
+            var x = 0;
+            var y = 0;
+			var dx2 = 0
+			var dy2 = 256
+            //ctx.fillStyle = "red"
+            //ctx.fillRect(dx2,dy2,400,400);
+			for(var j=0;j<allA.length;j+=1){
+				x=0
+				y=0
+            for(var i=0;i<mapTotalIndex;i++){
+                if(allA[j][i]==0){
+                ctx.fillStyle="#0000AA";
+                }else{
+                ctx.fillStyle="#FFFFFF";
+                }
+                ctx.fillRect(x*tileWidth,y*tileHeight,tileWidth,tileHeight);
+                ctx.fillRect((x*4)+dx2,(y*4)+dy2,4,4);
+                x+=1;
+                if(x>w-1){
+                    y+=1;
+                    x=0;
+                }
+            }
+            //ctx.restore()
+			dx2+=5*w
+			if(dx2+w*5>myCanvas.width){
+				dx2=0
+				dy2+=5*h
+			}
+			}
+			dx = dx2
+			dy=dy2
+			if(dy2+32>myCanvas.height){
+                resizeCanvas(myCanvas.width,myCanvas.height+32)
+                //console.log(myCanvas.height)
+            }
+
+
+		}
+        ctx.restore()
+		//console.log(fail)
+		// draw a tile map on teh canvas
+		// with the a binary string. 0's are
+		// blue/ 1's are white
+
+		
+		//cntX+=1
+        }//atarttime
+	}
+
+	function updateUI(){
+        
+
+            //for(i=0;i<rectangle.length;i+=1){
+            //    if(rectangle[i].color=='#000000')rectangle[i].draw(myGrid.ctx);
+           // }
+
+            ctx.globalAlpha = 1
+			drawButtons()
+            //drawButton2()
+            var a=""
+			for(var y=0;y<h;y+=1){
+			for(var x=0;x<w;x+=1){
+				a+=b[x][y]
+			}}
+            cntX=0
+            var x = 0;
+            var y = 0;
+			
+            for(var i=0;i<mapTotalIndex;i++){
+                if(a[i]==0){
+                ctx.fillStyle="#0000AA";
+                }else{
+                ctx.fillStyle="#FFFFFF";
+                }
+                ctx.fillRect(x*tileWidth,y*tileHeight,tileWidth,tileHeight);
+                ctx.fillRect((x*4)+dx,(y*4)+dy,4,4);
+                x+=1;
+                if(x>w-1){
+                    y+=1;
+                    x=0;
+                }
+            }
+        	myGrid.drawGrid(); // Draw the initial grid
+
+
+	}
+		//for(var i=0;i<511110;i+=1){
+			//doGameLoop()
+	//}
+	
+	function stringTo2DArray(string, width) {
+  // Split the string into a character array
+  const charList = string.split('');
+
+  // Calculate the required number of rows
+  const height = Math.ceil(charList.length / width);
+
+  // Create the 2D array with padding
+  const array = [];
+  for (let i = 0; i < height; i++) {
+    array.push(charList.splice(0, width).fill(' ', width));
+  }
+
+  return array;
+}
+
+// gemini
+function binaryArrayIncrement2(binaryArray) {
+  let carry = 1;
+
+  // Iterate through the array in reverse, starting from the rightmost column
+  for (let col = binaryArray[0].length - 1; col >= 0; col--) {
+    for (let row = binaryArray.length - 1; row >= 0; row--) {
+      const sum = binaryArray[row][col] + carry; 
+
+      if (sum === 2) { // '1' + '1' 
+        binaryArray[row][col] = 0;
+        carry = 1;
+      } else if (sum === 1) { // '0' + '1' or '1' + '0'
+        binaryArray[row][col] = 1;
+        carry = 0;
+      } else { // '0' + '0'
+        binaryArray[row][col] = 0;
+        carry = 0;
+      }
+    }
+  }
+
+  // Handle potential final carry
+  if (carry === 1) {
+    // Prepend a new row with a single '1' at the beginning
+    binaryArray.unshift(new Array(binaryArray[0].length).fill(0)); 
+    binaryArray[0][0] = 1; 
+  }
+
+  return binaryArray;
+}
+
+	// Poe chat - Sage function
+	function binaryStringIncrement(binaryString) {
+	  let carry = 1;
+	  let result = '';
+	  for (let i = binaryString.length - 1; i >= 0; i--) {
+	    if (binaryString[i] === '0' && carry === 1) {
+	      result = '1' + result;
+	      carry = 0;
+	    } else if (binaryString[i] === '1' && carry === 1) {
+	      result = '0' + result;
+	    } else {
+	      result = binaryString[i] + result;
+	    }
+	  }
+	  if (carry === 1) {
+	    result = '1' + result;
+	  }
+	  return result;
+	}
+function create2DArray(width, height, fillValue = null) {
+  const array = [];
+
+  // Create rows 
+  for (let i = 0; i < height; i++) {
+    array[i] = [];
+
+    // Create columns and fill with value
+    for (let j = 0; j < width; j++) {
+      array[i][j] = fillValue;
+    }
+  }
+
+  return array;
+}
+
+function resizeCanvas(newWidth, newHeight) {
+  // 1. Store existing data
+  const imageData = ctx.getImageData(0, 0, myCanvas.width, myCanvas.height);
+
+  // 2. Create temporary canvas
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCanvas.width = myCanvas.width;
+  tempCanvas.height = myCanvas.height;
+
+  // 3. Draw stored data onto the temporary canvas
+  tempCtx.putImageData(imageData, 0, 0);
+
+  // 4. Resize the original canvas
+  myCanvas.width = newWidth;
+  myCanvas.height = newHeight;
+
+  // 5. Redraw from temporary canvas
+  ctx.drawImage(tempCanvas, 0, 0); 
+}
+</script>
+</body>
+</html>
