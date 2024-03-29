@@ -28,9 +28,13 @@
 
       draw(ctx) {
         // Calculate lighter and darker border colors
-        const lighterColor = this.lightenColor(this.color, 20);
-        const darkerColor = this.darkenColor(this.color, 20);
-
+        var lighterColor = this.lightenColor(this.color, 40);
+		
+        var darkerColor = this.darkenColor(this.color, 20);
+		if(this.color=='#000000'){
+			lighterColor = this.lightenColor(this.color, 10);
+			darkerColor = this.darkenColor(this.color, -20);
+		}
         // Draw the rectangle
 		ctx.globalAlpha=1
         ctx.fillStyle = this.color;
@@ -144,18 +148,26 @@
 		ctx.fillStyle="black"
 		ctx.fillRect(0,0,myCanvas.width,myCanvas.height)
     const rectangle = []
-	var sx=128
-	for(y=0;y<myCanvas.height;y+=128){
-		for(x=0;x<myCanvas.width;x+=sx){
+	rectangle.push(new Rectangle(0,0,myCanvas.width,myCanvas.height, '#406080'))
+	rectangle.push(new Rectangle(10,10,myCanvas.width-20,80, '#000000'))
+	rectangle.push(new Rectangle(10,100,246,300, '#000000'))
+	var sx=256
+	var sy=256
+	for(y=100;y<myCanvas.height-(sy);y+=sy){
+		sy=64+Math.random()*256
+		for(x=256;x<myCanvas.width;x+=sx){
 			if(Math.random()<.8){
-	rectangle.push(new Rectangle(x, y, sx, 128, '#406080'))
+	rectangle.push(new Rectangle(x, y, sx, sy, '#406080'))
 }else{
-	rectangle.push(new Rectangle(x, y, sx, 128, '#000000'))
+	rectangle.push(new Rectangle(x, y, sx, sy, '#000000'))
 }
-}
-sx=32+Math.random()*256
+}	
+sx=64+Math.random()*256
+//sy=32+Math.random()*256
 }
 	
+
+
     // Draw the rectangle on the canvas
 	for(i=0;i<rectangle.length;i+=1){
     rectangle[i].draw(ctx);
