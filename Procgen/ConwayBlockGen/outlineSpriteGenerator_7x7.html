@@ -491,7 +491,8 @@ const myGrid = new ToggleGrid(myCanvas, 16, 16, w, h);
 				dy2+=5*h
 			}
 			}
-			
+			dx = dx2
+			dy=dy2
 			if(dy2+32>myCanvas.height){
                 resizeCanvas(myCanvas.width,myCanvas.height+32)
                 //console.log(myCanvas.height)
