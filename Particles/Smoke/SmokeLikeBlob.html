@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive Ovals</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      background-color: black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <script>
+    // original by Claude 3 opus. modded.
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size to fullscreen
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const ovals = [];
+    const numOvals = 96;
+    const ovalRadius = 16;
+    const ovalSpacing = 1;
+    const ovalSpeed = 0.05;
+    const pushForce = 0.01;
+
+    // Create oval objects
+    for (let i = 0; i < numOvals; i++) {
+      ovals.push({
+        x: canvas.width / 2 + Math.random() * 100 - 50,
+        y: canvas.height / 2 + Math.random() * 100 - 50,
+        vx: 0,
+        vy: 0,
+		rad:0
+      });
+    }
+	
+    // Animation loop
+    function animate() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Update and draw ovals
+      ctx.fillStyle = 'rgba(255, 225, 255, 0.4)';
+      for (let i = 0; i < numOvals; i++) {
+        const oval = ovals[i];
+        oval.x += oval.vx;
+        oval.y += oval.vy;
+
+        // Apply pushing effect between ovals
+        for (let j = 0; j < numOvals; j++) {
+          if (i !== j) {
+            const otherOval = ovals[j];
+            const dx = oval.x - otherOval.x;
+            const dy = oval.y - otherOval.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < (ovalRadius/10) * 2 + ovalSpacing) {
+              const angle = Math.atan2(dy, dx);
+              const forceMagnitude = pushForce * (1 - distance / (ovalRadius * 2 + ovalSpacing));
+              oval.vx += Math.cos(angle) * forceMagnitude;
+              oval.vy += Math.sin(angle) * forceMagnitude;
+			  if(oval.rad<2)oval.rad+=0.3
+            }else{
+			const angle = Math.atan2(dy, dx);
+              const forceMagnitude = pushForce * (1 - distance / (ovalRadius * 2 + ovalSpacing));
+              oval.vx -= Math.cos(angle)/100
+              oval.vy -= Math.sin(angle)/100
+			  if(oval.rad>0.1)oval.rad-=0.002
+	            }
+          }
+        }
+		ctx.save()
+ctx.scale(2,2)
+ctx.translate(-canvas.width*.25,-canvas.height*.25)
+        ctx.beginPath();
+        if(oval.rad>.02)ctx.ellipse(oval.x, oval.y, ovalRadius*oval.rad, ovalRadius*oval.rad, 0, 0, Math.PI * 2);
+		
+        ctx.fill();
+
+		ctx.restore()
+      }
+
+      requestAnimationFrame(animate);
+    }
+	
+    // Mouse/touch event handler
+    function onInput(event) {
+      const rect = canvas.getBoundingClientRect();
+      const inputX = event.clientX - rect.left || event.touches[0].clientX - rect.left;
+      const inputY = event.clientY - rect.top || event.touches[0].clientY - rect.top;
+
+      for (let i = 0; i < numOvals; i++) {
+        const oval = ovals[i];
+        const dx = inputX - oval.x;
+        const dy = inputY - oval.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < ovalRadius * 2) {
+          const angle = Math.atan2(dy, dx);
+          oval.vx += Math.cos(angle) * ovalSpeed;
+          oval.vy += Math.sin(angle) * ovalSpeed;
+        }
+      }
+    }
+
+    // Add event listeners
+    canvas.addEventListener('mousemove', onInput);
+    canvas.addEventListener('touchmove', onInput);
+
+    // Start animation
+    animate();
+  </script>
+</body>
+</html>
