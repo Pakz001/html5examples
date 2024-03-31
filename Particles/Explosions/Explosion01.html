@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Interactive Ovals</title>
+ <style>
+  body, html {
+   margin: 0;
+   padding: 0;
+   overflow: hidden;
+  }
+  canvas {
+    display: block;
+    background-color: black;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+ </style>
+</head>
+<body>
+ <canvas id="canvas"></canvas>
+
+ <script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Set canvas size to fullscreen
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  class OvalEffect {
+   constructor(x, y) {
+    this.ovals = [];
+    this.numOvals = 96;
+    this.ovalRadius = 16;
+    this.ovalSpacing = 1;
+    this.ovalSpeed = 0.05;
+    this.pushForce = 0.01;
+    this.ovalTimeOut = 60; // time active
+    this.ovalFadeOut = 20; // lower is at nearer end
+
+    this.initOvals(x, y);
+   }
+
+   initOvals(x, y) {
+    // Create oval objects
+	let time1 = this.ovalTimeOut*(Math.random()+.5)
+	let time2 = time1/2
+	let scales=Math.random()*2
+    for (let i = 0; i < this.numOvals; i++) {
+	
+     this.ovals.push({
+      x: x + Math.random() * 100 - 50,
+      y: y + Math.random() * 100 - 50,
+      radius: this.ovalRadius,
+      vx: 0,
+      vy: 0,
+      timeout: time1,
+	  fadeOut: time2,
+      rad: 0,
+	  scale:scales
+     });
+    }
+   }
+
+   update() {
+    if (this.ovals.length === 0) return;
+var inside =[]
+var inside2 =[]
+var inside3 = []
+    // Update and draw ovals
+    ctx.fillStyle = 'rgba(255, 22, 22, 0.4)';
+    for (let i = 0; i < this.numOvals; i++) {
+     const oval = this.ovals[i];
+     oval.x += oval.vx;
+     oval.y += oval.vy;
+
+     // Apply pushing effect between ovals
+     for (let j = 0; j < this.numOvals; j++) {
+      if (i !== j) {
+       const otherOval = this.ovals[j];
+       const dx = oval.x - otherOval.x;
+       const dy = oval.y - otherOval.y;
+       const distance = Math.sqrt(dx * dx + dy * dy);
+       if (distance < (this.ovalRadius / 10) * 2 + this.ovalSpacing) {
+        const angle = Math.atan2(dy, dx);
+        const forceMagnitude = this.pushForce * (1 - distance / (this.ovalRadius * 2 + this.ovalSpacing));
+        oval.vx += Math.cos(angle) * forceMagnitude;
+        oval.vy += Math.sin(angle) * forceMagnitude;
+        if (oval.rad < 2) oval.rad += 0.3;
+       } else {
+        const angle = Math.atan2(dy, dx);
+        const forceMagnitude = this.pushForce * (1 - distance / (this.ovalRadius * 2 + this.ovalSpacing));
+        oval.vx -= Math.cos(angle) / 100;
+        oval.vy -= Math.sin(angle) / 100;
+        if (oval.rad > 0.1) oval.rad -= 0.002;
+       }
+      }
+     }
+
+	 
+	 
+     ctx.beginPath();
+     if (oval.rad > 0.02) {
+		inside.push(oval.x)
+		inside.push(oval.y)
+	 	inside.push((oval.radius * oval.rad))
+		inside.push((oval.radius * oval.rad))
+		inside2.push(oval.x)
+		inside2.push(oval.y)
+	 	inside2.push((oval.radius * oval.rad)*.7)
+		inside2.push((oval.radius * oval.rad)*.7)
+		inside3.push(oval.x+2)
+		inside3.push(oval.y+2)
+	 	inside3.push((oval.radius * oval.rad)*.6)
+		inside3.push((oval.radius * oval.rad)*.6)
+		//ctx.ellipse(oval.x, oval.y, oval.radius * oval.rad, oval.radius * oval.rad, 0, 0, Math.PI * 2);
+	 }
+	 
+
+     ctx.fill();
+
+     oval.timeout -= 1;
+     if (oval.timeout < oval.fadeOut) {
+		 //console.log("@")
+      oval.radius *=.9
+     }
+    }
+	
+	
+	ctx.save()
+	ctx.scale(this.ovals[0].scale,this.ovals[0].scale)
+	ctx.translate(-(canvas.width*(1.0-this.ovals[0].scale)),-(canvas.height*(1.0-this.ovals[0].scale)))
+	
+	for(var q=0;q<inside.length;q+=4){
+		
+		ctx.fillStyle = 'rgba(255, 90, 20, 0.2)';
+		ctx.beginPath();
+		ctx.ellipse(inside[q], inside[q+1],inside[q+2],inside[q+3], 0,0, Math.PI * 2);
+		ctx.fill();
+		ctx.fillStyle = 'rgba(255, 255, 0, 0.1)';
+		ctx.beginPath();
+		ctx.ellipse(inside2[q], inside2[q+1],inside2[q+2],inside2[q+3], 0,0, Math.PI * 2);
+		ctx.fill();
+		ctx.fillStyle = 'rgba(255, 255, 255, .1)';
+		ctx.beginPath();
+		ctx.ellipse(inside3[q], inside3[q+1],inside3[q+2],inside3[q+3], 0,0, Math.PI * 2);
+		ctx.fill();
+	}
+	ctx.restore()
+	
+    if (this.ovals[0].timeout < 0) {
+     this.ovals = [];
+     this.initOvals(Math.random() * canvas.width, Math.random() * canvas.height);
+    }
+   }
+
+   onInput(event) {
+    const rect = canvas.getBoundingClientRect();
+    const inputX = event.clientX - rect.left || event.touches[0].clientX - rect.left;
+    const inputY = event.clientY - rect.top || event.touches[0].clientY - rect.top;
+
+    for (let i = 0; i < this.numOvals; i++) {
+     const oval = this.ovals[i];
+     const dx = inputX - oval.x;
+     const dy = inputY - oval.y;
+     const distance = Math.sqrt(dx * dx + dy * dy);
+     if (distance < this.ovalRadius * 2) {
+      const angle = Math.atan2(dy, dx);
+      oval.vx += Math.cos(angle) * this.ovalSpeed * 32;
+      oval.vy += Math.sin(angle) * this.ovalSpeed * 32;
+     }
+    }
+   }
+  }
+
+  const effects = []; // Array to store multiple effect instances
+
+  // Animation loop
+  function animate() {
+   // Clear canvas
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+   // Update and draw effects
+   for (let i = 0; i < effects.length; i++) {
+    effects[i].update();
+   }
+
+   requestAnimationFrame(animate);
+  }
+
+  // Mouse/touch event handler
+  function onInput(event) {
+   for (let i = 0; i < effects.length; i++) {
+    effects[i].onInput(event);
+   }
+  }
+
+  // Add event listeners
+  canvas.addEventListener('mousemove', onInput);
+  canvas.addEventListener('touchmove', onInput);
+
+  // Create multiple effect instances
+  for(var i=0;i<12;i+=1){
+  effects.push(new OvalEffect(Math.random() * canvas.width, Math.random() * canvas.height));
+  effects.push(new OvalEffect(Math.random() * canvas.width, Math.random() * canvas.height));
+	}
+  // Start animation
+  animate();
+ </script>
+</body>
+</html>
