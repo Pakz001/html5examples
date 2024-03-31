@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canvas and Textarea Example</title>
+  <style>
+  body {
+      margin: 0;
+      overflow: auto;
+    }
+    canvas2 {
+      border: 1px solid black;
+      width: 100%;
+      height: 600px;
+      background-color: white;
+    }
+    textarea {
+      width: 80%;
+      height: 100px;
+      vertical-align: middle;
+    }
+    button {
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <textarea id="inputTextarea"></textarea>
+  <button onclick="processTextarea()">Process</button>
+  <br><br>
+  <canvas id="myCanvas"></canvas>
+
+  <script>
+	const myCanvas = document.getElementById('myCanvas');
+  	const ctx = myCanvas.getContext('2d');
+    myCanvas.width=800
+	var w=h=8
+	var b = []
+	var tileWidth=tileHeight=6
+    function processTextarea() {
+      var myTextArea = document.getElementById('inputTextarea').value;
+      var b = myTextArea.split('\n');
+      //console.log(b.length)
+      // Further processing of the array can be done here
+	  
+	  
+	  
+	  
+            
+
+
+			var dx=0
+			var dy=0
+            cobo = true
+			fail = false
+//			dx+=5*w
+//			if(dx+w*5>c.width){
+//				dx=0
+//				dy+=5*h
+//			}
+            //ctx.beginPath()
+            //ctx.rect(0,0,myCanvas.width,myCanvas.height+1000)
+           //ctx.closePath()
+		   //console.log(b[0])
+            //ctx.clip();
+            ctx.globalAlpha = 1
+            var x = 0;
+            var y = 0;
+			var dx2 = 0
+			var dy2 = 0
+            //ctx.fillStyle = "red"
+            //ctx.fillRect(dx2,dy2,400,400);
+			for(var j=0;j<b.length;j+=1){
+				
+				x=0
+				y=0
+				var a=b[j]
+				let d=stringTo2DArray(a.slice(1,-1),w,h)
+            	for(var i=0;i<a.length;i++){
+					//if(Math.random()<.001)console.log(a.charAt(i))
+	                if(a.charAt(i)==0){
+	                ctx.fillStyle="#ffffff";
+	                }else if(a.charAt(i)==1){
+	                ctx.fillStyle="#000000";
+					
+	                }else{
+						continue
+	                }
+					
+	                //ctx.fillRect(x*tileWidth,y*tileHeight,tileWidth,tileHeight);
+	                ctx.fillRect((x*tileWidth)+dx2,(y*tileHeight)+dy2,tileWidth,tileHeight);
+	                x+=1;
+	                if(x>w-1){
+	                    y+=1;
+	                    x=0;
+	                }
+	            }
+				// top down area to red
+				for(var x=w-2;x>=0;x-=1){
+				for(var y=0;y<h;y+=1){
+					if(d[y][x]==1){
+						if(d[y+1][x]===0 && d[y+1][x-1]==1){
+							//console.log(d)
+							mf(d,x,y+1,0,2)
+							//console.log(d)
+						}
+						ctx.fillStyle="rgb(255,100,0,.9)"
+						ctx.fillRect((x*tileWidth)+dx2,(y*tileHeight)+dy2,tileWidth,tileHeight);
+						break
+					}
+					
+				}}
+				// left to right  area to red
+				for(var y=0;y<h;y+=1){
+				for(var x=0;x<w/2;x+=1){
+				
+					if(d[y][x]==1){
+						ctx.fillStyle="rgb(255,100,0,.9)"
+						ctx.fillRect((x*tileWidth)+dx2,(y*tileHeight)+dy2,tileWidth,tileHeight);
+						break
+					}
+					
+				}}
+				
+				//fill
+				for(var y=0;y<h;y+=1){
+				for(var x=0;x<w;x+=1){
+				
+					if(d[y][x]==2){
+						ctx.fillStyle="rgb(150,100,50)"
+						ctx.fillRect((x*tileWidth)+dx2,(y*tileHeight)+dy2,tileWidth,tileHeight);
+						
+					}
+					
+				}}
+				
+	            //ctx.restore()
+				dx2+=(tileWidth)*(w+2)
+				if(dx2+w*tileWidth>myCanvas.width){
+					dx2=0
+					dy2+=tileHeight*(h+2)
+				}
+				
+				//dx = dx2
+				//dy=dy2
+				if(dy2+128>myCanvas.height){
+	                resizeCanvas(myCanvas.width,myCanvas.height+32)
+	                //console.log(myCanvas.height)
+	            }
+				
+				
+				
+				
+				
+				}
+                console.log("done")        
+	  
+	  
+	  
+	  
+	  
+	  
+    }
+	function mf(a,x,y,val1,val2){
+		
+		//console.log(a[y][x])
+		
+		if(x<0)return
+		if(y<0)return
+		if(x>=w)return
+		if(y>=h)return
+		if(a[y][x]!=val1){
+			//console.log(a[y][x])
+			return
+		}
+		a[y][x]=val2
+		mf(a,x-1,y,val1,val2)
+		mf(a,x+1,y,val1,val2)
+		mf(a,x,y-1,val1,val2)
+		mf(a,x,y+1,val1,val2)
+	}
+	
+	function floodFill(grid, row, col, fillValue) {
+  const rows = grid.length;
+  const cols = grid[0].length;
+  const targetValue = grid[row][col]; // Value of the cell we're starting from
+
+  // Check if the cell is within bounds and matches the target value
+  function isValid(r, c) {
+    return r >= 0 && r < rows && c >= 0 && c < cols && grid[r][c] === targetValue;
+  }
+
+  // Recursive helper function to perform the flood fill
+  function fill(r, c) {
+    if (!isValid(r, c)) return; // Base case: out of bounds or cell already filled
+
+    grid[r][c] = fillValue;  // Fill the current cell
+
+    // Flood fill in 4 directions: up, down, left, right
+    fill(r - 1, c); 
+    fill(r + 1, c);
+    fill(r, c - 1); 
+    fill(r, c + 1);
+  }
+
+  // Start the fill
+  fill(row, col);
+  //console.log(grid)
+  
+}
+
+	
+	
+	
+	function stringTo2DArray(inputString, rows, columns) {
+  // Error handling: Ensure input parameters are valid
+  if (!inputString || rows <= 0 || columns <= 0) {
+    throw new Error("Invalid input: String, rows, and columns must be provided.");
+  }
+
+  // Error handling: Check if input length matches expected dimensions  
+  if (inputString.length !== rows * columns) {
+    throw new Error("Input string length does not match specified dimensions.");
+  }
+
+  const resultArray = [];
+  let index = 0;
+
+  // Create the 2D array
+  for (let i = 0; i < rows; i++) {
+    const row = [];
+    for (let j = 0; j < columns; j++) {
+      row.push(parseInt(inputString[index], 10)); // Convert '0' and '1' characters to numbers
+      index+=1
+    }
+    resultArray.push(row);
+  }
+
+  return resultArray;
+}
+
+
+	function resizeCanvas(newWidth, newHeight) {
+  // 1. Store existing data
+  const imageData = ctx.getImageData(0, 0, myCanvas.width, myCanvas.height);
+
+  // 2. Create temporary canvas
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCanvas.width = myCanvas.width;
+  tempCanvas.height = myCanvas.height;
+
+  // 3. Draw stored data onto the temporary canvas
+  tempCtx.putImageData(imageData, 0, 0);
+
+  // 4. Resize the original canvas
+  myCanvas.width = newWidth;
+  myCanvas.height = newHeight;
+
+  // 5. Redraw from temporary canvas
+  ctx.drawImage(tempCanvas, 0, 0); 
+}
+  </script>
+</body>
+</html>
