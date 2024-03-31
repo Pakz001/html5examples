@@ -3,7 +3,11 @@
 <head>
   <title>Canvas and Textarea Example</title>
   <style>
-    canvas {
+  body {
+      margin: 0;
+      overflow: auto;
+    }
+    canvas2 {
       border: 1px solid black;
       width: 100%;
       height: 600px;
@@ -28,6 +32,7 @@
   <script>
 	const myCanvas = document.getElementById('myCanvas');
   	const ctx = myCanvas.getContext('2d');
+    myCanvas.width=800
 	var w=h=8
 	var b = []
 	var tileWidth=tileHeight=1
@@ -102,9 +107,7 @@
 	                //console.log(myCanvas.height)
 	            }
 				}
-ctx.fillRect((0*tileWidth)+dx2,(0*tileHeight)+dy2,66,66);
-		console.log(b.length)
-        
+                console.log("done")        
 	  
 	  
 	  
