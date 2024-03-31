@@ -1,0 +1,11 @@
+
+function getSquareDimension(str) {
+  const length = str.length;
+  const dimension = Math.sqrt(length);
+  
+  if (dimension % 1 === 0) {
+    return [Math.floor(dimension), Math.floor(dimension)];
+  } else {
+    throw new Error("The length of the string is not a perfect square.");
+  }
+}
