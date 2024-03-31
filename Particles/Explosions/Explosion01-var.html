@@ -51,7 +51,8 @@
     // Create oval objects
 	let time1 = this.ovalTimeOut*(Math.random()+.5)
 	let time2 = time1/2
-	let scales=Math.random()*2
+	let scales=Math.random()
+	if(Math.random()<.5)scales/=4
     for (let i = 0; i < this.numOvals; i++) {
 	
      this.ovals.push({
@@ -134,8 +135,11 @@ var inside3 = []
 	
 	
 	ctx.save()
+	
+	
 	ctx.scale(this.ovals[0].scale,this.ovals[0].scale)
-	ctx.translate(-(canvas.width*(1.0-this.ovals[0].scale)),-(canvas.height*(1.0-this.ovals[0].scale)))
+	let s=this.ovals[0].scale
+	//ctx.translate((canvas.width*(this.ovals[0].scale)),(canvas.height*(this.ovals[0].scale)))
 	var ax=0
 	var ay=0
 	var cnt=0
@@ -145,35 +149,40 @@ var inside3 = []
 		cnt+=1
 		ctx.fillStyle = 'rgba(255, 90, 20, 0.2)';
 		ctx.beginPath();
-		ctx.ellipse(inside[q], inside[q+1],inside[q+2],inside[q+3], 0,0, Math.PI * 2);
+		ctx.ellipse(inside[q]/s, inside[q+1]/s,inside[q+2],inside[q+3], 0,0, Math.PI * 2);
 		ctx.fill();
 		ctx.fillStyle = 'rgba(255, 255, 0, 0.1)';
 		ctx.beginPath();
-		ctx.ellipse(inside2[q], inside2[q+1],inside2[q+2],inside2[q+3], 0,0, Math.PI * 2);
+		ctx.ellipse(inside2[q]/s, inside2[q+1]/s,inside2[q+2],inside2[q+3], 0,0, Math.PI * 2);
 		ctx.fill();
 		ctx.fillStyle = 'rgba(255, 255, 255, .1)';
 		ctx.beginPath();
-		ctx.ellipse(inside3[q], inside3[q+1],inside3[q+2],inside3[q+3], 0,0, Math.PI * 2);
+		ctx.ellipse(inside3[q]/s, inside3[q+1]/s,inside3[q+2],inside3[q+3], 0,0, Math.PI * 2);
 		ctx.fill();
 	}
 	
-	ctx.fillStyle = 'rgba(255, 255, 255, .7)';
+	
 	ax=ax/(cnt)
 	ay=ay/(cnt)
 	//console.log(ax)
+	ctx.fillStyle = 'rgba(255, 255, 255, .2)';
 		ctx.beginPath();
-		ctx.ellipse(ax,ay,inside[2],inside[3], 0,0, Math.PI * 2);
+		ctx.ellipse(ax/s,ay/s,inside[2]*1.5,inside[3]*1.5, 0,0, Math.PI * 2);
 		ctx.fill();
-		ctx.fillStyle = 'rgba(255, 255, 255, .5)';
+	ctx.fillStyle = 'rgba(255, 255, 255, .5)';
+		ctx.beginPath();
+		ctx.ellipse(ax/s,ay/s,inside[2]/3,inside[3]/3, 0,0, Math.PI * 2);
+		ctx.fill();
+		ctx.fillStyle = 'rgba(255, 255, 255, .2)';
 		for(var y=-1;y<2;y+=1){
 		for(var x=-1;x<2;x+=1){
 			
 		ctx.beginPath();
-		ctx.ellipse(ax+(x*inside[2]*.5),ay+(y*inside[3]*.5),inside[2]/2,inside[3]/2, 0,0, Math.PI * 2);
+		ctx.ellipse(ax/s+(x*inside[2]*.5),ay/s+(y*inside[3]*.5),inside[2]/4,inside[3]/4, 0,0, Math.PI * 2);
 		ctx.fill();
 	}}
 	ctx.restore()
-	
+
     if (this.ovals[0].timeout < 0) {
      this.ovals = [];
      this.initOvals(Math.random() * canvas.width, Math.random() * canvas.height);
