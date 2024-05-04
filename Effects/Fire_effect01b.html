@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	gameloop=setInterval(doGameLoop,16);
+
+	
+	var x = 320
+	var w = []
+	var wx = []
+	var a =0
+	var z=1
+	var z2 = 1
+	
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10); 
+		
+		w.push(20+Math.random()*40)
+		wx.push(Math.sin(a)*2)//(Math.random()*(w[w.length-1]/2))
+		a+=0.1
+		//console.log(w.length)
+		if(Math.random()<.08)z=.5+(Math.random()*5)
+		if(Math.random()<.08)z2=(.5-Math.random())*2
+		for(var i=0;i<w.length;i+=1){
+			w[i]-=Math.random()*z
+		}
+		ctx.fillStyle="red"
+		var t=1
+		var t2=1.0/w.length
+		for(var i=0;i<w.length;i+=1){
+			ctx.fillStyle="red"
+			ctx.globalAlpha = t 
+			t-=t2
+			var q=x+(Math.sin(i)*2)
+			ctx.fillRect(q+wx[wx.length-i],(300-i*4),w[w.length-i],3)
+			ctx.fillRect((q-w[w.length-i])+wx[wx.length-i],(300)-i*4,w[w.length-i],3)
+			
+			ctx.fillRect((q+wx[wx.length-i]),(300-i*4),w[w.length-i]/1.2,4)
+			ctx.fillRect((q-(w[w.length-i]))+wx[wx.length-i],(300)-i*4,w[w.length-i],4)
+			ctx.globalAlpha=0.7
+			ctx.fillStyle="black"
+			ctx.fillRect(q+wx[wx.length-i]+w[w.length-i]-4,(300-i*4),4,3)
+			ctx.fillRect(((q-w[w.length-i])+wx[wx.length-i]),(300)-i*4,4,3)
+			
+			wx[w.length-i]-=z2
+		}
+		ctx.fillStyle="yellow"
+		var t=1
+		var t2=1.0/(w.length/2)
+		for(var i=0;i<w.length/2;i+=1){
+			ctx.globalAlpha = t 
+			t-=t2
+			var q=x+(Math.sin(i)*2)
+			ctx.fillRect(q+wx[wx.length-i],(300)-i*2.5,w[w.length-i]/2.5,4)
+			ctx.fillRect((q-(w[w.length-i]/2.5))+wx[wx.length-i],(300)-i*2,w[w.length-i]/1.5,4)
+		}
+		for(var i=0;i<w.length;i+=1){
+			if(w[i]<1){
+				w.splice(i,1)
+				wx.splice(i,1)
+			}
+		}
+	}
+</script>
+</body>
+</html>
