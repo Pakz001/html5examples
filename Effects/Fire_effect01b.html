@@ -26,7 +26,8 @@ Use different browser.
 	gameloop=setInterval(doGameLoop,16);
 
 	
-	var x = 500
+	var x = window.innerWidth/2
+	var y = window.innerHeight/2
 	var w = []
 	var wx = []
 	var a =0
@@ -36,6 +37,8 @@ Use different browser.
 	function doGameLoop(){
 		myCanvas.height = window.innerHeight-32;
 		myCanvas.width = window.innerWidth-32;
+	x = window.innerWidth/2
+	y = window.innerHeight/2
 		ctx.fillStyle="rgb(0,0,0)";
 		ctx.fillRect(0,0,c.width,c.height);
 		ctx.fillStyle="rgb(255,255,255)";
@@ -58,15 +61,15 @@ Use different browser.
 			ctx.globalAlpha = t 
 			t-=t2
 			var q=x+(Math.sin(i)*2)
-			ctx.fillRect(q+wx[wx.length-i],(360-i*4),w[w.length-i],1)
-			ctx.fillRect((q-w[w.length-i])+wx[wx.length-i],(360)-i*4,w[w.length-i],1)
+			ctx.fillRect(q+wx[wx.length-i],(y-i*4),w[w.length-i],1)
+			ctx.fillRect((q-w[w.length-i])+wx[wx.length-i],(y)-i*4,w[w.length-i],1)
 			
-			ctx.fillRect((q+wx[wx.length-i]),(360-i*4),w[w.length-i]/1.2,4)
-			ctx.fillRect((q-(w[w.length-i]))+wx[wx.length-i],(360)-i*4,w[w.length-i],4)
+			ctx.fillRect((q+wx[wx.length-i]),(y-i*4),w[w.length-i]/1.2,4)
+			ctx.fillRect((q-(w[w.length-i]))+wx[wx.length-i],(y)-i*4,w[w.length-i],4)
 			ctx.globalAlpha=0.7
 			ctx.fillStyle="black"
-			ctx.fillRect(q+wx[wx.length-i]+w[w.length-i]-4,(360-i*4),4,3)
-			ctx.fillRect(((q-w[w.length-i])+wx[wx.length-i]),(360)-i*4,4,3)
+			ctx.fillRect(q+wx[wx.length-i]+w[w.length-i]-4,(y-i*4),4,3)
+			ctx.fillRect(((q-w[w.length-i])+wx[wx.length-i]),(y)-i*4,4,3)
 			
 			wx[w.length-i]-=z2
 		}
@@ -77,8 +80,8 @@ Use different browser.
 			ctx.globalAlpha = t 
 			t-=t2
 			var q=x+(Math.sin(i)*2)
-			ctx.fillRect(q+wx[wx.length-i],(360)-i*2.5,w[w.length-i]/2.5,2)
-			ctx.fillRect((q-(w[w.length-i]/2.5))+wx[wx.length-i],(360)-i*2,w[w.length-i]/1.5,2)
+			ctx.fillRect(q+wx[wx.length-i],(y)-i*4,w[w.length-i]/2.5,4)
+			ctx.fillRect((q-(w[w.length-i]/2.5))+wx[wx.length-i],(y)-i*4,(w[w.length-i]/2.5),4)
 		}
 		for(var i=0;i<w.length;i+=1){
 			if(w[i]<1){
