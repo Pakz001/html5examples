@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+#myCanvas {touch-action: none;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+-khtml-user-select:none;
+-moz-user-select:none;
+-ms-user-select:none;
+user-select:none;
+-webkit-tap-highlight-color:rgba(0,0,0,0);
+}
+</style>
+</head>
+<body bgcolor="black">
+<canvas id="myCanvas" width="320" height="240" style="border:0px solid #d3d3d3;">
+Use different browser.
+</canvas>
+	<script>
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+
+	gameloop=setInterval(doGameLoop,16);
+
+	class Fire {
+		constructor(x, y) {
+			this.x = x;
+			this.y = y;
+			this.w = [];
+			this.wx = [];
+			this.a = 0;
+			this.z = 1;
+			this.z2 = 1;
+		}
+
+		draw() {
+			ctx.fillStyle="red";
+			var t=1;
+			var t2=1.0/this.w.length;
+			for(var i=0;i<this.w.length;i+=1){
+				ctx.fillStyle="red";
+				ctx.globalAlpha = t;
+				t-=t2;
+				var q=this.x+(Math.sin(i)*2);
+				ctx.fillRect(q+this.wx[this.wx.length-i],(this.y-i*4),this.w[this.w.length-i],1);
+				ctx.fillRect((q-this.w[this.w.length-i])+this.wx[this.wx.length-i],(this.y)-i*4,this.w[this.w.length-i],1);
+				
+				ctx.fillRect((q+this.wx[this.wx.length-i]),(this.y-i*4),this.w[this.w.length-i]/1.2,4);
+				ctx.fillRect((q-(this.w[this.w.length-i]))+this.wx[this.wx.length-i],(this.y)-i*4,this.w[this.w.length-i],4);
+				ctx.globalAlpha=0.7;
+				ctx.fillStyle="black";
+				ctx.fillRect(q+this.wx[this.wx.length-i]+this.w[this.w.length-i]-4,(this.y-i*4),4,3);
+				ctx.fillRect(((q-this.w[this.w.length-i])+this.wx[this.wx.length-i]),(this.y)-i*4,4,3);
+				
+				this.wx[this.w.length-i]-=this.z2;
+			}
+			ctx.fillStyle="yellow";
+			var t=1;
+			var t2=1.0/(this.w.length/2);
+			for(var i=0;i<this.w.length/2;i+=1){
+				ctx.globalAlpha = t;
+				t-=t2;
+				var q=this.x+(Math.sin(i)*2);
+				ctx.fillRect(q+this.wx[this.wx.length-i],(this.y)-i*4,this.w[this.w.length-i]/2.5,4);
+				ctx.fillRect((q-(this.w[this.w.length-i]/2.5))+this.wx[this.wx.length-i],(this.y)-i*4,(this.w[this.w.length-i]/2.5),4);
+			}
+			for(var i=0;i<this.w.length;i+=1){
+				if(this.w[i]<1){
+					this.w.splice(i,1);
+					this.wx.splice(i,1);
+				}
+			}
+		}
+
+		update() {
+			this.w.push(20+Math.random()*40);
+			this.wx.push(Math.sin(this.a)*2);
+			this.a+=0.1;
+			if(Math.random()<.5)this.z=0.2+(Math.random()*5);
+			if(Math.random()<.08)this.z2=(0.5-Math.random())*2;
+			for(var i=0;i<this.w.length;i+=1){
+				this.w[i]-=Math.random()*this.z;
+			}
+		}
+	}
+
+	var fire1 = new Fire(window.innerWidth/2, window.innerHeight/2);
+	var fire2 = new Fire(window.innerWidth/4, window.innerHeight/2);
+	var fire3 = new Fire(window.innerWidth*3/4, window.innerHeight/2);
+
+	function doGameLoop(){
+		myCanvas.height = window.innerHeight-32;
+		myCanvas.width = window.innerWidth-32;
+		ctx.fillStyle="rgb(0,0,0)";
+		ctx.fillRect(0,0,c.width,c.height);
+		ctx.fillStyle="rgb(255,255,255)";
+		ctx.fillText("Javascript Html canvas example.",10,10);
+
+		fire1.update();
+		fire1.draw();
+		
+		fire2.update();
+		fire2.draw();
+		
+		fire3.update();
+		fire3.draw();
+	}
+</script>
+</body>
+</html>
