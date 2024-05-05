@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volumetric Fog Animation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set the canvas size to match the window size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Create an array to store the fog particles
+        const particles = [];
+        const numParticles = 80;
+
+        // Create the fog particles
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: (Math.random() * canvas.width+200)-200,
+                y: (Math.random() * canvas.height+200)-200,
+                radius: Math.random() * 160 + 160,
+                opacity: Math.random() * 0.01 + 0.01,
+                speed: Math.random() * 1 + 0.5,
+                angle: Math.random() * Math.PI * 2,
+				drew:Math.PI * 2
+            });
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Clear the canvas
+            ctx.fillStyle = 'rgb(0,0,0)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update and draw the fog particles
+            for (let i = 0; i < numParticles; i++) {
+                const particle = particles[i];
+
+                // Update the particle position based on its angle and speed
+                particle.x += Math.cos(particle.angle) * particle.speed;
+                particle.y += Math.sin(particle.angle) * particle.speed;
+
+                // Reset the particle position if it goes off the canvas
+                if (particle.x < 0 || particle.x > canvas.width) {
+					if(particle.x<-200)particle.x=canvas.width+200
+					if(particle.x>canvas.width+200)particle.x=-200
+                    //particle.x = Math.random() * canvas.width;
+					//particle.angle=-particle.angle
+                }
+                if (particle.y < 0 || particle.y > canvas.height) {
+					if(particle.y<-200)particle.x=canvas.height+200
+					if(particle.y>canvas.height+200)particle.y=-200
+					//particle.angle=-particle.angle
+                    //particle.y = Math.random() * canvas.height;
+                }
+
+                // Draw the particle
+				for(var j=particle.radius;j>2;j-=8){
+                ctx.beginPath();
+				
+                ctx.arc(particle.x, particle.y, particle.radius-j, 0, particle.drew);
+				
+                ctx.fillStyle = `rgba(80,0,0, ${particle.opacity})`;
+                ctx.fill();
+			}
+            }
+        }
+        animate();
+    </script>
+</body>
+</html>
