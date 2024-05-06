@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>3D Line Rotation</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+      background-color: black;
+    }
+  </style>
+</head>
+<body bgcolor="black">
+  <canvas id="canvas" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+	var sp = []
+    var lines = [
+      { x1: -50, y1: 0, z1: 0, x2: 50, y2: 0, z2: 0 },
+      { x1: 0, y1: -50, z1: 0, x2: 0, y2: 50, z2: 0 },
+      { x1: 0, y1: 0, z1: -50, x2: 0, y2: 0, z2: 50 }
+    ];
+
+    let angleX = 0;
+    let angleY = 0;
+    let angleZ = 0;
+
+    function rotateX(angle) {
+      angleX += angle;
+    }
+
+    function rotateY(angle) {
+      angleY += angle;
+    }
+
+    function rotateZ(angle) {
+      angleZ += angle;
+    }
+
+    function drawLines() {
+      //ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+
+      const cosX = Math.cos(angleX);
+      const sinX = Math.sin(angleX);
+      const cosY = Math.cos(angleY);
+      const sinY = Math.sin(angleY);
+      const cosZ = Math.cos(angleZ);
+      const sinZ = Math.sin(angleZ);
+
+      const transform = (x, y, z) => {
+        const rotatedX = x * cosY * cosZ + y * (sinX * sinY * cosZ - cosX * sinZ) + z * (cosX * sinY * cosZ + sinX * sinZ);
+        const rotatedY = x * cosY * sinZ + y * (sinX * sinY * sinZ + cosX * cosZ) + z * (cosX * sinY * sinZ - sinX * cosZ);
+        const rotatedZ = -x * sinY + y * sinX * cosY + z * cosX * cosY;
+
+        return {
+          x: rotatedX,
+          y: rotatedY,
+          z: rotatedZ
+        };
+      };
+	  
+	  sp = []
+	
+      lines.forEach(line => {
+
+        if(Math.random()<0.000001){
+        line.x2=Math.random()*25+25
+        line.y2=Math.random()*25+25
+        line.z2=Math.random()*25+25
+        line.x1=Math.random()*25+25
+        line.y1=Math.random()*25+25
+        line.z1=Math.random()*25+25
+        }
+        const point1 = transform(line.x1, line.y1, line.z1);
+        const point2 = transform(line.x2, line.y2, line.z2);
+		
+        //ctx.beginPath();
+        //ctx.moveTo(centerX + point1.x, centerY + point1.y);
+        //ctx.lineTo(centerX + point2.x, centerY + point2.y);
+        //ctx.stroke();
+		sp.push({x:centerX + point1.x,y: centerY + point1.y,z:Math.floor(point1.z)})
+		sp.push({x:centerX + point2.x,y: centerY + point2.y,z:Math.floor(point2.z)})
+      });
+    }
+	
+	var mod1 = 16
+	var mod2 = 0.2
+	var aa = 1.805305
+	var bb = 0.7575207
+	var cc = 8.2607202
+	var dd = 1.1298946
+    var ee = 0.041617264
+	
+	var mod1 = 16
+	var mod2 = 0.2
+	var aa = 1.77724
+	var bb = 1.89534
+	var cc = 22.68321
+	var dd = 1.096245
+    var ee = 0.017222
+	
+	var mod1 = 16
+	var mod2 = 0.2
+	var aa = 1.77724
+	var bb = 1.89534
+	var cc = 22.68321
+	var dd = 1.096245
+    var ee = 0.017222
+	
+	
+	canvas.width=window.innerWidth
+	canvas.height=window.innerHeight
+    function animate() {
+		//ctx.save()
+		//ctx.scale(4,4)
+		if(Math.random()<0.01)aa=Math.random()*2
+		if(Math.random()<0.01)bb=Math.random()*2
+		if(Math.random()<0.01)cc=Math.random()*16+8
+		if(Math.random()<0.01)dd=Math.random()+0.25
+		if(Math.random()<0.01)ee=Math.random()/30+0.01
+
+        //mod1+=(mod2)
+		//if(mod1<10 || mod1>12)mod2=-mod2
+		
+		ctx.globalAlpha=ee*2//0.05//075//0.175
+		ctx.fillStyle = "black"
+		ctx.fillRect(0,0,canvas.width,canvas.height)
+      	rotateX(0.01);
+      	rotateY(0.02);
+      	rotateZ(0.03);
+      	drawLines();
+	  	ctx.fillStyle="red"
+		//ctx.globalAlpha=0.05
+	  	for(var i=0;i<sp.length;i+=1){
+	  		var s =( (50 - sp[i].z)/5)+8
+	  		//ctx.fillRect(sp[i].x,sp[i].y,s,s)
+			//ctx.beginPath();
+			//ctx.arc(sp[i].x, sp[i].y, s/4, 0, 2 * Math.PI); // Full circle
+			//ctx.fillStyle = "red";
+			//ctx.fill();
+  		}
+		
+		for(var z2=0;z2<Math.PI*2;z2+=Math.PI/aa){
+			for(var z3=0;z3<Math.PI*2;z3+=Math.PI/bb){	
+		for(var z=0;z<Math.PI*2;z+=Math.PI/cc){
+		rotateX(z);
+      	rotateY(z2);
+      	rotateZ(z3);
+      	drawLines();
+		ctx.fillStyle="red"
+		ctx.globalAlpha=ee*10
+	  	for(var i=0;i<sp.length;i+=1){
+	  		var s =( (50 - sp[i].z)/5)+8
+	  		//ctx.fillRect(sp[i].x,sp[i].y,s,s)
+			ctx.beginPath();
+			ctx.arc(sp[i].x, sp[i].y, (s/2)/((z+dd)*mod1), 0, 2 * Math.PI); // Full circle
+			//ctx.fillStyle = "red";
+			ctx.fill();
+  		}
+		rotateX(-z);
+      	rotateY(-z2);
+      	rotateZ(-z3);
+		}}}
+		//ctx.restore()
+	  	//ctx.fillStyle="black"
+	  	//ctx.fillText(sp[0].z,sp[0].x,sp[0].y)
+      	requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
