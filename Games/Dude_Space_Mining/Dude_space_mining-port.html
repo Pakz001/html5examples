@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dude Space Mining</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="640" height="480"></canvas>
+
+    <script>
+        // Global game variables
+        let startx, starty;
+        let gamestate = "world";
+        let c64color = [];
+        let debugx1, debugy1, debugx2, debugy2;
+        let debugr1;
+        let debugw1, debugh1;
+
+        // Our gfx
+        let shipim, shipcan;
+        let rockim, rockcan;
+        let rockltim, rockltcan;
+        let rockrtim, rockrtcan;
+        let rocklbim, rocklbcan;
+        let rockrbim, rockrbcan;
+        let rockbackim, rockbackcan;
+        let rockore1im, rockore1can;
+        let rockore2im, rockore2can;
+        let iconore1im, iconore1can;
+        let iconore2im, iconore2can;
+        let iconore3im, iconore3can;
+        let iconscrapim, iconscrapcan;
+        let iconelecim, iconeleccan;
+        let explosionframe1im, explosionframe1can;
+        let explosionframe2im, explosionframe2can;
+        let explosionframe3im, explosionframe3can;
+        let missileim, missilecan;
+        let spacestationltim, spacestationrtim, spacestationlbim, spacestationrbim;
+        let spacestationltcan, spacestationrtcan, spacestationlbcan, spacestationrbcan;
+
+        class Spacestation {
+            constructor(x, y) {
+                this.tilex = x;
+                this.tiley = y;
+            }
+
+            update() {
+                // No implementation in the original code
+            }
+        }
+
+        class Minimap {
+            constructor() {
+                this.infotexttime = 200;
+                this.x = 0;
+                this.y = 0;
+                this.entityim = new Image();
+                this.entitycan = document.createElement('canvas').getContext('2d');
+                this.entitycan.canvas.width = myship.map[0].length;
+                this.entitycan.canvas.height = myship.map.length;
+                this.entitycan.clearRect(0, 0, this.entitycan.canvas.width, this.entitycan.canvas.height);
+                this.createmap();
+            }
+
+            createmap() {
+                this.minimapim = new Image();
+                this.minimapcan = document.createElement('canvas').getContext('2d');
+                this.minimapcan.canvas.width = myship.map[0].length;
+                this.minimapcan.canvas.height = myship.map.length;
+                for (let _y = 0; _y < this.minimapim.height; _y++) {
+                    for (let _x = 0; _x < this.minimapim.width; _x++) {
+                        if (this.solid(_x, _y)) {
+                            this.minimapcan.fillStyle = 'grey';
+                            this.minimapcan.fillRect(_x, _y, 1, 1);
+                        }
+                        if (myship.map[_x][_y] === 6) {
+                            this.minimapcan.fillStyle = 'rgba(128, 128, 128, 0.7)';
+                            this.minimapcan.fillRect(_x, _y, 1, 1);
+                        }
+                    }
+                }
+            }
+
+            update() {
+                if (keyDown('ArrowRight')) this.x -= 10;
+                if (keyDown('ArrowLeft')) this.x += 10;
+                if (keyDown('ArrowDown')) this.y -= 10;
+                if (keyDown('ArrowUp')) this.y += 10;
+            }
+
+            addentities() {
+                this.entitycan.clearRect(0, 0, this.entitycan.canvas.width, this.entitycan.canvas.height);
+                this.entitycan.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                this.entitycan.fillRect(0, 0, this.entitycan.canvas.width, this.entitycan.canvas.height);
+                this.infotexttime = 100;
+                this.x = -(myship.x / myship.tilew) * 4 + 320;
+                this.y = -(myship.y / myship.tileh) * 4 + 240;
+                this.entitycan.fillStyle = 'yellow';
+                this.entitycan.fillRect(myship.x / myship.tilew + (320 / myship.tilew), myship.y / myship.tileh + (240 / myship.tileh), 1, 1);
+                // add missiles
+                for (let i of mymissiles) {
+                    this.entitycan.fillStyle = 'red';
+                    this.entitycan.fillRect(myship.x / myship.tilew + i.x / myship.tilew, myship.y / myship.tileh + i.y / myship.tileh, 1, 1);
+                }
+                // add spacestations
+                for (let i = 0; i < myspacestation.length; i++) {
+                    this.entitycan.fillStyle = 'blue';
+                    this.entitycan.fillRect(myspacestation[i].tilex, myspacestation[i].tiley, 4, 4);
+                }
+            }
+
+            draw(canvas) {
+                canvas.drawImage(this.minimapim, this.x, this.y, 0, 4, 4);
+                canvas.drawImage(this.entityim, this.x, this.y, 0, 4, 4);
+                if (this.infotexttime > 0) {
+                    this.infotexttime--;
+                    canvas.fillStyle = 'black';
+                    canvas.fillRect(200, 0, 640 - 200, 30);
+                    canvas.fillStyle = 'white';
+                    canvas.fillText("Use Cursor Keys to move map around.. M - exit", 210, 0);
+                }
+            }
+
+            solid(_x, _y) {
+                switch (myship.map[_x][_y]) {
+                    case 0: // nothing
+                        return false;
+                    case 1: // rock
+                        return true;
+                    case 2: // left top
+                        return true;
+                    case 3: // right top
+                        return true;
+                    case 4: // left bottom
+                        return true;
+                    case 5: // right bottom
+                        return true;
+                    case 6: // background
+                        return false;
+                    case 7: // ore1(crystal)
+                        return true;
+                    case 8: // ore2(metal)
+                        return true;
+                }
+                return false;
+            }
+        }
+
+        class Explosion {
+            constructor(x, y, tp, startdelay) {
+                this.x = x;
+                this.y = y;
+                this.tp = tp;
+                this.delay = 0;
+                this.delaymax = Math.floor(Math.random() * 6) + 1;
+                this.startcount = 0;
+                this.startdelay = startdelay;
+                this.anim = [];
+                this.animpointer = 0;
+                this.deleteme = false;
+                this.rotation = 0;
+                switch (tp) {
+                    case 1:
+                        this.anim = [0, 1, 2, 1, 0];
+                        break;
+                }
+            }
+
+            update() {
+                this.delay++;
+                this.startcount++;
+                if (this.startcount < this.startdelay) return;
+                this.rotation += 0.1;
+                if (this.rotation > Math.PI * 2) this.rotation = 0;
+                if (this.delay > this.delaymax) {
+                    this.delay = 0;
+                    this.animpointer++;
+                    switch (this.tp) {
+                        case 1:
+                            if (this.animpointer > 4) {
+                                this.deleteme = true;
+                                return;
+                            }
+                            break;
+                    }
+                }
+            }
+
+            draw(canvas) {
+                canvas.save();
+                canvas.translate(this.x, this.y);
+                canvas.rotate(this.rotation);
+                switch (this.tp) {
+                    case 1:
+                        switch (this.anim[this.animpointer]) {
+                            case 0:
+                                canvas.drawImage(explosionframe1im, -explosionframe1im.width / 2, -explosionframe1im.height / 2);
+                                break;
+                            case 1:
+                                canvas.drawImage(explosionframe2im, -explosionframe2im.width / 2, -explosionframe2im.height / 2);
+                                break;
+                            case 2:
+                                canvas.drawImage(explosionframe3im, -explosionframe3im.width / 2, -explosionframe3im.height / 2);
+                                break;
+                        }
+                        break;
+                }
+                canvas.restore();
+            }
+        }
+
+        class ShipInventory {
+            constructor() {
+                this.x = 96;
+                this.y = 96;
+                this.w = 640 - 96 * 2;
+                this.h = 480 - 96 * 2;
+                this.inv = new Array(23).fill(0);
+                this.invnum = new Array(23).fill(0);
+                for (let i = 0; i < 5; i++) {
+                    let num = 8;
+                    if (Math.random() < 0.2) num = 1;
+                    if (Math.random() < 0.2) num = 7;
+                    if (Math.random() < 0.2) num = 9;
+                    if (Math.random() < 0.2) num = 10;
+                    this.inv[i] = num;
+                    this.invnum[i] = Math.floor(Math.random() * 99) + 1;
+                    if (Math.random() < 0.3) this.invnum[i] = 99;
+                    if (Math.random() < 0.4) this.invnum[i] = 1;
+                }
+            }
+
+            update() {
+                // No implementation in the original code
+            }
+
+            draw(canvas) {
+                this.winboxoutside(canvas, this.x, this.y, this.w, this.h);
+                this.maininventoryslots(canvas, this.x + 32, this.y + 12, this.w - 64, 128 + 8, this.inv);
+            }
+
+            maininventoryslots(canvas, _x, _y, _w, _h, inv) {
+                let num = 0;
+                for (let y = 0; y < _h; y += 48) {
+                    for (let x = 0; x < _w; x += 48) {
+                        this.winboxinside(canvas, _x + x, _y + y, 48, 48);
+                        if (num < inv.length) {
+                            // draw icon
+                            this.drawicon(canvas, _x + x, _y + y, inv[num]);
+                            // draw amount
+                            if (this.invnum[num] > 1) {
+                                canvas.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                                canvas.fillRect(_x + x + 48 - 30, _y + y + 48 - 20, 28, 16);
+                                canvas.fillStyle = 'black';
+                                canvas.fillText(this.invnum[num], _x + x + 48 - 24, _y + y + 48 - 20);
+                                canvas.fillText(this.invnum[num], _x + x + 48 - 23, _y + y + 48 - 18);
+                                canvas.fillStyle = 'white';
+                                canvas.fillText(this.invnum[num], _x + x + 48 - 25, _y + y + 48 - 22);
+                                canvas.fillText(this.invnum[num], _x + x + 48 - 24, _y + y + 48 - 21);
+                            }
+                        }
+                        num++;
+                    }
+                }
+            }
+
+            winboxoutside(canvas, _x, _y, _w, _h) {
+                // black outline
+                canvas.fillStyle = c64color[0];
+                canvas.fillRect(_x, _y, _w, _h);
+                // medium grey inside
+                canvas.fillStyle = c64color[15];
+                canvas.fillRect(_x + 1, _y + 1, _w - 2, _h - 2);
+                // dark grey bottom hor and right
+                canvas.fillStyle = c64color[11];
+                canvas.fillRect(_x + 1, _y + _h - 4, _w - 2, 4);
+                canvas.fillRect(_x + _w - 5, _y + 1, 4, _h - 2);
+                // dark top right and bottom
+                canvas.fillStyle = c64color[1];
+                canvas.fillRect(_x + 1, _y + 1, _w - 2, 4);
+                canvas.fillRect(_x + 1, _y + 1, 4, _h - 2);
+            }
+
+            winboxinside(canvas, _x, _y, _w, _h) {
+                // black outline
+                canvas.fillStyle = c64color[0];
+                canvas.fillRect(_x, _y, _w, _h);
+                // dark grey inside
+                canvas.fillStyle = c64color[11];
+                canvas.fillRect(_x + 1, _y + 1, _w - 2, _h - 2);
+                // white bottom hor and right
+                canvas.fillStyle = c64color[1];
+                canvas.fillRect(_x + 1, _y + _h - 2, _w - 1, 1);
+                canvas.fillRect(_x + _w - 2, _y + 1, 1, _h - 1);
+                // black top right and bottom
+                canvas.fillStyle = c64color[0];
+                canvas.fillRect(_x + 1, _y + 1, _w - 1, 1);
+                canvas.fillRect(_x + 1, _y + 1, 1, _h - 1);
+            }
+
+            drawicon(canvas, _x, _y, num) {
+                canvas.save();
+                canvas.translate(_x + 24, _y + 24);
+                switch (num) {
+                    case 1: // rock icon
+                        canvas.drawImage(iconore3im, -iconore3im.width / 2, -iconore3im.height / 2);
+                        break;
+                    case 7: // crystal blue
+                        canvas.drawImage(iconore1im, -iconore1im.width / 2, -iconore1im.height / 2);
+                        break;
+                    case 8: // metal
+                        canvas.drawImage(iconore2im, -iconore2im.width / 2, -iconore2im.height / 2);
+                        break;
+                    case 9: // scrap
+                        canvas.drawImage(iconscrapim, -iconscrapim.width / 2, -iconscrapim.height / 2);
+                        break;
+                    case 10: // electronics
+                        canvas.drawImage(iconelecim, -iconelecim.width / 2, -iconelecim.height / 2);
+                        break;
+                }
+                canvas.restore();
+            }
+        }
+
+        class Missiles {
+            constructor(x, y, angle) {
+                this.x = x;
+                this.y = y;
+                this.angle = angle;
+                this.launchangle = angle;
+                this.deleteme = false;
+                this.home = false;
+                this.launchtime = 60;
+            }
+
+            update() {
+                if (edistance(this.x, this.y, 320, 240) < 200) {
+                    this.home = true;
+                }
+                if (edistance(this.x, this.y, 320, 240) < 32) {
+                    this.home = false;
+                    this.deleteme = true;
+                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x * myship.tilew - myship.x + myship.tilew / 2, this.y * myship.tileh - myship.y + myship.tileh / 2, 9));
+                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x * myship.tilew - myship.x + myship.tilew / 2, this.y * myship.tileh - myship.y + myship.tileh / 2, 10));
+                    for (let i = 0; i < 10; i++) {
+                        myexplosions.push(new Explosion(this.x + Math.floor(Math.random() * 64) - 32, this.y + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                    }
+                    myship.respawn = true;
+                }
+                if (this.home === false) return;
+                this.launchtime--;
+                if (this.launchtime > 0) {
+                    let vx = Math.cos(this.launchangle) * (100 - this.launchtime) / 70.0;
+                    let vy = Math.sin(this.launchangle) * (100 - this.launchtime) / 70.0;
+                    this.x += vx;
+                    this.y += vy;
+                    let tan = -getangle(this.x, this.y, 320, 240);
+                    let difference = angledifference(tan, this.angle);
+                    if (difference < 0) this.angle -= 0.15;
+                    else this.angle += 0.15;
+                    return;
+                }
+                // Home the missile
+                let targetx = 320 - this.x;
+                let targety = 240 - this.y;
+                this.angle = Math.atan2(targety, targetx) * 180 / Math.PI;
+                // 2 here below is the movement speed
+                let vx = 2 * (90 - Math.abs(this.angle)) / 90;
+                let vy;
+                if (this.angle < 0) {
+                    vy = -2 + Math.abs(vx);
+                } else {
+                    vy = 2 - Math.abs(vx);
+                }
+                this.x += vx;
+                this.y += vy;
+                this.angle = -Math.atan2(vy, vx) + Math.PI * 2;
+
+                // collision with walls
+                let rx = Math.floor(this.x + myship.x);
+                let ry = Math.floor(this.y + myship.y);
+                let tx = Math.floor(rx / myship.tilew);
+                let ty = Math.floor(ry / myship.tileh);
+                for (let y2 = -1; y2 <= 1; y2++) {
+                    for (let x2 = -1; x2 <= 1; x2++) {
+                        let ax = (tx + x2) * myship.tilew;
+                        let ay = (ty + y2) * myship.tileh;
+                        if (isore(myship.map[tx + x2][ty + y2]) || myship.map[tx + x2][ty + y2] === 1) {
+                            if (rectsoverlap(ax, ay, myship.tilew, myship.tileh, rx, ry, 3, 3)) {
+                                this.deleteme = true;
+                                for (let i = 0; i < 10; i++) {
+                                    myexplosions.push(new Explosion(this.x + Math.floor(Math.random() * 64) - 32, this.y + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                                }
+                                if (Math.random() < 0.8) mypickups.push(new Pickups(this.x * myship.tilew - myship.x + myship.tilew / 2, this.y * myship.tileh - myship.y + myship.tileh / 2, 9));
+                                if (Math.random() < 0.8) mypickups.push(new Pickups(this.x * myship.tilew - myship.x + myship.tilew / 2, this.y * myship.tileh - myship.y + myship.tileh / 2, 10));
+                            }
+                        }
+                        if (myship.map[tx + x2][ty + y2] === 2) { // left top
+                            let x1 = ax;
+                            let y1 = ay + myship.tileh;
+                            let x2 = ax + myship.tilew;
+                            let y2 = ay + myship.tileh;
+                            let x3 = ax + myship.tilew;
+                            let y3 = ay;
+                            for (let an = 0; an < Math.PI * 2; an += 0.5) {
+                                let x4 = Math.cos(an) * 16;
+                                let y4 = Math.sin(an) * 16;
+                                if (pointintriangle2d(rx + x4, ry + y4, x1, y1, x2, y2, x3, y3)) {
+                                    this.deleteme = true;
+                                    for (let i = 0; i < 10; i++) {
+                                        myexplosions.push(new Explosion(this.x + Math.floor(Math.random() * 64) - 32, this.y + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                                    }
+                                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x + myship.tilew / 2, this.y + myship.tileh / 2, 9));
+                                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x + myship.tilew / 2, this.y + myship.tileh / 2, 10));
+                                    return;
+                                }
+                            }
+                        }
+                        if (myship.map[tx + x2][ty + y2] === 3) { // right top
+                            let x1 = ax;
+                            let y1 = ay;
+                            let x2 = ax + myship.tilew;
+                            let y2 = ay + myship.tileh;
+                            let x3 = ax;
+                            let y3 = ay + myship.tileh;
+                            for (let an = 0; an < Math.PI * 2; an += 0.5) {
+                                let x4 = Math.cos(an) * 16;
+                                let y4 = Math.sin(an) * 16;
+                                if (pointintriangle2d(rx + x4, ry + y4, x1, y1, x2, y2, x3, y3)) {
+                                    this.deleteme = true;
+                                    for (let i = 0; i < 10; i++) {
+                                        myexplosions.push(new Explosion(this.x + Math.floor(Math.random() * 64) - 32, this.y + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                                    }
+                                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x + myship.tilew / 2, this.y + myship.tileh / 2, 9));
+                                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x + myship.tilew / 2, this.y + myship.tileh / 2, 10));
+                                    return;
+                                }
+                            }
+                        }
+                        if (myship.map[tx + x2][ty + y2] === 4) { // left bottom
+                            let x1 = ax;
+                            let y1 = ay;
+                            let x2 = ax + myship.tilew;
+                            let y2 = ay + myship.tileh;
+                            let x3 = ax + myship.tilew;
+                            let y3 = ay;
+                            for (let an = 0; an < Math.PI * 2; an += 0.5) {
+                                let x4 = Math.cos(an) * 16;
+                                let y4 = Math.sin(an) * 16;
+                                if (pointintriangle2d(rx + x4, ry + y4, x1, y1, x2, y2, x3, y3)) {
+                                    this.deleteme = true;
+                                    for (let i = 0; i < 10; i++) {
+                                        myexplosions.push(new Explosion(this.x + Math.floor(Math.random() * 64) - 32, this.y + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                                    }
+                                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x + myship.tilew / 2, this.y + myship.tileh / 2, 9));
+                                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x + myship.tilew / 2, this.y + myship.tileh / 2, 10));
+                                    return;
+                                }
+                            }
+                        }
+                        if (myship.map[tx + x2][ty + y2] === 5) { // right bottom
+                            let x1 = ax;
+                            let y1 = ay;
+                            let x2 = ax;
+                            let y2 = ay + myship.tileh;
+                            let x3 = ax + myship.tilew;
+                            let y3 = ay + myship.tileh;
+                            for (let an = 0; an < Math.PI * 2; an += 0.5) {
+                                let x4 = Math.cos(an) * 16;
+                                let y4 = Math.sin(an) * 16;
+                                if (pointintriangle2d(rx + x4, ry + y4, x1, y1, x2, y2, x3, y3)) {
+                                    this.deleteme = true;
+                                    for (let i = 0; i < 10; i++) {
+                                        myexplosions.push(new Explosion(this.x + Math.floor(Math.random() * 64) - 32, this.y + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                                    }
+                                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x + myship.tilew / 2, this.y + myship.tileh / 2, 9));
+                                    if (Math.random() < 0.8) mypickups.push(new Pickups(this.x + myship.tilew / 2, this.y + myship.tileh / 2, 10));
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            draw(canvas) {
+                canvas.save();
+                canvas.translate(this.x, this.y);
+                canvas.rotate(this.angle);
+                canvas.drawImage(missileim, -missileim.width / 2, -missileim.height / 2);
+                canvas.restore();
+            }
+        }
+
+        class Pickups {
+            constructor(x, y, tp) {
+                this.deleteme = false;
+                this.x = x;
+                this.y = y;
+                this.angle = 0;
+                this.incx = 0;
+                this.incy = 0;
+                this.s = 8;
+                this.rotation = 0;
+                this.tp = tp; // type of icon (uses tile numbering)
+            }
+
+            update() {
+                this.rotation += 0.05;
+                if (this.rotation > Math.PI * 2) this.rotation -= Math.PI * 2;
+                this.x += this.incx;
+                this.y += this.incy;
+                // check distance to ship
+                // and if close move it quickly to ship position
+                if (edistance(this.x, this.y, 320, 240) < 50) {
+                    let a = getangle(this.x, this.y, 320, 240);
+                    this.incx = Math.cos(a) * 10;
+                    this.incy = Math.sin(a) * 10;
+                }
+                // if closer to ship remove (add to inventory!)
+                if (edistance(this.x, this.y, 320, 240) < 10) {
+                    this.deleteme = true;
+                    this.addtoplayerinventory();
+                }
+            }
+
+            addtoplayerinventory() {
+                // first check for almost filled stacks
+                for (let i = 0; i < myshipinventory.inv.length; i++) {
+                    if (myshipinventory.inv[i] === this.tp && myshipinventory.invnum[i] < 99) {
+                        myshipinventory.invnum[i]++;
+                        return;
+                    }
+                }
+                // check for empty inventory space
+                for (let i = 0; i < myshipinventory.inv.length; i++) {
+                    if (myshipinventory.inv[i] === 0 && myshipinventory.invnum[i] < 99) {
+                        myshipinventory.inv[i] = this.tp;
+                        myshipinventory.invnum[i]++;
+                        return;
+                    }
+                }
+            }
+
+            draw(canvas) {
+                canvas.save();
+                canvas.translate(this.x, this.y);
+                canvas.rotate(this.rotation);
+                canvas.translate(-this.x, -this.y);
+                if (this.tp === 1) { // rock
+                    canvas.drawImage(iconore3im, this.x - iconore3im.width / 2, this.y - iconore3im.height / 2);
+                }
+                if (this.tp === 7) { // crystal blue
+                    canvas.drawImage(iconore1im, this.x - iconore1im.width / 2, this.y - iconore1im.height / 2);
+                }
+                if (this.tp === 8) { // metal
+                    canvas.drawImage(iconore2im, this.x - iconore2im.width / 2, this.y - iconore2im.height / 2);
+                }
+                if (this.tp === 9) { // scrap
+                    canvas.drawImage(iconscrapim, this.x - iconscrapim.width / 2, this.y - iconscrapim.height / 2);
+                }		
+				
+				if (this.tp === 10) { // elec
+                    canvas.drawImage(iconelecim, this.x - iconelecim.width / 2, this.y - iconelecim.height / 2);
+                }
+                canvas.restore();
+            }
+        }
+
+        class Laser {
+            constructor(x, y, incx, incy) {
+                this.x = x;
+                this.y = y;
+                this.s = 3;
+                this.incx = incx;
+                this.incy = incy;
+                this.time = 0;
+                this.timeout = 320;
+                this.deleteme = false;
+            }
+
+            update() {
+                // increase life
+                this.time++;
+                // if too old then mark for delete
+                if (this.time > this.timeout) this.deleteme = true;
+                this.x += this.incx;
+                this.y += this.incy;
+
+                // get map position
+                let rx = Math.floor(this.x + myship.x);
+                let ry = Math.floor(this.y + myship.y);
+                let tx = Math.floor(rx / myship.tilew);
+                let ty = Math.floor(ry / myship.tileh);
+                for (let y2 = -1; y2 <= 1; y2++) {
+                    for (let x2 = -1; x2 <= 1; x2++) {
+                        let ax = tx + x2 * myship.tilew;
+                        let ay = ty + y2 * myship.tileh;
+                        if (isore(myship.map[ax][ay]) || myship.map[ax][ay] === 1) {
+                            if (rectsoverlap(ax * myship.tilew, ay * myship.tileh, myship.tilew, myship.tileh, rx, ry, 3, 3)) {
+                                this.deleteme = true;
+                                myship.mapdamage[ax][ay]++;
+                                if (myship.mapdamage[ax][ay] < 4) return;
+                                if (myship.map[ax][ay] === 7) { // drop pickup (crystal)
+                                    mypickups.push(new Pickups(ax * myship.tilew - myship.x + myship.tilew / 2, ay * myship.tileh - myship.y + myship.tileh / 2, 7));
+                                }
+                                if (myship.map[ax][ay] === 8) { // drop pickup (metal)
+                                    mypickups.push(new Pickups(ax * myship.tilew - myship.x + myship.tilew / 2, ay * myship.tileh - myship.y + myship.tileh / 2, 8));
+                                }
+                                if (myship.map[ax][ay] === 1) { // drop pickup (rock)
+                                    mypickups.push(new Pickups(ax * myship.tilew - myship.x + myship.tilew / 2, ay * myship.tileh - myship.y + myship.tileh / 2, 1));
+                                }
+                                myship.map[ax][ay] = 6;
+                                // remove any edges
+                                for (let bx = -1; bx <= 1; bx++) {
+                                    for (let by = -1; by <= 1; by++) {
+                                        if (myship.map[ax + bx][ay + by] > 1 && myship.map[ax + bx][ay + by] < 6) {
+                                            myship.map[ax + bx][ay + by] = 6;
+                                        }
+                                    }
+                                }
+                                // recreate any edges
+                                for (let by = ay - 2; by < ay + 2; by++) {
+                                    for (let bx = ax - 2; bx < ax + 2; bx++) {
+                                        if (myship.map[bx][by] === 1 && myship.map[bx - 1][by + 1] === 1 && myship.map[bx - 1][by] === 6) {
+                                            myship.map[bx - 1][by] = 2;
+                                            myship.mapdamage[bx - 1][by] = 0; // left top rock
+                                        }
+                                        if (myship.map[bx][by] === 1 && myship.map[bx + 1][by + 1] === 1 && myship.map[bx + 1][by] === 6) {
+                                            myship.map[bx + 1][by] = 3;
+                                            myship.mapdamage[bx + 1][by] = 0; // right top rock
+                                        }
+                                        if (myship.map[bx][by] === 1 && myship.map[bx - 1][by - 1] === 1 && myship.map[bx - 1][by] === 6) {
+                                            myship.map[bx - 1][by] = 4;
+                                            myship.mapdamage[bx - 1][by] = 0; // left bottom rock
+                                        }
+                                        if (myship.map[bx][by] === 1 && myship.map[bx + 1][by - 1] === 1 && myship.map[bx + 1][by] === 6) {
+                                            myship.map[bx + 1][by] = 5;
+                                            myship.mapdamage[bx + 1][by] = 0; // right bottom rock
+                                        }
+                                    }
+                                }
+                                // remove any missiles on the rocks
+                                for (let i of mymissiles) {
+                                    if (edistance(ax * myship.tilew - myship.x + myship.tilew / 2, ay * myship.tileh - myship.y + myship.tileh / 2, i.x, i.y) < 64) {
+                                        i.deleteme = true;
+                                        if (Math.random() < 0.8) mypickups.push(new Pickups(i.x + Math.floor(Math.random() * 16) - 8, i.y + Math.floor(Math.random() * 16) - 8, 9));
+                                        if (Math.random() < 0.8) mypickups.push(new Pickups(i.x + Math.floor(Math.random() * 16) - 8, i.y + Math.floor(Math.random() * 16) - 8, 10));
+                                        for (let i2 = 0; i2 < 10; i2++) {
+                                            myexplosions.push(new Explosion(i.x + Math.floor(Math.random() * 64) - 32, i.y + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                                        }
+                                    }
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                // collision with missiles
+                for (let i of mymissiles) {
+                    if (rectsoverlap(i.x, i.y, 6, 6, this.x, this.y, 4, 4)) {
+                        i.deleteme = true;
+                        if (Math.random() < 0.8) mypickups.push(new Pickups(this.x, this.y, 9));
+                        if (Math.random() < 0.8) mypickups.push(new Pickups(this.x, this.y, 10));
+                        for (let i = 0; i < 10; i++) {
+                            myexplosions.push(new Explosion(this.x + Math.floor(Math.random() * 64) - 32, this.y + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                        }
+                    }
+                }
+            }
+
+            draw(canvas) {
+                canvas.beginPath();
+                canvas.arc(this.x, this.y, this.s, 0, Math.PI * 2);
+                canvas.fillStyle = 'red';
+                canvas.fill();
+            }
+        }
+
+        class Ship {
+            constructor(x, y, angle) {
+                this.respawn = false;
+                this.respawntime = 0;
+                this.map = [];
+                this.mapdamage = [];
+                this.tilew = 48;
+                this.tileh = 48;
+                this.numstars = 80;
+                this.starx = [];
+                this.stary = [];
+                this.starspeed = [];
+                this.starcol = [];
+                this.x = x;
+                this.y = y;
+                this.incx = 0;
+                this.incy = 0;
+                this.thrust = 0;
+                this.thrustmax = 2;
+                this.angle = angle;
+                this.maxspeed = 2;
+                for (let i = 0; i < 512; i++) {
+                    this.map[i] = [];
+                    this.mapdamage[i] = [];
+                    for (let j = 0; j < 512; j++) {
+                        this.map[i][j] = 0;
+                        this.mapdamage[i][j] = 0;
+                    }
+                }
+                this.generatemap();
+                for (let i of mymissiles) {
+                    i.x -= this.x;
+                    i.y -= this.y;
+                }
+                for (let i = 0; i < this.numstars; i++) {
+                    this.starx[i] = Math.random() * 640;
+                    this.stary[i] = Math.random() * 480;
+                    this.starspeed[i] = Math.random() * 2.9 + 0.1;
+                    this.starcol[i] = `rgba(255, 255, 255, ${Math.random() * 0.6 + 0.2})`;
+                }
+            }
+
+            update() {
+                if (this.respawn) {
+                    this.incx = 0;
+                    this.incy = 0;
+                    this.respawntime++;
+                    if (this.respawntime > 100) {
+                        this.respawntime = 0;
+                        // realign anything on the map
+                        for (let i of mymissiles) {
+                            i.x += this.x - startx;
+                            i.y += this.y - starty;
+                            if (i.home) i.deleteme = true;
+                        }
+                        for (let i of mypickups) {
+                            i.x += this.x - startx;
+                            i.y += this.y - starty;
+                        }
+                        mylaser = [];
+                        // set to original position
+                        this.x = startx;
+                        this.y = starty;
+                        this.incx = 0;
+                        this.incy = 0;
+                        this.angle = 0;
+                        this.respawn = false;
+                    }
+                    return;
+                }
+
+                if (this.thrust > 0) this.thrust -= 0.01;
+
+                // collision with tiles
+                // get map position
+                let rx = Math.floor(320 + this.x);
+                let ry = Math.floor(240 + this.y);
+                let tx = Math.floor(rx / this.tilew);
+                let ty = Math.floor(ry / this.tileh);
+                for (let y2 = -1; y2 <= 1; y2++) {
+                    for (let x2 = -1; x2 <= 1; x2++) {
+                        let ax = (tx + x2) * this.tilew;
+                        let ay = (ty + y2) * this.tileh;
+                        if (this.map[tx + x2][ty + y2] === 1 || isore(this.map[tx + x2][ty + y2])) {
+                            // rect
+                            if (circlerectcollide(rx, ry, 16, ax, ay, this.tilew, this.tileh)) {
+                                this.incx = -this.incx;
+                                this.incy = -this.incy;
+                                this.dienow();
+                                return;
+                            }
+                        }
+                        if (this.map[tx + x2][ty + y2] === 2) { // left top
+                            let x1 = ax;
+                            let y1 = ay + this.tileh;
+                            let x2 = ax + this.tilew;
+                            let y2 = ay + this.tileh;
+                            let x3 = ax + this.tilew;
+                            let y3 = ay;
+                            for (let an = 0; an < Math.PI * 2; an += 0.5) {
+                                let x4 = Math.cos(an) * 16;
+                                let y4 = Math.sin(an) * 16;
+                                if (pointintriangle2d(rx + x4, ry + y4, x1, y1, x2, y2, x3, y3)) {
+                                    this.incx = -this.incx;
+                                    this.incy = -this.incy;
+                                    this.dienow();
+                                    return;
+                                }
+                            }
+                        }
+                        if (this.map[tx + x2][ty + y2] === 3) { // right top
+                            let x1 = ax;
+                            let y1 = ay;
+                            let x2 = ax + this.tilew;
+                            let y2 = ay + this.tileh;
+                            let x3 = ax;
+                            let y3 = ay + this.tileh;
+                            for (let an = 0; an < Math.PI * 2; an += 0.5) {
+                                let x4 = Math.cos(an) * 16;
+                                let y4 = Math.sin(an) * 16;
+                                if (pointintriangle2d(rx + x4, ry + y4, x1, y1, x2, y2, x3, y3)) {
+                                    this.incx = -this.incx;
+                                    this.incy = -this.incy;
+                                    this.dienow();
+                                    return;
+                                }
+                            }
+                        }
+                        if (this.map[tx + x2][ty + y2] === 4) { // left bottom
+                            let x1 = ax;
+                            let y1 = ay;
+                            let x2 = ax + this.tilew;
+                            let y2 = ay + this.tileh;
+                            let x3 = ax + this.tilew;
+                            let y3 = ay;
+                            for (let an = 0; an < Math.PI * 2; an += 0.5) {
+                                let x4 = Math.cos(an) * 16;
+                                let y4 = Math.sin(an) * 16;
+                                if (pointintriangle2d(rx + x4, ry + y4, x1, y1, x2, y2, x3, y3)) {
+                                    this.incx = -this.incx;
+                                    this.incy = -this.incy;
+                                    this.dienow();
+                                    return;
+                                }
+                            }
+                        }
+                        if (this.map[tx + x2][ty + y2] === 5) { // right bottom
+                            let x1 = ax;
+                            let y1 = ay;
+                            let x2 = ax;
+                            let y2 = ay + this.tileh;
+							
+							
+							let x3 = ax + this.tilew;
+                            let y3 = ay + this.tileh;
+                            for (let an = 0; an < Math.PI * 2; an += 0.5) {
+                                let x4 = Math.cos(an) * 16;
+                                let y4 = Math.sin(an) * 16;
+                                if (pointintriangle2d(rx + x4, ry + y4, x1, y1, x2, y2, x3, y3)) {
+                                    this.incx = -this.incx;
+                                    this.incy = -this.incy;
+                                    this.dienow();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            controls() {
+                if (this.respawn) return;
+                // mine
+                if (keyReleased('Space')) {
+                    mylaser.push(new Laser(320 + 24 - 16, 200 + 24 + 16, Math.cos(this.angle) * 4, -Math.sin(this.angle) * 4));
+                }
+
+                // turn
+                if (keyDown('ArrowRight')) this.angle -= 0.1;
+                if (keyDown('ArrowLeft')) this.angle += 0.1;
+                if (this.angle < 0) this.angle += Math.PI * 2;
+                if (this.angle > Math.PI * 2) this.angle -= Math.PI * 2;
+                // thrust (inc)
+                if (keyDown('ArrowUp')) {
+                    this.thrust += 0.015;
+                    if (this.thrust > this.thrustmax) this.thrust = this.thrustmax;
+                    let nvx = this.incx + Math.cos(this.angle) * this.thrust;
+                    let nvy = this.incy + Math.sin(this.angle) * this.thrust;
+                    // get the angle of the new nvx and nvy
+                    let nangle = Math.atan2(nvy, nvx); // get the angle from the movement variables
+                    // get the distance traveled from location of ship and the location with the movement added
+                    let dist = edistance(this.x, this.y, this.x + nvx, this.y + nvy);
+                    // If the movement is larger than max then limit
+                    if (Math.abs(dist) > this.maxspeed) {
+                        this.incx = Math.cos(nangle) * this.maxspeed;
+                        this.incy = Math.sin(nangle) * this.maxspeed;
+                    } else {
+                        // if the movement is within bounds then update the inc variables
+                        this.incx = nvx;
+                        this.incy = nvy;
+                    }
+                }
+                this.x += this.incx;
+                this.y -= this.incy;
+
+                // update the stars
+                for (let i = 0; i < this.numstars; i++) {
+                    this.starx[i] -= this.incx * this.starspeed[i];
+                    this.stary[i] += this.incy * this.starspeed[i];
+                    if (this.starx[i] < 0) this.starx[i] = 640;
+                    if (this.starx[i] > 640) this.starx[i] = 0;
+                    if (this.stary[i] < 0) this.stary[i] = 480;
+                    if (this.stary[i] > 480) this.stary[i] = 0;
+                }
+                // realign the objects with the map
+                for (let i of mypickups) {
+                    i.x -= this.incx;
+                    i.y += this.incy;
+                }
+                for (let i of mymissiles) {
+                    i.x -= this.incx;
+                    i.y += this.incy;
+                }
+                for (let i of myexplosions) {
+                    i.x -= this.incx;
+                    i.y += this.incy;
+                }
+            }
+
+            generatemap() {
+                // center of map set to 256,256
+                // create asteroid by growing pixels
+                this.map[256][256] = 1;
+                for (let i = 0; i < 2000 * 2000; i++) {
+                    let x = 256 + Math.floor(Math.random() * 301) - 150;
+                    let y = 256 + Math.floor(Math.random() * 301) - 150;
+                    if (this.map[x][y] === 1) {
+                        for (let y2 = -1; y2 <= 1; y2++) {
+                            for (let x2 = -1; x2 <= 1; x2++) {
+                                if (Math.random() < 0.5) this.map[x + x2][y + y2] = 1;
+                            }
+                        }
+                    }
+                }
+
+                let point = [];
+                let numpoints = 100;
+                for (let i = 0; i < numpoints; i++) {
+                    let exitloop = false;
+                    let x, y;
+                    while (!exitloop) {
+                        x = 256 + Math.floor(Math.random() * 341) - 170;
+                        y = 256 + Math.floor(Math.random() * 341) - 170;
+                        if (this.map[x][y] === 1) exitloop = true;
+                    }
+                    point.push({ x: x, y: y });
+                }
+                for (let i = 1; i < point.length; i++) {
+                    // carve
+                    let x1 = point[i - 1].x;
+                    let y1 = point[i - 1].y;
+                    let x2 = point[i].x;
+                    let y2 = point[i].y;
+                    while (x1 !== x2 && y1 !== y2) {
+                        if (x1 < x2) x1++;
+                        if (x1 > x2) x1--;
+                        if (y1 < y2) y1++;
+                        if (y1 > y2) y1--;
+                        let s = 1;
+                        if (Math.random() < 0.1) s = Math.floor(Math.random() * 2) + 2;
+                        for (let y = -s; y <= s; y++) {
+                            for (let x = -s; x <= s; x++) {
+                                this.map[x1 + x][y1 + y] = 6;
+                            }
+                        }
+                    }
+                }
+
+                // find edges and create those tile values
+                for (let y = 1; y < 511; y++) {
+                    for (let x = 1; x < 511; x++) {
+                        if (this.map[x][y] === 1 && this.map[x - 1][y + 1] === 1 && this.map[x - 1][y] === 6) this.map[x - 1][y] = 2; // left top rock
+                        if (this.map[x][y] === 1 && this.map[x + 1][y + 1] === 1 && this.map[x + 1][y] === 6) this.map[x + 1][y] = 3; // right top rock
+                        if (this.map[x][y] === 1 && this.map[x - 1][y - 1] === 1 && this.map[x - 1][y] === 6) this.map[x - 1][y] = 4; // left bottom rock
+                        if (this.map[x][y] === 1 && this.map[x + 1][y - 1] === 1 && this.map[x + 1][y] === 6) this.map[x + 1][y] = 5; // right bottom rock
+                        if (this.map[x][y] === 1 && this.map[x - 1][y + 1] === 1 && this.map[x - 1][y] === 0) this.map[x - 1][y] = 2; // left top rock
+                        if (this.map[x][y] === 1 && this.map[x + 1][y + 1] === 1 && this.map[x + 1][y] === 0) this.map[x + 1][y] = 3; // right top rock
+                        if (this.map[x][y] === 1 && this.map[x - 1][y - 1] === 1 && this.map[x - 1][y] === 0) this.map[x - 1][y] = 4; // left bottom rock
+                        if (this.map[x][y] === 1 && this.map[x + 1][y - 1] === 1 && this.map[x + 1][y] === 0) this.map[x + 1][y] = 5; // right bottom rock
+                    }
+                }
+
+                // add ore 1
+                for (let i = 0; i < 900; i++) {
+                    let x = 256 + Math.floor(Math.random() * 201) - 100;
+                    let y = 256 + Math.floor(Math.random() * 201) - 100;
+                    if (this.map[x][y] === 1) this.map[x][y] = 7;
+                    // grow
+                    if (Math.random() < 0.8) {
+                        let s = Math.floor(Math.random() * 79) + 2;
+                        for (let i2 = 0; i2 < s; i2++) {
+                            let x2 = x + Math.floor(Math.random() * 51) - 25;
+                            let y2 = y + Math.floor(Math.random() * 51) - 25;
+                            if (this.map[x2][y2] === 7) {
+                                for (let x3 = -1; x3 <= 1; x3++) {
+                                    for (let y3 = -1; y3 <= 1; y3++) {
+                                        if (this.map[x2 + x3][y2 + y3] === 1 && Math.random() < 0.3) {
+                                            this.map[x2 + x3][y2 + y3] = 7;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // add ore 2
+                for (let i = 0; i < 900; i++) {
+                    let x = 256 + Math.floor(Math.random() * 201) - 100;
+                    let y = 256 + Math.floor(Math.random() * 201) - 100;
+                    if (this.map[x][y] === 1) this.map[x][y] = 8;
+                    // grow
+                    if (Math.random() < 0.8) {
+                        let s = Math.floor(Math.random() * 179) + 2;
+                        for (let i2 = 0; i2 < s; i2++) {
+                            let x2 = x + Math.floor(Math.random() * 51) - 25;
+                            let y2 = y + Math.floor(Math.random() * 51) - 25;
+                            if (this.map[x2][y2] === 8) {
+                                for (let x3 = -1; x3 <= 1; x3++) {
+                                    for (let y3 = -1; y3 <= 1; y3++) {
+                                        if (this.map[x2 + x3][y2 + y3] === 1 && Math.random() < 0.3) {
+                                            this.map[x2 + x3][y2 + y3] = 8;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // add some missiles
+                for (let i = 0; i < 50000; i++) {
+                    let nx = Math.floor(Math.random() * 301) + 100;
+                    let ny = Math.floor(Math.random() * 301) + 100;
+                    if (this.map[nx][ny] === 1 && this.map[nx + 1][ny] === 6) {
+                        mymissiles.push(new Missiles(((nx + 1) * this.tilew) + 32 / 2, ny * this.tileh + this.tileh / 2, 0));
+                    }
+                    if (this.map[nx][ny] === 1 && this.map[nx - 1][ny] === 6) {
+                        mymissiles.push(new Missiles((nx * this.tilew) - 32 / 2, ny * this.tileh + this.tileh / 2, Math.PI));
+                    }
+                }
+
+                // add space station
+                myspacestation.push(new Spacestation(350, 350));
+                this.map[350][350] = 9;
+                this.map[351][350] = 10;
+                this.map[350][351] = 11;
+                this.map[351][351] = 12;
+            }
+
+            drawstars(canvas) {
+                for (let i = 0; i < this.numstars; i++) {
+                    canvas.fillStyle = this.starcol[i];
+                    canvas.fillRect(this.starx[i], this.stary[i], 1, 1);
+                }
+            }
+
+            drawmap(canvas) {
+                let offx = Math.floor(this.x / this.tilew);
+                let offy = Math.floor(this.y / this.tileh);
+                let poffx = (offx * this.tilew) - this.x;
+                let poffy = (offy * this.tileh) - this.y;
+                for (let my = 0; my < 16; my++) {
+                    for (let mx = 0; mx < 24; mx++) {
+                        let damage = this.mapdamage[offx + mx][offy + my];
+                        if (damage > 0) {
+                            canvas.fillStyle = `rgba(255, 255, 255, ${1.0 / 10 * damage})`;
+                        } else {
+                            canvas.fillStyle = 'white';
+                        }
+                        if (this.map[offx + mx][offy + my] === 1) { // rock
+                            canvas.drawImage(rockim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 2) { // left top rock
+                            canvas.drawImage(rockltim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 3) { // right top rock
+                            canvas.drawImage(rockrtim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 4) { // left bottom rock
+                            canvas.drawImage(rocklbim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 5) { // right bottom rock
+                            canvas.drawImage(rockrbim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh+ poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 6) { // background rock
+                            canvas.drawImage(rockbackim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 7) { // rock ore 1 (blue crystal)
+                            canvas.drawImage(rockore1im, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 8) { // rock ore 2 (metal)
+                            canvas.drawImage(rockore2im, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 9) { // space station left top
+                            canvas.drawImage(spacestationltim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 10) { // space station right top
+                            canvas.drawImage(spacestationrtim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 11) { // space station left bottom
+                            canvas.drawImage(spacestationlbim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                        if (this.map[offx + mx][offy + my] === 12) { // space station right bottom
+                            canvas.drawImage(spacestationrbim, 0 + mx * this.tilew + poffx, 0 + my * this.tileh + poffy);
+                        }
+                    }
+                }
+            }
+
+            dienow() {
+                if (Math.sqrt(this.incx * this.incx + this.incy * this.incy) > 1) {
+                    for (let i = 0; i < 10; i++) {
+                        myexplosions.push(new Explosion(320 + Math.floor(Math.random() * 64) - 32, 240 + Math.floor(Math.random() * 64) - 32, 1, Math.floor(Math.random() * 30)));
+                    }
+                    this.respawn = true;
+                }
+            }
+        }
+
+        let mylaser = [];
+        let myship;
+        let mypickups = [];
+        let mymissiles = [];
+        let myshipinventory;
+        let myexplosions = [];
+        let myminimap;
+        let myspacestation = [];
+
+        class MyWindow {
+            constructor() {
+                this.introinfotime = 200;
+                this.setupim();
+                myship = new Ship(349 * 48, 349 * 48 + 20, 0);
+                startx = 349 * 48;
+                starty = 349 * 48 + 20;
+                myshipinventory = new ShipInventory();
+                myminimap = new Minimap();
+                requestAnimationFrame(this.render.bind(this));
+            }
+
+            render() {
+                let canvas = document.getElementById('gameCanvas').getContext('2d');
+                canvas.clearRect(0, 0, canvas.canvas.width, canvas.canvas.height);
+
+                if (gamestate === "minimap") {
+                    myminimap.draw(canvas);
+                    if (keyReleased('KeyM')) {
+                        gamestate = "world";
+                    }
+                    myminimap.update();
+                }
+
+                if (gamestate === "shipinventory") {
+                    if (keyReleased('KeyI')) gamestate = "world";
+                    myshipinventory.update();
+                    myshipinventory.draw(canvas);
+                }
+
+                if (gamestate === "world") {
+                    if (keyReleased('KeyM')) {
+                        gamestate = "minimap";
+                        myminimap.addentities();
+                    }
+                    if (keyReleased('KeyI')) gamestate = "shipinventory";
+                    myship.update();
+                    myship.controls();
+                    // update the lasers
+                    for (let i of mylaser) {
+                        i.update();
+                    }
+                    // remove any dead ones
+                    mylaser = mylaser.filter(i => !i.deleteme);
+                    // update the pickups
+                    for (let i of mypickups) {
+                        i.update();
+                    }
+                    // remove any dead pickups
+                    mypickups = mypickups.filter(i => !i.deleteme);
+                    // update the missiles
+                    for (let i of mymissiles) {
+                        i.update();
+                    }
+                    // remove any dead missiles
+                    mymissiles = mymissiles.filter(i => !i.deleteme);
+                    // explosions
+                    for (let i of myexplosions) {
+                        i.update();
+                    }
+                    // remove any dead explosions
+                    myexplosions = myexplosions.filter(i => !i.deleteme);
+
+                    myship.drawstars(canvas);
+                    myship.drawmap(canvas);
+                    canvas.save();
+                    canvas.translate(320, 240);
+                    canvas.rotate(myship.angle);
+                    canvas.drawImage(shipim, -shipim.width / 2, -shipim.height / 2);
+                    canvas.restore();
+
+                    // draw the lasers
+                    for (let i of mylaser) {
+                        i.draw(canvas);
+                    }
+                    // draw the pickups
+                    for (let i of mypickups) {
+                        i.draw(canvas);
+                    }
+                    // draw the missiles
+                    for (let i of mymissiles) {
+                        i.draw(canvas);
+                    }
+                    // draw the explosions
+                    for (let i of myexplosions) {
+                        i.draw(canvas);
+                    }
+
+                    canvas.fillStyle = 'white';
+                    canvas.fillText("angle : " + myship.angle, 0, 10);
+                    canvas.fillText("thrust : " + myship.thrust, 0, 25);
+                    canvas.fillText("incx and incy : " + myship.incx + "," + myship.incy, 0, 40);
+                    if (this.introinfotime > 0) {
+                        this.introinfotime--;
+                        let x = 310;
+                        if (this.introinfotime < 50) x += 320 - this.introinfotime * 6;
+                        canvas.fillStyle = 'black';
+                        canvas.fillRect(x, 0, 330, 40);
+                        canvas.fillStyle = 'white';
+                        canvas.fillText("Press i toggle inventory.", x, 10);
+                        canvas.fillText("Press m toggle map.", x, 30);
+                    }
+                }
+
+                requestAnimationFrame(this.render.bind(this));
+            }
+
+            setupim() {
+                inic64colors();
+                shipim = new Image();
+                shipim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAApklEQVRYhe2WsQ2AIBAFjwTBYAaLJdiEEdiGbViFCRjA4g+a4BJwl0DSvLvLNSF8Xj4FEXkwE5jZBKyAHeidc1vYPkA3oJRAUQTyWkPbtmCtDZ8HChG5CZSTgoi8gA04vAZWYAmb55wHTdMEdV0HdV2r6romaNtW+b4PfN8neJ5H3nVd8Pt/P7BxHIW7LMvAOacsyxLEcUwQRZGO4zgS+L7/B3EC7NIiwXDIqbwAAAAASUVORK5CYII=';
+                shipim.onload = () => {
+                    shipcan = document.createElement('canvas');
+                    shipcan.width = shipim.width;
+                    shipcan.height = shipim.height;
+                    let shipctx = shipcan.getContext('2d');
+                    shipctx.clearRect(0, 0, shipcan.width, shipcan.height);
+                    shipctx.drawImage(shipim, 0, 0);
+                };
+                missileim = new Image();
+                missileim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAlElEQVRYhe2UQQ6AIAwEp8T//+IFvXgSIgZa2EUTJyZ0OrMFkVLaOOdcAkDO+aM5R9GRJOdMnudACAFIKZG1FogxApxzcM5xjJFda+CcA733nFJiYwyYpokVEZgxBjbGwIwxBOecQ0oJL4pCc6UqCU0rNt29txHMHzPF/XdR1QSsE5h1pr0FrDPM9gjIE8z6GqKg7DMGzf9+/gT+eQeweZXUgWmiRkHAAAAABJRU5ErkJggg==';
+                missileim.onload = () => {
+                    missilecan = document.createElement('canvas');
+                    missilecan.width = missileim.width;
+                    missilecan.height = missileim.height;
+                    let missilectx = missilecan.getContext('2d');
+                    missilectx.clearRect(0, 0, missilecan.width, missilecan.height);
+                    missilectx.drawImage(missileim, 0, 0);
+                };
+                rockim = new Image();
+                rockim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABuUlEQVRoge2ZQU7DMBBFXwlFpRzbQxBxg8QNKNsixYJDwA0oN4AbUG5AuQFsWSAhduUSO8OkM4kTN/6TLKVpkvF7/ozjOCGMSEQtAA9m7c1sB+CZiNrwLB0sEdtu5B0Rte+9F5HLRt6LyBbA62PEiSgD0JnZa+QjEaVZ4gBAVZ+MMa92f4wxm6o+1RZfVADA3gdV7e7K/31ijFmo6qqm/tTfh4SqZgBasEFV2xrydeCw+CIyVghV0D0AZxFZisgCwArAnYgcd+kp5D+C/MUjImq/6APdUVWyExGRWVX9Y8gDaDbZiYhcOz2uiIyzz/8KqqPVAFV1YCDQzz5HK/BrNUoB71lVHY87B3Dp9JzXEN93GNgS0aW9fQ9ZrKr71INzNxcRZS6IyMb1/J60OxEMJCJfA7M0zSJrjNm6mKq221xvIDIYePR3qOoawD2Adkge/0DVtc450SCYDD4GRmPrg7ejwcDR4OgMRINPp3YwsAVwHnhsbX19AzXxOjCLiFwNxNrARN4ZY84C4reqeukXVf3d8q3xz3MZ5RdFo1EKNBpFBQCsY5Jtt+2Oqtqr6vBZRPoTVqPRaDQSI6X0BVHcM6r752/mAAAAAElFTkSuQmCC';
+                rockim.onload = () => {
+                    rockcan = document.createElement('canvas');
+                    rockcan.width = rockim.width;
+                    rockcan.height = rockim.height;
+                    let rockctx = rockcan.getContext('2d');
+                    rockctx.clearRect(0, 0, rockcan.width, rockcan.height);
+                    rockctx.drawImage(rockim, 0, 0);
+                };
+                rockltim = new Image();
+                rockltim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAC7UlEQVRoge2Zy27bMBBFvxJQAW7tfIvkTRJvYKA7uEvlVRxvkniTdAu7W7lAChQofIUZ8nIoSqQsWT8GGFCmKFIzc+7cIUWNFZZYYokllljif4/a8b/YAXhU1QsAEFUdrLWjMeaXqg5hJkUkU9Wr+PkrgE8AFm5xVf0BoAfwxVp7iScR0RFAqar/PGkAde68FJHHb6FW1ScAY1gAwGCtfZaE8mciMqhqD+Bvqqm19ldMwAH4BaBICV4x5DX9rDEmmqCqVUzAWvsYa4hID2BBRFkMWVXLZE5EGk/eWtvHBERkCKiVaQIRDURUqeoy9VhH8lnspDLanBiUeRBgknm5WQJyJtV6Qx+w1jYpmdQLXMsNAfEFBRvTWlsCKK21AxF99jKaYjqSz5hOstZWvv6aNQzAzXIX1G5zPtTGGnPY6a2qg6pWzrmzH+mLZG06IrpgL+Hd6ZTEJZXQWts4506+ZXv7WKhq7RrVtG07HPxoJXPE9fX8A/dDTtx1XRl22LNvWe+TMkbeI3d+n+u9Esu2bQsAhyBbZVkeIiSv48J93g0+Oo1Vt9vtMKcXNjP9EoXneXvxXddlAE6z+wDA7XZT59yLAPd9n+ec8yjRh8iJ+77PrbUvIH2/35POO51OKyKqwn7vNhwOByHvXPWZF3Vdp12XNk3TLNwO8VXValnXde5/8Mnn5RQhqap6DnZEfr1ePVkdNr4oirppGs2yTP1eCbvrKZi7yCbywMPxeDyLSBkmLstSPOkZTy/HgiDA6XTKfw3BOI7JXRBLYCKvqkPf9zKOY/oipCPwmJJ3JDgi6uIDyTWZjq8a4EWgqqpT5NM/Go/WLLnAfAKJfRu+Yc/Pz1sijmWi2eQLw3BKrZf+s+RWdDqdNOHf3AIrLLHEEkv8p/EfvQWNmkJeJoMAAAAASUVORK5CYII=';
+                rockltim.onload = () => {
+                    rockltcan = document.createElement('canvas');
+                    rockltcan.width = rockltim.width;
+                    rockltcan.height = rockltim.height;
+                    let rockltctx = rockltcan.getContext('2d');
+                    rockltctx.clearRect(0, 0, rockltcan.width, rockltcan.height);
+                    rockltctx.drawImage(rockltim, 0, 0);
+                };
+                rockrtim = new Image();
+                rockrtim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACwklEQVRoge2Zy27bMBBFv5IABa4afA3DOzTeoPYaTrpys/Amjjexu7C6RRsgQIHCF8bkx6FIWaRE6TLAYKaSKIqcufeQsixiEYtYxCIWsYinhn0C/iKiv/xyZhlrJiIBIABgjNFpmZMiVS2stZNNRCUA9ZA7Vb1DsMyZ+I6UZVmq6s0z7hTAoNR4NktAVW8BuGl5p+V7AN9V9X1q0/RqKs/zOxFBaj0Rha/QIGOMqGoI2Zls4OFhqhbcywWstbc5+tTGtuu6aynLsgmbfBY+S4CIQkX6lIq5RQVi0Mc7vScCyTHQNA1iYRq6P1cgyzLEfHRyEU+q4F8kEFI02lCr6rsoAXdtTyoNHbgBuK7r1VQjIvJ2Pwmcc/lT15vMpZnAJuvHp55oEycBERG3Q78YozJYpCzLjrMZY0Lajrqu1+EMdeDCvPj8/PzTWhuS4dXxePxMRLvwuVSdEO+tXZxOp21i7Y/ZMd7e3to4z/6R3qc6ENfKuq63xhj/Ur16eXnZxeYQESyJPM+fQNpu4DiOv1IEQouZd5ZhGMxZ4G63C8cpdYpx+f7+nk3t+xzwvnXeKdwjohAIx+Nxb4y5D6yZBmaziouI6g6pW2PMnTcIAG9vb/8YY77EE6QiNTTzpmnqruvGbrez19fXq2q1mnTPO9nS+OBk+Tj0GbHWntQPvu26u7GqKo0WXl1dfZq7qjmLk4CqKjVUZJ17xGcQQWFr7Z6IaKq6z5HvOy4HtNauAbxxD77sOhwOD8GE3EvmAwAQ0d51xmrbduN/9H3fvL6+SkqmBzD4FYgJAMCPHz+0bVsXDhXoHKc5sBcAKa/KIICyLH9/ELk1f30PoVQC/xb9Ab/Ot+CVNkdoAAAAAElFTkSuQmCC';
+                rockrtim.onload = () => {
+                    rockrtcan = document.createElement('canvas');
+                    rockrtcan.width = rockrtim.width;
+                    rockrtcan.height = rockrtim.height;
+                    let rockrtctx = rockrtcan.getContext('2d');
+                    rockrtctx.clearRect(0, 0, rockrtcan.width, rockrtcan.height);
+                    rockrtctx.drawImage(rockrtim, 0, 0);
+                };
+                rocklbim = new Image();
+                rocklbim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACy0lEQVRoge2ZzW7bMBBFvxIA+VI1+Rqu99B4AyObJF6l8SaON0k2qbqNA19a5BLukpdDUZZlS7ZOAxhWLImUN3dmSFnWJCYxiUlMYhL/bywj/EXka7xQ3T5CxrERUQa7oV+iqupijEHVxBjzxXv/JGAcx8IYc1JTSql1NAERqRcCsNbaS/A+m0Dbtqsxxs3wTvqGxfVXAI/W2tvUAdaNJtu2LYlow82zIKKVSNDnHMdRiKj2IFSpE5GyLIvWfMfjsSijvOb8IlWiKIqjA5/3/oWIuGvwK+oahArmBsAlILRTIBODKqaL7QOh+fCIvfc0j0BdOX03z0GtNY8RKIqCw2Nyzt3NIkBET5fwjDH7c53zBTpCWTQHovpA3/c3a+26IyoRLc65rrTWrgBWa+0tEVEvXM65L9cCRVFs17yPx6PUdb0YY4II1I3WXbff9vt9CaCP2RFARyLqQ87JGKO11upTHdcnPu89tTIRdRvGFACUUpv7TCk1AhBjDAGQ3BTwCqXUnYB5npc/CXjvsxe1pmmSpM6C1nq1SgAAdrsdW2s/A5ibpjmcOXIpb/j+/fv+8ePHhzPnMgJKqZu+tNau3vsVQAlgBrDXWr/Z7/cPpwjUdS2z78aemOQJwFcAr04cc2WMWWez2SGm38wBKeV3KeWTX1Zd142U8kZK+W3b5zoBpdQspZxbqTtrrbsQESnljZTy2F5KeZTgN+9wIlJSyqlQSs1SyjmVTwhwG9NvLu6klLeZcgPQEtEvKeW3zUspZynlLP4p0HeNcyOUUnM2QRJCZGtjjPkWmUFSSjnLKbmtAmBmKG+tvQ15tgUiDuSu3qXU+cFZjEDUiQD7bZ4gojambwje3d1dReAF15O4DnXnNZcC/wCg/5CG5twP2QAAAABJRU5ErkJggg==';
+                rocklbim.onload = () => {
+                    rocklbcan = document.createElement('canvas');
+                    rocklbcan.width = rocklbim.width;
+                    rocklbcan.height = rocklbim.height;
+                    let rocklbctx = rocklbcan.getContext('2d');
+                    rocklbctx.clearRect(0, 0, rocklbcan.width, rocklbcan.height);
+                    rocklbctx.drawImage(rocklbim, 0, 0);
+                };
+                rockrbim = new Image();
+                rockrbim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAC6UlEQVRoge2Zv27UQBDGf3PGQkIilC4PgOANKP2SJ+ANKHkCaoTSUVDxABTph4RQhIQE/hXunLP3zuzOrp3IozJXo7VPu+M/x7M/ezU8Mo888nBisOtflmUiIje7xnfNiYgHsLNa7ByrqouqTYK21ZVmW2d9d1+0zq6qXuq5/q2pujPkiIgHAm12bN8bMRHSjqhchhJtd88aYURzHHwHAh4FzLyLHzrlfAE6NMd8BbLIsO4mi6IiZY1UtrbXzFEqMMW+Z+YqIfqQ2cRzHZwBOAVSqelFV1fdXr159jl+/fpX8+++/viyKYgrgNNT19MXz5y8BoG3btuu6JjMzs23bKnNdV/v9zMxhKpNl2UkURUfGmPEQxxRZln0BsKhC0GmS67pmy7KcEdGptXYeQgiYuXXObZqmaZqmaZumcZsLLB4fn8zMcZ7nMyKaDz1gZo4BQERmEaksy+kAj4hoZoxZCgCEEGDbNDvvfbher1trrer9C2EE4LLv8pu2bWtrbRjSiMiplPIWgN8GbIwx42azaTYR0aJt27Z37VWv6JDQtu2s9xnzxp99359UVfXn3r17t/tnP3/+DAC+qir27vIA4Lz3+WYx27bter2ue4HvhZaXaO9jyNze3uY3Nzez3pB5//59/ubNm4u+ljRJkixHtRiGRBRsbLqu889evHjpZrNZ6CvU5eXlFAD6hpwAuMx7IVUVa+0cQNi7ygwALy8vZxcXFzMiwjAimgO4NMaM+yG2XC7nqc9VLMtzIlqEENw2LpfL+YbfOKNiZi6Y2e1qllV1NgSuqpOqqv7eu3fvdq9k+fLlVFXtVrOMGHuPnQKoAbjUcl9EpgD8xjdlPyGiUykEABAR6RN7YUpESwCzlPWFaZomG330/v0HAIBHx+SWZ2aCb56QyBjzVkTKrQRCCDAOIdMQ+Wg0ujOIEEJQa22wbVv1vU3btLuJzGYDANNNqKvvbTar6Lx8qhEAsNPx+CrV+StmSyKaTafTUgB4772I4GEjZblC8ZoAgKqqZkRUiEglr8fjqyMACCFgNNoKXQJnZycAgF+/fk4B4JjZLZfL+YATAHjMrH3PJSKlc+5227pUaVOeSCwAwHvvjTF+Nptt3X3tuu6o67pDIroQEVxfX2/1FYmoEpEa/Qzc1VnuZ+2uqSIiUNW8H1kiArEsA0AlpazSl9aQIuIAhBDCzU5Dlcr6Qgjee++JyAO4JTNbKWUVQgjOuUoevPL//2cSk5jEwxT/APjIvHlCLzl7AAAAAElFTkSuQmCC';
+                rockrbim.onload = () => {
+                    rockrbcan = document.createElement('canvas');
+                    rockrbcan.width = rockrbim.width;
+                    rockrbcan.height = rockrbim.height;
+                    let rockrbctx = rockrbcan.getContext('2d');
+                    rockrbctx.clearRect(0, 0, rockrbcan.width, rockrbcan.height);
+                    rockrbctx.drawImage(rockrbim, 0, 0);
+                };
+                rockbackim = new Image();
+                rockbackim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABkklEQVRoge2ZQW7DMAxEPYXVpFlnnTfoOuuss9GtWTboFdqlN9glSE+JEsefWFISYP6ElER+pCiJlBNJSEhISEj4C2QO5o0H4NTAIyIaATwT0fEeogHAGcClYfdAROdFvkR09jY3ESkAnJj5vcdWRCoBaDLz1usrEcllPwNQ1WdjzLNuW2PMMdSfWw+A2WwRCQ2ijX0EcBKRKiIlgAuANyI6Bcff408TFREzF2SHmGswM3u7LWbeP7IOALTKISLajRj+QGPyiYhFTekBoNaWExG9eHncM3PZ7r1/IHyXywFV7VAg0Gouj6N2wH5q5wK8Z1V17DkOoRIPNZVSC8kpIs+6WZNm6wEXkT0IqmrbMevbTBtgXyRjPSciR11h5pPXZObab9YzoKpz4VhVNV15Zr6pKj7H6wwQUa0LqtoCeAdQbInVr9BlDQxGtgO7Ja0DWge2fhntgI2RdqDPgV4DxPsPQnN7eAdss6RIHSNrKnxm5rrw6oE/l8sWf6QlJGyJfyf2NySMJxrDAAAAAElFTkSuQmCC';
+                rockbackim.onload = () => {
+                    rockbackcan = document.createElement('canvas');
+                    rockbackcan.width = rockbackim.width;
+                    rockbackcan.height = rockbackim.height;
+                    let rockbackctx = rockbackcan.getContext('2d');
+                    rockbackctx.clearRect(0, 0, rockbackcan.width, rockbackcan.height);
+                    rockbackctx.drawImage(rockbackim, 0, 0);
+                };
+                rockore1im = new Image();
+                rockore1im.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEDElEQVRoge2ZS2gVVxzGf+fOSy94MSbeWmNtFR+4UmniK6igLnyAuhFciO5cKLhxKSi6UXfRnYjgQrpyoy58LKSCLSi1WvEZNVZrMb6TxjQ3907O34UzQ8YkNzM30zto/jDc4Zwz33zn+/5nfhAkJCQkJPy/oUQEEakAbheRS0BaRNpVNeucm3DOze8y3gJ2A23ABZ/lErgCTKrqHVVd3+x7cX4QkUxLS8vX2Ww2m06ncyLiOzs7NR6PdxGRAa4Ch4As0KSqIiItQIeqPgAGVXVpo28iWUMikhWRx5VKRWu1mv/SV6vVVFXvbaJzdwRrB/g8AuPXIvJIRFoaWqDp6WmA0eTk5Evi8fjdSCTS6TvdbLFYDPr7+6lWq/2hUOhz4LM9e/ZQrVb/mJiYuKeqpb3AHLDmv2vOTnDOHUnlcjnOnDlTr3nv4cOHH1UqleFwOPx7W1tbwXt29epVTp8+DdwAioAN8EfAqrXWWGtnALZqYROqOlmpVNi/fz93796t3x8aGspfv359ORKJPJuYmHBh9NL/l4wxnD17FmvtIeAjAGutcc6tL47neaRSKUSEBsnPOWPMZ8aYac/zcM7hvVzjX4iJRILx8fH/Fjg/yNYVc85VReRXoNvDzTqoAB+q6q97enoYGxsjlUrVAx2NRutjnTx5kpGRkch2A9zof9euXezdu5e2tjZSqRThcJh8Pk8+n2dxcZGxsTEWFxdxzs0YY74xxkxvdIULFy4QBAHGGFKpFIcOHdr082g0WlfdNWJbAT548CCDg4OICNFoFM/zSKfTdHR00NXV9cb409PTfwK/AX+VshkzNDTknHMUi0VyuRydnZ2MjIxw4sSJhia4trbG9evXAbDW/qdoW6CPHTtGf38/sViM9vZ2PM9jdXWVeXNgKT2XmXOPrLXWGENfXx8XL17kwIED4SAIUBW01MQjV6RUnSdbydkVd2ciMrkM7g/6+88xMDBAJpPBWkuhUKiruqr+t4Faa+8DH6TT6eqJEycYHh4mlUrVN6yIAHD79m2Gh4e3DerQ0FD+xo0by3Nzc4yOjtLT0/PaYhcKhXqNtZapqamamd5UhRobGwOgWCyya9cubty4QbFYfIWhTa6vr3PixIn4m+Stj8HszMzMmlIqK+XyRXVuCKBarXLo0CGmpqaoVqtMT0/jed76YfjOO+9QLBYj6XSa3bt3b2kF8bBuQXV29k+lPG/UsT67wU8i0pxIJOju7kZEmJmZAV5ZxOaVlZWPgR9mZ2cbk9haClVVyeW0qKqTbGD3zrklEfk60K5SyeTcyy1MTEywf/9+ent7yeVydHd3A6CU5+cX58Lh8IfWWsrlsm6R8uvmfPu2KhBIuazsPLHVWjsJDAJfAj9aa6mVK/fbnXNVYFUp362HTVZW6O3qAucYL5fLH3Z0dPSk0+lkIpHY09TUdC8Wi7VGo9EtV0spjSlBMIGqFnK5XD6VSsVisdhX0Wj0diwWc5FIpPEMicizIAiqSimhlCpBUNvRDCpCEARrwBT8/VjznSLyLfAOwm1jTNk5d09VbwLDOP+WuYdcK9ChCp7vNX7J5Io0R2D19fCZU9UFVR1T1aWdBjchISEhIaFR/A3aEqB2Jv9p0QAAAABJRU5ErkJggg==';
+                rockore1im.onload = () => {
+                    rockore1can = document.createElement('canvas');
+                    rockore1can.width = rockore1im.width;
+                    rockore1can.height = rockore1im.height;
+                    let rockore1ctx = rockore1can.getContext('2d');
+                    rockore1ctx.clearRect(0, 0, rockore1can.width, rockore1can.height);
+                    rockore1ctx.drawImage(rockore1im, 0, 0);
+                };
+                rockore2im = new Image();
+                rockore2im.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAD6klEQVRoge2Zy27bMBCGPxUFFNimzrVIc4nmGmm8QZJN0kPSa6S5RnuNpJfIJkCAFih8hR7ycChKluJIp80AA1qmKFHkzPBjOOMUFBQUFBT8N1Gh+z9JAbgPyyvn3FUlohSABMBO2OyF11trJ6o62NfmKM6N4/gyjuM8DMMiDEN/cXFht/Fdb6LWWjk8PPyQZZktisL3fWVZmpubG2Kt3TtgAPAZQArgIggCqOqFqj4FcK2qj621N/t67EWAcy4LwzBLksT0HlVVIcuyndtv23YVz+OeAQNb3zyCIECSJMiyDHEc3yAj8vHxMQCQx8fHyxaM7eE94Ov19XXVdd2qXSuKQpqm+QLgszHmE4Av0M8AzAEsBEDXdS8/Pj6y8fPrfqb/v+m3YfkD3/fRti2yLMMwDAiCAMYYhGEI3/dhjIHv+zDGoG1bdF2HqqpwOBgcHR3h+Ph4pxjXXgx96b3LMAxo2/aOfdd1G50BwP39PYQEz3M+Ho8BAF5fX5/7vg/nHPq+3+jQOYeu61AUBR4eHvD09ATn3KcgCK4B/LITgfWXoiiQpincBvtlWaJpGpRlibIs8fLygrIs0bYtiqJA0zR3+xzWarHvxVmWoes6dF1378WubZ9Op/j29pYeHBygrms457ZaRqSR+gDe+r6/ppSej0ajz0mSIEkSRFGEIAi+u+q3t7fIsuzLvokDACHtVq0VUv2klIZpmh6PRqMXQgiiKIK19vuYtdbCOffrzljokfP09BRnZ2cYj	8cIwRBAECIIAcRwjSRIkSYI4jmGtxXA4xPn5+d5xry3m5eUlAKAoCvi+j9vbW1RVtVJkjV8cx3DOrVzfpSbW1qDb21sAQFVVGI1GuL6+RlVVK45Wfa6vr/Hr1y85OTlZG/dKBRyPx7d5nrdSluVYnftKKQUAlGWJ4+NjPD4+whiDp6cnGGP+cvju3TtUVYUoijAYDDYqEBHb39zcPBNjxuJ5p4y9BfBBVS3jOEaSJFBVPD8/A/hLsWWe558AfH14eNhLYmOXUlURkX8opTNsmIFKqRci8pFS6gml9LO1FuPx+CMA+L7/ZTgcfrTWQkTw9va2VuK/2uj5+bmoMyalFJ83DHXOPQfwXil1LSIopfRcKT0DABHBYDCA7/sghHxxzqEoCkhZ1vmWzJQS4pwjIiIbTaZ1mgUR+U0pdSIiv4vIC6UURIS0bftZVY2I/JSrK2itxbdv36CUghIShmH4tixLFEWxldpKaarOM1FKzTzPy4bD4bCu62sAvwL4Til143ke0jTFNmWklPru+z6apkFd1zDGwPd933XB2HUyAEApnQP4DeAxIcSoqqrfROQ9pXRBRKo4jnceOiLyO6W0FREupVyIagURIUqpORG9wV9eM2sXROQLpTSjlM601kpEXonIGBHyRdWRqsK5/59XAIAxpgCQA4CI7LQxCgoKCgoK/mX+BKdUlkiw+DrsAAAAAElFTkSuQmCC';
+                rockore2im.onload = () => {
+                    rockore2can = document.createElement('canvas');
+                    rockore2can.width = rockore2im.width;
+                    rockore2can.height = rockore2im.height;
+                    let rockore2ctx = rockore2can.getContext('2d');
+                    rockore2ctx.clearRect(0, 0, rockore2can.width, rockore2can.height);
+                    rockore2ctx.drawImage(rockore2im, 0, 0);
+                };
+                iconore1im = new Image();
+                iconore1im.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABSUlEQVRYhe2XvUrEQBSFv1VIIVYWVjYp/BK29iLY2ItgJT6BhfgCPoCN2NlZWqmNolhoI4JYWE0x7IaJyWST7DjN3A9Cdpl75pw7w2QZGBgYGPifmFT7vAfmpvEO8JDynVV/iYgR8BQFisgo+v2iqvcNjbvWdqqaVxsBN8CS7bzSbajVvtQ0bh3VdwNvMSOcwLdZr8ArXgLOgZ0mVu8GXNt9UQckdD0D3/ZuGAI37Yk4twOSJKYN01n1m+8IXrBMa5LEN16WiHjzcwIOIvBBrIcT0Ts/P+BS50VCPyfgEPr1FvYS/x6BvUQZbwK85ifwTh2AP+A4+t3JqohsA5dArY3TNEXELvAITGs13bkdMDAwMDBQTQG8AUQi/fJSWhK6AAAAAElFTkSuQmCC';
+                iconore1im.onload = () => {
+                    iconore1can = document.createElement('canvas');
+                    iconore1can.width = iconore1im.width;
+                    iconore1can.height = iconore1im.height;
+                    let iconore1ctx = iconore1can.getContext('2d');
+                    iconore1ctx.clearRect(0, 0, iconore1can.width, iconore1can.height);
+                    iconore1ctx.drawImage(iconore1im, 0, 0);
+                };
+                iconore2im = new Image();
+                iconore2im.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABXUlEQVRYhe2WMU7DQBBFPw4SHRJFGhpSIFHlBDkNUlJxg9wgR8gNcoMcITSICzQ0FKRAVBAS2SLFerFjZbyOY2V+afR5Z/6+mXnr+jAYDAaD/5wILsAMfGvtPjHG12pKr8Ln4BsbY34kSfIKoOo6nqaPVh+qqmqUUkfBhJRa1fV1XusXsATfAnilYqrHGc6XZVmvlIJcvvDz6KLP5FJKURSF7aw7gJMQ8GNdSikNQJ7nbYC75rUH+NL3xGkNtC310JnhrXYuswFO67xIeONgRUQmznMPcBkDz2I+rIDW+TkBR9qv9nAv8esR2EuUM0bAGz8BX1QAflSHzvdWVt9EQohD4AHwVpXzNCXEPvAMpJGa0VgDg8FgMPhXWQOfGhn/snG9zgAAAABJRU5ErkJggg==';
+                iconore2im.onload = () => {
+                    iconore2can = document.createElement('canvas');
+                    iconore2can.width = iconore2im.width;
+                    iconore2can.height = iconore2im.height;
+                    let iconore2ctx = iconore2can.getContext('2d');
+                    iconore2ctx.clearRect(0, 0, iconore2can.width, iconore2can.height);
+                    iconore2ctx.drawImage(iconore2im, 0, 0);
+                };
+                iconore3im = new Image();
+                iconore3im.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABaElEQVRYhe2WPU7DQBCFHwcpOiSKNDSkQKLKCXIapKTiBrlBjpAb5AahQVygoaGgBaKCkMgWKdYfazXrxHYyT1rt+plvxrMeGAwGg8HgtzIGX8JYc1HO0xoB98A6IeZrFMB3TJ9LHReiwfDhU6fAOeACOK5yvpXUYzbZD/AO3AInNQewfI0TvJnPefAKnAHbeVoTATpK14Bp8bAHbHJHYS8CqtRPLTrAT1m5iyKgt6QEGTg/1sClGNQ5PyXgXPvVFk4S3xqBSSIbJwK885PZBAbgyL6/l7KqqiMhxB4wBSZrV9NpCiG2gRmwY4kxXw0MBoPB4E/zBRa0/3I58v5iAAAAAElFTkSuQmCC';
+                iconore3im.onload = () => {
+                    iconore3can = document.createElement('canvas');
+                    iconore3can.width = iconore3im.width;
+                    iconore3can.height = iconore3im.height;
+                    let iconore3ctx = iconore3can.getContext('2d');
+                    iconore3ctx.clearRect(0, 0, iconore3can.width, iconore3can.height);
+                    iconore3ctx.drawImage(iconore3im, 0, 0);
+                };
+                iconscrapim = new Image();
+                iconscrapim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABgklEQVRYhe2VvU7DMBSF36BI0DAwwMIMCOUEHAFGGDgCjHADjnADGGHiCDBCQ8UMtIgBAiEDqjBRxY/0pU6IU9exk/oXlp6/+D3bz36xg8FgMPwGAe7AH3z1KFOROeAC/CTEXIwC+IDJrZwnm6IiIJPz6lXGBViFwCEwU1H4CvgGPoEV78lG4L4DI2A7v5vz7dQFmHAG3Gu/rBMOgW3gNEIGUOwENE9UQKQz4AP4BuZTJXAX6SfnAlJ+ypMRCH7VIFk70x/AQkBY9/yMgFPtV1u4lfiWCLgSyUQIOM93AQEpBCzZ9fUo9DKXhBATwBEwXbmaTFMIMQocA7MBYaxXA4PBYDBEYgV4Bh7r1jkF9pXPJ0zDuv2zwSgAV2pq1oCjtkWOgcNBBEIELKlurlI2HVRAymQqZX/R2mBZdoGHQSMQExVTeQ+UOo4EREKIZQo3MZ2ICHCj42y+4X2AE+Uv1MWKT/Gea7vBaLrZKxEwGP41fgDRZFa8JDOuMAAAAABJRU5ErkJggg==';
+                iconscrapim.onload = () => {
+                    iconscrapcan = document.createElement('canvas');
+                    iconscrapcan.width = iconscrapim.width;
+                    iconscrapcan.height = iconscrapim.height;
+                    let iconscrapctx = iconscrapcan.getContext('2d');
+                    iconscrapctx.clearRect(0, 0, iconscrapcan.width, iconscrapcan.height);
+                    iconscrapctx.drawImage(iconscrapim, 0, 0);
+                };
+                iconelecim = new Image();
+                iconelecim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABfElEQVRYhe2WMU4DMRBF3w2XoOEQNBSEoMgT8BqkpOIFeQKegCfgCbgBKbgBDQUFISgoCIKEI1yRYr1x7azHYyfxS1bieefPeGbs5hgMBoPh73ABfMI0r1mXGAEn4DMh5qzkwBeZ+brmYiPgBXgtAXvAVkPhR+ALuAdm5MkmAo47sAdsZz+LY2e8AQ+qX9UO+8AmcBUhAyh3Apojq0LSPeAOfAKjVAncefrJuUBqnRnLCPi/6nVwcaM/gSsBYd3zCwJOtF9t4VrieyLgSyTjIeA935cEpBCwZN/NS5HkkhBiAlwBo9KrfpoWQqwBN8Ckh4z1amAwGAyGnpgCz8C9Up1rYFf73MJEd8zcV4ORAy7VVc/eeUkK7FmrgJaAlHWrSNk7WNVj7V3APrCv2qWqgJRcKgpAkz0wrgpI2tRx9mP1Z18XkDKjgBDiwjGKX53jVgIB3ABbwqVGEtAkAjmbFtfSV4GAwfBf+Aa1Zz3SyDE+4AAAAABJRU5ErkJggg==';
+                iconelecim.onload = () => {
+                    iconeleccan = document.createElement('canvas');
+                    iconeleccan.width = iconelecim.width;
+                    iconeleccan.height = iconelecim.height;
+                    let iconelecctx = iconeleccan.getContext('2d');
+                    iconelecctx.clearRect(0, 0, iconeleccan.width, iconeleccan.height);
+                    iconelecctx.drawImage(iconelecim, 0, 0);
+                };
+                explosionframe1im = new Image();
+                explosionframe1im.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAwUlEQVRYhe2WUQrDIBBEe1M9k96T16s9h6SkrauLEH+sAzMwRDcPwiNk+TuMMaYCT+AXpnWsWIbAvQ/YAqoHZCDwAkbHvFVeZ2AOkIjsRCQRKR6LR1MAFM+miLaBwERkrwq0BoTaXAF8qjnrAwCISDugBZA94wIAqj6ufswHqDqIyAhcgEsroAeg6igi38hUAhzNALdVIAAWwLwAiAY8i6o+fM3wQdWJ1msIVIdjTkRknQDTukTYo28eETkDN+D0J7HGGPM33oEhPsdVqITJAAAAAElFTkSuQmCC';
+                explosionframe1im.onload = () => {
+                    explosionframe1can = document.createElement('canvas');
+                    explosionframe1can.width = explosionframe1im.width;
+                    explosionframe1can.height = explosionframe1im.height;
+                    let explosionframe1ctx = explosionframe1can.getContext('2d');
+                    explosionframe1ctx.clearRect(0, 0, explosionframe1can.width, explosionframe1can.height);
+                    explosionframe1ctx.drawImage(explosionframe1im, 0, 0);
+                };
+                explosionframe2im = new Image();
+                explosionframe2im.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACOElEQVRYhe2VzYrUQBSFvxoFpV0o3U23Ql9AN2II4lLwBVyKvoC+gPgALoYBd6Mv4RsMLlyNr+BOBHHAhc5UFCSCmQ4KIUJXV8c/cZLqCxS3q5N7zz33VKpTH2RkZPw3qADHwBf5deTl+QsKwCnw7uH5DSoBs8CHhzFXpS4wuQUFYMHBJA0VlM/AbsrBAFBrc/r04S9kfcIfD7U2Z5qI94KqqrYPZrHV6A+BG7drB/BaKyDfMpGLoqBer6PUr6cSER4fHymKgkajYe71XKqYqpq6TauaqroFbNm/j4vF4h3wBLSAETC21m4B80CQmvj/RQBYF5E3ItIC8sYYRGQMPIjI3hSa/4CI7IrIuTVS45sBwBizBewD+5eXl0/lcnmn0WhsAOfAfJr9/0P/AaAAVCqVrcPDw7dWq7XY7XZpNptKRGYGKACVcrnMwcHBU6vV+mi328zNzaWWFCRhv4NarTYGesAV8Pz4+EipVAIgz3Nv9qmLqFAo0O/3KRaLjEYjBoPBNOcDYoQv9vv9stXgEXhS1+v1L6JGo/HWarXIsuzfJbC3J/9cE7kgX2w7k5nMJTExWTmMi2uvXcYmWZlkZZ2iH7bq48YuJ/YArUKqZ1Qjn1rOwySrCUwQN7YekzjJyuAw/2qpyMjIyPhZ/ATdJX7pBxvJqgAAAABJRU5ErkJggg==';
+                explosionframe2im.onload = () => {
+                    explosionframe2can = document.createElement('canvas');
+                    explosionframe2can.width = explosionframe2im.width;
+                    explosionframe2can.height = explosionframe2im.height;
+                    let explosionframe2ctx = explosionframe2can.getContext('2d');
+                    explosionframe2ctx.clearRect(0, 0, explosionframe2can.width, explosionframe2can.height);
+                    explosionframe2ctx.drawImage(explosionframe2im, 0, 0);
+                };
+                explosionframe3im = new Image();
+                explosionframe3im.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACZklEQVRYhe2VvWsUQRjGfyc5gmchkLtcjmjKnCmDENBgbeEfYKNgIVZaCdqIYKOdhVYiWqiVgpA/QRvRxlZBsLAXrYJ6l0sIGMJdvMTL5aydw+7lNruzs7uzexdYmGKZed99n33fmXlnByIiIv5XJIEl4BqwCfyOt03gKrAIJH8/tFrwwCpNM/At3rJ11hwh/lV8h6PBANaBOfO0B5ZDgmTy5oD3gPbAVeAiEG6kVkE/oDywPmZsDTPNR8E6xm0F80QpWoH8/w4gG4BG9GUO2ABuAS+A0/FY5xVQCcMyDGvAM+BxgMTePeBrnXUCkBZfYBGPqYpIXE1E8Uaapqlardap/yJQjYgiOZEoSZPY5ouUpISIhk4O5uEkIJHbcCTPxc5bAdTOUB9/CcyLRN8xRgQYh681c9kAtgQeYV6n2hAT8U2wQFwVG8QUMSfQtBRRiUg4FZGKatKqNO6DFN+Y7nxqx7MXPy9ZvIkJgZZJVfM5T8cE0CG9Py2lQCt+WiJLvpVdgZmfgJmAvIyR71BxCBmUgZtMwxfKCUgLUEAHIEBg6BHfFijVTUIJb0mgr2kPFV1P4Icd7qfO8Mx5V7qHUz0xBSuAD3Y1VbPyKsKz5N2YyStT4FmNhYaZAGP3KQrPWvZMKVlEvQ6RvC++LS+iK88kbz0Iqfim4abgQzjnRMSjpnlJn6TQbhOtB6XACd6qadMTUrqFVIuHtaL+H08jYVUIaqEUnj62JHgV0ipQFLgWcVp4EbnmXGZERET8q/gBUkNlQR3GYr8AAAAASUVORK5CYII=';
+                explosionframe3im.onload = () => {
+                    explosionframe3can = document.createElement('canvas');
+                    explosionframe3can.width = explosionframe3im.width;
+                    explosionframe3can.height = explosionframe3im.height;
+                    let explosionframe3ctx = explosionframe3can.getContext('2d');
+                    explosionframe3ctx.clearRect(0, 0, explosionframe3can.width, explosionframe3can.height);
+                    explosionframe3ctx.drawImage(explosionframe3im, 0, 0);
+                };
+                spacestationltim = new Image();
+                spacestationltim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAAC4UlEQVRIibWWv2sUQRTHPzMnCAmi+QMPwUZsrNJaiHCNjWBhqWhhZ2NjK/4HYqGNNmJhZSGijTZWFlaihY1gIUgaEQ+PxDu/ZWd2Z3bmvTdwb/dl38eb+c7Me/v9fhTJzBLgBvAIKIBf+V8BPAYeAkmMLoQZyDfNPR1LRkSuiMgHEdkTkT/5Z8/PvRAR7aqRmZ0h5SuAW8ArVT3dZiAiY+BdvjzreE8i0Kd+4D0wabTmj6pVERkBW8AecE5VPzcbmw6+Bx4A90VkhV/3++x/ICJLQAH8xJ1d1ItzuCEim8BK3rNnZmdqdlUHgFsAqvoEeGhmqyJyF8eIExG5DzxX1W+d9O+RqpaqWqiqquqcqj71eEyAJwCqepN/GERnMeqTqm6o6jMRGfd4LHBRKrEJLDURiO1wI1X9oKofgUXgrsd2s8GgA0EcyAbAKbcAVgk4sQ+cmyX/ICLzwFVcGE69pqo6bPJdxFE97hAqFsAR8DWEUZVURCbABi6ZOqGqw5o/VX1dW0+AWb3AKtDrbdvkEjACRsBiJD+xyL+TBwCHMfzE8qCqVV5MgWlqPxGRRQYQIiAi173YD1T1wJe3EVDVLVUdxfCTtWFmJ72eXwn8BBbabIPKCaEYqmpvBj0Cw7yfHpP/6HCiVRTkRy6iqgdtLbQmOa4uNoTHfUFEFkRkA3gb0gJ4XHlG4qOvkbqDVqp6eBxneql5G7iaj3RVlUxo57zB4AjE5sLcwBLpf5WIzAOTALwVgdgSmHdNdJFRtTABVurzZqrXwZf1VoArZrY9q+MZL68Bdvx1m3RwPp/oVuAe/rnbq341Z7eA06EO5OM8CXjRnSoTjVwNDnQfwSMuAh9F5ORMXkUumNmHPxrp40sH23lV3Z0hUZbN7DSunM/kLRu0+pqvR5FEZBmYd/WxVr92cGfdQEVu4eYhTGBgZjtmtmtm1tPv1n+KxT8R2W+twgAAAABJRU5ErkJggg==';
+                spacestationltim.onload = () => {
+                    spacestationltcan = document.createElement('canvas');
+                    spacestationltcan.width = spacestationltim.width;
+                    spacestationltcan.height = spacestationltim.height;
+                    let spacestationltctx = spacestationltcan.getContext('2d');
+                    spacestationltctx.clearRect(0, 0, spacestationltcan.width, spacestationltcan.height);
+                    spacestationltctx.drawImage(spacestationltim, 0, 0);
+                };
+                spacestationrtim = new Image();
+                spacestationrtim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAAC7klEQVRIibWWMWgUQRSGvzObEBST+AcpUthYWFikSprYWNjZ2mgR/4PUNhYJaQQLGwtJGjtBECsrCyGNjSJEgoKghUKwnPfN7MzszO7b97zCvXLP9+bNfN+8ebOOlKbpMeAicF9E1oBN4AfQAwrgGXAHOJKmqRvHg0+g6j/1Pxw7GRHJReSRiKyLyFZUtkXklYhcExEfquP9/iR+BnSAa8ASsBjprQcREeAFcB7ouExSj4AfbQx8F5FFR+fGGxFjTAJUImICZxnBfWQcAzcxpgDmInDXGDMPzAIzxphFY0xuWgx4ElVV9Y0xX8gu02U3gXIwGPTSNN3N83zOY5AZY35GQN9XVbmqbvi6NE2PA09jXVEUN4DzxpgrREB7pKrbqvqxKAp1gFdVNQF4IyKvVXU7BE7TdMVpIm21AMxH6vPAS1+hqnmEX+WCAFzz31cDgEXgQyDs/AhcSlxVLYAq6gBsmDEGm4FlX2SMOQlcjsDXROQPkDbm+p6ITFR1mHn1wk1NiWHvAj9qNSLyIMIvGpwHFoCPgWSbT4CZuj5N012AoigAHhpjzEQEgDvAU4+AiQCvBfdFRIYEdkyMoT3wlLmIfGsL0jpdpgHfVwI74/pSESS0Ax7ocfwTdCBN0xS4PYlQGwELVquVWsDSJPwkAsuTgoYIDHtcDsA3JJtlWZfRvdCWxDT9zCGw5yOwYoEjeN+S+HEEttqIBMCnRKQf8n+IADa3cULlAPAKeO8DDiOwDJxoyapRl4F3wJfRClRV1QMuAS8jvdoYOQIbqb4DzgyL+6IoSuB6h9f7uwQc2A1V/T3OvXnS1Y04PkENzS3gKUMHp5eIgxMRVwEXBnDLvlKO0sFxQVX7wJp16tmvXwP2mhgRkRy4BCz4Bjln3FpoVfCJjSMROQB+twE7/1eA65/pf/bKJjR2i79cAAAAAElFTkSuQmCC';
+                spacestationrtim.onload = () => {
+                    spacestationrtcan = document.createElement('canvas');
+                    spacestationrtcan.width = spacestationrtim.width;
+                    spacestationrtcan.height = spacestationrtim.height;
+                    let spacestationrtctx = spacestationrtcan.getContext('2d');
+                    spacestationrtctx.clearRect(0, 0, spacestationrtcan.width, spacestationrtcan.height);
+                    spacestationrtctx.drawImage(spacestationrtim, 0, 0);
+                };
+                spacestationlbim = new Image();
+                spacestationlbim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAADBklEQVRIibWWP2gUQRTGfzObIChqTLSysLFJYmSCNjWgKG8HKxs5C8D9IZSFqESxstLBSUCutLCwEBW0UNERQLNTAHe/N7M7M7My+9wr3ypv5vjfz3rz5pkXyPD8M3AFeAD3gd/7XB14DN4H9eZ67cZw6BMKxYveNRkREbojIdxH5LSJ/8m8vv3stIn5VI3M4CvwbQAncAZ6r6olUA0QkA57lnxODLgkA/Tf94AUQFGDwUBSq2gFmgV/ACVVdS/S2A/wA3AXuiEiXv/vbHjggIocABTaAZRsEoDCzqrqJNeorVQ2zs+l9OwAcB1DVV8CMiHRF5CaWESkicgt4qaqrjfTvqVAVeZ4rUI4gp9KOIuFBVc+p6nMRSWNyZcRRFUrVeVWdDeWgqhc9wZfAfn8gFKGqC6p6X0SStsCqKl4CqrqgqvcSgKdEZBZrjj+AS8BkG8n0LcQf2HL8I5gHZoChfbvAO2A3kp4mSURkGsh80VW1SgHUAa4Bv2IBFAX8Aj5FclMLY8zWM9rkthNxPGgCXlTV2gzYLFXAbvSw34PfAE4lwDcBzgPPE4BrgM+xiowxfhaeRwEMy7c3AXjBB9juoqo+acyrBfi8M/NNKcSAh8ANa3a7DuC3xpjhfwFsjPGODtBV1T99N2vPuLEzDaifBWPMWFsUbM8CIjJpz/kMBPkY9wGMMWPAr9iebSB7tI6BOmmA14Gldek6ZLYemIMBbnwn5jN5UtUmgDPGmGf29EZkPxTBs406r4H3bOuBz8DJtuIdmv8EOAqcABCRw8DRFu64KICqvibusq1m1Dqc4MjH9LV1AqxM+s9pJMNFljtyv4OHPVX90RStzbwfJ4hPtdAHeQr4GguCiIhi/b+vqmWbgw0AK17lfFTVsrWBFOFVzp4HbgEnE+H3sJFY7ApSHv5T4BpwOQV0BCLAc+BzKPsJ/VuEe77f9ZwJTjXPECJyCCiMMX5I12rMPGOJe0FsgAk7zNqA1/0DKjAXQpVMngkAAAAASUVORK5CYII=';
+                spacestationlbim.onload = () => {
+                    spacestationlbcan = document.createElement('canvas');
+                    spacestationlbcan.width = spacestationlbim.width;
+                    spacestationlbcan.height = spacestationlbim.height;
+                    let spacestationlbctx = spacestationlbcan.getContext('2d');
+                    spacestationlbctx.clearRect(0, 0, spacestationlbcan.width, spacestationlbcan.height);
+                    spacestationlbctx.drawImage(spacestationlbim, 0, 0);
+                };
+                spacestationrbim = new Image();
+                spacestationrbim.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAAC9UlEQVRIibWWv4sUSRTHP9Xdk4urcbqKiIKwoKCNf4CuNjY2goiNjY02gqKgNjaCNjYi2NgIgoiCiDY2LiLsKrhnERS8O2d6Xld1VeVDT+/N9QzsfKh01Xuv6tP1qvrVS6c8zw8Cp4E7wALwK/+tgFfADeAQ4MbxoDHvG7cJh9EopTyllD6mlDZSSmsppY38m9L8M6WU2nRi/v/YKvAamALXgVkgsvp9oA88BVZ6vV6zUQo4cGt7wBNgWqM7Sil1jTEBsOCMcca0VgFj5ZkDVmJO4Jxz+bMXQMsY07HWBseswWbqfhN2kL4CLmEd6xtjJsaYLtAzxkyMMcGfRRs1wNBw5eUDY3p04HBVVV0AzlprYzAKNVOJb6JAWZbEcew2m2EY1q1o3lqbK6VmpZQ3gXe1i/u4lVL6nFJaDhzkeZ5baztKqQullA/yPC+01ovOuRuO0e+UUkv9fv8gYJx4zjkNPI/jONFaN1bX6/UOAU+AnpO6KIr9vu0YY/4aY7rGmNA5dxxoPQlSAMdqLEg7PT198K8duYHtAC9qtS7K+Q9g6F5+EgSxAnw1sVKqBaxPAnA7gcDqWPWmwwDcPxynRjWfZALnTrjf44Qd8AqbY4ELwPUmLbDWvgX+pzrUAqhHJfwdcU+Q+OFxAOr1SQD+JRBPAvAwge9NAI8CgNXV1Q5wyydxXYqiWJv0hpRledFa+8QYo/wzvgGXR3HtlVJLSilprRdHjFZZlsuX43hjfxoHcRrwWGsdt6FYj48VgKqqdCwGxgDIcRfBgzruFQDW2sJaGywuLrYGp7IsO8DKeC9Ya+MA9gD3tgMgI3TgLvDJtZsikAOXnHNvJ3Sg3+8fAO76/mOtFeAS8Mwjcr4xFSbwEDg2qs/Ksmxba6+WZdlcXO5AQ1pr4/F9n/vABRoSKYFnTjKtdWIYmKqUUvt3yAGfUaMNSqnKShYEQZN5HZEcMOb0QAJba+0KEM1ijAFkUgjwsWsZJAAURbEC6LF55hzA1tqtcR6SEg1DSSfFtP95xVp7H5jBznPz/a42pOHZWvsaeCMiPpPW7/f3AL/HbRRr7SrwdrPX7UBJxd/AYafzQQSWgeuM6URKaW5csCMiEdZpEay0B4FpSulFE/jt0G7ugIhEwC3gmFOsB7zCeuN89SLPfsDbPPOxWz7GmMQ5t9nOZttn9H98u/hPVh3dFJplwA4AAAAASUVORK5CYII=';
+                spacestationrbim.onload = () => {
+                    spacestationrbcan = document.createElement('canvas');
+                    spacestationrbcan.width = spacestationrbim.width;
+                    spacestationrbcan.height = spacestationrbim.height;
+                    let spacestationrbctx = spacestationrbcan.getContext('2d');
+                    spacestationrbctx.clearRect(0, 0, spacestationrbcan.width, spacestationrbcan.height);
+                    spacestationrbctx.drawImage(spacestationrbim, 0, 0);
+                };
+            }
+        }
+
+        // Helper functions
+        function edistance(x1, y1, x2, y2) {
+            return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+        }
+
+        function rectsoverlap(x1, y1, w1, h1, x2, y2, w2, h2) {
+            if (x1 >= (x2 + w2) || (x1 + w1) <= x2) return false;
+            if (y1 >= (y2 + h2) || (y1 + h1) <= y2) return false;
+            return true;
+        }
+
+        function getangle(x1, y1, x2, y2) {
+            return Math.atan2(y2 - y1, x2 - x1);
+        }
+
+        function angledifference(target, angle) {
+            let difference = target - angle;
+            while (difference < -Math.PI) {
+                difference += Math.PI * 2;
+            }
+            while (difference > Math.PI) {
+                difference -= Math.PI * 2;
+            }
+            return difference;
+        }
+
+        function circlerectcollide(cx, cy, cr, rx, ry, rw, rh) {
+            let closestx = Math.max(rx, Math.min(cx, rx + rw));
+            let closesty = Math.max(ry, Math.min(cy, ry + rh));
+            let distancex = cx - closestx;
+            let distancey = cy - closesty;
+            let distancesquared = (distancex * distancex) + (distancey * distancey);
+            return distancesquared < (cr * cr);
+        }
+
+        function isore(val) {
+            if (val === 7) return true;
+            if (val === 8) return true;
+            return false;
+        }
+
+        function pointintriangle2d(px, pz, x1, y1, x2, y2, x3, y3) {
+            let bc = x2 * y3 - y2 * x3;
+            let ca = x3 * y1 - y3 * x1;
+            let ab = x1 * y2 - y1 * x2;
+            let ap = x1 * pz - y1 * px;
+            let bp = x2 * pz - y2 * px;
+            let cp = x3 * pz - y3 * px;
+            let abc = Math.sign(bc + ca + ab);
+            if ((abc * (bc - bp + cp) >= 0) && (abc * (ca - cp + ap) >= 0) && (abc * (ab - ap + bp) >= 0)) return true;
+            return false;
+        }
+
+        function inic64colors() {
+            c64color = [
+                [0, 0, 0], // Black
+                [255, 255, 255], // White
+                [136, 0, 0], // Red
+                [170, 255, 238], // Cyan
+                [204, 68, 204], // Violet / Purple
+                [0, 204, 85], // Green
+                [0, 0, 170], // Blue
+                [238, 238, 119], // Yellow
+                [221, 136, 85], // Orange
+                [102, 68, 0], // Brown
+                [255, 119, 119], // Light red
+                [51, 51, 51], // Dark grey / Grey 1
+                [119, 119, 119], // Grey 2
+                [170, 255, 102], // Light green
+                [0, 136, 255], // Light blue
+                [187, 187, 187] // Light grey / grey 3
+            ];
+        }
+
+        function keyDown(key) {
+            return keysDown[key];
+        }
+
+        function keyReleased(key) {
+            if (keysDown[key]) {
+                keysReleased[key] = true;
+                return true;
+            }
+            return false;
+        }
+
+        let keysDown = {};
+        let keysReleased = {};
+        document.addEventListener('keydown', (e) => {
+            keysDown[e.code] = true;
+        });
+        document.addEventListener('keyup', (e) => {
+            keysDown[e.code] = false;
+        });
+
+        // Start the game
+        new MyWindow();
+    </script>
+</body>
+</html>
