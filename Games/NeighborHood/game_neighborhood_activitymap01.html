@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Individual Bot Parameters Simulation with Obstacles</title>
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+            border: 1px solid #444;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="simulation"></canvas>
+    <script>
+        // Canvas Setup
+        const canvas = document.getElementById('simulation');
+        const ctx = canvas.getContext('2d');
+        const screenWidth = 800;
+        const screenHeight = 600;
+        canvas.width = screenWidth;
+        canvas.height = screenHeight;
+
+        // Backbuffer Setup
+        const backBufferCanvas = document.createElement('canvas');
+        const backBufferCtx = backBufferCanvas.getContext('2d');
+        backBufferCanvas.width = screenWidth;
+        backBufferCanvas.height = screenHeight;
+
+        // Simulation Parameters
+        const numBots = 30;
+        const botRadius = 5;
+        const boundaryMargin = 100;
+
+        // 2D Array for Obstacles
+        let obstacleGrid = Array.from({ length: screenWidth }, () => Array(screenHeight).fill(0));
+        
+// Function to Add Obstacles with Hollow Rectangle and Openings
+function addRectangle(x, y, width, height, color) {
+    backBufferCtx.fillStyle = color;
+
+    // Draw the outer rectangle
+    backBufferCtx.fillRect(x, y, width, height);
+
+    // Clear the inner part to make it hollow, leaving a 5-pixel margin
+    backBufferCtx.clearRect(x + 5, y + 5, width - 10, height - 10);
+
+    // Create an opening on the top and bottom sides (opposite sides)
+    backBufferCtx.clearRect(x + Math.floor(width / 3), y, Math.floor(width / 3), 5); // Top opening
+    backBufferCtx.clearRect(x + Math.floor(width / 3), y + height - 5, Math.floor(width / 3), 5); // Bottom opening
+
+    // Mark the obstacle in the grid, excluding the hollow and openings
+    for (let i = x; i < x + width; i++) {
+        for (let j = y; j < y + height; j++) {
+            const isEdge = 
+                (i < x + 5 || i >= x + width - 5 || j < y + 5 || j >= y + height - 5);
+            const isTopOpening = 
+                (j >= y && j < y + 5 && i >= x + Math.floor(width / 3) && i < x + 2 * Math.floor(width / 3));
+            const isBottomOpening = 
+                (j >= y + height - 5 && j < y + height && i >= x + Math.floor(width / 3) && i < x + 2 * Math.floor(width / 3));
+            
+            if (isEdge && !isTopOpening && !isBottomOpening) {
+                if (i >= 0 && i < screenWidth && j >= 0 && j < screenHeight) {
+                    obstacleGrid[i | 0][j | 0] = 1; // Mark edges as obstacles
+                }
+            }
+        }
+    }
+}
+
+
+        // Draw Obstacles on Backbuffer
+        function drawObstacles() {
+            for (let i = 0; i < 5; i++) { // Add 5 random rectangles
+                const x = Math.random() * (screenWidth - 200) + 100;
+                const y = Math.random() * (screenHeight - 200) + 100;
+                const width = Math.random() * 50 + 50; // Width between 50 and 100
+                const height = Math.random() * 50 + 50; // Height between 50 and 100
+                const color = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.5)`;
+                addRectangle(x, y, width, height, color);
+            }
+        }
+
+        drawObstacles(); // Initialize obstacles
+
+
+
+
+        class Drawing {
+        constructor() {
+            this.isDrawing = false;
+            this.currentLine = [];
+            this.lines = [];
+        }
+
+        startDrawing(x, y) {
+            this.isDrawing = true;
+            this.currentLine = [{ x, y }];
+        }
+
+        draw(x, y) {
+            if (!this.isDrawing) return;
+            this.currentLine.push({ x, y });
+            //backBufferCtx.clearRect(0, 0, backBufferCanvas.width, backBufferCanvas.height);
+
+            // Redraw all previous lines
+            this.lines.forEach(line => {
+                backBufferCtx.beginPath();
+                for (let i = 0; i < line.length - 1; i++) {
+                    const start = line[i];
+                    const end = line[i + 1];
+                    backBufferCtx.moveTo(start.x, start.y);
+                    backBufferCtx.lineTo(end.x, end.y);
+                }
+                backBufferCtx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                backBufferCtx.lineWidth = 2;
+                backBufferCtx.stroke();
+            });
+
+            // Draw the current line
+            backBufferCtx.beginPath();
+            for (let i = 0; i < this.currentLine.length - 1; i++) {
+                const start = this.currentLine[i];
+                const end = this.currentLine[i + 1];
+                backBufferCtx.moveTo(start.x, start.y);
+                backBufferCtx.lineTo(end.x, end.y);
+            }
+            backBufferCtx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+            backBufferCtx.lineWidth = 2;
+            backBufferCtx.stroke();
+        }
+
+        stopDrawing() {
+            if (this.isDrawing && this.currentLine.length > 0) {
+                this.lines.push(this.currentLine);
+                this.currentLine = [];
+            }
+            this.isDrawing = false;
+        }
+    }
+
+
+
+
+
+
+
+
+    const drawing = new Drawing();
+
+    // Event Listeners for Drawing
+    canvas.addEventListener('mousedown', (e) => {
+        if (e.button === 0) { // Left mouse button
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            drawing.startDrawing(x, y);
+        }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+        if (drawing.isDrawing) {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            drawing.draw(x, y);
+        }
+    });
+
+    canvas.addEventListener('mouseup', (e) => {
+        if (e.button === 0) { // Left mouse button
+            drawing.stopDrawing();
+        }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        drawing.stopDrawing();
+    });
+
+
+
+
+
+        
+        // Bot Class
+        class Bot {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.vx = 0;
+                this.vy = 0;
+                this.velocity = Math.random();
+                this.heading = Math.random() * Math.PI * 2;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.radius = Math.random() * 50 + 30; // Circle radius between 30 and 80
+                this.circleColor = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 0.02 + 0.04})`; // Circle color with transparency
+            }
+
+            update(bots) {
+        let fx = 0;
+        let fy = 0;
+
+        // Adjust heading slightly
+        this.heading += (Math.random() - 0.5) * 0.1;
+        this.heading %= Math.PI * 2;
+
+        // Apply boundary constraints
+        if (this.x < boundaryMargin) fx += (boundaryMargin - this.x) * 0.1;
+        if (this.x > screenWidth - boundaryMargin) fx -= (this.x - (screenWidth - boundaryMargin)) * 0.1;
+        if (this.y < boundaryMargin) fy += (boundaryMargin - this.y) * 0.1;
+        if (this.y > screenHeight - boundaryMargin) fy -= (this.y - (screenHeight - boundaryMargin)) * 0.1;
+
+        // Avoid other bots
+        bots.forEach(otherBot => {
+            if (otherBot !== this) {
+                const dx = this.x - otherBot.x;
+                const dy = this.y - otherBot.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                // Apply repulsion force if bots are too close
+                const minDistance = 2 * botRadius + 10; // Minimum allowed distance between bots
+                if (distance < minDistance) {
+                    const repulsionStrength = 0.5; // Increase this to make repulsion stronger
+                    fx += (dx / distance) * (minDistance - distance) * repulsionStrength;
+                    fy += (dy / distance) * (minDistance - distance) * repulsionStrength;
+                }
+            }
+        });
+
+
+
+// Detect and follow lines
+let lineFollowed = false;
+    drawing.lines.forEach(line => {
+        for (let i = 0; i < line.length - 1; i++) {
+            const start = line[i];
+            const end = line[i + 1];
+
+            // Compute distance from bot to line segment
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const t = ((this.x - start.x) * dx + (this.y - start.y) * dy) / (length * length);
+            const nearestX = start.x + Math.max(0, Math.min(1, t)) * dx;
+            const nearestY = start.y + Math.max(0, Math.min(1, t)) * dy;
+            const distance = Math.sqrt((this.x - nearestX) ** 2 + (this.y - nearestY) ** 2);
+
+            // If close to the line, adjust heading
+            const threshold = 20; // Detection threshold
+            if (distance < threshold) {
+                const tangentX = dx / length;
+                const tangentY = dy / length;
+                this.heading = Math.atan2(tangentY, tangentX);
+                lineFollowed = true;
+                break;
+            }
+        }
+        if (lineFollowed) return;
+    });
+
+
+
+
+        // Compute movement
+        const speed = 0.2 + this.velocity;
+        this.vx = Math.cos(this.heading) * speed + fx;
+        this.vy = Math.sin(this.heading) * speed + fy;
+
+        // Update position
+        const newX = this.x + this.vx / 5;
+        const newY = this.y + this.vy / 5;
+
+        // Prevent movement into obstacles
+        if (newX >= 0 && newX < screenWidth && newY >= 0 && newY < screenHeight && obstacleGrid[Math.floor(newX)][Math.floor(newY)] === 0) {
+            this.x = newX;
+            this.y = newY;
+        } else {
+            this.heading += Math.PI; // Bounce back
+        }
+
+        // Ensure bot doesn't get stuck in an obstacle
+        this.ensureNotStuck();
+    }
+
+    ensureNotStuck() {
+        const xCell = Math.floor(this.x);
+        const yCell = Math.floor(this.y);
+
+        if (obstacleGrid[xCell] && obstacleGrid[xCell][yCell] === 1) {
+            // Bot is stuck inside an obstacle, find nearest open space
+            for (let r = 1; r < 20; r++) { // Search up to a radius of 20
+                for (let dx = -r; dx <= r; dx++) {
+                    for (let dy = -r; dy <= r; dy++) {
+                        const newX = xCell + dx;
+                        const newY = yCell + dy;
+                        if (newX >= 0 && newX < screenWidth && newY >= 0 && newY < screenHeight && obstacleGrid[newX][newY] === 0) {
+                            this.x = newX;
+                            this.y = newY;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+            draw() {
+                // Draw the bot
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, botRadius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                // Draw the transparent circle
+                ctx.beginPath();
+
+                ctx.arc(this.x-1, this.y-1, this.radius+2, 0, Math.PI * 2);
+                ctx.fillStyle = this.circleColor;
+
+                ctx.fill();
+
+    // Draw the transparent circle outline
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = this.circleColor; // Use the circle color for the outline
+    ctx.lineWidth = 2; // Set outline width
+    ctx.stroke(); // Draw the outline
+
+            }
+        }
+
+        // Create Bots
+        const bots = [];
+        for (let i = 0; i < numBots; i++) {
+            bots.push(new Bot(
+                Math.random() * (screenWidth - 2 * boundaryMargin) + boundaryMargin,
+                Math.random() * (screenHeight - 2 * boundaryMargin) + boundaryMargin
+            ));
+        }
+
+        // Main Simulation Loop
+        function simulate() {
+            // Draw Backbuffer (Obstacles)
+            ctx.fillStyle = "black";
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(backBufferCanvas, 0, 0);
+
+            // Update and draw bots
+            let speed = 50
+            for (let i = 0; i < speed; i++) {
+            bots.forEach(bot => {
+                bot.update(bots);
+                
+            });
+            }
+            bots.forEach(bot => {
+                
+                bot.draw();
+            });
+
+            // Draw Boundary
+            //ctx.strokeStyle = 'white';
+            //ctx.strokeRect(boundaryMargin, boundaryMargin, screenWidth - 2 * boundaryMargin, screenHeight - 2 * boundaryMargin);
+
+            // Loop
+            requestAnimationFrame(simulate);
+        }
+
+        // Start Simulation
+        simulate();
+    </script>
+</body>
+</html>
